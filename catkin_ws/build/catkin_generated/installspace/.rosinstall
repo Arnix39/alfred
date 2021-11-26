@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/arnix/src/alfred/catkin_ws/install/setup.sh
