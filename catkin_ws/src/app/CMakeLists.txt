@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(app)
+set(PROJECT_NAME app)
+project(${PROJECT_NAME})
 
 add_compile_options(-std=c++11)
 
@@ -35,7 +36,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES app
-#  CATKIN_DEPENDS roscpp std_msgs
+  CATKIN_DEPENDS roscpp std_msgs
 #  DEPENDS system_lib
 )
 
@@ -54,13 +55,13 @@ include_directories(
 # )
 
 # add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-# add_executable(${PROJECT_NAME}_node src/app_node.cpp)
+add_executable(${PROJECT_NAME}_node src/app_helloWorld.cpp)
 # set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-# target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(${PROJECT_NAME}_node
+  ${catkin_LIBRARIES}
+)
 
 #############
 ## Testing ##
@@ -68,5 +69,5 @@ include_directories(
 
 catkin_add_gtest(${PROJECT_NAME}-test test/test_app.cpp)
 if(TARGET ${PROJECT_NAME}-test)
-   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
+  target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES})
 endif()
