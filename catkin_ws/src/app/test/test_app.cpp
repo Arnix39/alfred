@@ -1,13 +1,16 @@
 #include <ros/ros.h>
 #include <gtest/gtest.h>
 
-// Declare a test
-TEST(TestApp, testCase1)
+TEST(TestApp, testApp_succeed)
 {
     SUCCEED();
 }
 
-// Run all the tests that were declared with TEST()
+TEST(TestApp, testApp_fail)
+{
+    FAIL();
+}
+
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
