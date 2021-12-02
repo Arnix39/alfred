@@ -67,7 +67,7 @@ target_link_libraries(${PROJECT_NAME}_node
 ## Testing ##
 #############
 
-catkin_add_gtest(${PROJECT_NAME}-test test/test_app.cpp)
+catkin_add_gmock(${PROJECT_NAME}-test test/test_app.cpp)
 if(TARGET ${PROJECT_NAME}-test)
   target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES})
 endif()
