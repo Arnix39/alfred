@@ -1,12 +1,11 @@
-#include <ros/ros.h>
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
-TEST(TestApp, testApp_succeed)
+TEST(TestApp, testApp_success)
 {
     SUCCEED();
 }
 
-TEST(TestApp, testApp_fail)
+TEST(TestApp, testApp_failure)
 {
     FAIL();
 }
@@ -14,7 +13,5 @@ TEST(TestApp, testApp_fail)
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
-    ros::init(argc, argv, "testApp");
-    ros::NodeHandle nh;
     return RUN_ALL_TESTS();
 }
