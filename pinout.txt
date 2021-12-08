@@ -1,8 +1,9 @@
 #############################################
-## 	      Raspberry Pi		    ##
+## 	      Raspberry Pi		   ##
 #############################################
 
 PIN	GPIO	Function		Color
+
 1	3V3	VCC MPU6050		purple
 2	5V	5V Distribution	red
 3	2	Data MPU6050		yellow
@@ -45,9 +46,11 @@ PIN	GPIO	Function		Color
 40	21		
 
 #############################################
-## 	      STM32F3 board		    ##
+## 	      STM32F3 board		   ##
 #############################################
+
 PIN	Function		Color
+
 5V	VCC HC-05 module	red
 GND	GND HC-05 module	black
 PA9	RX HC-05 module	yellow
