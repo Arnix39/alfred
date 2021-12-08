@@ -1,9 +1,13 @@
+#############################################
+## 	      Raspberry Pi		    ##
+#############################################
+
 PIN	GPIO	Function		Color
-1	3V3	VCC Accelerometer	purple
+1	3V3	VCC MPU6050		purple
 2	5V	5V Distribution	red
-3	2	Data Accelerometer	yellow
+3	2	Data MPU6050		yellow
 4	5V	
-5	3	Clock Accelerometer	grey
+5	3	Clock MPU6050		grey
 6	GND	GND Encoder motor 2	green
 7	4		
 8	14		
@@ -12,7 +16,7 @@ PIN	GPIO	Function		Color
 11	17	Encoder ch A motor 1	yellow
 12	18	Encoder ch B motor 1	white
 13	27		
-14	GND	GND Accelerometer	black
+14	GND	GND MPU6050		black
 15	22	Encoder ch A motor 2	yellow
 16	23	Encoder ch B motor 2	white
 17	3V3	3v3 Distribution	purple	
@@ -39,3 +43,14 @@ PIN	GPIO	Function		Color
 38	20		
 39	GND		
 40	21		
+
+#############################################
+## 	      STM32F3 board		    ##
+#############################################
+PIN	Function		Color
+5V	VCC HC-05 module	red
+GND	GND HC-05 module	black
+PA9	RX HC-05 module	yellow
+PA10	TX HC-05 module	green
+PB3	to SW0 (for ITM)	white
+
