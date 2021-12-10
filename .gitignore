@@ -1,3 +1,7 @@
 catkin_ws/build/
 catkin_ws/devel/
 catkin_ws/.vscode/
+catkin_ws/build_aarch64/
+catkin_ws/cc_internals/
+catkin_ws/install_aarch64/
+catkin_ws/log/

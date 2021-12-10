@@ -64,6 +64,14 @@ target_link_libraries(${PROJECT_NAME}_node
 )
 
 #############
+## Install ##
+#############
+install(TARGETS
+  ${PROJECT_NAME}_node
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+#############
 ## Testing ##
 #############
 
