@@ -10,6 +10,9 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
 )
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} )
+find_package(pigpio MODULE REQUIRED)
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -47,6 +50,7 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
+  ${pigpio_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -61,6 +65,15 @@ add_executable(${PROJECT_NAME}_node src/hal_helloWorld.cpp)
 
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
+  ${pigpio_LIBRAIRIES}
+)
+
+#############
+## Install ##
+#############
+install(TARGETS
+  ${PROJECT_NAME}_node
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 #############
