@@ -8,7 +8,7 @@ PIN	GPIO	Function		Color
 2	5V	5V Distribution 	red
 3	2	Data MPU6050		yellow
 4	5V	
-5	3	Clock MPU6050		grey
+5	3	Clock MPU6050		white
 6	GND	GND Encoder motor 2	green
 7	4		
 8	14		
@@ -22,7 +22,7 @@ PIN	GPIO	Function		Color
 16	23	Encoder ch B motor 2	white
 17	3V3	3V3 Distribution	purple	
 18	24		
-19	10		
+19	10	OE Level Shifter	grey	
 20	GND	GND Level shifter	black	
 21	9	PWM A motor 1		brown
 22	25	PWM B motor 1		orange
