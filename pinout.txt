@@ -5,9 +5,9 @@
 PIN	GPIO	Function		Color
 
 1	3V3	VCC MPU6050		purple
-2	5V	5V Distribution 	red
+2	5V	5V Level Shifter 	red
 3	2	Data MPU6050		yellow
-4	5V	
+4	5V	5V Ultrasonic sensor	red
 5	3	Clock MPU6050		white
 6	GND	GND Encoder motor 2	green
 7	4		
