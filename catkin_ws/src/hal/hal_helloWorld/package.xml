@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>hal_pigpio</name>
+  <name>hal_helloworld</name>
   <version>0.0.1</version>
-  <description>HAL PiGpio package for Alfred</description>
+  <description>HAL Hello World package for Alfred</description>
 
   <!-- Maintainer, author and license information -->
   <maintainer email="arnaud.hote@gmail.com">Arnix</maintainer>

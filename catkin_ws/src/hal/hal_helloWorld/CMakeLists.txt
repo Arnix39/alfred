@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-set(PROJECT_NAME hal_pigpio)
+set(PROJECT_NAME hal_helloworld)
 project(${PROJECT_NAME})
 
 add_compile_options(-std=c++11)
@@ -10,9 +10,6 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   message_generation
 )
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} )
-find_package(pigpio MODULE REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -28,21 +25,12 @@ find_package(pigpio MODULE REQUIRED)
 #   Message2.msg
 # )
 
-## Generate services in the 'srv' folder
-add_service_files(
-   FILES
-   hal_pigpioGetHandle.srv
-   hal_pigpioSetInputMode.srv
-   hal_pigpioSetOutputMode.srv
-   hal_pigpioSetPwmDutycycle.srv
-   hal_pigpioSetPwmFrequency.srv
- )
 
 ## Generate added messages and services with any dependencies listed here
-  generate_messages(
-   DEPENDENCIES 
-   std_msgs
- )
+#  generate_messages(
+#   DEPENDENCIES 
+#   std_msgs
+# )
 
 ###################################
 ## catkin specific configuration ##
@@ -70,19 +58,19 @@ include_directories(
 # )
 
 # add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_executable(${PROJECT_NAME}_node src/hal_helloWorld.cpp)
 # set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
-add_executable(${PROJECT_NAME}Init_node src/hal_pigpioInit.cpp)
-add_dependencies(${PROJECT_NAME}Init_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(${PROJECT_NAME}Init_node
+target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
   ${pigpio_LIBRAIRIES}
 )
+
 
 #############
 ## Install ##
 #############
 install(TARGETS
-  ${PROJECT_NAME}Init_node
+  ${PROJECT_NAME}_node
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
