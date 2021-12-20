@@ -21,4 +21,4 @@ Alfred is composed of the following components:
 - UBEC with a 5V output
 - 4 18650 batteries
 
-The remote used to control Alfred is a [STM32F3 Discovery board](https://gitlab.com/arnixroboticslab/alfred/-/blob/master/Datasheets/STM32F3_Disc_manual.pdf) to which a [HC05](https://gitlab.com/arnixroboticslab/alfred/-/blob/master/Datasheets/HC05_DS.pdf) bluetooth module.
+The remote used to control Alfred is a [STM32F3 Discovery board](https://gitlab.com/arnixroboticslab/alfred/-/blob/master/Datasheets/STM32F3_Disc_manual.pdf) to which a [HC05](https://gitlab.com/arnixroboticslab/alfred/-/blob/master/Datasheets/HC05_DS.pdf) bluetooth module is connected.
