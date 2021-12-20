@@ -1,4 +1,4 @@
-int32 gpioId
-int32 frequency
+uint16 gpioId
+uint16 frequency
 ---
 bool result

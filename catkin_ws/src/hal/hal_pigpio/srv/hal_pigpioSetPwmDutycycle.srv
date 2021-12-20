@@ -1,4 +1,4 @@
-int32 gpioId
-int32 dutycycle
+uint16 gpioId
+uint8 dutycycle
 ---
 bool result
