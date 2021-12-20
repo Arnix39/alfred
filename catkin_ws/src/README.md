@@ -1,1 +1,1 @@
-This directory contains the source file of the ROS `catkin` workspace.
+This directory contains the source files directory of the ROS `catkin` workspace.
