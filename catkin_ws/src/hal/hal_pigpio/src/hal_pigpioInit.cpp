@@ -84,7 +84,6 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "hal_pigpioInit");
     ros::NodeHandle node;
 
-    ros::Rate loop_rate(1000);
     pigpio_handle = pigpio_start(NULL, NULL);
 
     ros::ServiceServer getHandleService = node.advertiseService("hal_pigpioGetHandle", getHandle);
