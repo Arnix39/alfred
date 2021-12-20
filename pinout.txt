@@ -55,5 +55,3 @@ PIN	Function		Color
 GND	GND HC-05 module	black
 PA9	RX HC-05 module 	yellow
 PA10	TX HC-05 module 	green
-PB3	to SW0 (for ITM)	white
-
