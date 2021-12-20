@@ -36,6 +36,8 @@ add_service_files(
    hal_pigpioSetOutputMode.srv
    hal_pigpioSetPwmDutycycle.srv
    hal_pigpioSetPwmFrequency.srv
+   hal_pigpioI2cOpen.srv
+   hal_pigpioI2cClose.srv
  )
 
 ## Generate added messages and services with any dependencies listed here
@@ -78,11 +80,19 @@ target_link_libraries(${PROJECT_NAME}Init_node
   ${pigpio_LIBRAIRIES}
 )
 
+add_executable(${PROJECT_NAME}I2c_node src/hal_pigpioI2c.cpp)
+add_dependencies(${PROJECT_NAME}I2c_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(${PROJECT_NAME}I2c_node
+  ${catkin_LIBRARIES}
+  ${pigpio_LIBRAIRIES}
+)
+
 #############
 ## Install ##
 #############
 install(TARGETS
   ${PROJECT_NAME}Init_node
+  ${PROJECT_NAME}I2c_node
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
