@@ -14,9 +14,8 @@ static int pigpio_handle;
 bool i2cOpen(hal_pigpio::hal_pigpioI2cOpen::Request &req,
              hal_pigpio::hal_pigpioI2cOpen::Response &res)
 {
-    int i2cHandle = i2c_open(pigpio_handle, req.bus, req.address, 0);
-    res.handle = i2cHandle;
-    if (i2cHandle >= 0)
+    res.handle = i2c_open(pigpio_handle, req.bus, req.address, 0);
+    if (res.handle >= 0)
     {
         res.result = true;
     }
