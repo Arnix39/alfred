@@ -1,0 +1,1 @@
+This directory contains the ROS `catkin` workspace.
