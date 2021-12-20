@@ -21,5 +21,5 @@ Alfred is composed of the following components:
 The remote used to control Alfred is a [STM32F3 Discovery board](https://gitlab.com/arnixroboticslab/alfred/-/blob/master/Datasheets/STM32F3_Disc_manual.pdf) to which a [HC05](https://gitlab.com/arnixroboticslab/alfred/-/blob/master/Datasheets/HC05_DS.pdf) bluetooth module is connected.
 
 ## Tooling
-[`ros_cross_compile`](https://github.com/ros-tooling/cross_compile) is used to compile the project for the Raspberry Pi.
-`Cargo` is used to compile the remote's `Rust` code.
+[`ros_cross_compile`](https://github.com/ros-tooling/cross_compile) is used to compile the project (`C++¬) for the Raspberry Pi.
+`Cargo` is used to compile the remote's code (`Rust`).
