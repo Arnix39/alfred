@@ -6,9 +6,6 @@ This project's main goal is for me to learn (or consolidate) and apply new skill
 - ROS, OpenCV and Google Test
 - C++, Rust and UML
 
-## Tooling
-[`ros_cross_compile`](https://github.com/ros-tooling/cross_compile) is used to compile the project for the Raspberry Pi.
-
 ## Hardware
 Alfred is composed of the following components:
 - 2 motors GA25-371 (with quadrature encoders)
@@ -22,3 +19,7 @@ Alfred is composed of the following components:
 - 4 18650 batteries
 
 The remote used to control Alfred is a [STM32F3 Discovery board](https://gitlab.com/arnixroboticslab/alfred/-/blob/master/Datasheets/STM32F3_Disc_manual.pdf) to which a [HC05](https://gitlab.com/arnixroboticslab/alfred/-/blob/master/Datasheets/HC05_DS.pdf) bluetooth module is connected.
+
+## Tooling
+[`ros_cross_compile`](https://github.com/ros-tooling/cross_compile) is used to compile the project for the Raspberry Pi.
+`Cargo` is used to compile the remote's `Rust` code.
