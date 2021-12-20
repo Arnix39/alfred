@@ -1,0 +1,4 @@
+int32 gpioId
+int32 frequency
+---
+bool result
