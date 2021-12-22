@@ -1,0 +1,1 @@
+This directory contains the `hal` components related to the proximity sensor (`HC-SR04`).

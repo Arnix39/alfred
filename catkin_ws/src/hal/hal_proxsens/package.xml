@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>hal_proxsens</name>
+  <version>0.0.1</version>
+  <description>HAL Proximity sensor package for Alfred</description>
+
+  <!-- Maintainer, author and license information -->
+  <maintainer email="arnaud.hote@gmail.com">Arnix</maintainer>
+  <author email="arnaud.hote@gmail.com">Arnix</author>
+  <license>BSD</license>
+
+  <!-- Dependencies -->
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+
+</package>
