@@ -20,6 +20,11 @@ Alfred is composed of the following components:
 
 The remote used to control Alfred is a [STM32F3 Discovery board](https://gitlab.com/arnixroboticslab/alfred/-/blob/master/Datasheets/STM32F3_Disc_manual.pdf) to which a [HC05](https://gitlab.com/arnixroboticslab/alfred/-/blob/master/Datasheets/HC05_DS.pdf) bluetooth module is connected.
 
+## Software
+The software powering Alfred is using [ROS Noetic](http://wiki.ros.org/noetic) running on [Ubuntu server 20.04 LTS](https://ubuntu.com/download/raspberry-pi) for Raspberry Pi.
+The code is using some librairies:
+- [pigpio](http://abyz.me.uk/rpi/pigpio/index.html): a library used to control the GPIOs of the Rapsberry Pi
+
 ## Tooling
-[`ros_cross_compile`](https://github.com/ros-tooling/cross_compile) is used to compile the project (`C++`) for the Raspberry Pi.
-`Cargo` is used to compile the remote's code (`Rust`).
+[`ros_cross_compile`](https://github.com/ros-tooling/cross_compile) is used to compile the project (that is written in `C++`) for the Raspberry Pi on a desktop machine. The executable are then deployed manually to the Raspberry Pi.
+`Cargo` is used to compile the remote's code (written in `Rust`).
