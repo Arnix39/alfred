@@ -8,12 +8,12 @@ This project's main goal is for me to learn (or consolidate) and apply new skill
 
 ## Hardware
 Alfred is composed of the following components:
-- 2 motors GA25-371 (with quadrature encoders)
-- MDD3A drive
+- 2 motors [GA25-371](https://www.seeedstudio.com/JGA25-371-Geared-Motor-with-Encoder-p-4125.html) (with quadrature encoders)
+- [MDD3A drive](https://gitlab.com/arnixroboticslab/alfred/-/blob/master/Datasheets/mdd3a.pdf)
 - [MPU6050](https://gitlab.com/arnixroboticslab/alfred/-/blob/master/Datasheets/MPU-6000-Datasheet1.pdf) accelerometer + gyroscope
 - [HC-SR04](https://gitlab.com/arnixroboticslab/alfred/-/blob/master/Datasheets/HCSR04.pdf) ultrasonic sensor
-- Raspberry Pi Camera V2
-- Raspberry Pi 3B
+- [Raspberry Pi Camera V2](https://www.raspberrypi.com/products/camera-module-v2/)
+- [Raspberry Pi 3B+](https://www.raspberrypi.com/products/raspberry-pi-3-model-b-plus/)
 - [TXB0104](https://gitlab.com/arnixroboticslab/alfred/-/blob/master/Datasheets/txb0104.pdf) level shifter
 - UBEC with a 5V output
 - 4 18650 batteries
