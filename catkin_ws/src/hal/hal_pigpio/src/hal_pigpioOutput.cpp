@@ -8,6 +8,8 @@
 #include "hal_pigpio/hal_pigpioGetHandle.h"
 #include "hal_pigpio/hal_pigpioSetPwmDutycycle.h"
 #include "hal_pigpio/hal_pigpioSetPwmFrequency.h"
+#include "hal_pigpio/hal_pigpioSetGpioHigh.h"
+#include "hal_pigpio/hal_pigpioSetGpioLow.h"
 
 static int pigpio_handle;
 
@@ -41,6 +43,34 @@ bool setPwmFrequency(hal_pigpio::hal_pigpioSetPwmFrequency::Request &req,
     return true;
 }
 
+bool setGpioHigh(hal_pigpio::hal_pigpioSetGpioHigh::Request &req,
+                 hal_pigpio::hal_pigpioSetGpioHigh::Response &res)
+{
+    if ((gpio_write(pigpio_handle, req.gpioId, PI_HIGH) != 0))
+    {
+        res.result = true;
+    }
+    else
+    {
+        res.result = false;
+    }
+    return true;
+}
+
+bool setGpioLow(hal_pigpio::hal_pigpioSetGpioLow::Request &req,
+                hal_pigpio::hal_pigpioSetGpioLow::Response &res)
+{
+    if ((gpio_write(pigpio_handle, req.gpioId, PI_LOW) != 0))
+    {
+        res.result = true;
+    }
+    else
+    {
+        res.result = false;
+    }
+    return true;
+}
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "hal_pigpioI2c");
@@ -53,6 +83,8 @@ int main(int argc, char **argv)
 
     ros::ServiceServer setPwmDutycycleService = node.advertiseService("hal_pigpioSetPwmDutycycle", setPwmDutycycle);
     ros::ServiceServer setPwmFrequencyService = node.advertiseService("hal_pigpioSetPwmFrequency", setPwmFrequency);
+    ros::ServiceServer setGpioHighService = node.advertiseService("hal_pigpioSetGpioHigh", setGpioHigh);
+    ros::ServiceServer setGpioLowService = node.advertiseService("hal_pigpioSetGpioLow", setGpioLow);
 
     ros::spin();
 
