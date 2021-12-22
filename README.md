@@ -25,7 +25,7 @@ The software powering Alfred is using [ROS Noetic](http://wiki.ros.org/noetic) r
 The Pi's code is using some librairies:
 - [pigpio](http://abyz.me.uk/rpi/pigpio/index.html): a library used to control the GPIOs of the Rapsberry Pi
 
-I am planning to use [Hubris](https://oxidecomputer.github.io/hubris/)(a small OS written in `Rust`) to run on the remote.
+I am planning to use [Hubris](https://oxidecomputer.github.io/hubris/) (a small OS written in `Rust`) to run on the remote.
 
 ## Tooling
 [`ros_cross_compile`](https://github.com/ros-tooling/cross_compile) is used to compile the project (that is written in `C++`) for the Raspberry Pi on a desktop machine. The ROS packages are then deployed manually to the Raspberry Pi.

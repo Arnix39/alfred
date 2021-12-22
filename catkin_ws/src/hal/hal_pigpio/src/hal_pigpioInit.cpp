@@ -56,7 +56,7 @@ int main(int argc, char **argv)
 
     if (pigpio_handle < 0)
     {
-        ROS_ERROR("Failed to start PiGpio daemon");
+        ROS_ERROR("Failed to start pigpio daemon");
         return 1;
     }
 
