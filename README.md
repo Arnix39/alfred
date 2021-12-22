@@ -1,5 +1,5 @@
 ## What is Alfred?
-Alfred is a self balanced two-wheels robot based around a Raspberry Pi. It can move autonomously or be remotely controlled.
+Alfred is a self balanced two-wheels robot based around a Raspberry Pi. It will be able to move autonomously or be remotely controlled.
 
 ## Aim of the project
 This project's main goal is for me to learn (or consolidate) and apply new skills:
@@ -22,9 +22,11 @@ The remote used to control Alfred is a [STM32F3 Discovery board](https://gitlab.
 
 ## Software
 The software powering Alfred is using [ROS Noetic](http://wiki.ros.org/noetic) running on [Ubuntu server 20.04 LTS](https://ubuntu.com/download/raspberry-pi) for Raspberry Pi.
-The code is using some librairies:
+The Pi's code is using some librairies:
 - [pigpio](http://abyz.me.uk/rpi/pigpio/index.html): a library used to control the GPIOs of the Rapsberry Pi
 
+I am planning to use [Hubris](https://oxidecomputer.github.io/hubris/)(a small OS written in `Rust`) to run on the remote.
+
 ## Tooling
-[`ros_cross_compile`](https://github.com/ros-tooling/cross_compile) is used to compile the project (that is written in `C++`) for the Raspberry Pi on a desktop machine. The executable are then deployed manually to the Raspberry Pi.
+[`ros_cross_compile`](https://github.com/ros-tooling/cross_compile) is used to compile the project (that is written in `C++`) for the Raspberry Pi on a desktop machine. The ROS packages are then deployed manually to the Raspberry Pi.
 `Cargo` is used to compile the remote's code (written in `Rust`).
