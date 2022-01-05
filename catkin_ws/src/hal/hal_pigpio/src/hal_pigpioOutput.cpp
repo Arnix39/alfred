@@ -73,7 +73,7 @@ bool setGpioLow(hal_pigpio::hal_pigpioSetGpioLow::Request &req,
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "hal_pigpioI2c");
+    ros::init(argc, argv, "hal_pigpioOutput");
     ros::NodeHandle node;
 
     ros::ServiceClient getPigpioHandle = node.serviceClient<hal_pigpio::hal_pigpioGetHandle>("hal_pigpioGetHandle");

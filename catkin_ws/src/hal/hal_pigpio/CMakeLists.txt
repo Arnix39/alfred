@@ -41,6 +41,7 @@ add_service_files(
    hal_pigpioI2cOpen.srv
    hal_pigpioI2cClose.srv
    hal_pigpioReadGpio.srv
+   hal_pigpioSetCallback.srv
  )
 
 ## Generate added messages and services with any dependencies listed here
