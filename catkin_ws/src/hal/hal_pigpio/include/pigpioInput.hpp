@@ -71,11 +71,13 @@ public:
         {
             if (edgeChangeType == 0)
             {
+                nbInputEdges.nbRisingEdges = 0;
                 nbInputEdges.nbFallingEdges = 1;
             }
             else
             {
                 nbInputEdges.nbRisingEdges = 1;
+                nbInputEdges.nbFallingEdges = 0;
             }
             inputEdges.insert({gpioId, nbInputEdges});
         }
