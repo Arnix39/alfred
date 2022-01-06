@@ -23,7 +23,7 @@ private:
     ros::ServiceServer ReadGpioService;
     ros::ServiceServer SetCallbackRisingEdgeService;
     int pigpio_handle;
-    static std::unordered_map<unsigned, gpioEdgesNumber> inputEdges;
+    inline static std::unordered_map<unsigned, gpioEdgesNumber> inputEdges;
 
 public:
     PigpioInput(ros::NodeHandle *node, int handle)
@@ -53,8 +53,8 @@ public:
 
     static void gpioEdgeChangeCallback(int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us)
     {
-        auto it = inputEdges.find(gpioId);
         gpioEdgesNumber nbInputEdges;
+        auto it = inputEdges.find(gpioId);
 
         if (it != inputEdges.end())
         {

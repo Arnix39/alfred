@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 set(PROJECT_NAME hal_pigpio)
 project(${PROJECT_NAME})
 
-add_compile_options(-std=c++11)
+add_compile_options(-std=c++17)
 
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS

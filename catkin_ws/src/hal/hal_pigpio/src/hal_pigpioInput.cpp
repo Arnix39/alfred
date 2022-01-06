@@ -11,6 +11,8 @@ int main(int argc, char **argv)
     getPigpioHandle.call(pigpioHandleRequest);
     pigpio_handle = pigpioHandleRequest.response.handle;
 
+    PigpioInput pigpioInput = PigpioInput(&node, pigpio_handle);
+
     ros::spin();
 
     return 0;
