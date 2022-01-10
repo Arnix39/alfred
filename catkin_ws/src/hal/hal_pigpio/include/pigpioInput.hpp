@@ -1,6 +1,4 @@
 #include "ros/ros.h"
-#include "std_msgs/String.h"
-#include <unordered_map>
 
 // Pigpio library
 #include <pigpiod_if2.h>
