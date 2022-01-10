@@ -1,5 +1,8 @@
 #include "pigpioInput.hpp"
 
+// Services headers (generated)
+#include "hal_pigpio/hal_pigpioGetHandle.h"
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "hal_pigpioInput");

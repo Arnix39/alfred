@@ -4,7 +4,6 @@
 #include <pigpiod_if2.h>
 
 // Services headers (generated)
-#include "hal_pigpio/hal_pigpioGetHandle.h"
 #include "hal_pigpio/hal_pigpioSetPwmDutycycle.h"
 #include "hal_pigpio/hal_pigpioSetPwmFrequency.h"
 #include "hal_pigpio/hal_pigpioSetGpioHigh.h"

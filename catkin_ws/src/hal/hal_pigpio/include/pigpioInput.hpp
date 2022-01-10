@@ -4,7 +4,6 @@
 #include <pigpiod_if2.h>
 
 // Services headers (generated)
-#include "hal_pigpio/hal_pigpioGetHandle.h"
 #include "hal_pigpio/hal_pigpioReadGpio.h"
 #include "hal_pigpio/hal_pigpioSetCallback.h"
 #include "hal_pigpio/hal_pigpioGetEdgesNumber.h"
@@ -15,8 +14,8 @@ class PigpioInput
 {
 private:
     inline static ros::Publisher gpioEdgeChangePub;
-    ros::ServiceServer ReadGpioService;
-    ros::ServiceServer SetCallbackRisingEdgeService;
+    ros::ServiceServer readGpioService;
+    ros::ServiceServer setCallbackRisingEdgeService;
     int pigpio_handle;
 
 public:
@@ -26,8 +25,8 @@ public:
 
         ros::Publisher gpioEdgeChangePub = node->advertise<hal_pigpio::hal_pgpioEdgeChangeMsg>("gpioEdgeChange", 1000);
 
-        ros::ServiceServer ReadGpioService = node->advertiseService("hal_pigpioReadGpio", &PigpioInput::readGpio, this);
-        ros::ServiceServer SetCallbackRisingEdgeService = node->advertiseService("hal_pigpioSetCallback", &PigpioInput::setCallback, this);
+        ros::ServiceServer readGpioService = node->advertiseService("hal_pigpioReadGpio", &PigpioInput::readGpio, this);
+        ros::ServiceServer setCallbackRisingEdgeService = node->advertiseService("hal_pigpioSetCallback", &PigpioInput::setCallback, this);
     }
 
     bool readGpio(hal_pigpio::hal_pigpioReadGpio::Request &req,
