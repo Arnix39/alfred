@@ -9,28 +9,24 @@
 #include "hal_pigpio/hal_pigpioGetHandle.h"
 #include "hal_pigpio/hal_pigpioReadGpio.h"
 #include "hal_pigpio/hal_pigpioSetCallback.h"
-
-struct gpioEdgesNumber
-{
-    uint32_t nbRisingEdges;
-    uint32_t nbFallingEdges;
-};
+#include "hal_pigpio/hal_pigpioGetEdgesNumber.h"
+#include "hal_pigpio/hal_pigpioResetEdgesNumber.h"
+#include "hal_pigpio/hal_pgpioEdgeChangeMsg.h"
 
 class PigpioInput
 {
 private:
-    ros::Publisher gpioEdgeChangePub;
+    inline static ros::Publisher gpioEdgeChangePub;
     ros::ServiceServer ReadGpioService;
     ros::ServiceServer SetCallbackRisingEdgeService;
     int pigpio_handle;
-    inline static std::unordered_map<unsigned, gpioEdgesNumber> inputEdges;
 
 public:
     PigpioInput(ros::NodeHandle *node, int handle)
     {
         pigpio_handle = handle;
 
-        ros::Publisher gpioEdgeChangePub = node->advertise<std_msgs::String>("gpioEdgeChange", 1000);
+        ros::Publisher gpioEdgeChangePub = node->advertise<hal_pigpio::hal_pgpioEdgeChangeMsg>("gpioEdgeChange", 1000);
 
         ros::ServiceServer ReadGpioService = node->advertiseService("hal_pigpioReadGpio", &PigpioInput::readGpio, this);
         ros::ServiceServer SetCallbackRisingEdgeService = node->advertiseService("hal_pigpioSetCallback", &PigpioInput::setCallback, this);
@@ -53,34 +49,13 @@ public:
 
     static void gpioEdgeChangeCallback(int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us)
     {
-        gpioEdgesNumber nbInputEdges;
-        auto it = inputEdges.find(gpioId);
+        hal_pigpio::hal_pgpioEdgeChangeMsg edgeChangeMsg;
 
-        if (it != inputEdges.end())
-        {
-            if (edgeChangeType == 0)
-            {
-                it->second.nbRisingEdges = it->second.nbFallingEdges++;
-            }
-            else
-            {
-                it->second.nbFallingEdges = it->second.nbRisingEdges++;
-            }
-        }
-        else
-        {
-            if (edgeChangeType == 0)
-            {
-                nbInputEdges.nbRisingEdges = 0;
-                nbInputEdges.nbFallingEdges = 1;
-            }
-            else
-            {
-                nbInputEdges.nbRisingEdges = 1;
-                nbInputEdges.nbFallingEdges = 0;
-            }
-            inputEdges.insert({gpioId, nbInputEdges});
-        }
+        edgeChangeMsg.gpioId = gpioId;
+        edgeChangeMsg.edgeChangeType = edgeChangeType;
+        edgeChangeMsg.timeSinceBoot_us = timeSinceBoot_us;
+
+        gpioEdgeChangePub.publish(edgeChangeMsg);
     }
 
     bool setCallback(hal_pigpio::hal_pigpioSetCallback::Request &req,
