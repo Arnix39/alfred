@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>sim</name>
+  <version>0.0.1</version>
+  <description>Simulation package for Alfred</description>
+
+  <!-- Maintainer, author and license information -->
+  <maintainer email="arnaud.hote@gmail.com">Arnix</maintainer>
+  <author email="arnaud.hote@gmail.com">Arnix</author>
+  <license>BSD</license>
+
+  <!-- Dependencies -->
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roslaunch</build_depend>
+  <exec_depend>joint_state_publisher</exec_depend>
+  <exec_depend>joint_state_publisher_gui</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>rviz</exec_depend>
+  <exec_depend>xacro</exec_depend>
+
+</package>
