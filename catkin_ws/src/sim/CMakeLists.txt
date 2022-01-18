@@ -20,6 +20,6 @@ endif()
 #############
 ## Install ##
 #############
-install(DIRECTORY meshes launch rviz urdf
+install(DIRECTORY config launch rviz urdf
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
