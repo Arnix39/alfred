@@ -1,5 +1,5 @@
 <launch>
-  <arg name="model" default="$(find sim)/urdf/alfred.urdf"/>
+  <arg name="model" default="$(find sim)/urdf/alfred.xacro"/>
   <arg name="rvizconfig" default="$(find sim)/rviz/urdf.rviz" />
 
   <include file="$(find sim)/launch/gazebo.launch">
