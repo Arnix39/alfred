@@ -17,6 +17,8 @@
   <xacro:property name="wheelRadius" value="0.035" />
   <xacro:property name="wheelWidth" value="0.03" />
   <xacro:property name="wheelMass" value="0.03" />
+  <xacro:property name="rightWheelXPos" value="-0.09" />
+  <xacro:property name="leftWheelXPos" value="0.09" />
 
 <!-- Macros definition -->
   <xacro:macro name="body_shape">
@@ -34,7 +36,7 @@
 
   <xacro:macro name="cylinder_inertia" params="radius height mass">
     <mass value="${mass}"/>
-    <inertia ixx="${1/12*mass*(radius*radius+height*height)}" ixy="0.0" ixz="0.0" iyy="${1/12*mass*(radius*radius+height*height)}" iyz="0.0" izz="${1/12*mass*radius*radius}"/>
+    <inertia ixx="${1/12*mass*(3*radius*radius+height*height)}" ixy="0.0" ixz="0.0" iyy="${1/12*mass*(3*radius*radius+height*height)}" iyz="0.0" izz="${1/2*mass*radius*radius}"/>
   </xacro:macro>
 
   <xacro:macro name="box_inertia" params="width height depth mass">
@@ -45,17 +47,14 @@
   <xacro:macro name="wheel_link" params="side">
     <link name="${side}_wheel">
       <visual>
-        <xacro:wheel_shape>
-        </xacro:wheel_shape>
+        <xacro:wheel_shape />
         <material name="blue"/>
       </visual>
       <collision>
-        <xacro:wheel_shape>
-        </xacro:wheel_shape>
+        <xacro:wheel_shape />
       </collision>
       <inertial>
-        <xacro:cylinder_inertia radius="${wheelRadius}" height="${wheelWidth}" mass="${wheelMass}">
-        </xacro:cylinder_inertia>
+        <xacro:cylinder_inertia radius="${wheelRadius}" height="${wheelWidth}" mass="${wheelMass}" />
       </inertial>
     </link>
 
@@ -80,31 +79,39 @@
     </transmission>
   </xacro:macro>
 
+  <xacro:macro name="wheel_joint" params="side">
+    <joint name="base_to_${side}_wheel" type="continuous">
+      <parent link="base_link"/>
+      <child link="${side}_wheel"/>
+      <xacro:if value="${side == 'right'}" >
+        <origin xyz="${rightWheelXPos} 0 ${-wheelRadius}"/>
+      </xacro:if>
+      <xacro:if value="${side == 'left'}" >
+        <origin xyz="${leftWheelXPos} 0 ${-wheelRadius}"/>
+      </xacro:if>
+      <axis xyz="1 0 0"/>
+    </joint>
+  </xacro:macro>
+
 <!-- Links definition -->
   <link name="dummy">
   </link>
 
   <link name="base_link">
     <visual>
-      <xacro:body_shape>
-      </xacro:body_shape>
+      <xacro:body_shape />
       <material name="black"/>
     </visual>
     <collision>
-      <xacro:body_shape>
-      </xacro:body_shape>
+      <xacro:body_shape />
     </collision>
     <inertial>
-      <xacro:box_inertia width="${bodyLength}" height="${bodyHeight}" depth ="${bodyDepth}" mass="${bodyMass}">
-      </xacro:box_inertia>
+      <xacro:box_inertia width="${bodyLength}" height="${bodyHeight}" depth ="${bodyDepth}" mass="${bodyMass}" />
     </inertial>
   </link>
 
-  <xacro:wheel_link side="right">
-  </xacro:wheel_link>
-
-  <xacro:wheel_link side="left">
-  </xacro:wheel_link>
+  <xacro:wheel_link side="right" />
+  <xacro:wheel_link side="left" />
  
 <!-- Joints definition -->
   <joint name="dummy_joint" type="fixed">
@@ -112,26 +119,12 @@
     <child link="base_link"/>
   </joint>
 
-  <joint name="base_to_right_wheel" type="continuous">
-    <parent link="base_link"/>
-    <child link="right_wheel"/>
-    <origin xyz="0.09 0 -0.035"/>
-    <axis xyz="1 0 0"/>
-  </joint>
-
-  <joint name="base_to_left_wheel" type="continuous">
-    <parent link="base_link"/>
-    <child link="left_wheel"/>
-    <origin xyz="-0.09 0 -0.035"/>
-    <axis xyz="1 0 0"/>
-  </joint>
+  <xacro:wheel_joint side="right" />
+  <xacro:wheel_joint side="left" />
 
 <!-- Wheels transmission definition -->
-  <xacro:wheel_transmission side="right">
-  </xacro:wheel_transmission>
-
-  <xacro:wheel_transmission side="left">
-  </xacro:wheel_transmission>
+  <xacro:wheel_transmission side="right" />
+  <xacro:wheel_transmission side="left" />
 
 <!-- Gazebo plugin for ROS Control -->
   <gazebo>
