@@ -9,7 +9,7 @@
     <color rgba="0 0 0 1"/>
   </material>
 
-<!-- Physical definition -->
+<!-- Physical definitions -->
   <xacro:property name="bodyLength" value="0.15" />
   <xacro:property name="bodyHeight" value="0.10" />
   <xacro:property name="bodyDepth" value="0.07" />
@@ -17,7 +17,6 @@
   <xacro:property name="wheelRadius" value="0.035" />
   <xacro:property name="wheelWidth" value="0.03" />
   <xacro:property name="wheelMass" value="0.03" />
-  <xacro:property name="pi_2" value="1.57075" />
 
 <!-- Macros definition -->
   <xacro:macro name="body_shape">
@@ -30,7 +29,7 @@
     <geometry>
       <cylinder length="${wheelWidth}" radius="${wheelRadius}"/>
     </geometry>
-    <origin rpy="0 ${pi_2} 0" xyz="0 0 0"/>
+    <origin rpy="0 ${pi/2} 0" xyz="0 0 0"/>
   </xacro:macro>
 
   <xacro:macro name="cylinder_inertia" params="radius height mass">
