@@ -8,14 +8,21 @@ int main(int argc, char **argv)
 
     ros::Publisher proxSensPub = node.advertise<std_msgs::String>("proxSensorValues", 1000);
 
-    std_msgs::String proxSensMessage;
-    std::stringstream stream;
-    stream << "Proximity sensor values: NaN";
-    proxSensMessage.data = stream.str();
+    ros::Rate loop_rate(10);
 
-    proxSensPub.publish(proxSensMessage);
+    while (ros::ok())
+    {
+        std_msgs::String proxSensMessage;
+        
+        std::stringstream stream;
+        stream << "Proximity sensor values: NaN";
+        proxSensMessage.data = stream.str();
 
-    ros::spin();
+        proxSensPub.publish(proxSensMessage);
 
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
+        
     return 0;
 }

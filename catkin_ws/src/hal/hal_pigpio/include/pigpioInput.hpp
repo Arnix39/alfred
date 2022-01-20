@@ -3,12 +3,10 @@
 // Pigpio library
 #include <pigpiod_if2.h>
 
-// Services headers (generated)
+// Services and messages headers (generated)
 #include "hal_pigpio/hal_pigpioReadGpio.h"
 #include "hal_pigpio/hal_pigpioSetCallback.h"
-#include "hal_pigpio/hal_pigpioGetEdgesNumber.h"
-#include "hal_pigpio/hal_pigpioResetEdgesNumber.h"
-#include "hal_pigpio/hal_pgpioEdgeChangeMsg.h"
+#include "hal_pigpio/hal_pigpioEdgeChangeMsg.h"
 
 class PigpioInput
 {

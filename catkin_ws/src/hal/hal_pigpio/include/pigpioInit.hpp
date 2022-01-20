@@ -3,7 +3,7 @@
 // Pigpio library
 #include <pigpiod_if2.h>
 
-// Services headers (generated)
+// Services and messages headers (generated)
 #include "hal_pigpio/hal_pigpioGetHandle.h"
 #include "hal_pigpio/hal_pigpioSetInputMode.h"
 #include "hal_pigpio/hal_pigpioSetOutputMode.h"
