@@ -7,15 +7,11 @@ add_compile_options(-std=c++17)
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  std_msgs
   message_generation
 )
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} )
 find_package(pigpio MODULE REQUIRED)
-
-## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -46,36 +42,24 @@ add_service_files(
 ## Generate added messages and services with any dependencies listed here
   generate_messages(
    DEPENDENCIES 
-   std_msgs
  )
 
 ###################################
 ## catkin specific configuration ##
 ###################################
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES hal
-  CATKIN_DEPENDS roscpp std_msgs
-#  DEPENDS system_lib
+  CATKIN_DEPENDS roscpp 
 )
 
 ###########
 ## Build ##
 ###########
-
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
   ${pigpio_INCLUDE_DIRS}
 )
 
-## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/hal.cpp
-# )
-
-# add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-# set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
 add_executable(${PROJECT_NAME}Init_node src/hal_pigpioInit.cpp)
 add_dependencies(${PROJECT_NAME}Init_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME}Init_node

@@ -1,4 +1,5 @@
 #include "ros/ros.h"
+#include "std_msgs/String.h"
 
 // Services and messages headers (generated)
 #include "hal_pigpio/hal_pigpioSetGpioHigh.h"
