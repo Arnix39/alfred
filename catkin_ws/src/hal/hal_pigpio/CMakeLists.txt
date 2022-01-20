@@ -114,12 +114,3 @@ install(TARGETS
   ${PROJECT_NAME}Input_node
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
-
-#############
-## Testing ##
-#############
-
-catkin_add_gmock(${PROJECT_NAME}-test test/test_hal.cpp)
-if(TARGET ${PROJECT_NAME}-test)
-  target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES})
-endif()
