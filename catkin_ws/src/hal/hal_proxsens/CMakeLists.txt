@@ -7,7 +7,6 @@ add_compile_options(-std=c++11)
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  std_msgs
   message_generation
   hal_pigpio
 )
@@ -25,14 +24,13 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate added messages and services with any dependencies listed here
   generate_messages(
    DEPENDENCIES 
-   std_msgs
  )
 
 ###################################
 ## catkin specific configuration ##
 ###################################
 catkin_package(
-  CATKIN_DEPENDS roscpp std_msgs
+  CATKIN_DEPENDS roscpp
 )
 
 ###########
