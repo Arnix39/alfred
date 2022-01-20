@@ -13,14 +13,15 @@
 <!-- Physical definitions -->
 <!-- #################### -->
   <xacro:property name="bodyLength" value="0.15" />
-  <xacro:property name="bodyHeight" value="0.10" />
-  <xacro:property name="bodyDepth" value="0.07" />
-  <xacro:property name="bodyMass" value="1" />
-  <xacro:property name="wheelRadius" value="0.035" />
-  <xacro:property name="wheelWidth" value="0.03" />
-  <xacro:property name="wheelMass" value="0.03" />
-  <xacro:property name="rightWheelXPos" value="-0.09" />
-  <xacro:property name="leftWheelXPos" value="0.09" />
+  <xacro:property name="bodyHeight" value="0.11" />
+  <xacro:property name="bodyDepth" value="0.09" />
+  <xacro:property name="bodyMass" value="0.72" />
+  <xacro:property name="wheelRadius" value="0.0375" />
+  <xacro:property name="wheelWidth" value="0.035" />
+  <xacro:property name="wheelMass" value="0.05" />
+  <xacro:property name="rightWheelXPos" value="-0.09375" />
+  <xacro:property name="leftWheelXPos" value="0.09375" />
+  <xacro:property name="wheelZPos" value="-0.04" />
 
 <!-- ################# -->
 <!-- Macros definition -->
@@ -95,10 +96,10 @@
       <parent link="base_link"/>
       <child link="${side}_wheel"/>
       <xacro:if value="${side == 'right'}" >
-        <origin xyz="${rightWheelXPos} 0 ${-wheelRadius}"/>
+        <origin xyz="${rightWheelXPos} 0 ${wheelZPos}"/>
       </xacro:if>
       <xacro:if value="${side == 'left'}" >
-        <origin xyz="${leftWheelXPos} 0 ${-wheelRadius}"/>
+        <origin xyz="${leftWheelXPos} 0 ${wheelZPos}"/>
       </xacro:if>
       <axis xyz="1 0 0"/>
     </joint>
