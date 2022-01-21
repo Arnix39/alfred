@@ -7,8 +7,8 @@ PigpioI2c::PigpioI2c(ros::NodeHandle *node, int handle)
 {
     pigpio_handle = handle;
 
-    ros::ServiceServer i2cOpenService = node->advertiseService("hal_pigpioI2cOpen", &PigpioI2c::i2cOpen, this);
-    ros::ServiceServer i2cCloseService = node->advertiseService("hal_pigpioI2cClose", &PigpioI2c::i2cClose, this);
+    i2cOpenService = node->advertiseService("hal_pigpioI2cOpen", &PigpioI2c::i2cOpen, this);
+    i2cCloseService = node->advertiseService("hal_pigpioI2cClose", &PigpioI2c::i2cClose, this);
 }
 
 bool PigpioI2c::i2cOpen(hal_pigpio::hal_pigpioI2cOpen::Request &req,

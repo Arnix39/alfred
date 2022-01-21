@@ -7,10 +7,10 @@ PigpioOutput::PigpioOutput(ros::NodeHandle *node, int handle)
 {
     pigpio_handle = handle;
 
-    ros::ServiceServer setPwmDutycycleService = node->advertiseService("hal_pigpioSetPwmDutycycle", &PigpioOutput::setPwmDutycycle, this);
-    ros::ServiceServer setPwmFrequencyService = node->advertiseService("hal_pigpioSetPwmFrequency", &PigpioOutput::setPwmFrequency, this);
-    ros::ServiceServer setGpioHighService = node->advertiseService("hal_pigpioSetGpioHigh", &PigpioOutput::setGpioHigh, this);
-    ros::ServiceServer setGpioLowService = node->advertiseService("hal_pigpioSetGpioLow", &PigpioOutput::setGpioLow, this);
+    setPwmDutycycleService = node->advertiseService("hal_pigpioSetPwmDutycycle", &PigpioOutput::setPwmDutycycle, this);
+    setPwmFrequencyService = node->advertiseService("hal_pigpioSetPwmFrequency", &PigpioOutput::setPwmFrequency, this);
+    setGpioHighService = node->advertiseService("hal_pigpioSetGpioHigh", &PigpioOutput::setGpioHigh, this);
+    setGpioLowService = node->advertiseService("hal_pigpioSetGpioLow", &PigpioOutput::setGpioLow, this);
 }
 
 bool PigpioOutput::setPwmDutycycle(hal_pigpio::hal_pigpioSetPwmDutycycle::Request &req,

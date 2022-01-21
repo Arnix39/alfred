@@ -11,8 +11,9 @@
 class PigpioInit
 {
 private:
-    ros::ServiceServer i2cOpenService;
-    ros::ServiceServer i2cCloseService;
+    ros::ServiceServer getHandleService;
+    ros::ServiceServer setInputModeService;
+    ros::ServiceServer setOutputModeService;
     int pigpio_handle;
 
 public:

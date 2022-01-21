@@ -9,9 +9,9 @@ PigpioInit::PigpioInit(ros::NodeHandle *node)
         ROS_ERROR("Failed to start pigpio daemon");
     }
 
-    ros::ServiceServer getHandleService = node->advertiseService("hal_pigpioGetHandle", &PigpioInit::getHandle, this);
-    ros::ServiceServer setInputModeService = node->advertiseService("hal_pigpioSetInputMode", &PigpioInit::setInputMode, this);
-    ros::ServiceServer setOutputModeService = node->advertiseService("hal_pigpioSetOutputMode", &PigpioInit::setOutputMode, this);
+    getHandleService = node->advertiseService("hal_pigpioGetHandle", &PigpioInit::getHandle, this);
+    setInputModeService = node->advertiseService("hal_pigpioSetInputMode", &PigpioInit::setInputMode, this);
+    setOutputModeService = node->advertiseService("hal_pigpioSetOutputMode", &PigpioInit::setOutputMode, this);
 }
 
 PigpioInit::~PigpioInit()

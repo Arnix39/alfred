@@ -7,10 +7,10 @@ PigpioInput::PigpioInput(ros::NodeHandle *node, int handle)
 {
     pigpio_handle = handle;
 
-    ros::Publisher gpioEdgeChangePub = node->advertise<hal_pigpio::hal_pigpioEdgeChangeMsg>("gpioEdgeChange", 1000);
+    gpioEdgeChangePub = node->advertise<hal_pigpio::hal_pigpioEdgeChangeMsg>("gpioEdgeChange", 1000);
 
-    ros::ServiceServer readGpioService = node->advertiseService("hal_pigpioReadGpio", &PigpioInput::readGpio, this);
-    ros::ServiceServer setCallbackRisingEdgeService = node->advertiseService("hal_pigpioSetCallback", &PigpioInput::setCallback, this);
+    readGpioService = node->advertiseService("hal_pigpioReadGpio", &PigpioInput::readGpio, this);
+    setCallbackRisingEdgeService = node->advertiseService("hal_pigpioSetCallback", &PigpioInput::setCallback, this);
 }
 
 bool PigpioInput::readGpio(hal_pigpio::hal_pigpioReadGpio::Request &req,
