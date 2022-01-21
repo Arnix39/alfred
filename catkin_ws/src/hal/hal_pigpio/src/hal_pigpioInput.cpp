@@ -45,12 +45,12 @@ bool PigpioInput::setCallback(hal_pigpio::hal_pigpioSetCallback::Request &req,
     res.callbackId = callback(pigpio_handle, req.gpioId, req.edgeChangeType, PigpioInput::gpioEdgeChangeCallback);
     if (res.callbackId >= 0)
     {
-        res.result = true;
+        res.hasSucceeded = true;
         ROS_INFO("Callback for GPIO %u configured.", req.gpioId);
     }
     else
     {
-        res.result = false;
+        res.hasSucceeded = false;
         ROS_ERROR("Failed to configure callback for GPIO %u!", req.gpioId);
     }
     return true;
