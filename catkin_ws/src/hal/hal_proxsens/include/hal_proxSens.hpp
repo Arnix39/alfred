@@ -28,6 +28,7 @@ private:
     uint8_t edgeChangeType;
     uint32_t timestamp;
     uint32_t echoCallbackId;
+    uint16_t distanceInCm;
     void edgeChangeCallback(const hal_pigpio::hal_pigpioEdgeChangeMsg& msg);
 
 public:

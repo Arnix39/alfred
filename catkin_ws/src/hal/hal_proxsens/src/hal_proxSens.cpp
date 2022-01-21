@@ -11,16 +11,19 @@ ProxSens::ProxSens(ros::NodeHandle *node)
 
 void ProxSens::edgeChangeCallback(const hal_pigpio::hal_pigpioEdgeChangeMsg& msg)
 {
+    //TODO: filter out messages that are not for the proximity sensor GPIOs
     gpio = msg.gpioId;
     edgeChangeType = msg.edgeChangeType;
     timestamp = msg.timeSinceBoot_us;
 }
 
-void ProxSens::publishMessage(hal_proxsens::hal_proxsensMsg message)
+void ProxSens::publishMessage(void)
 {
-    hal_proxsens::hal_proxsensMsg proxSensMessage = 0; 
-    proxSensMessage.distanceInCm = 100;
+    hal_proxsens::hal_proxsensMsg message; 
 
+    //TODO: compute distanceInCm
+
+    message.distanceInCm = distanceInCm;
     proxSensPub.publish(message);
 }
 
@@ -38,7 +41,7 @@ void ProxSens::configureGpios(void)
     setOutputModeSrv.request.gpioId = PROXSENS_TRIGGER_GPIO;
 
     gpioSetInputClient.call(setInputModeSrv);
-    
+
     gpioSetCallbackClient.call(setCallbackSrv);
     if(setCallbackSrv.response.hasSucceeded)
     {
@@ -50,7 +53,7 @@ void ProxSens::configureGpios(void)
 
 void ProxSens::trigger(void)
 {
-
+    //TODO: write to the trigger GPIO
 }
 
 int main(int argc, char **argv)
