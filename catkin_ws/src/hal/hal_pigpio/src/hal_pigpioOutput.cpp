@@ -1,4 +1,4 @@
-#include "pigpioOutput.hpp"
+#include "hal_pigpioOutput.hpp"
 
 // Services headers (generated)
 #include "hal_pigpio/hal_pigpioGetHandle.h"

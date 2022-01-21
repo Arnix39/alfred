@@ -1,4 +1,4 @@
-#include "pigpioInit.hpp"
+#include "hal_pigpioInit.hpp"
 
 PigpioInit::PigpioInit(ros::NodeHandle *node)
 {
