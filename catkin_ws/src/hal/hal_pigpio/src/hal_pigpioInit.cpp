@@ -31,11 +31,11 @@ bool PigpioInit::setInputMode(hal_pigpio::hal_pigpioSetInputMode::Request &req,
 {
     if (set_mode(pigpio_handle, req.gpioId, PI_INPUT) == 0)
     {
-        res.result = true;
+        ROS_INFO("GPIO %u configured as input.", req.gpioId);
     }
     else
     {
-        res.result = false;
+        ROS_ERROR("Failed to configure GPIO %u as input!", req.gpioId);
     }
 
     return true;
@@ -46,11 +46,11 @@ bool PigpioInit::setOutputMode(hal_pigpio::hal_pigpioSetOutputMode::Request &req
 {
     if (set_mode(pigpio_handle, req.gpioId, PI_OUTPUT) == 0)
     {
-        res.result = true;
+        ROS_INFO("GPIO %u configured as output.", req.gpioId);
     }
     else
     {
-        res.result = false;
+        ROS_ERROR("Failed to configure GPIO %u as output!", req.gpioId);
     }
     return true;
 }

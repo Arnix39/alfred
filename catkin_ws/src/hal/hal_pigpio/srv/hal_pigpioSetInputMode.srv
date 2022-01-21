@@ -1,3 +1,2 @@
 uint16 gpioId
 ---
-bool result
