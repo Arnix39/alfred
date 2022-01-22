@@ -16,6 +16,7 @@ private:
 
 public:
     PigpioI2c(ros::NodeHandle *node, int handle);
+    ~PigpioI2c() = default;
     bool i2cOpen(hal_pigpio::hal_pigpioI2cOpen::Request &req,
                  hal_pigpio::hal_pigpioI2cOpen::Response &res);
     bool i2cClose(hal_pigpio::hal_pigpioI2cClose::Request &req,

@@ -20,6 +20,7 @@ private:
 
 public:
     PigpioOutput(ros::NodeHandle *node, int handle);
+    ~PigpioOutput() = default;
     bool setPwmDutycycle(hal_pigpio::hal_pigpioSetPwmDutycycle::Request &req,
                          hal_pigpio::hal_pigpioSetPwmDutycycle::Response &res);
     bool setPwmFrequency(hal_pigpio::hal_pigpioSetPwmFrequency::Request &req,
