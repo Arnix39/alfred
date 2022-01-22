@@ -10,7 +10,7 @@ PigpioInput::PigpioInput(ros::NodeHandle *node, int handle)
     gpioEdgeChangePub = node->advertise<hal_pigpio::hal_pigpioEdgeChangeMsg>("gpioEdgeChange", 1000);
 
     readGpioService = node->advertiseService("hal_pigpioReadGpio", &PigpioInput::readGpio, this);
-    setCallbackRisingEdgeService = node->advertiseService("hal_pigpioSetCallback", &PigpioInput::setCallback, this);
+    setCallbackRisingEdgeService = node->advertiseService("hal_pigpioSetCallback", &PigpioInput::setCallback, this);  
 }
 
 bool PigpioInput::readGpio(hal_pigpio::hal_pigpioReadGpio::Request &req,
@@ -39,10 +39,18 @@ void PigpioInput::gpioEdgeChangeCallback(int handle, unsigned gpioId, unsigned e
     gpioEdgeChangePub.publish(edgeChangeMsg);
 }
 
+// This is to pass the pointer of the callback function gpioEdgeChangeCallback to the pigpio library API
+void c_callback_wrapper(int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us, void* userdata)
+{
+    auto& c_edgeCallback = *reinterpret_cast<edgeCallback_t*>(handle, gpioId, edgeChangeType, timeSinceBoot_us, userdata);
+    c_edgeCallback(handle, gpioId, edgeChangeType, timeSinceBoot_us);
+}
+
 bool PigpioInput::setCallback(hal_pigpio::hal_pigpioSetCallback::Request &req,
                               hal_pigpio::hal_pigpioSetCallback::Response &res)
 {
-    res.callbackId = callback(pigpio_handle, req.gpioId, req.edgeChangeType, PigpioInput::gpioEdgeChangeCallback);
+    edgeCallback_t edgeCallback = std::bind(&PigpioInput::gpioEdgeChangeCallback, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
+    res.callbackId = callback_ex(pigpio_handle, req.gpioId, req.edgeChangeType, c_callback_wrapper, &edgeCallback);
     if (res.callbackId >= 0)
     {
         res.hasSucceeded = true;
