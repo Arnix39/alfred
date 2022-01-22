@@ -32,6 +32,7 @@ void PigpioInput::gpioEdgeChangeCallback(int handle, unsigned gpioId, unsigned e
 {
     hal_pigpio::hal_pigpioEdgeChangeMsg edgeChangeMsg;
 
+    //TODO: handle the different calls for each GPIO
     edgeChangeMsg.gpioId = gpioId;
     edgeChangeMsg.edgeChangeType = edgeChangeType;
     edgeChangeMsg.timeSinceBoot_us = timeSinceBoot_us;
