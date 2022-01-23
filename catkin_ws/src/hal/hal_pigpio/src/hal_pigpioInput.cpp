@@ -10,7 +10,15 @@ PigpioInput::PigpioInput(ros::NodeHandle *node, int handle)
     gpioEdgeChangePub = node->advertise<hal_pigpio::hal_pigpioEdgeChangeMsg>("gpioEdgeChange", 1000);
 
     readGpioService = node->advertiseService("hal_pigpioReadGpio", &PigpioInput::readGpio, this);
-    setCallbackRisingEdgeService = node->advertiseService("hal_pigpioSetCallback", &PigpioInput::setCallback, this);  
+    setCallbackRisingEdgeService = node->advertiseService("hal_pigpioSetCallback", &PigpioInput::setCallback, this);
+}
+
+PigpioInput::~PigpioInput()
+{
+    for(uint callbackId : callbackList)
+    {
+        callback_cancel(callbackId);
+    }
 }
 
 bool PigpioInput::readGpio(hal_pigpio::hal_pigpioReadGpio::Request &req,
@@ -32,7 +40,6 @@ void PigpioInput::gpioEdgeChangeCallback(int handle, unsigned gpioId, unsigned e
 {
     hal_pigpio::hal_pigpioEdgeChangeMsg edgeChangeMsg;
 
-    //TODO: handle the different calls for each GPIO
     edgeChangeMsg.gpioId = gpioId;
     edgeChangeMsg.edgeChangeType = edgeChangeType;
     edgeChangeMsg.timeSinceBoot_us = timeSinceBoot_us;
@@ -41,9 +48,9 @@ void PigpioInput::gpioEdgeChangeCallback(int handle, unsigned gpioId, unsigned e
 }
 
 // This is to pass the pointer of the callback function gpioEdgeChangeCallback to the pigpio library API
-void c_callback_wrapper(int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us, void* userdata)
+void c_callback_wrapper(int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us, void *userdata)
 {
-    auto& c_edgeCallback = *reinterpret_cast<edgeCallback_t*>(handle, gpioId, edgeChangeType, timeSinceBoot_us, userdata);
+    auto &c_edgeCallback = *reinterpret_cast<edgeCallback_t *>(handle, gpioId, edgeChangeType, timeSinceBoot_us, userdata);
     c_edgeCallback(handle, gpioId, edgeChangeType, timeSinceBoot_us);
 }
 
@@ -55,6 +62,7 @@ bool PigpioInput::setCallback(hal_pigpio::hal_pigpioSetCallback::Request &req,
     if (res.callbackId >= 0)
     {
         res.hasSucceeded = true;
+        callbackList.push_back((uint)res.callbackId);
         ROS_INFO("Callback for GPIO %u configured.", req.gpioId);
     }
     else
