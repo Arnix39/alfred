@@ -1,4 +1,4 @@
 uint16 gpioId
-uint32 pulseLength
+uint32 pulseLengthInUs
 ---
-bool result
+bool hasSucceeded

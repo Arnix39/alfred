@@ -75,13 +75,15 @@ bool PigpioOutput::setGpioLow(hal_pigpio::hal_pigpioSetGpioLow::Request &req,
 bool PigpioOutput::sendTriggerPulse(hal_pigpio::hal_pigpioSendTriggerPulse::Request &req,
                                     hal_pigpio::hal_pigpioSendTriggerPulse::Response &res)
 {
-    if (gpio_trigger(pigpio_handle, req.gpioId, req.pulseLength, PI_HIGH) == 0)
+    if (gpio_trigger(pigpio_handle, req.gpioId, req.pulseLengthInUs, PI_HIGH) == 0)
     {
-        res.result = true;
+        res.hasSucceeded = true;
+        ROS_INFO("Sent trigger pulse for GPIO %u!", req.gpioId);
     }
     else
     {
-        res.result = false;
+        res.hasSucceeded = false;
+        ROS_ERROR("Failed to send trigger pulse for GPIO %u!", req.gpioId);
     }
     return true;
 }

@@ -53,7 +53,12 @@ void ProxSens::configureGpios(void)
 
 void ProxSens::trigger(void)
 {
-    //TODO: write to the trigger GPIO
+    hal_pigpio::hal_pigpioSendTriggerPulse sendTriggerPulseSrv;
+
+    sendTriggerPulseSrv.request.gpioId = PROXSENS_TRIGGER_GPIO;
+    sendTriggerPulseSrv.request.pulseLengthInUs = PROXSENS_TRIGGER_LENGTH_US;
+    
+    gpioSendTriggerPulseClient.call(sendTriggerPulseSrv);
 }
 
 int main(int argc, char **argv)
