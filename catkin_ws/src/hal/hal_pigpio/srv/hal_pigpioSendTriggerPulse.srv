@@ -1,0 +1,4 @@
+uint16 gpioId
+uint32 pulseLength
+---
+bool result

@@ -33,6 +33,7 @@ add_service_files(
    hal_pigpioSetGpioLow.srv
    hal_pigpioSetPwmDutycycle.srv
    hal_pigpioSetPwmFrequency.srv
+   hal_pigpioSendTriggerPulse.srv
    hal_pigpioI2cOpen.srv
    hal_pigpioI2cClose.srv
    hal_pigpioReadGpio.srv

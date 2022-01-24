@@ -11,6 +11,7 @@
 #include "hal_pigpio/hal_pigpioSetPwmFrequency.h"
 #include "hal_pigpio/hal_pigpioSetGpioHigh.h"
 #include "hal_pigpio/hal_pigpioSetGpioLow.h"
+#include "hal_pigpio/hal_pigpioSendTriggerPulse.h"
 
 class PigpioOutput
 {
@@ -19,6 +20,7 @@ private:
     ros::ServiceServer setPwmFrequencyService;
     ros::ServiceServer setGpioHighService;
     ros::ServiceServer setGpioLowService;
+    ros::ServiceServer sendTriggerPulseService;
     int pigpio_handle;
 
 public:
@@ -32,6 +34,8 @@ public:
                      hal_pigpio::hal_pigpioSetGpioHigh::Response &res);
     bool setGpioLow(hal_pigpio::hal_pigpioSetGpioLow::Request &req,
                     hal_pigpio::hal_pigpioSetGpioLow::Response &res);
+    bool sendTriggerPulse(hal_pigpio::hal_pigpioSendTriggerPulse::Request &req,
+                          hal_pigpio::hal_pigpioSendTriggerPulse::Response &res);
 };
 
 #endif

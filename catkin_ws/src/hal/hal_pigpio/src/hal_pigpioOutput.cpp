@@ -11,6 +11,7 @@ PigpioOutput::PigpioOutput(ros::NodeHandle *node, int handle)
     setPwmFrequencyService = node->advertiseService("hal_pigpioSetPwmFrequency", &PigpioOutput::setPwmFrequency, this);
     setGpioHighService = node->advertiseService("hal_pigpioSetGpioHigh", &PigpioOutput::setGpioHigh, this);
     setGpioLowService = node->advertiseService("hal_pigpioSetGpioLow", &PigpioOutput::setGpioLow, this);
+    sendTriggerPulseService = node->advertiseService("hal_pigpioSendTriggerPulse", &PigpioOutput::sendTriggerPulse, this);
 }
 
 bool PigpioOutput::setPwmDutycycle(hal_pigpio::hal_pigpioSetPwmDutycycle::Request &req,
@@ -46,7 +47,7 @@ bool PigpioOutput::setPwmFrequency(hal_pigpio::hal_pigpioSetPwmFrequency::Reques
 bool PigpioOutput::setGpioHigh(hal_pigpio::hal_pigpioSetGpioHigh::Request &req,
                                hal_pigpio::hal_pigpioSetGpioHigh::Response &res)
 {
-    if ((gpio_write(pigpio_handle, req.gpioId, PI_HIGH) != 0))
+    if (gpio_write(pigpio_handle, req.gpioId, PI_HIGH) == 0)
     {
         res.result = true;
     }
@@ -60,7 +61,21 @@ bool PigpioOutput::setGpioHigh(hal_pigpio::hal_pigpioSetGpioHigh::Request &req,
 bool PigpioOutput::setGpioLow(hal_pigpio::hal_pigpioSetGpioLow::Request &req,
                               hal_pigpio::hal_pigpioSetGpioLow::Response &res)
 {
-    if ((gpio_write(pigpio_handle, req.gpioId, PI_LOW) != 0))
+    if (gpio_write(pigpio_handle, req.gpioId, PI_LOW) == 0)
+    {
+        res.result = true;
+    }
+    else
+    {
+        res.result = false;
+    }
+    return true;
+}
+
+bool PigpioOutput::sendTriggerPulse(hal_pigpio::hal_pigpioSendTriggerPulse::Request &req,
+                                    hal_pigpio::hal_pigpioSendTriggerPulse::Response &res)
+{
+    if (gpio_trigger(pigpio_handle, req.gpioId, req.pulseLength, PI_HIGH) == 0)
     {
         res.result = true;
     }
