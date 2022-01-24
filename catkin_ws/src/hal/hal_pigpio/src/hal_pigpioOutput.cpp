@@ -19,11 +19,11 @@ bool PigpioOutput::setPwmDutycycle(hal_pigpio::hal_pigpioSetPwmDutycycle::Reques
 {
     if ((req.dutycycle != 0) && (set_PWM_dutycycle(pigpio_handle, req.gpioId, req.dutycycle) == 0))
     {
-        res.result = true;
+        res.hasSucceeded = true;
     }
     else
     {
-        res.result = false;
+        res.hasSucceeded = false;
     }
     return true;
 }
@@ -35,11 +35,11 @@ bool PigpioOutput::setPwmFrequency(hal_pigpio::hal_pigpioSetPwmFrequency::Reques
 
     if ((pwmSettingResult != PI_NOT_PERMITTED) && (pwmSettingResult != PI_BAD_USER_GPIO))
     {
-        res.result = true;
+        res.hasSucceeded = true;
     }
     else
     {
-        res.result = false;
+        res.hasSucceeded = false;
     }
     return true;
 }
@@ -49,11 +49,11 @@ bool PigpioOutput::setGpioHigh(hal_pigpio::hal_pigpioSetGpioHigh::Request &req,
 {
     if (gpio_write(pigpio_handle, req.gpioId, PI_HIGH) == 0)
     {
-        res.result = true;
+        res.hasSucceeded = true;
     }
     else
     {
-        res.result = false;
+        res.hasSucceeded = false;
     }
     return true;
 }
@@ -63,11 +63,11 @@ bool PigpioOutput::setGpioLow(hal_pigpio::hal_pigpioSetGpioLow::Request &req,
 {
     if (gpio_write(pigpio_handle, req.gpioId, PI_LOW) == 0)
     {
-        res.result = true;
+        res.hasSucceeded = true;
     }
     else
     {
-        res.result = false;
+        res.hasSucceeded = false;
     }
     return true;
 }

@@ -27,11 +27,11 @@ bool PigpioInput::readGpio(hal_pigpio::hal_pigpioReadGpio::Request &req,
     res.level = gpio_read(pigpio_handle, req.gpioId);
     if (res.level != PI_BAD_GPIO)
     {
-        res.result = true;
+        res.hasSucceeded = true;
     }
     else
     {
-        res.result = false;
+        res.hasSucceeded = false;
     }
     return true;
 }
