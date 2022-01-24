@@ -1,3 +1,6 @@
+#ifndef HAL_PIGPIOINIT
+#define HAL_PIGPIOINIT
+
 #include "ros/ros.h"
 
 // Pigpio library
@@ -26,3 +29,5 @@ public:
     bool setOutputMode(hal_pigpio::hal_pigpioSetOutputMode::Request &req,
                        hal_pigpio::hal_pigpioSetOutputMode::Response &res);
 };
+
+#endif

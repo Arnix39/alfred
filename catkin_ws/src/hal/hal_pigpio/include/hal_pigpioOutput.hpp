@@ -1,3 +1,6 @@
+#ifndef HAL_PIGPIOOUTPUT
+#define HAL_PIGPIOOUTPUT
+
 #include "ros/ros.h"
 
 // Pigpio library
@@ -30,3 +33,5 @@ public:
     bool setGpioLow(hal_pigpio::hal_pigpioSetGpioLow::Request &req,
                     hal_pigpio::hal_pigpioSetGpioLow::Response &res);
 };
+
+#endif

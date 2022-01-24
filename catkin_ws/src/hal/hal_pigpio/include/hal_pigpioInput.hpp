@@ -1,3 +1,6 @@
+#ifndef HAL_PIGPIOINPUT
+#define HAL_PIGPIOINPUT
+
 #include "ros/ros.h"
 
 // Pigpio library
@@ -28,3 +31,5 @@ public:
     bool setCallback(hal_pigpio::hal_pigpioSetCallback::Request &req,
                      hal_pigpio::hal_pigpioSetCallback::Response &res);
 };
+
+#endif

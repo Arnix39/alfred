@@ -1,3 +1,6 @@
+#ifndef HAL_PROXSENS
+#define HAL_PROXSENS
+
 #include "ros/ros.h"
 
 // Services and messages headers (generated)
@@ -37,3 +40,5 @@ public:
     void configureGpios(void);
     void trigger(void);
 };
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef HAL_PIGPIOI2C
+#define HAL_PIGPIOI2C
+
 #include "ros/ros.h"
 
 // Pigpio library
@@ -22,3 +25,5 @@ public:
     bool i2cClose(hal_pigpio::hal_pigpioI2cClose::Request &req,
                   hal_pigpio::hal_pigpioI2cClose::Response &res);
 };
+
+#endif
