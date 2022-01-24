@@ -20,10 +20,12 @@ bool PigpioOutput::setPwmDutycycle(hal_pigpio::hal_pigpioSetPwmDutycycle::Reques
     if ((req.dutycycle != 0) && (set_PWM_dutycycle(pigpio_handle, req.gpioId, req.dutycycle) == 0))
     {
         res.hasSucceeded = true;
+        ROS_INFO("Set PWM duty cycle of %u for GPIO %u!", req.dutycycle, req.gpioId);
     }
     else
     {
         res.hasSucceeded = false;
+        ROS_ERROR("Failed to set PWM duty cycle for GPIO %u!", req.gpioId);
     }
     return true;
 }
@@ -36,10 +38,12 @@ bool PigpioOutput::setPwmFrequency(hal_pigpio::hal_pigpioSetPwmFrequency::Reques
     if ((pwmSettingResult != PI_NOT_PERMITTED) && (pwmSettingResult != PI_BAD_USER_GPIO))
     {
         res.hasSucceeded = true;
+        ROS_INFO("Set PWM frequency of %u for GPIO %u!", req.frequency, req.gpioId);
     }
     else
     {
         res.hasSucceeded = false;
+        ROS_ERROR("Failed to set PWM frequency for GPIO %u!", req.gpioId);
     }
     return true;
 }
