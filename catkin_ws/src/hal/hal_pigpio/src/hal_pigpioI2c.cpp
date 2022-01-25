@@ -34,12 +34,12 @@ bool PigpioI2c::i2cClose(hal_pigpio::hal_pigpioI2cClose::Request &req,
     if (i2c_close(pigpio_handle, req.handle) == 0)
     {
         res.hasSucceeded = true;
-        ROS_INFO("I2C bus %u closed.", req.bus);
+        ROS_INFO("I2C device with handle %u closed.", req.handle);
     }
     else
     {
         res.hasSucceeded = false;
-        ROS_ERROR("Failed to close I2C bus %u.", req.bus);
+        ROS_ERROR("Failed to close I2C device with handle %u.", req.handle);
     }
     return true;
 }

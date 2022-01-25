@@ -1,5 +1,5 @@
 uint16 bus
 uint16 address
 ---
-bool result
+bool hasSucceeded
 int32 handle
