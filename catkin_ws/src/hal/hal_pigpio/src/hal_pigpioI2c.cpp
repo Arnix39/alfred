@@ -17,11 +17,13 @@ bool PigpioI2c::i2cOpen(hal_pigpio::hal_pigpioI2cOpen::Request &req,
     res.handle = i2c_open(pigpio_handle, req.bus, req.address, 0);
     if (res.handle >= 0)
     {
-        res.result = true;
+        res.hasSucceeded = true;
+        ROS_INFO("I2C bus %u open for device %u.", req.bus, req.address);
     }
     else
     {
-        res.result = false;
+        res.hasSucceeded = false;
+        ROS_ERROR("Failed to open I2C bus %u for device %u.", req.bus, req.address);
     }
     return true;
 }
@@ -31,11 +33,13 @@ bool PigpioI2c::i2cClose(hal_pigpio::hal_pigpioI2cClose::Request &req,
 {
     if (i2c_close(pigpio_handle, req.handle) == 0)
     {
-        res.result = true;
+        res.hasSucceeded = true;
+        ROS_INFO("I2C bus %u closed.", req.bus);
     }
     else
     {
-        res.result = false;
+        res.hasSucceeded = false;
+        ROS_ERROR("Failed to close I2C bus %u.", req.bus);
     }
     return true;
 }
