@@ -11,7 +11,7 @@ ProxSens::ProxSens(ros::NodeHandle *node)
 
 void ProxSens::edgeChangeCallback(const hal_pigpio::hal_pigpioEdgeChangeMsg &msg)
 {
-    static uint8_t lastEdgeChangeType = NO_CHANGE;
+    static uint8_t lastEdgeChangeType = RISING_EDGE;
     static uint32_t lastTimestamp = 0;
 
     uint32_t edgeLength = 0;

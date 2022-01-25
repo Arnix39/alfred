@@ -33,6 +33,8 @@ catkin_package(
   CATKIN_DEPENDS roscpp
 )
 
+add_library(hal_proxSens src/hal_proxSens.cpp)
+
 ###########
 ## Build ##
 ###########
@@ -60,5 +62,5 @@ install(TARGETS
 #############
 catkin_add_gmock(${PROJECT_NAME}-test test/test_hal_proxSens.cpp)
 if(TARGET ${PROJECT_NAME}-test)
-  target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES})
+  target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} hal_proxSens)
 endif()
