@@ -36,7 +36,6 @@ private:
     ros::ServiceClient gpioSetCallbackClient;
     ros::ServiceClient gpioSetOutputClient;
     ros::ServiceClient gpioSendTriggerPulseClient;
-    uint8_t gpio;
     uint8_t edgeChangeType;
     uint32_t timestamp;
     uint32_t echoCallbackId;
