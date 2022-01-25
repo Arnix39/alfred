@@ -58,7 +58,7 @@ install(TARGETS
 #############
 ## Testing ##
 #############
-catkin_add_gmock(${PROJECT_NAME}-test test/test_hal.cpp)
+catkin_add_gmock(${PROJECT_NAME}-test test/test_hal_proxSens.cpp)
 if(TARGET ${PROJECT_NAME}-test)
   target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES})
 endif()

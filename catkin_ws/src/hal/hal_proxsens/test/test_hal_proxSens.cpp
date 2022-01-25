@@ -1,12 +1,12 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 
-TEST(TestHal, testHal_success)
+TEST(TestHalProxSens, testHalProxSens_success)
 {
     SUCCEED();
 }
 
-TEST(TestHal, testHal_failure)
+TEST(TestHalProxSens, testHalProxSens_failure)
 {
     FAIL();
 }
