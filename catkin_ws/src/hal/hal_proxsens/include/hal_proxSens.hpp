@@ -27,11 +27,30 @@
 #define RISING_EDGE 1
 #define NO_CHANGE 2
 
+class ProxSensPublisher
+{
+public:
+    ProxSensPublisher() {}
+    virtual ~ProxSensPublisher() {}
+    virtual void publish(hal_proxsens::hal_proxsensMsg message) = 0;
+};
+
+class ProxSensPublisherRos : public ProxSensPublisher
+{
+private:
+    ros::Publisher proxSensPubRos;
+
+public:
+    ProxSensPublisherRos(ros::NodeHandle *node);
+    ~ProxSensPublisherRos() = default;
+    void publish(hal_proxsens::hal_proxsensMsg message) override;
+};
+
 class ProxSens
 {
 private:
+    ProxSensPublisher *proxSensPub;
     ros::Subscriber edgeChangeSub;
-    ros::Publisher proxSensPub;
     ros::ServiceClient gpioSetInputClient;
     ros::ServiceClient gpioSetCallbackClient;
     ros::ServiceClient gpioSetOutputClient;
@@ -43,7 +62,7 @@ private:
     void edgeChangeCallback(const hal_pigpio::hal_pigpioEdgeChangeMsg &msg);
 
 public:
-    ProxSens(ros::NodeHandle *node);
+    ProxSens(ros::NodeHandle *node, ProxSensPublisher *proxSensPub);
     void publishMessage(void);
     void configureGpios(void);
     void trigger(void);

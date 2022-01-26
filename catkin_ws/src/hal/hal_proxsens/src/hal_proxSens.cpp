@@ -1,9 +1,24 @@
 #include "hal_proxSens.hpp"
 
-ProxSens::ProxSens(ros::NodeHandle *node)
+ProxSensPublisherRos::ProxSensPublisherRos(ros::NodeHandle *node)
 {
-    proxSensPub = node->advertise<hal_proxsens::hal_proxsensMsg>("proxSensorValue", 1000);
+    proxSensPubRos = node->advertise<hal_proxsens::hal_proxsensMsg>("proxSensorValue", 1000);
+}
+
+void ProxSensPublisherRos::publish(hal_proxsens::hal_proxsensMsg message)
+{
+    proxSensPubRos.publish(message);
+}
+
+ProxSens::ProxSens(ros::NodeHandle *node, ProxSensPublisher *proxSensPublisher)
+{
+    edgeChangeType = NO_CHANGE;
+    timestamp = 0;
+    echoCallbackId = 0;
+    distanceInCm = UINT16_MAX;
+
     edgeChangeSub = node->subscribe("gpioEdgeChange", 1000, &ProxSens::edgeChangeCallback, this);
+    proxSensPub = proxSensPublisher;
 
     gpioSetInputClient = node->serviceClient<hal_pigpio::hal_pigpioSetInputMode>("hal_pigpioSetInputMode");
     gpioSetOutputClient = node->serviceClient<hal_pigpio::hal_pigpioSetOutputMode>("hal_pigpioSetOutputMode");
@@ -45,7 +60,7 @@ void ProxSens::publishMessage(void)
     hal_proxsens::hal_proxsensMsg message;
 
     message.distanceInCm = distanceInCm;
-    proxSensPub.publish(message);
+    proxSensPub->publish(message);
 }
 
 void ProxSens::configureGpios(void)
@@ -87,7 +102,9 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "hal_proxsens");
     ros::NodeHandle node;
 
-    ProxSens proxSens = ProxSens(&node);
+    ProxSensPublisherRos proxSensPublisherRos = ProxSensPublisherRos(&node);
+
+    ProxSens proxSens = ProxSens(&node, &proxSensPublisherRos);
     proxSens.configureGpios();
 
     ros::Rate loop_rate(10);
