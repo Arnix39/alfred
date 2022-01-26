@@ -3,46 +3,33 @@
 
 #include "hal_proxSens.hpp"
 
-TEST(TestHalProxSens, testHalProxSens_success)
+static uint16_t distanceInCm = 0;
+
+class ProxSensPublisher_mock : public ProxSensPublisher
+{
+public:
+    ProxSensPublisher_mock() = default;
+    ~ProxSensPublisher_mock() = default;
+    void publish(hal_proxsens::hal_proxsensMsg message) override;
+    uint16_t distanceInCm;
+};
+
+void ProxSensPublisher_mock::publish(hal_proxsens::hal_proxsensMsg message)
+{
+    distanceInCm = message.distanceInCm;
+}
+
+TEST(TestHalProxSens, sensorDistanceDefaultValue)
 {
     ros::NodeHandle node;
-    ros::Publisher publisher;
-    ros::Subscriber subscriber;
-    uint16_t distanceInCm = 0;
-
     hal_pigpio::hal_pigpioEdgeChangeMsg edgeChangeMsg;
+    ProxSensPublisher_mock proxSensPublisher = ProxSensPublisher_mock();
 
-    ProxSens proxSens = ProxSens(&node);
-
-    publisher = node.advertise<hal_pigpio::hal_pigpioEdgeChangeMsg>("gpioEdgeChange", 1000);
-    subscriber = node.subscribe<hal_proxsens::hal_proxsensMsg>("proxSensorValue", 1000, [&distanceInCm](const ros::MessageEvent<hal_proxsens::hal_proxsensMsg const> &event)
-                                                               {
-                                                                auto msg = *(event.getConstMessage());
-                                                                distanceInCm = msg.distanceInCm; });
-
-    edgeChangeMsg.gpioId = PROXSENS_ECHO_GPIO;
-    edgeChangeMsg.edgeChangeType = RISING_EDGE;
-    edgeChangeMsg.timeSinceBoot_us = 10000;
-
-    publisher.publish(edgeChangeMsg);
-
-    ros::WallDuration(1.0).sleep();
-    ros::spinOnce();
-
-    edgeChangeMsg.gpioId = PROXSENS_ECHO_GPIO;
-    edgeChangeMsg.edgeChangeType = FALLING_EDGE;
-    edgeChangeMsg.timeSinceBoot_us = 10590;
-
-    publisher.publish(edgeChangeMsg);
-
-    ros::WallDuration(1.0).sleep();
-    ros::spinOnce();
+    ProxSens proxSens = ProxSens(&node, &proxSensPublisher);
 
     proxSens.publishMessage();
 
-    ros::spinOnce();
-
-    ASSERT_EQ(distanceInCm, 10);
+    ASSERT_EQ(proxSensPublisher.distanceInCm, UINT16_MAX);
 }
 
 int main(int argc, char **argv)
