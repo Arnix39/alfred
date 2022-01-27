@@ -3,7 +3,8 @@
 
 #include "hal_proxSens.hpp"
 
-#define DISTANCE_TO_CHECK_10CM 10
+#define PROX_SENS_DISTANCE_10CM 10
+#define PROX_SENS_DISTANCE_DEFAULT_VALUE UINT16_MAX
 
 class ProxSensPublisherMock : public ProxSensPublisher
 {
@@ -54,7 +55,7 @@ TEST(TestHalProxSens, sensorDistanceDefaultValue)
 
     proxSens.publishMessage();
 
-    ASSERT_EQ(proxSensPublisher.distanceInCm, UINT16_MAX);
+    ASSERT_EQ(proxSensPublisher.distanceInCm, PROX_SENS_DISTANCE_DEFAULT_VALUE);
 }
 
 TEST(TestHalProxSens, sensorDistance10cm)
@@ -74,7 +75,7 @@ TEST(TestHalProxSens, sensorDistance10cm)
 
     proxSens.publishMessage();
 
-    ASSERT_EQ(proxSensPublisher.distanceInCm, DISTANCE_TO_CHECK_10CM);
+    ASSERT_EQ(proxSensPublisher.distanceInCm, PROX_SENS_DISTANCE_10CM);
 }
 
 TEST(TestHalProxSens, sensorDistance10cmWithTimestampRollout)
@@ -94,7 +95,27 @@ TEST(TestHalProxSens, sensorDistance10cmWithTimestampRollout)
 
     proxSens.publishMessage();
 
-    ASSERT_EQ(proxSensPublisher.distanceInCm, DISTANCE_TO_CHECK_10CM);
+    ASSERT_EQ(proxSensPublisher.distanceInCm, PROX_SENS_DISTANCE_10CM);
+}
+
+TEST(TestHalProxSens, sensorDistanceFallingEdgeFirst)
+{
+    ros::NodeHandle node;
+    hal_pigpio::hal_pigpioEdgeChangeMsg edgeChangeMsg;
+    ProxSensPublisherMock proxSensPublisher = ProxSensPublisherMock();
+    ProxSensSubscriberMock proxSensSubscriber = ProxSensSubscriberMock();
+
+    uint32_t timestampFallingEdge = 10000;
+    uint32_t timestampRisingEdge = 10590;
+
+    ProxSens proxSens = ProxSens(&node, &proxSensSubscriber, &proxSensPublisher);
+
+    proxSens.edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, FALLING_EDGE, timestampFallingEdge));
+    proxSens.edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, RISING_EDGE, timestampRisingEdge));
+
+    proxSens.publishMessage();
+
+    ASSERT_EQ(proxSensPublisher.distanceInCm, PROX_SENS_DISTANCE_DEFAULT_VALUE);
 }
 
 int main(int argc, char **argv)

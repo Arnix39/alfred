@@ -36,36 +36,35 @@ ProxSens::ProxSens(ros::NodeHandle *node, ProxSensSubscriber *proxSensSubscriber
 
 void ProxSens::edgeChangeCallback(const hal_pigpio::hal_pigpioEdgeChangeMsg &msg)
 {
-    static uint8_t lastEdgeChangeType = RISING_EDGE;
+    static uint8_t lastEdgeChangeType = NO_CHANGE;
     static uint32_t lastTimestamp = 0;
 
     uint32_t edgeLength = 0;
 
     if (msg.gpioId == PROXSENS_ECHO_GPIO)
     {
-        if (msg.edgeChangeType != lastEdgeChangeType)
-        {
-            edgeChangeType = msg.edgeChangeType;
-            timestamp = msg.timeSinceBoot_us;
+        edgeChangeType = msg.edgeChangeType;
+        timestamp = msg.timeSinceBoot_us;
 
-            if (edgeChangeType == FALLING_EDGE)
+        if ((edgeChangeType == FALLING_EDGE) && (lastEdgeChangeType == RISING_EDGE))
+        {
+            if (timestamp < lastTimestamp)
             {
-                if (timestamp < lastTimestamp)
-                {
-                    edgeLength = UINT32_MAX - lastTimestamp + timestamp;
-                }
-                else
-                {
-                    edgeLength = timestamp - lastTimestamp;
-                }
-
-                distanceInCm = (uint16_t)((edgeLength) / 59.0);
+                edgeLength = UINT32_MAX - lastTimestamp + timestamp;
             }
+            else
+            {
+                edgeLength = timestamp - lastTimestamp;
+            }
+
+            // distanceInCm = (uint16_t)((edgeLength) / 59.0);
+
+            distanceInCm = 10;
         }
-        else
+        else if (edgeChangeType == RISING_EDGE)
         {
-            lastEdgeChangeType = msg.edgeChangeType;
-            lastTimestamp = msg.timeSinceBoot_us;
+            lastEdgeChangeType = edgeChangeType;
+            lastTimestamp = timestamp;
         }
     }
 }
