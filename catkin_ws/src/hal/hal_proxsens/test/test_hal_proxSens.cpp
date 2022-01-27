@@ -33,6 +33,43 @@ void ProxSensSubscriberMock::subscribe(ProxSens *proxSens)
     (void)proxSens;
 }
 
+class ProxSensClientsMock : public ProxSensClients
+{
+private:
+    ros::ServiceClient SetInputClientMock;
+    ros::ServiceClient SetCallbackClientMock;
+    ros::ServiceClient SetOutputClientmock;
+    ros::ServiceClient SendTriggerPulseClientMock;
+
+public:
+    ProxSensClientsMock() = default;
+    ~ProxSensClientsMock() = default;
+    ros::ServiceClient getSetInputClientHandle() override;
+    ros::ServiceClient getSetCallbackClientHandle() override;
+    ros::ServiceClient getSetOutputClientHandle() override;
+    ros::ServiceClient getSendTriggerPulseClientHandle() override;
+};
+
+ros::ServiceClient ProxSensClientsMock::getSetInputClientHandle()
+{
+    return SetInputClientMock;
+}
+
+ros::ServiceClient ProxSensClientsMock::getSetCallbackClientHandle()
+{
+    return SetCallbackClientMock;
+}
+
+ros::ServiceClient ProxSensClientsMock::getSetOutputClientHandle()
+{
+    return SetOutputClientmock;
+}
+
+ros::ServiceClient ProxSensClientsMock::getSendTriggerPulseClientHandle()
+{
+    return SendTriggerPulseClientMock;
+}
+
 const hal_pigpio::hal_pigpioEdgeChangeMsg &edgeChangeMessage(uint8_t gpioId, uint8_t edgeChangeType, uint32_t timeSinceBoot_us)
 {
     hal_pigpio::hal_pigpioEdgeChangeMsg msg;
@@ -50,7 +87,8 @@ protected:
     ros::NodeHandle node;
     ProxSensPublisherMock proxSensPublisher;
     ProxSensSubscriberMock proxSensSubscriber;
-    ProxSens proxSens = ProxSens(&node, &proxSensSubscriber, &proxSensPublisher);
+    ProxSensClientsMock proxSensServiceClients;
+    ProxSens proxSens = ProxSens(&proxSensSubscriber, &proxSensPublisher, &proxSensServiceClients);
 };
 
 TEST_F(ProxSensTest, sensorDistanceDefaultValue)
