@@ -3,7 +3,7 @@
 
 #include "hal_proxSens.hpp"
 
-static uint16_t distanceInCm = 0;
+#define DISTANCE_TO_CHECK_10CM 10
 
 class ProxSensPublisherMock : public ProxSensPublisher
 {
@@ -49,7 +49,6 @@ TEST(TestHalProxSens, sensorDistanceDefaultValue)
     hal_pigpio::hal_pigpioEdgeChangeMsg edgeChangeMsg;
     ProxSensPublisherMock proxSensPublisher = ProxSensPublisherMock();
     ProxSensSubscriberMock proxSensSubscriber = ProxSensSubscriberMock();
-    distanceInCm = 0;
 
     ProxSens proxSens = ProxSens(&node, &proxSensSubscriber, &proxSensPublisher);
 
@@ -65,21 +64,37 @@ TEST(TestHalProxSens, sensorDistance10cm)
     ProxSensPublisherMock proxSensPublisher = ProxSensPublisherMock();
     ProxSensSubscriberMock proxSensSubscriber = ProxSensSubscriberMock();
 
-    hal_pigpio::hal_pigpioEdgeChangeMsg msg2;
-    msg2.gpioId = PROXSENS_ECHO_GPIO;
-    msg2.edgeChangeType = FALLING_EDGE;
-    msg2.timeSinceBoot_us = 10590;
-    const hal_pigpio::hal_pigpioEdgeChangeMsg &msgFallingEdge = msg2;
-
-    distanceInCm = 0;
+    uint32_t timestampRisingEdge = 10000;
+    uint32_t timestampFallingEdge = 10590;
 
     ProxSens proxSens = ProxSens(&node, &proxSensSubscriber, &proxSensPublisher);
 
-    proxSens.edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, RISING_EDGE, 10000));
-    proxSens.edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, FALLING_EDGE, 10590));
+    proxSens.edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, RISING_EDGE, timestampRisingEdge));
+    proxSens.edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, FALLING_EDGE, timestampFallingEdge));
 
     proxSens.publishMessage();
-    ASSERT_EQ(proxSensPublisher.distanceInCm, 10);
+
+    ASSERT_EQ(proxSensPublisher.distanceInCm, DISTANCE_TO_CHECK_10CM);
+}
+
+TEST(TestHalProxSens, sensorDistance10cmWithTimestampRollout)
+{
+    ros::NodeHandle node;
+    hal_pigpio::hal_pigpioEdgeChangeMsg edgeChangeMsg;
+    ProxSensPublisherMock proxSensPublisher = ProxSensPublisherMock();
+    ProxSensSubscriberMock proxSensSubscriber = ProxSensSubscriberMock();
+
+    uint32_t timestampRisingEdge = UINT32_MAX - 295;
+    uint32_t timestampFallingEdge = 295;
+
+    ProxSens proxSens = ProxSens(&node, &proxSensSubscriber, &proxSensPublisher);
+
+    proxSens.edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, RISING_EDGE, timestampRisingEdge));
+    proxSens.edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, FALLING_EDGE, timestampFallingEdge));
+
+    proxSens.publishMessage();
+
+    ASSERT_EQ(proxSensPublisher.distanceInCm, DISTANCE_TO_CHECK_10CM);
 }
 
 int main(int argc, char **argv)
