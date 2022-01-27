@@ -118,6 +118,8 @@ TEST(TestHalProxSens, sensorDistanceFallingEdgeFirst)
     ASSERT_EQ(proxSensPublisher.distanceInCm, PROX_SENS_DISTANCE_DEFAULT_VALUE);
 }
 
+// TODO: add test fixture
+
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
