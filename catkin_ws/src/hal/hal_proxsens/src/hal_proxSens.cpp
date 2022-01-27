@@ -49,7 +49,7 @@ ros::ServiceClient &ProxSensClientsRos::getSendTriggerPulseClientHandle()
     return gpioSendTriggerPulseClientRos;
 }
 
-ProxSens::ProxSens(ProxSensSubscriber *proxSensSubscriber, ProxSensPublisher *proxSensPublisher, ProxSensClientsRos *proxSensServiceClients)
+ProxSens::ProxSens(ProxSensSubscriber *proxSensSubscriber, ProxSensPublisher *proxSensPublisher, ProxSensClients *proxSensServiceClients)
 {
     edgeChangeType = NO_CHANGE;
     timestamp = 0;
