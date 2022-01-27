@@ -57,9 +57,7 @@ void ProxSens::edgeChangeCallback(const hal_pigpio::hal_pigpioEdgeChangeMsg &msg
                 edgeLength = timestamp - lastTimestamp;
             }
 
-            // distanceInCm = (uint16_t)((edgeLength) / 59.0);
-
-            distanceInCm = 10;
+            distanceInCm = (uint16_t)((edgeLength) / 59.0);
         }
         else if (edgeChangeType == RISING_EDGE)
         {
