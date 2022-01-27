@@ -11,9 +11,6 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
 )
 
-## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
-
 ################################################
 ## Declare ROS messages, services and actions ##
 ################################################
@@ -36,10 +33,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## catkin specific configuration ##
 ###################################
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES hal
   CATKIN_DEPENDS roscpp std_msgs
-#  DEPENDS system_lib
 )
 
 ###########
@@ -47,24 +41,14 @@ catkin_package(
 ###########
 
 include_directories(
-# include
+  include
   ${catkin_INCLUDE_DIRS}
-  ${pigpio_INCLUDE_DIRS}
 )
 
-## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/hal.cpp
-# )
-
-# add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_executable(${PROJECT_NAME}_node src/hal_imu.cpp)
-# set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
-  ${pigpio_LIBRAIRIES}
 )
-
 
 #############
 ## Install ##
