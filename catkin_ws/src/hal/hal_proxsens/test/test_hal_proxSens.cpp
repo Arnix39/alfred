@@ -6,6 +6,7 @@
 #define PROX_SENS_DISTANCE_10CM 10
 #define PROX_SENS_DISTANCE_DEFAULT_VALUE UINT16_MAX
 
+/* Publisher interface mock */
 class ProxSensPublisherMock : public ProxSensPublisher
 {
 public:
@@ -20,6 +21,7 @@ void ProxSensPublisherMock::publish(hal_proxsens::hal_proxsensMsg message)
     distanceInCm = message.distanceInCm;
 }
 
+/* Subscriber interface mock */
 class ProxSensSubscriberMock : public ProxSensSubscriber
 {
 public:
@@ -33,6 +35,7 @@ void ProxSensSubscriberMock::subscribe(ProxSens *proxSens)
     (void)proxSens;
 }
 
+/* Services interface mock */
 class ProxSensClientsMock : public ProxSensClients
 {
 private:
@@ -70,6 +73,7 @@ ros::ServiceClient ProxSensClientsMock::getSendTriggerPulseClientHandle()
     return SendTriggerPulseClientMock;
 }
 
+/* Helper functions */
 const hal_pigpio::hal_pigpioEdgeChangeMsg &edgeChangeMessage(uint8_t gpioId, uint8_t edgeChangeType, uint32_t timeSinceBoot_us)
 {
     hal_pigpio::hal_pigpioEdgeChangeMsg msg;
@@ -81,6 +85,7 @@ const hal_pigpio::hal_pigpioEdgeChangeMsg &edgeChangeMessage(uint8_t gpioId, uin
     return msgToSend;
 }
 
+/* Test fixtures */
 class ProxSensTest : public testing::Test
 {
 protected:
@@ -91,6 +96,7 @@ protected:
     ProxSens proxSens = ProxSens(&proxSensSubscriber, &proxSensPublisher, &proxSensServiceClients);
 };
 
+/* Test cases */
 TEST_F(ProxSensTest, sensorDistanceDefaultValue)
 {
     proxSens.publishMessage();
