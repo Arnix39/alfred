@@ -1,5 +1,6 @@
 #include "hal_proxSens.hpp"
 
+/* Publisher interface implementation */
 ProxSensPublisherRos::ProxSensPublisherRos(ros::NodeHandle *node)
 {
     proxSensPubRos = node->advertise<hal_proxsens::hal_proxsensMsg>("proxSensorValue", 1000);
@@ -10,6 +11,7 @@ void ProxSensPublisherRos::publish(hal_proxsens::hal_proxsensMsg message)
     proxSensPubRos.publish(message);
 }
 
+/* Subscriber interface implementation */
 ProxSensSubscriberRos::ProxSensSubscriberRos(ros::NodeHandle *node)
 {
     nodeHandle = node;
@@ -20,6 +22,7 @@ void ProxSensSubscriberRos::subscribe(ProxSens *proxSens)
     proxSensSubRos = nodeHandle->subscribe("gpioEdgeChange", 1000, &ProxSens::edgeChangeCallback, proxSens);
 }
 
+/* Services interface implementation */
 ProxSensClientsRos::ProxSensClientsRos(ros::NodeHandle *node)
 {
 
@@ -49,6 +52,7 @@ ros::ServiceClient ProxSensClientsRos::getSendTriggerPulseClientHandle()
     return gpioSendTriggerPulseClientRos;
 }
 
+/* Proximity sensor implementation */
 ProxSens::ProxSens(ProxSensSubscriber *proxSensSubscriber, ProxSensPublisher *proxSensPublisher, ProxSensClients *proxSensServiceClients)
 {
     edgeChangeType = NO_CHANGE;

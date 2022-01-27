@@ -4,6 +4,7 @@
 #include "stdint.h"
 
 #include "ros/ros.h"
+#include "hal_proxSensInterfaces.hpp"
 
 // Services and messages headers (generated)
 #include "hal_pigpio/hal_pigpioSetInputMode.h"
@@ -26,75 +27,6 @@
 #define FALLING_EDGE 0
 #define RISING_EDGE 1
 #define NO_CHANGE 2
-
-class ProxSens;
-
-class ProxSensPublisher
-{
-public:
-    ProxSensPublisher() {}
-    virtual ~ProxSensPublisher() {}
-    virtual void publish(hal_proxsens::hal_proxsensMsg message) = 0;
-};
-
-class ProxSensPublisherRos : public ProxSensPublisher
-{
-private:
-    ros::Publisher proxSensPubRos;
-
-public:
-    ProxSensPublisherRos(ros::NodeHandle *node);
-    ~ProxSensPublisherRos() = default;
-    void publish(hal_proxsens::hal_proxsensMsg message) override;
-};
-
-class ProxSensSubscriber
-{
-public:
-    ProxSensSubscriber() {}
-    virtual ~ProxSensSubscriber() {}
-    virtual void subscribe(ProxSens *proxSens) = 0;
-};
-
-class ProxSensSubscriberRos : public ProxSensSubscriber
-{
-private:
-    ros::Subscriber proxSensSubRos;
-    ros::NodeHandle *nodeHandle;
-
-public:
-    ProxSensSubscriberRos(ros::NodeHandle *node);
-    ~ProxSensSubscriberRos() = default;
-    void subscribe(ProxSens *proxSens) override;
-};
-
-class ProxSensClients
-{
-public:
-    ProxSensClients() {}
-    virtual ~ProxSensClients() {}
-    virtual ros::ServiceClient getSetInputClientHandle() = 0;
-    virtual ros::ServiceClient getSetCallbackClientHandle() = 0;
-    virtual ros::ServiceClient getSetOutputClientHandle() = 0;
-    virtual ros::ServiceClient getSendTriggerPulseClientHandle() = 0;
-};
-
-class ProxSensClientsRos : public ProxSensClients
-{
-private:
-    ros::ServiceClient gpioSetInputClientRos;
-    ros::ServiceClient gpioSetCallbackClientRos;
-    ros::ServiceClient gpioSetOutputClientRos;
-    ros::ServiceClient gpioSendTriggerPulseClientRos;
-
-public:
-    ProxSensClientsRos(ros::NodeHandle *node);
-    ~ProxSensClientsRos() = default;
-    ros::ServiceClient getSetInputClientHandle() override;
-    ros::ServiceClient getSetCallbackClientHandle() override;
-    ros::ServiceClient getSetOutputClientHandle() override;
-    ros::ServiceClient getSendTriggerPulseClientHandle() override;
-};
 
 class ProxSens
 {
