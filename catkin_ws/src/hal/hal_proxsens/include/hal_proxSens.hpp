@@ -73,10 +73,10 @@ class ProxSensClients
 public:
     ProxSensClients() {}
     virtual ~ProxSensClients() {}
-    virtual ros::ServiceClient &getSetInputClientHandle() = 0;
-    virtual ros::ServiceClient &getSetCallbackClientHandle() = 0;
-    virtual ros::ServiceClient &getSetOutputClientHandle() = 0;
-    virtual ros::ServiceClient &getSendTriggerPulseClientHandle() = 0;
+    virtual ros::ServiceClient getSetInputClientHandle() = 0;
+    virtual ros::ServiceClient getSetCallbackClientHandle() = 0;
+    virtual ros::ServiceClient getSetOutputClientHandle() = 0;
+    virtual ros::ServiceClient getSendTriggerPulseClientHandle() = 0;
 };
 
 class ProxSensClientsRos : public ProxSensClients
@@ -90,10 +90,10 @@ private:
 public:
     ProxSensClientsRos(ros::NodeHandle *node);
     ~ProxSensClientsRos() = default;
-    ros::ServiceClient &getSetInputClientHandle() override;
-    ros::ServiceClient &getSetCallbackClientHandle() override;
-    ros::ServiceClient &getSetOutputClientHandle() override;
-    ros::ServiceClient &getSendTriggerPulseClientHandle() override;
+    ros::ServiceClient getSetInputClientHandle() override;
+    ros::ServiceClient getSetCallbackClientHandle() override;
+    ros::ServiceClient getSetOutputClientHandle() override;
+    ros::ServiceClient getSendTriggerPulseClientHandle() override;
 };
 
 class ProxSens

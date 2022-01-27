@@ -29,22 +29,22 @@ ProxSensClientsRos::ProxSensClientsRos(ros::NodeHandle *node)
     gpioSendTriggerPulseClientRos = node->serviceClient<hal_pigpio::hal_pigpioSendTriggerPulse>("hal_pigpioSendTriggerPulse");
 }
 
-ros::ServiceClient &ProxSensClientsRos::getSetInputClientHandle()
+ros::ServiceClient ProxSensClientsRos::getSetInputClientHandle()
 {
     return gpioSetInputClientRos;
 }
 
-ros::ServiceClient &ProxSensClientsRos::getSetCallbackClientHandle()
+ros::ServiceClient ProxSensClientsRos::getSetCallbackClientHandle()
 {
     return gpioSetOutputClientRos;
 }
 
-ros::ServiceClient &ProxSensClientsRos::getSetOutputClientHandle()
+ros::ServiceClient ProxSensClientsRos::getSetOutputClientHandle()
 {
     return gpioSetCallbackClientRos;
 }
 
-ros::ServiceClient &ProxSensClientsRos::getSendTriggerPulseClientHandle()
+ros::ServiceClient ProxSensClientsRos::getSendTriggerPulseClientHandle()
 {
     return gpioSendTriggerPulseClientRos;
 }
