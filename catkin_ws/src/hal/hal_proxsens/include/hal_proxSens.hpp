@@ -68,21 +68,42 @@ public:
     void subscribe(ProxSens *proxSens) override;
 };
 
+class ProxSensClients
+{
+public:
+    ProxSensClients() {}
+    virtual ~ProxSensClients() {}
+};
+
+class ProxSensClientsRos : public ProxSensClients
+{
+private:
+    ros::ServiceClient gpioSetInputClientRos;
+    ros::ServiceClient gpioSetCallbackClientRos;
+    ros::ServiceClient gpioSetOutputClientRos;
+    ros::ServiceClient gpioSendTriggerPulseClientRos;
+
+public:
+    ProxSensClientsRos(ros::NodeHandle *node);
+    ~ProxSensClientsRos() = default;
+    ros::ServiceClient &getSetInputClientHandle();
+    ros::ServiceClient &getSetCallbackClientHandle();
+    ros::ServiceClient &getSetOutputClientHandle();
+    ros::ServiceClient &getSendTriggerPulseClientHandle();
+};
+
 class ProxSens
 {
 private:
     ProxSensPublisher *proxSensPub;
-    ros::ServiceClient gpioSetInputClient;
-    ros::ServiceClient gpioSetCallbackClient;
-    ros::ServiceClient gpioSetOutputClient;
-    ros::ServiceClient gpioSendTriggerPulseClient;
+    ProxSensClientsRos *proxSensClients;
     uint8_t edgeChangeType;
     uint32_t timestamp;
     uint32_t echoCallbackId;
     uint16_t distanceInCm;
 
 public:
-    ProxSens(ros::NodeHandle *node, ProxSensSubscriber *proxSensSubscriber, ProxSensPublisher *proxSensPub);
+    ProxSens(ProxSensSubscriber *proxSensSubscriber, ProxSensPublisher *proxSensPub, ProxSensClientsRos *proxSensServiceClients);
     void publishMessage(void);
     void configureGpios(void);
     void trigger(void);

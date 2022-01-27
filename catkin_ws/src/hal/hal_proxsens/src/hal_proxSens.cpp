@@ -20,7 +20,36 @@ void ProxSensSubscriberRos::subscribe(ProxSens *proxSens)
     proxSensSubRos = nodeHandle->subscribe("gpioEdgeChange", 1000, &ProxSens::edgeChangeCallback, proxSens);
 }
 
-ProxSens::ProxSens(ros::NodeHandle *node, ProxSensSubscriber *proxSensSubscriber, ProxSensPublisher *proxSensPublisher)
+ProxSensClientsRos::ProxSensClientsRos(ros::NodeHandle *node)
+{
+
+    gpioSetInputClientRos = node->serviceClient<hal_pigpio::hal_pigpioSetInputMode>("hal_pigpioSetInputMode");
+    gpioSetOutputClientRos = node->serviceClient<hal_pigpio::hal_pigpioSetOutputMode>("hal_pigpioSetOutputMode");
+    gpioSetCallbackClientRos = node->serviceClient<hal_pigpio::hal_pigpioSetCallback>("hal_pigpioSetCallback");
+    gpioSendTriggerPulseClientRos = node->serviceClient<hal_pigpio::hal_pigpioSendTriggerPulse>("hal_pigpioSendTriggerPulse");
+}
+
+ros::ServiceClient &ProxSensClientsRos::getSetInputClientHandle()
+{
+    return gpioSetInputClientRos;
+}
+
+ros::ServiceClient &ProxSensClientsRos::getSetCallbackClientHandle()
+{
+    return gpioSetOutputClientRos;
+}
+
+ros::ServiceClient &ProxSensClientsRos::getSetOutputClientHandle()
+{
+    return gpioSetCallbackClientRos;
+}
+
+ros::ServiceClient &ProxSensClientsRos::getSendTriggerPulseClientHandle()
+{
+    return gpioSendTriggerPulseClientRos;
+}
+
+ProxSens::ProxSens(ProxSensSubscriber *proxSensSubscriber, ProxSensPublisher *proxSensPublisher, ProxSensClientsRos *proxSensServiceClients)
 {
     edgeChangeType = NO_CHANGE;
     timestamp = 0;
@@ -29,9 +58,7 @@ ProxSens::ProxSens(ros::NodeHandle *node, ProxSensSubscriber *proxSensSubscriber
 
     proxSensPub = proxSensPublisher;
     proxSensSubscriber->subscribe(this);
-
-    gpioSetInputClient = node->serviceClient<hal_pigpio::hal_pigpioSetInputMode>("hal_pigpioSetInputMode");
-    gpioSetOutputClient = node->serviceClient<hal_pigpio::hal_pigpioSetOutputMode>("hal_pigpioSetOutputMode");
+    proxSensClients = proxSensServiceClients;
 }
 
 void ProxSens::edgeChangeCallback(const hal_pigpio::hal_pigpioEdgeChangeMsg &msg)
@@ -88,15 +115,15 @@ void ProxSens::configureGpios(void)
 
     setOutputModeSrv.request.gpioId = PROXSENS_TRIGGER_GPIO;
 
-    gpioSetInputClient.call(setInputModeSrv);
+    proxSensClients->getSetInputClientHandle().call(setInputModeSrv);
 
-    gpioSetCallbackClient.call(setCallbackSrv);
+    proxSensClients->getSetCallbackClientHandle().call(setCallbackSrv);
     if (setCallbackSrv.response.hasSucceeded)
     {
         echoCallbackId = setCallbackSrv.response.callbackId;
     }
 
-    gpioSetOutputClient.call(setOutputModeSrv);
+    proxSensClients->getSetOutputClientHandle().call(setOutputModeSrv);
 }
 
 void ProxSens::trigger(void)
@@ -106,7 +133,7 @@ void ProxSens::trigger(void)
     sendTriggerPulseSrv.request.gpioId = PROXSENS_TRIGGER_GPIO;
     sendTriggerPulseSrv.request.pulseLengthInUs = PROXSENS_TRIGGER_LENGTH_US;
 
-    gpioSendTriggerPulseClient.call(sendTriggerPulseSrv);
+    proxSensClients->getSendTriggerPulseClientHandle().call(sendTriggerPulseSrv);
 }
 
 int main(int argc, char **argv)
@@ -116,8 +143,9 @@ int main(int argc, char **argv)
 
     ProxSensPublisherRos proxSensPublisherRos = ProxSensPublisherRos(&node);
     ProxSensSubscriberRos proxSensSubscriber = ProxSensSubscriberRos(&node);
+    ProxSensClientsRos proxSensServiceClients = ProxSensClientsRos(&node);
 
-    ProxSens proxSens = ProxSens(&node, &proxSensSubscriber, &proxSensPublisherRos);
+    ProxSens proxSens = ProxSens(&proxSensSubscriber, &proxSensPublisherRos, &proxSensServiceClients);
     proxSens.configureGpios();
 
     ros::Rate loop_rate(10);
