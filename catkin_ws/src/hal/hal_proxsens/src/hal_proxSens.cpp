@@ -1,4 +1,5 @@
 #include "hal_proxSens.hpp"
+#include "hal_proxSensInterfaces.hpp"
 
 /* Publisher interface implementation */
 ProxSensPublisherRos::ProxSensPublisherRos(ros::NodeHandle *node)

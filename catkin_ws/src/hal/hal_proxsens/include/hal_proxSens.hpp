@@ -4,7 +4,7 @@
 #include "stdint.h"
 
 #include "ros/ros.h"
-#include "hal_proxSensInterfaces.hpp"
+#include "hal_proxSensVirtuals.hpp"
 
 // Services and messages headers (generated)
 #include "hal_pigpio/hal_pigpioSetInputMode.h"
