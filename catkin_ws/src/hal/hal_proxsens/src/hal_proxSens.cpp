@@ -10,15 +10,25 @@ void ProxSensPublisherRos::publish(hal_proxsens::hal_proxsensMsg message)
     proxSensPubRos.publish(message);
 }
 
-ProxSens::ProxSens(ros::NodeHandle *node, ProxSensPublisher *proxSensPublisher)
+ProxSensSubscriberRos::ProxSensSubscriberRos(ros::NodeHandle *node)
+{
+    nodeHandle = node;
+}
+
+void ProxSensSubscriberRos::subscribe(ProxSens *proxSens)
+{
+    proxSensSubRos = nodeHandle->subscribe("gpioEdgeChange", 1000, &ProxSens::edgeChangeCallback, proxSens);
+}
+
+ProxSens::ProxSens(ros::NodeHandle *node, ProxSensSubscriber *proxSensSubscriber, ProxSensPublisher *proxSensPublisher)
 {
     edgeChangeType = NO_CHANGE;
     timestamp = 0;
     echoCallbackId = 0;
     distanceInCm = UINT16_MAX;
 
-    edgeChangeSub = node->subscribe("gpioEdgeChange", 1000, &ProxSens::edgeChangeCallback, this);
     proxSensPub = proxSensPublisher;
+    proxSensSubscriber->subscribe(this);
 
     gpioSetInputClient = node->serviceClient<hal_pigpio::hal_pigpioSetInputMode>("hal_pigpioSetInputMode");
     gpioSetOutputClient = node->serviceClient<hal_pigpio::hal_pigpioSetOutputMode>("hal_pigpioSetOutputMode");
@@ -31,27 +41,32 @@ void ProxSens::edgeChangeCallback(const hal_pigpio::hal_pigpioEdgeChangeMsg &msg
 
     uint32_t edgeLength = 0;
 
-    if ((msg.gpioId == PROXSENS_ECHO_GPIO) && (msg.edgeChangeType != lastEdgeChangeType))
+    if (msg.gpioId == PROXSENS_ECHO_GPIO)
     {
-        edgeChangeType = msg.edgeChangeType;
-        timestamp = msg.timeSinceBoot_us;
-
-        if (edgeChangeType == FALLING_EDGE)
+        if (msg.edgeChangeType != lastEdgeChangeType)
         {
-            if (timestamp < lastTimestamp)
-            {
-                edgeLength = UINT32_MAX - lastTimestamp + timestamp;
-            }
-            else
-            {
-                edgeLength = timestamp - lastTimestamp;
-            }
+            edgeChangeType = msg.edgeChangeType;
+            timestamp = msg.timeSinceBoot_us;
 
-            distanceInCm = (uint16_t)((edgeLength) / 59.0);
+            if (edgeChangeType == FALLING_EDGE)
+            {
+                if (timestamp < lastTimestamp)
+                {
+                    edgeLength = UINT32_MAX - lastTimestamp + timestamp;
+                }
+                else
+                {
+                    edgeLength = timestamp - lastTimestamp;
+                }
+
+                distanceInCm = (uint16_t)((edgeLength) / 59.0);
+            }
         }
-
-        lastEdgeChangeType = edgeChangeType;
-        lastTimestamp = timestamp;
+        else
+        {
+            lastEdgeChangeType = msg.edgeChangeType;
+            lastTimestamp = msg.timeSinceBoot_us;
+        }
     }
 }
 
@@ -103,8 +118,9 @@ int main(int argc, char **argv)
     ros::NodeHandle node;
 
     ProxSensPublisherRos proxSensPublisherRos = ProxSensPublisherRos(&node);
+    ProxSensSubscriberRos proxSensSubscriber = ProxSensSubscriberRos(&node);
 
-    ProxSens proxSens = ProxSens(&node, &proxSensPublisherRos);
+    ProxSens proxSens = ProxSens(&node, &proxSensSubscriber, &proxSensPublisherRos);
     proxSens.configureGpios();
 
     ros::Rate loop_rate(10);

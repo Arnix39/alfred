@@ -27,6 +27,8 @@
 #define RISING_EDGE 1
 #define NO_CHANGE 2
 
+class ProxSens;
+
 class ProxSensPublisher
 {
 public:
@@ -46,11 +48,30 @@ public:
     void publish(hal_proxsens::hal_proxsensMsg message) override;
 };
 
+class ProxSensSubscriber
+{
+public:
+    ProxSensSubscriber() {}
+    virtual ~ProxSensSubscriber() {}
+    virtual void subscribe(ProxSens *proxSens) = 0;
+};
+
+class ProxSensSubscriberRos : public ProxSensSubscriber
+{
+private:
+    ros::Subscriber proxSensSubRos;
+    ros::NodeHandle *nodeHandle;
+
+public:
+    ProxSensSubscriberRos(ros::NodeHandle *node);
+    ~ProxSensSubscriberRos() = default;
+    void subscribe(ProxSens *proxSens) override;
+};
+
 class ProxSens
 {
 private:
     ProxSensPublisher *proxSensPub;
-    ros::Subscriber edgeChangeSub;
     ros::ServiceClient gpioSetInputClient;
     ros::ServiceClient gpioSetCallbackClient;
     ros::ServiceClient gpioSetOutputClient;
@@ -59,13 +80,13 @@ private:
     uint32_t timestamp;
     uint32_t echoCallbackId;
     uint16_t distanceInCm;
-    void edgeChangeCallback(const hal_pigpio::hal_pigpioEdgeChangeMsg &msg);
 
 public:
-    ProxSens(ros::NodeHandle *node, ProxSensPublisher *proxSensPub);
+    ProxSens(ros::NodeHandle *node, ProxSensSubscriber *proxSensSubscriber, ProxSensPublisher *proxSensPub);
     void publishMessage(void);
     void configureGpios(void);
     void trigger(void);
+    void edgeChangeCallback(const hal_pigpio::hal_pigpioEdgeChangeMsg &msg);
 };
 
 #endif
