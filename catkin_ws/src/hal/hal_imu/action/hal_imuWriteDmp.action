@@ -5,4 +5,4 @@ bool write
 bool success
 ---
 #feedback
-bool writingInProgress
+uint8 bank
