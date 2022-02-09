@@ -4,6 +4,8 @@
 #include "ros/ros.h"
 #include <actionlib/server/simple_action_server.h>
 
+#include "hal_imuDmpMemory.hpp"
+
 // Services and messages headers (generated)
 #include "hal_imu/hal_imuWriteDmpAction.h"
 #include "hal_imu/hal_imuWriteDmpResult.h"
