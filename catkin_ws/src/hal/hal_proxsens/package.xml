@@ -11,9 +11,13 @@
 
   <!-- Dependencies -->
   <buildtool_depend>catkin</buildtool_depend>
+
   <build_depend>roscpp</build_depend>
   <build_depend>hal_pigpio</build_depend>
+  <build_depend>message_generation</build_depend>
+
   <exec_depend>roscpp</exec_depend>
   <exec_depend>hal_pigpio</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
 
 </package>

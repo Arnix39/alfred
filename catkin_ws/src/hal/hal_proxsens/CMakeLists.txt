@@ -23,17 +23,16 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## Generate added messages and services with any dependencies listed here
   generate_messages(
-   DEPENDENCIES 
+   DEPENDENCIES
  )
 
 ###################################
 ## catkin specific configuration ##
 ###################################
 catkin_package(
-  CATKIN_DEPENDS roscpp
+  CATKIN_DEPENDS
+  roscpp
 )
-
-add_library(hal_proxSens src/hal_proxSens.cpp)
 
 ###########
 ## Build ##
@@ -44,9 +43,12 @@ include_directories(
 )
 
 add_executable(${PROJECT_NAME}_node src/hal_proxSens.cpp)
-add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
+)
+add_dependencies(${PROJECT_NAME}_node
+  ${catkin_EXPORTED_TARGETS}
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
 )
 
 #############
