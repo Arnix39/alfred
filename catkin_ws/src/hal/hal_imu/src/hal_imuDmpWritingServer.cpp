@@ -1,6 +1,6 @@
 #include "hal_imuDmpWritingServer.hpp"
 
-ImuDmpWritingServer::ImuDmpWritingServer(ros::NodeHandle *node) : imuDmpWritingServer(&node, "imuDMPWriting", boost::bind(&ImuDmpWritingServer::writeDmp, this, _1), false),
+ImuDmpWritingServer::ImuDmpWritingServer(ros::NodeHandle *node) : imuDmpWritingServer(*node, "imuDMPWriting", boost::bind(&ImuDmpWritingServer::writeDmp, this, _1), false),
                                                                   nodeHandle(node)
 {
     imuDmpWritingServer.start();
