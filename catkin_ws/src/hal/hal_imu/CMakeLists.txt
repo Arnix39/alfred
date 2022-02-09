@@ -8,7 +8,7 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
-  message_generation
+  actionlib_msgs
 )
 
 ################################################
@@ -22,18 +22,27 @@ find_package(catkin REQUIRED COMPONENTS
 #   Message2.msg
 # )
 
+## Generate action servers in the 'action' folder
+add_action_files(
+  DIRECTORY action
+  FILES hal_imuWriteDMP.action
+)
 
 ## Generate added messages and services with any dependencies listed here
-#  generate_messages(
-#   DEPENDENCIES 
-#   std_msgs
-# )
+generate_messages(
+  DEPENDENCIES 
+  std_msgs
+  actionlib_msgs
+)
 
 ###################################
 ## catkin specific configuration ##
 ###################################
 catkin_package(
-  CATKIN_DEPENDS roscpp std_msgs
+  CATKIN_DEPENDS 
+  roscpp 
+  std_msgs 
+  actionlib_msgs
 )
 
 ###########
@@ -49,7 +58,7 @@ add_executable(${PROJECT_NAME}_node src/hal_imu.cpp)
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
 )
-add_executable(${PROJECT_NAME}_node src/hal_imuInit.cpp)
+add_executable(${PROJECT_NAME}Init_node src/hal_imuInit.cpp)
 target_link_libraries(${PROJECT_NAME}Init_node
   ${catkin_LIBRARIES}
 )
