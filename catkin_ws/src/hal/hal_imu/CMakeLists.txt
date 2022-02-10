@@ -61,13 +61,11 @@ target_link_libraries(${PROJECT_NAME}_node
 )
 
 add_executable(${PROJECT_NAME}DmpWritingServer_node src/hal_imuDmpWritingServer.cpp)
+add_dependencies(${PROJECT_NAME}DmpWritingServer_node	${${PROJECT_NAME}_EXPORTED_TARGETS}	${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME}DmpWritingServer_node
   ${catkin_LIBRARIES}
 )
-add_dependencies(${PROJECT_NAME}DmpWritingServer_node
-	${${PROJECT_NAME}_EXPORTED_TARGETS}
-	${catkin_EXPORTED_TARGETS}
-)
+
 
 #############
 ## Install ##

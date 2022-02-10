@@ -36,6 +36,8 @@ add_service_files(
    hal_pigpioSendTriggerPulse.srv
    hal_pigpioI2cOpen.srv
    hal_pigpioI2cClose.srv
+   hal_pigpioI2cReadByteData.srv
+   hal_pigpioI2cWriteByteData.srv
    hal_pigpioReadGpio.srv
    hal_pigpioSetCallback.srv
  )

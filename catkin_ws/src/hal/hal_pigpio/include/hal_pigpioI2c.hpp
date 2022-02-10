@@ -9,12 +9,16 @@
 // Services and messages headers (generated)
 #include "hal_pigpio/hal_pigpioI2cOpen.h"
 #include "hal_pigpio/hal_pigpioI2cClose.h"
+#include "hal_pigpio/hal_pigpioI2cReadByteData.h"
+#include "hal_pigpio/hal_pigpioI2cWriteByteData.h"
 
 class PigpioI2c
 {
 private:
     ros::ServiceServer i2cOpenService;
     ros::ServiceServer i2cCloseService;
+    ros::ServiceServer i2cWriteByteDataService;
+    ros::ServiceServer i2cReadByteDataService;
     int pigpio_handle;
 
 public:
@@ -24,6 +28,10 @@ public:
                  hal_pigpio::hal_pigpioI2cOpen::Response &res);
     bool i2cClose(hal_pigpio::hal_pigpioI2cClose::Request &req,
                   hal_pigpio::hal_pigpioI2cClose::Response &res);
+    bool i2cReadByteData(hal_pigpio::hal_pigpioI2cReadByteData::Request &req,
+                         hal_pigpio::hal_pigpioI2cReadByteData::Response &res);
+    bool i2cWriteByteData(hal_pigpio::hal_pigpioI2cWriteByteData::Request &req,
+                          hal_pigpio::hal_pigpioI2cWriteByteData::Response &res);
 };
 
 #endif
