@@ -5,11 +5,14 @@
 #include <actionlib/server/simple_action_server.h>
 
 #include "hal_imuDmpMemory.hpp"
+#include "hal_imuVirtuals.hpp"
 
 // Services and messages headers (generated)
 #include "hal_imu/hal_imuWriteDmpAction.h"
 #include "hal_imu/hal_imuWriteDmpResult.h"
 #include "hal_imu/hal_imuWriteDmpGoal.h"
+#include "hal_pigpio/hal_pigpioI2cReadByteData.h"
+#include "hal_pigpio/hal_pigpioI2cWriteByteData.h"
 
 class ImuDmpWritingServer
 {

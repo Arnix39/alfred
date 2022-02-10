@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   actionlib
   message_generation
+  hal_pigpio
 )
 
 ################################################
