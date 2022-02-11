@@ -54,16 +54,14 @@ ros::ServiceClient ProxSensClientsRos::getSendTriggerPulseClientHandle()
 }
 
 /* Proximity sensor implementation */
-ProxSens::ProxSens(ProxSensSubscriber *proxSensSubscriber, ProxSensPublisher *proxSensPublisher, ProxSensClients *proxSensServiceClients)
+ProxSens::ProxSens(ProxSensSubscriber *proxSensSubscriber, ProxSensPublisher *proxSensPublisher, ProxSensClients *proxSensServiceClients) : edgeChangeType(NO_CHANGE),
+                                                                                                                                            timestamp(0),
+                                                                                                                                            echoCallbackId(0),
+                                                                                                                                            distanceInCm(UINT16_MAX),
+                                                                                                                                            proxSensPub(proxSensPublisher),
+                                                                                                                                            proxSensClients(proxSensServiceClients)
 {
-    edgeChangeType = NO_CHANGE;
-    timestamp = 0;
-    echoCallbackId = 0;
-    distanceInCm = UINT16_MAX;
-
-    proxSensPub = proxSensPublisher;
     proxSensSubscriber->subscribe(this);
-    proxSensClients = proxSensServiceClients;
 }
 
 void ProxSens::edgeChangeCallback(const hal_pigpio::hal_pigpioEdgeChangeMsg &msg)
