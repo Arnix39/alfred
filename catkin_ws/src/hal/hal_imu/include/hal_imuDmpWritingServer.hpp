@@ -18,14 +18,18 @@ class ImuDmpWritingServer
 {
 private:
     ros::NodeHandle *nodeHandle;
+    ImuClients *imuClients;
     actionlib::SimpleActionServer<hal_imu::hal_imuWriteDmpAction> imuDmpWritingServer;
     hal_imu::hal_imuWriteDmpFeedback feedback;
     hal_imu::hal_imuWriteDmpResult result;
+    int32_t imuHandle;
 
 public:
-    ImuDmpWritingServer(ros::NodeHandle *node);
+    ImuDmpWritingServer(ros::NodeHandle *node, ImuClients *imuServiceClients);
     ~ImuDmpWritingServer() = default;
     void writeDmp(const hal_imu::hal_imuWriteDmpGoalConstPtr &goal);
+    bool writeByteInRegister(uint8_t chipRegister, uint8_t value);
+    bool writeByte(uint8_t bank, uint8_t addressInBank, uint8_t value);
 };
 
 #endif
