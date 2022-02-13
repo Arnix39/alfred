@@ -2,9 +2,8 @@
 #include "hal_proxSensInterfaces.hpp"
 
 /* Publisher interface implementation */
-ProxSensPublisherRos::ProxSensPublisherRos(ros::NodeHandle *node)
+ProxSensPublisherRos::ProxSensPublisherRos(ros::NodeHandle *node) : proxSensPubRos(node->advertise<hal_proxsens::hal_proxsensMsg>("proxSensorValue", 1000))
 {
-    proxSensPubRos = node->advertise<hal_proxsens::hal_proxsensMsg>("proxSensorValue", 1000);
 }
 
 void ProxSensPublisherRos::publish(hal_proxsens::hal_proxsensMsg message)
@@ -13,9 +12,8 @@ void ProxSensPublisherRos::publish(hal_proxsens::hal_proxsensMsg message)
 }
 
 /* Subscriber interface implementation */
-ProxSensSubscriberRos::ProxSensSubscriberRos(ros::NodeHandle *node)
+ProxSensSubscriberRos::ProxSensSubscriberRos(ros::NodeHandle *node) : nodeHandle(node)
 {
-    nodeHandle = node;
 }
 
 void ProxSensSubscriberRos::subscribe(ProxSens *proxSens)
@@ -24,32 +22,31 @@ void ProxSensSubscriberRos::subscribe(ProxSens *proxSens)
 }
 
 /* Services interface implementation */
-ProxSensClientsRos::ProxSensClientsRos(ros::NodeHandle *node)
+ProxSensClientsRos::ProxSensClientsRos(ros::NodeHandle *node) : gpioSetInputClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetInputMode>("hal_pigpioSetInputMode")),
+                                                                gpioSetOutputClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetOutputMode>("hal_pigpioSetOutputMode")),
+                                                                gpioSetCallbackClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetCallback>("hal_pigpioSetCallback")),
+                                                                gpioSendTriggerPulseClientRos(node->serviceClient<hal_pigpio::hal_pigpioSendTriggerPulse>("hal_pigpioSendTriggerPulse"))
 {
-    gpioSetInputClientRos = node->serviceClient<hal_pigpio::hal_pigpioSetInputMode>("hal_pigpioSetInputMode");
-    gpioSetOutputClientRos = node->serviceClient<hal_pigpio::hal_pigpioSetOutputMode>("hal_pigpioSetOutputMode");
-    gpioSetCallbackClientRos = node->serviceClient<hal_pigpio::hal_pigpioSetCallback>("hal_pigpioSetCallback");
-    gpioSendTriggerPulseClientRos = node->serviceClient<hal_pigpio::hal_pigpioSendTriggerPulse>("hal_pigpioSendTriggerPulse");
 }
 
-ros::ServiceClient ProxSensClientsRos::getSetInputClientHandle()
+ros::ServiceClient *ProxSensClientsRos::getSetInputClientHandle()
 {
-    return gpioSetInputClientRos;
+    return &gpioSetInputClientRos;
 }
 
-ros::ServiceClient ProxSensClientsRos::getSetCallbackClientHandle()
+ros::ServiceClient *ProxSensClientsRos::getSetCallbackClientHandle()
 {
-    return gpioSetOutputClientRos;
+    return &gpioSetOutputClientRos;
 }
 
-ros::ServiceClient ProxSensClientsRos::getSetOutputClientHandle()
+ros::ServiceClient *ProxSensClientsRos::getSetOutputClientHandle()
 {
-    return gpioSetCallbackClientRos;
+    return &gpioSetCallbackClientRos;
 }
 
-ros::ServiceClient ProxSensClientsRos::getSendTriggerPulseClientHandle()
+ros::ServiceClient *ProxSensClientsRos::getSendTriggerPulseClientHandle()
 {
-    return gpioSendTriggerPulseClientRos;
+    return &gpioSendTriggerPulseClientRos;
 }
 
 /* Proximity sensor implementation */
@@ -117,15 +114,15 @@ void ProxSens::configureGpios(void)
 
     setOutputModeSrv.request.gpioId = PROXSENS_TRIGGER_GPIO;
 
-    proxSensClients->getSetInputClientHandle().call(setInputModeSrv);
+    proxSensClients->getSetInputClientHandle()->call(setInputModeSrv);
 
-    proxSensClients->getSetCallbackClientHandle().call(setCallbackSrv);
+    proxSensClients->getSetCallbackClientHandle()->call(setCallbackSrv);
     if (setCallbackSrv.response.hasSucceeded)
     {
         echoCallbackId = setCallbackSrv.response.callbackId;
     }
 
-    proxSensClients->getSetOutputClientHandle().call(setOutputModeSrv);
+    proxSensClients->getSetOutputClientHandle()->call(setOutputModeSrv);
 }
 
 void ProxSens::trigger(void)
@@ -135,7 +132,7 @@ void ProxSens::trigger(void)
     sendTriggerPulseSrv.request.gpioId = PROXSENS_TRIGGER_GPIO;
     sendTriggerPulseSrv.request.pulseLengthInUs = PROXSENS_TRIGGER_LENGTH_US;
 
-    proxSensClients->getSendTriggerPulseClientHandle().call(sendTriggerPulseSrv);
+    proxSensClients->getSendTriggerPulseClientHandle()->call(sendTriggerPulseSrv);
 }
 
 int main(int argc, char **argv)

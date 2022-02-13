@@ -29,10 +29,10 @@ class ProxSensClients
 public:
     ProxSensClients() {}
     virtual ~ProxSensClients() {}
-    virtual ros::ServiceClient getSetInputClientHandle() = 0;
-    virtual ros::ServiceClient getSetCallbackClientHandle() = 0;
-    virtual ros::ServiceClient getSetOutputClientHandle() = 0;
-    virtual ros::ServiceClient getSendTriggerPulseClientHandle() = 0;
+    virtual ros::ServiceClient *getSetInputClientHandle() = 0;
+    virtual ros::ServiceClient *getSetCallbackClientHandle() = 0;
+    virtual ros::ServiceClient *getSetOutputClientHandle() = 0;
+    virtual ros::ServiceClient *getSendTriggerPulseClientHandle() = 0;
 };
 
 #endif

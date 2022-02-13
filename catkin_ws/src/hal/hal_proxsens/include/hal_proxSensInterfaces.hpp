@@ -37,10 +37,10 @@ private:
 public:
     ProxSensClientsRos(ros::NodeHandle *node);
     ~ProxSensClientsRos() = default;
-    ros::ServiceClient getSetInputClientHandle() override;
-    ros::ServiceClient getSetCallbackClientHandle() override;
-    ros::ServiceClient getSetOutputClientHandle() override;
-    ros::ServiceClient getSendTriggerPulseClientHandle() override;
+    ros::ServiceClient *getSetInputClientHandle() override;
+    ros::ServiceClient *getSetCallbackClientHandle() override;
+    ros::ServiceClient *getSetOutputClientHandle() override;
+    ros::ServiceClient *getSendTriggerPulseClientHandle() override;
 };
 
 #endif
