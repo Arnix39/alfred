@@ -56,6 +56,12 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+add_library(${PROJECT_NAME}_lib src/hal_imuDmpWritingServer.cpp)
+add_dependencies(${PROJECT_NAME}_lib
+  ${catkin_EXPORTED_TARGETS}
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+)
+
 add_executable(${PROJECT_NAME}_node src/hal_imu.cpp)
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
@@ -66,7 +72,6 @@ add_dependencies(${PROJECT_NAME}DmpWritingServer_node	${${PROJECT_NAME}_EXPORTED
 target_link_libraries(${PROJECT_NAME}DmpWritingServer_node
   ${catkin_LIBRARIES}
 )
-
 
 #############
 ## Install ##
@@ -79,7 +84,7 @@ install(TARGETS
 #############
 ## Testing ##
 #############
-catkin_add_gmock(${PROJECT_NAME}-test test/test_hal_imu.cpp)
+catkin_add_gmock(${PROJECT_NAME}-test test/test_hal_imuDmpWritingServer.cpp)
 if(TARGET ${PROJECT_NAME}-test)
-  target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES})
+  target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} ${PROJECT_NAME}_lib)
 endif()
