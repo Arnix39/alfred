@@ -26,7 +26,6 @@ void ProxSensSubscriberRos::subscribe(ProxSens *proxSens)
 /* Services interface implementation */
 ProxSensClientsRos::ProxSensClientsRos(ros::NodeHandle *node)
 {
-
     gpioSetInputClientRos = node->serviceClient<hal_pigpio::hal_pigpioSetInputMode>("hal_pigpioSetInputMode");
     gpioSetOutputClientRos = node->serviceClient<hal_pigpio::hal_pigpioSetOutputMode>("hal_pigpioSetOutputMode");
     gpioSetCallbackClientRos = node->serviceClient<hal_pigpio::hal_pigpioSetCallback>("hal_pigpioSetCallback");
