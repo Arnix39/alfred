@@ -16,15 +16,15 @@ find_package(catkin REQUIRED COMPONENTS
 ################################################
 
 ## Generate messages in the 'msg' folder
- add_message_files(
-   FILES
-   hal_proxsensMsg.msg
- )
+add_message_files(
+  FILES
+  hal_proxsensMsg.msg
+)
 
 ## Generate added messages and services with any dependencies listed here
-  generate_messages(
-   DEPENDENCIES
- )
+generate_messages(
+  DEPENDENCIES
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -40,6 +40,12 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+)
+
+add_library(${PROJECT_NAME}_lib src/hal_proxSens.cpp)
+add_dependencies(${PROJECT_NAME}_lib
+  ${catkin_EXPORTED_TARGETS}
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
 )
 
 add_executable(${PROJECT_NAME}_node src/hal_proxSens.cpp)
@@ -64,5 +70,5 @@ install(TARGETS
 #############
 catkin_add_gmock(${PROJECT_NAME}-test test/test_hal_proxSens.cpp)
 if(TARGET ${PROJECT_NAME}-test)
-  target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} hal_proxSens)
+  target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} ${PROJECT_NAME}_lib)
 endif()

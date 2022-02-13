@@ -47,30 +47,30 @@ private:
 public:
     ProxSensClientsMock() = default;
     ~ProxSensClientsMock() = default;
-    ros::ServiceClient getSetInputClientHandle() override;
-    ros::ServiceClient getSetCallbackClientHandle() override;
-    ros::ServiceClient getSetOutputClientHandle() override;
-    ros::ServiceClient getSendTriggerPulseClientHandle() override;
+    ros::ServiceClient *getSetInputClientHandle() override;
+    ros::ServiceClient *getSetCallbackClientHandle() override;
+    ros::ServiceClient *getSetOutputClientHandle() override;
+    ros::ServiceClient *getSendTriggerPulseClientHandle() override;
 };
 
-ros::ServiceClient ProxSensClientsMock::getSetInputClientHandle()
+ros::ServiceClient *ProxSensClientsMock::getSetInputClientHandle()
 {
-    return SetInputClientMock;
+    return &SetInputClientMock;
 }
 
-ros::ServiceClient ProxSensClientsMock::getSetCallbackClientHandle()
+ros::ServiceClient *ProxSensClientsMock::getSetCallbackClientHandle()
 {
-    return SetCallbackClientMock;
+    return &SetCallbackClientMock;
 }
 
-ros::ServiceClient ProxSensClientsMock::getSetOutputClientHandle()
+ros::ServiceClient *ProxSensClientsMock::getSetOutputClientHandle()
 {
-    return SetOutputClientmock;
+    return &SetOutputClientmock;
 }
 
-ros::ServiceClient ProxSensClientsMock::getSendTriggerPulseClientHandle()
+ros::ServiceClient *ProxSensClientsMock::getSendTriggerPulseClientHandle()
 {
-    return SendTriggerPulseClientMock;
+    return &SendTriggerPulseClientMock;
 }
 
 /* Helper functions */
