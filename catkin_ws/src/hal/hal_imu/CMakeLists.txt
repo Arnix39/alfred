@@ -75,3 +75,11 @@ install(TARGETS
   ${PROJECT_NAME}_node
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+
+#############
+## Testing ##
+#############
+catkin_add_gmock(${PROJECT_NAME}-test test/test_hal_imu.cpp)
+if(TARGET ${PROJECT_NAME}-test)
+  target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES})
+endif()
