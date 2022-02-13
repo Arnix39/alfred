@@ -86,5 +86,5 @@ install(TARGETS
 #############
 catkin_add_gmock(${PROJECT_NAME}-test test/test_hal_imuDmpWritingServer.cpp)
 if(TARGET ${PROJECT_NAME}-test)
-  target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} ${PROJECT_NAME}_lib)
+  target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME}_lib ${catkin_LIBRARIES})
 endif()

@@ -6,10 +6,6 @@
 /* Action server interface mock */
 class ImuActionServerMock : public ImuActionServer
 {
-private:
-    ros::NodeHandle *nodeHandle;
-    imuActionServer_t imuWriteDmpServermock;
-
 public:
     ImuActionServerMock() = default;
     ~ImuActionServerMock() = default;
@@ -19,11 +15,12 @@ public:
 
 void ImuActionServerMock::registerCallback(ImuDmpWritingServer *imuDmpWritingServer)
 {
+    (void)imuDmpWritingServer;
 }
 
 imuActionServer_t *ImuActionServerMock::getActionServerHandle()
 {
-    return &imuWriteDmpServermock;
+    return nullptr;
 }
 
 /* Services interface mock */
@@ -63,7 +60,6 @@ protected:
 /* Test cases */
 TEST_F(ImuDmpWritingServerTest, sensorDistanceDefaultValue)
 {
-    ASSERT_TRUE(true);
 }
 
 int main(int argc, char **argv)
