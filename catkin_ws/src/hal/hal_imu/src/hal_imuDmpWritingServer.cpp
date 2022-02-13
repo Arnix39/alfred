@@ -2,32 +2,51 @@
 #include "hal_imuInterfaces.hpp"
 #include "hal_imuMPU6050.hpp"
 
+/* Action server interface implementation */
+ImuActionServerRos::ImuActionServerRos(ros::NodeHandle *node) : nodeHandle(node),
+                                                                imuWriteDmpServerRos(*nodeHandle, "imuDMPWriting", false)
+{
+}
+
+ImuActionServerRos::ImuActionServerRos(const ImuActionServerRos &) : imuWriteDmpServerRos(*nodeHandle, "imuDMPWriting", false)
+{
+}
+
+void ImuActionServerRos::registerCallback(ImuDmpWritingServer *imuDmpWritingServer)
+{
+    imuWriteDmpServerRos.registerGoalCallback((std::function<void()>)std::bind(&ImuDmpWritingServer::writeDmp, imuDmpWritingServer));
+}
+
+imuActionServer_t *ImuActionServerRos::getActionServerHandle()
+{
+    return &imuWriteDmpServerRos;
+}
+
 /* Services interface implementation */
-ImuClientsRos::ImuClientsRos(ros::NodeHandle *node)
+ImuClientsRos::ImuClientsRos(ros::NodeHandle *node) : i2cReadByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cReadByteData>("hal_pigpioI2cReadByteData")),
+                                                      i2cWriteByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteByteData>("hal_pigpioI2cWriteByteData"))
 {
-    i2cReadByteDataClientRos = node->serviceClient<hal_pigpio::hal_pigpioI2cReadByteData>("hal_pigpioI2cReadByteData");
-    i2cWriteByteDataClientRos = node->serviceClient<hal_pigpio::hal_pigpioI2cWriteByteData>("hal_pigpioI2cWriteByteData");
 }
 
-ros::ServiceClient ImuClientsRos::getReadByteDataClientHandle()
+ros::ServiceClient *ImuClientsRos::getReadByteDataClientHandle()
 {
-    return i2cReadByteDataClientRos;
+    return &i2cReadByteDataClientRos;
 }
 
-ros::ServiceClient ImuClientsRos::getWriteByteDataClientHandle()
+ros::ServiceClient *ImuClientsRos::getWriteByteDataClientHandle()
 {
-    return i2cWriteByteDataClientRos;
+    return &i2cWriteByteDataClientRos;
 }
 
 /* IMU implementation */
-ImuDmpWritingServer::ImuDmpWritingServer(ros::NodeHandle *node, ImuClients *imuServiceClients) : imuDmpWritingServer(*node, "imuDMPWriting", boost::bind(&ImuDmpWritingServer::writeDmp, this, _1), false),
-                                                                                                 nodeHandle(node),
-                                                                                                 imuClients(imuServiceClients)
+ImuDmpWritingServer::ImuDmpWritingServer(ImuActionServer *imuWriteDmpServer, ImuClients *imuServiceClients) : imuDmpWritingServer(imuWriteDmpServer),
+                                                                                                              imuClients(imuServiceClients)
 {
-    imuDmpWritingServer.start();
+    imuDmpWritingServer->registerCallback(this);
+    imuDmpWritingServer->getActionServerHandle()->start();
 }
 
-void ImuDmpWritingServer::writeDmp(const hal_imu::hal_imuWriteDmpGoalConstPtr &goal)
+void ImuDmpWritingServer::writeDmp(void)
 {
     uint8_t bank = 0;
     uint8_t addressInBank = 0;
@@ -53,11 +72,11 @@ void ImuDmpWritingServer::writeDmp(const hal_imu::hal_imuWriteDmpGoalConstPtr &g
 
     if (result.success)
     {
-        imuDmpWritingServer.setSucceeded(result);
+        imuDmpWritingServer->getActionServerHandle()->setSucceeded(result);
     }
     else
     {
-        imuDmpWritingServer.setAborted(result);
+        imuDmpWritingServer->getActionServerHandle()->setAborted(result);
     }
 }
 
@@ -101,7 +120,7 @@ bool ImuDmpWritingServer::writeByteInRegister(uint8_t chipRegister, uint8_t valu
 
     i2cWriteByteDataSrv.request.deviceRegister = chipRegister;
     i2cWriteByteDataSrv.request.value = value;
-    imuClients->getWriteByteDataClientHandle().call(i2cWriteByteDataSrv);
+    imuClients->getWriteByteDataClientHandle()->call(i2cWriteByteDataSrv);
 
     if (i2cWriteByteDataSrv.response.hasSucceeded)
     {
@@ -119,8 +138,9 @@ int main(int argc, char **argv)
     ros::NodeHandle node;
 
     ImuClientsRos imuServiceClients = ImuClientsRos(&node);
+    ImuActionServerRos imuWriteDmpServer = ImuActionServerRos(&node);
 
-    ImuDmpWritingServer imuDmpWritingServer(&node, &imuServiceClients);
+    ImuDmpWritingServer imuDmpWritingServer(&imuWriteDmpServer, &imuServiceClients);
 
     ros::spin();
 

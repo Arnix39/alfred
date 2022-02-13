@@ -3,6 +3,20 @@
 
 #include "hal_imuVirtuals.hpp"
 
+class ImuActionServerRos : public ImuActionServer
+{
+private:
+    ros::NodeHandle *nodeHandle;
+    imuActionServer_t imuWriteDmpServerRos;
+
+public:
+    ImuActionServerRos(ros::NodeHandle *node);
+    ImuActionServerRos(const ImuActionServerRos &);
+    ~ImuActionServerRos() = default;
+    void registerCallback(ImuDmpWritingServer *imuDmpWritingServer) override;
+    imuActionServer_t *getActionServerHandle() override;
+};
+
 class ImuClientsRos : public ImuClients
 {
 private:
@@ -12,8 +26,8 @@ private:
 public:
     ImuClientsRos(ros::NodeHandle *node);
     ~ImuClientsRos() = default;
-    ros::ServiceClient getReadByteDataClientHandle() override;
-    ros::ServiceClient getWriteByteDataClientHandle() override;
+    ros::ServiceClient *getReadByteDataClientHandle() override;
+    ros::ServiceClient *getWriteByteDataClientHandle() override;
 };
 
 #endif
