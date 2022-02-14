@@ -140,11 +140,11 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "hal_proxsens");
     ros::NodeHandle node;
 
-    ProxSensPublisherRos proxSensPublisherRos = ProxSensPublisherRos(&node);
-    ProxSensSubscriberRos proxSensSubscriber = ProxSensSubscriberRos(&node);
-    ProxSensClientsRos proxSensServiceClients = ProxSensClientsRos(&node);
+    ProxSensPublisherRos proxSensPublisherRos(&node);
+    ProxSensSubscriberRos proxSensSubscriberRos(&node);
+    ProxSensClientsRos proxSensServiceClientsRos(&node);
 
-    ProxSens proxSens = ProxSens(&proxSensSubscriber, &proxSensPublisherRos, &proxSensServiceClients);
+    ProxSens proxSens(&proxSensSubscriberRos, &proxSensPublisherRos, &proxSensServiceClientsRos);
     proxSens.configureGpios();
 
     ros::Rate loop_rate(10);

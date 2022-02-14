@@ -43,10 +43,6 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME}_lib src/hal_proxSens.cpp)
-add_dependencies(${PROJECT_NAME}_lib
-  ${catkin_EXPORTED_TARGETS}
-  ${${PROJECT_NAME}_EXPORTED_TARGETS}
-)
 
 add_executable(${PROJECT_NAME}_node src/hal_proxSens.cpp)
 target_link_libraries(${PROJECT_NAME}_node

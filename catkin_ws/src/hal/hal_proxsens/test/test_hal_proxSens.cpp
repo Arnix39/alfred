@@ -90,10 +90,15 @@ class ProxSensTest : public testing::Test
 {
 protected:
     ros::NodeHandle node;
-    ProxSensPublisherMock proxSensPublisher;
-    ProxSensSubscriberMock proxSensSubscriber;
-    ProxSensClientsMock proxSensServiceClients;
-    ProxSens proxSens = ProxSens(&proxSensSubscriber, &proxSensPublisher, &proxSensServiceClients);
+    ProxSensPublisherMock proxSensPublisherMock;
+    ProxSensSubscriberMock proxSensSubscriberMock;
+    ProxSensClientsMock proxSensServiceClientsMock;
+    ProxSens proxSens;
+
+public:
+    ProxSensTest() : proxSens(&proxSensSubscriberMock, &proxSensPublisherMock, &proxSensServiceClientsMock)
+    {
+    }
 };
 
 /* Test cases */
@@ -101,7 +106,7 @@ TEST_F(ProxSensTest, sensorDistanceDefaultValue)
 {
     proxSens.publishMessage();
 
-    ASSERT_EQ(proxSensPublisher.distanceInCm, PROX_SENS_DISTANCE_DEFAULT_VALUE);
+    ASSERT_EQ(proxSensPublisherMock.distanceInCm, PROX_SENS_DISTANCE_DEFAULT_VALUE);
 }
 
 TEST_F(ProxSensTest, sensorDistanceFallingEdgeFirst)
@@ -114,7 +119,7 @@ TEST_F(ProxSensTest, sensorDistanceFallingEdgeFirst)
 
     proxSens.publishMessage();
 
-    ASSERT_EQ(proxSensPublisher.distanceInCm, PROX_SENS_DISTANCE_DEFAULT_VALUE);
+    ASSERT_EQ(proxSensPublisherMock.distanceInCm, PROX_SENS_DISTANCE_DEFAULT_VALUE);
 }
 
 TEST_F(ProxSensTest, sensorDistance10cm)
@@ -127,7 +132,7 @@ TEST_F(ProxSensTest, sensorDistance10cm)
 
     proxSens.publishMessage();
 
-    ASSERT_EQ(proxSensPublisher.distanceInCm, PROX_SENS_DISTANCE_10CM);
+    ASSERT_EQ(proxSensPublisherMock.distanceInCm, PROX_SENS_DISTANCE_10CM);
 }
 
 TEST_F(ProxSensTest, sensorDistance10cmWithTimestampRollout)
@@ -140,7 +145,7 @@ TEST_F(ProxSensTest, sensorDistance10cmWithTimestampRollout)
 
     proxSens.publishMessage();
 
-    ASSERT_EQ(proxSensPublisher.distanceInCm, PROX_SENS_DISTANCE_10CM);
+    ASSERT_EQ(proxSensPublisherMock.distanceInCm, PROX_SENS_DISTANCE_10CM);
 }
 
 int main(int argc, char **argv)
