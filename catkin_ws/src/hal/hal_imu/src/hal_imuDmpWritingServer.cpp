@@ -8,10 +8,6 @@ ImuActionServerRos::ImuActionServerRos(ros::NodeHandle *node) : nodeHandle(node)
 {
 }
 
-ImuActionServerRos::ImuActionServerRos(const ImuActionServerRos &) : imuWriteDmpServerRos(*nodeHandle, "imuDMPWriting", false)
-{
-}
-
 void ImuActionServerRos::registerCallback(ImuDmpWritingServer *imuDmpWritingServer)
 {
     imuWriteDmpServerRos.registerGoalCallback((std::function<void()>)std::bind(&ImuDmpWritingServer::writeDmp, imuDmpWritingServer));
@@ -137,8 +133,8 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "hal_imuInit");
     ros::NodeHandle node;
 
-    ImuClientsRos imuServiceClients = ImuClientsRos(&node);
-    ImuActionServerRos imuWriteDmpServer = ImuActionServerRos(&node);
+    ImuClientsRos imuServiceClients(&node);
+    ImuActionServerRos imuWriteDmpServer(&node);
 
     ImuDmpWritingServer imuDmpWritingServer(&imuWriteDmpServer, &imuServiceClients);
 

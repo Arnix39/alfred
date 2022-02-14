@@ -6,12 +6,19 @@
 /* Action server interface mock */
 class ImuActionServerMock : public ImuActionServer
 {
+private:
+    imuActionServer_t *imuWriteDmpServer;
+
 public:
-    ImuActionServerMock() = default;
+    ImuActionServerMock(imuActionServer_t *imuWriteDmpServerMock);
     ~ImuActionServerMock() = default;
     void registerCallback(ImuDmpWritingServer *imuDmpWritingServer) override;
     imuActionServer_t *getActionServerHandle() override;
 };
+
+ImuActionServerMock::ImuActionServerMock(imuActionServer_t *imuWriteDmpServerMock) : imuWriteDmpServer(imuWriteDmpServerMock)
+{
+}
 
 void ImuActionServerMock::registerCallback(ImuDmpWritingServer *imuDmpWritingServer)
 {
@@ -20,7 +27,7 @@ void ImuActionServerMock::registerCallback(ImuDmpWritingServer *imuDmpWritingSer
 
 imuActionServer_t *ImuActionServerMock::getActionServerHandle()
 {
-    return nullptr;
+    return imuWriteDmpServer;
 }
 
 /* Services interface mock */
@@ -52,13 +59,21 @@ class ImuDmpWritingServerTest : public testing::Test
 {
 protected:
     ros::NodeHandle node;
+    imuActionServer_t imuWriteDmpServerMock;
     ImuActionServerMock imuWriteDmpServer;
     ImuClientsMock imuServiceClients;
-    ImuDmpWritingServer imuDmpWritingServer = ImuDmpWritingServer(&imuWriteDmpServer, &imuServiceClients);
+    ImuDmpWritingServer imuDmpWritingServer;
+
+public:
+    ImuDmpWritingServerTest() : imuWriteDmpServerMock(node, "imuDMPWriting", false),
+                                imuWriteDmpServer(&imuWriteDmpServerMock),
+                                imuDmpWritingServer(&imuWriteDmpServer, &imuServiceClients)
+    {
+    }
 };
 
 /* Test cases */
-TEST_F(ImuDmpWritingServerTest, sensorDistanceDefaultValue)
+TEST_F(ImuDmpWritingServerTest, writeByte)
 {
 }
 

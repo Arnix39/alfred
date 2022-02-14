@@ -11,7 +11,6 @@ private:
 
 public:
     ImuActionServerRos(ros::NodeHandle *node);
-    ImuActionServerRos(const ImuActionServerRos &);
     ~ImuActionServerRos() = default;
     void registerCallback(ImuDmpWritingServer *imuDmpWritingServer) override;
     imuActionServer_t *getActionServerHandle() override;
