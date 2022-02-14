@@ -60,8 +60,8 @@ void ImuDmpWritingServer::writeDmp(void)
 
         if (addressInBank == 0)
         {
-            feedback = bank;
-            imuDmpWritingServer->getActionServerHandle()->publishFeedback(feedback)
+            feedback.bank = bank;
+            imuDmpWritingServer->getActionServerHandle()->publishFeedback(feedback);
         }
 
         writeSuccess = writeByte(bank, addressInBank, byteData);
