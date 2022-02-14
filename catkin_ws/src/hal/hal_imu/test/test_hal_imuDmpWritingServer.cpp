@@ -72,11 +72,6 @@ public:
     }
 };
 
-/* Test cases */
-TEST_F(ImuDmpWritingServerTest, writeByte)
-{
-}
-
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
