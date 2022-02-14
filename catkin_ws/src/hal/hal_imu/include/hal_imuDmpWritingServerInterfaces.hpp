@@ -1,7 +1,7 @@
-#ifndef HAL_IMUINTERFACES
-#define HAL_IMUINTERFACES
+#ifndef HAL_IMUDMPWRITINGSERVERINTERFACES
+#define HAL_IMUDMPWRITINGSERVERINTERFACES
 
-#include "hal_imuVirtuals.hpp"
+#include "hal_imuDmpWritingServerVirtuals.hpp"
 
 class ImuActionServerRos : public ImuActionServer
 {

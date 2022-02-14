@@ -1,5 +1,5 @@
 #include "hal_imuDmpWritingServer.hpp"
-#include "hal_imuInterfaces.hpp"
+#include "hal_imuDmpWritingServerInterfaces.hpp"
 #include "hal_imuMPU6050.hpp"
 
 /* Action server interface implementation */
