@@ -58,6 +58,12 @@ void ImuDmpWritingServer::writeDmp(void)
         addressInBank = byte % MPU6050_BANK_SIZE;
         bank = (byte - addressInBank) / MPU6050_BANK_SIZE;
 
+        if (addressInBank == 0)
+        {
+            feedback = bank;
+            imuDmpWritingServer->getActionServerHandle()->publishFeedback(feedback)
+        }
+
         writeSuccess = writeByte(bank, addressInBank, byteData);
         if (!writeSuccess)
         {
