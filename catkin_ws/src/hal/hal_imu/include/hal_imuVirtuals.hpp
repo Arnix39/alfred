@@ -10,7 +10,7 @@ class ImuServers
 public:
     ImuServers() {}
     virtual ~ImuServers() {}
-    virtual void advertise(Imu *imu) = 0;
+    virtual void advertiseGetHandleService(Imu *imu) = 0;
 };
 
 #endif

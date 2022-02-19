@@ -12,7 +12,7 @@ private:
 public:
     ImuServersRos(ros::NodeHandle *node);
     ~ImuServersRos() = default;
-    void advertise(Imu *imu) override;
+    void advertiseGetHandleService(Imu *imu) override;
 };
 
 #endif

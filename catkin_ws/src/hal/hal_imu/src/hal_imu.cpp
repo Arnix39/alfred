@@ -6,7 +6,7 @@ ImuServersRos::ImuServersRos(ros::NodeHandle *node) : nodeHandle(node)
 {
 }
 
-void ImuServersRos::advertise(Imu *imu)
+void ImuServersRos::advertiseGetHandleService(Imu *imu)
 {
     imuGetHandleServerRos = nodeHandle->advertiseService("hal_imuGetHandle", &Imu::getHandle, imu);
 }
@@ -14,7 +14,7 @@ void ImuServersRos::advertise(Imu *imu)
 /* IMU implementation */
 Imu::Imu(ImuServers *imuServiceServers) : imuServers(imuServiceServers)
 {
-    imuServers->advertise(this);
+    imuServers->advertiseGetHandleService(this);
 }
 
 bool Imu::getHandle(hal_imu::hal_imuGetHandle::Request &req,
