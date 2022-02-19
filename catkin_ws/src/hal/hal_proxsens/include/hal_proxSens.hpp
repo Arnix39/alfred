@@ -33,6 +33,7 @@ class ProxSens
 private:
     ProxSensPublisher *proxSensPub;
     ProxSensClients *proxSensClients;
+    ProxSensSubscriber *proxSensSub;
     uint8_t edgeChangeType;
     uint32_t timestamp;
     uint32_t echoCallbackId;

@@ -55,9 +55,10 @@ ProxSens::ProxSens(ProxSensSubscriber *proxSensSubscriber, ProxSensPublisher *pr
                                                                                                                                             echoCallbackId(0),
                                                                                                                                             distanceInCm(UINT16_MAX),
                                                                                                                                             proxSensPub(proxSensPublisher),
-                                                                                                                                            proxSensClients(proxSensServiceClients)
+                                                                                                                                            proxSensClients(proxSensServiceClients),
+                                                                                                                                            proxSensSub(proxSensSubscriber)
 {
-    proxSensSubscriber->subscribe(this);
+    proxSensSub->subscribe(this);
 }
 
 void ProxSens::edgeChangeCallback(const hal_pigpio::hal_pigpioEdgeChangeMsg &msg)
