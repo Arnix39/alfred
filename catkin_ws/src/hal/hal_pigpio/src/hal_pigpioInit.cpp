@@ -2,9 +2,9 @@
 
 PigpioInit::PigpioInit(ros::NodeHandle *node)
 {
-    pigpio_handle = pigpio_start(NULL, NULL);
+    pigpioHandle = pigpio_start(NULL, NULL);
 
-    if (pigpio_handle < 0)
+    if (pigpioHandle < 0)
     {
         ROS_ERROR("Failed to start pigpio daemon");
     }
@@ -16,20 +16,20 @@ PigpioInit::PigpioInit(ros::NodeHandle *node)
 
 PigpioInit::~PigpioInit()
 {
-    pigpio_stop(pigpio_handle);
+    pigpio_stop(pigpioHandle);
 }
 
 bool PigpioInit::getHandle(hal_pigpio::hal_pigpioGetHandle::Request &req,
                            hal_pigpio::hal_pigpioGetHandle::Response &res)
 {
-    res.handle = pigpio_handle;
+    res.handle = pigpioHandle;
     return true;
 }
 
 bool PigpioInit::setInputMode(hal_pigpio::hal_pigpioSetInputMode::Request &req,
                               hal_pigpio::hal_pigpioSetInputMode::Response &res)
 {
-    if (set_mode(pigpio_handle, req.gpioId, PI_INPUT) == 0)
+    if (set_mode(pigpioHandle, req.gpioId, PI_INPUT) == 0)
     {
         res.hasSucceeded = true;
         ROS_INFO("GPIO %u configured as input.", req.gpioId);
@@ -46,7 +46,7 @@ bool PigpioInit::setInputMode(hal_pigpio::hal_pigpioSetInputMode::Request &req,
 bool PigpioInit::setOutputMode(hal_pigpio::hal_pigpioSetOutputMode::Request &req,
                                hal_pigpio::hal_pigpioSetOutputMode::Response &res)
 {
-    if (set_mode(pigpio_handle, req.gpioId, PI_OUTPUT) == 0)
+    if (set_mode(pigpioHandle, req.gpioId, PI_OUTPUT) == 0)
     {
         res.hasSucceeded = true;
         ROS_INFO("GPIO %u configured as output.", req.gpioId);

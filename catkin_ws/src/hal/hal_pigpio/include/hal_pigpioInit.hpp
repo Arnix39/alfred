@@ -17,7 +17,7 @@ private:
     ros::ServiceServer getHandleService;
     ros::ServiceServer setInputModeService;
     ros::ServiceServer setOutputModeService;
-    int pigpio_handle;
+    int pigpioHandle;
 
 public:
     PigpioInit(ros::NodeHandle *node);
