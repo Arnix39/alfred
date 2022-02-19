@@ -20,7 +20,8 @@ imuActionServer_t *ImuActionServerRos::getActionServerHandle()
 
 /* Services interface implementation */
 ImuClientsRos::ImuClientsRos(ros::NodeHandle *node) : i2cReadByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cReadByteData>("hal_pigpioI2cReadByteData")),
-                                                      i2cWriteByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteByteData>("hal_pigpioI2cWriteByteData"))
+                                                      i2cWriteByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteByteData>("hal_pigpioI2cWriteByteData")),
+                                                      i2cGetHandleClientRos(node->serviceClient<hal_imu::hal_imuGetHandle>("hal_imuGetHandle"))
 {
 }
 
@@ -34,12 +35,22 @@ ros::ServiceClient *ImuClientsRos::getWriteByteDataClientHandle()
     return &i2cWriteByteDataClientRos;
 }
 
+ros::ServiceClient *ImuClientsRos::getGetHandleClientHandle()
+{
+    return &i2cGetHandleClientRos;
+}
+
 /* IMU implementation */
 ImuDmpWritingServer::ImuDmpWritingServer(ImuActionServer *imuWriteDmpServer, ImuClients *imuServiceClients) : imuDmpWritingServer(imuWriteDmpServer),
                                                                                                               imuClients(imuServiceClients)
 {
+    hal_imu::hal_imuGetHandle i2cGetHandleSrv;
+
     imuDmpWritingServer->registerCallback(this);
     imuDmpWritingServer->getActionServerHandle()->start();
+
+    imuClients->getGetHandleClientHandle()->call(i2cGetHandleSrv);
+    imuHandle = i2cGetHandleSrv.response.handle;
 }
 
 void ImuDmpWritingServer::writeDmp(void)

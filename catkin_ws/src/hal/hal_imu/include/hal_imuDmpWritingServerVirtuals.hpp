@@ -26,6 +26,7 @@ public:
     virtual ~ImuClients() {}
     virtual ros::ServiceClient *getReadByteDataClientHandle() = 0;
     virtual ros::ServiceClient *getWriteByteDataClientHandle() = 0;
+    virtual ros::ServiceClient *getGetHandleClientHandle() = 0;
 };
 
 #endif
