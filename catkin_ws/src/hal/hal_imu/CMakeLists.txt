@@ -24,6 +24,12 @@ find_package(catkin REQUIRED COMPONENTS
 #   Message2.msg
 # )
 
+## Generate services in the 'srv' folder
+add_service_files(
+  FILES
+  hal_imuGetHandle.srv
+)
+
 ## Generate action servers in the 'action' folder
 add_action_files(
   FILES

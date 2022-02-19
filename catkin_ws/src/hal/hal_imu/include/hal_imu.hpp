@@ -6,7 +6,19 @@
 
 // Services and messages headers (generated)
 #include "hal_imu/hal_imuWriteDmpAction.h"
+#include "hal_imu/hal_imuGetHandle.h"
 
 typedef actionlib::SimpleActionClient<hal_imu::hal_imuWriteDmpAction> imuActionClient_t;
+
+class Imu
+{
+private:
+    int32_t imuHandle;
+
+public:
+    Imu();
+    bool getHandle(hal_imu::hal_imuGetHandle::Request &req,
+                   hal_imu::hal_imuGetHandle::Response &res);
+};
 
 #endif
