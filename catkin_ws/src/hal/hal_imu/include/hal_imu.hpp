@@ -8,6 +8,7 @@
 
 // Services and messages headers (generated)
 #include "hal_pigpio/hal_pigpioI2cOpen.h"
+#include "hal_pigpio/hal_pigpioI2cClose.h"
 #include "hal_imu/hal_imuWriteDmpAction.h"
 #include "hal_imu/hal_imuGetHandle.h"
 #include "hal_imu/hal_imuMsg.h"

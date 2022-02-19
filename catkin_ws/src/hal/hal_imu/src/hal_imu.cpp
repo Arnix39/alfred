@@ -22,13 +22,19 @@ void ImuServersRos::advertiseGetHandleService(Imu *imu)
 }
 
 /* Services clients interface implementation */
-ImuClientsRos::ImuClientsRos(ros::NodeHandle *node) : i2cOpenClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cOpen>("hal_pigpioI2cOpen"))
+ImuClientsRos::ImuClientsRos(ros::NodeHandle *node) : i2cOpenClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cOpen>("hal_pigpioI2cOpen")),
+                                                      i2cCloseClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cClose>("hal_pigpioI2cClose"))
 {
 }
 
 ros::ServiceClient *ImuClientsRos::getI2cOpenHandle()
 {
     return &i2cOpenClientRos;
+}
+
+ros::ServiceClient *ImuClientsRos::getI2cCloseHandle()
+{
+    return &i2cCloseClientRos;
 }
 
 /* IMU implementation */
