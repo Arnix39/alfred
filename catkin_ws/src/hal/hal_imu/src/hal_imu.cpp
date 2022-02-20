@@ -23,7 +23,9 @@ void ImuServersRos::advertiseGetHandleService(Imu *imu)
 
 /* Services clients interface implementation */
 ImuClientsRos::ImuClientsRos(ros::NodeHandle *node) : i2cOpenClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cOpen>("hal_pigpioI2cOpen")),
-                                                      i2cCloseClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cClose>("hal_pigpioI2cClose"))
+                                                      i2cCloseClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cClose>("hal_pigpioI2cClose")),
+                                                      i2cReadByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cReadByteData>("hal_pigpioI2cReadByteData")),
+                                                      i2cWriteByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteByteData>("hal_pigpioI2cWriteByteData"))
 {
 }
 
@@ -35,6 +37,16 @@ ros::ServiceClient *ImuClientsRos::getI2cOpenHandle()
 ros::ServiceClient *ImuClientsRos::getI2cCloseHandle()
 {
     return &i2cCloseClientRos;
+}
+
+ros::ServiceClient *ImuClientsRos::getReadByteDataClientHandle()
+{
+    return &i2cReadByteDataClientRos;
+}
+
+ros::ServiceClient *ImuClientsRos::getWriteByteDataClientHandle()
+{
+    return &i2cWriteByteDataClientRos;
 }
 
 /* IMU implementation */
@@ -61,7 +73,15 @@ bool Imu::getHandle(hal_imu::hal_imuGetHandle::Request &req,
     return true;
 }
 
-void Imu::initI2c(void)
+void Imu::init(void)
+{
+    this->initI2cCommunication();
+    this->writeDmp();
+    this->calibrateAccelerometer();
+    this->enableGyroCalibrationOnDMP();
+}
+
+void Imu::initI2cCommunication(void)
 {
     hal_pigpio::hal_pigpioI2cOpen i2cOpenSrv;
 
@@ -99,6 +119,38 @@ void Imu::writeDmp(void)
     }
 }
 
+void Imu::calibrateAccelerometer(void)
+{
+}
+
+void Imu::enableGyroCalibrationOnDMP(void)
+{
+}
+
+bool Imu::writeByteInRegister(uint8_t chipRegister, uint8_t value)
+{
+    hal_pigpio::hal_pigpioI2cWriteByteData i2cWriteByteDataSrv;
+    hal_pigpio::hal_pigpioI2cReadByteData i2cReadByteDataSrv;
+
+    i2cWriteByteDataSrv.request.handle = imuHandle;
+    i2cReadByteDataSrv.request.handle = imuHandle;
+
+    i2cWriteByteDataSrv.request.deviceRegister = chipRegister;
+    i2cWriteByteDataSrv.request.value = value;
+    imuClients->getWriteByteDataClientHandle()->call(i2cWriteByteDataSrv);
+
+    if (i2cWriteByteDataSrv.response.hasSucceeded)
+    {
+        imuClients->getReadByteDataClientHandle()->call(i2cReadByteDataSrv);
+        if (i2cReadByteDataSrv.response.hasSucceeded && (i2cReadByteDataSrv.response.value == value))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "hal_imu");
@@ -108,9 +160,8 @@ int main(int argc, char **argv)
     ImuServersRos imuServiceServersRos(&node);
     ImuClientsRos imuServiceClientsRos(&node);
 
-    Imu Imu(&imuMessagePublisherRos, &imuServiceServersRos, &imuServiceClientsRos);
-    Imu.initI2c();
-    Imu.writeDmp();
+    Imu imu(&imuMessagePublisherRos, &imuServiceServersRos, &imuServiceClientsRos);
+    imu.init();
 
     ros::Rate loop_rate(200);
 
