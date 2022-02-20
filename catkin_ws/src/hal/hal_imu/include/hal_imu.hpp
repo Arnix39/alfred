@@ -21,7 +21,6 @@
 /* Extracted from Motion Driver 5.1.3 from Invensense */
 #define DMP_FEATURE_6X_LP_QUAT 0xA9E
 #define DMP_FEATURE_6X_LP_QUAT_SIZE 4
-static const unsigned char dmp6AxisQuaternion[DMP_FEATURE_6X_LP_QUAT_SIZE] = {0x20, 0x28, 0x30, 0x38};
 
 typedef actionlib::SimpleActionClient<hal_imu::hal_imuWriteDmpAction> imuActionClient_t;
 
@@ -41,6 +40,7 @@ public:
     void init(void);
     void initI2cCommunication(void);
     void writeDmp(void);
+    void enable6AxisQuaternion(void);
     void calibrateAccelerometer(void);
     bool writeByteInRegister(uint8_t chipRegister, uint8_t value);
     void enableGyroCalibrationOnDMP(void);

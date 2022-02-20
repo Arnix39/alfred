@@ -123,6 +123,43 @@ void Imu::calibrateAccelerometer(void)
 {
 }
 
+void Imu::enable6AxisQuaternion(void)
+{
+    const unsigned char dmp6AxisQuaternionEnable[DMP_FEATURE_6X_LP_QUAT_SIZE] = {0x20, 0x28, 0x30, 0x38};
+    bool writeSuccess = false;
+    uint8_t imuRegister = 0;
+
+    const uint8_t lsb6AxisQuaternionAddress = (uint8_t)(DMP_FEATURE_6X_LP_QUAT >> 8);
+    const uint8_t msb6AxisQuaternionAddress = (uint8_t)(DMP_FEATURE_6X_LP_QUAT & 0xFF);
+    writeSuccess = writeByteInRegister(imuRegister, lsb6AxisQuaternionAddress);
+    if (writeSuccess)
+    {
+        writeSuccess = writeByteInRegister(imuRegister, msb6AxisQuaternionAddress);
+        if (!writeSuccess)
+        {
+            ROS_ERROR("Error while enabling 6 axis quaternions on DMP!");
+        }
+    }
+    else
+    {
+        ROS_ERROR("Error while enabling 6 axis quaternions on DMP!");
+    }
+
+    for (uint8_t index; index < DMP_FEATURE_6X_LP_QUAT_SIZE; ++index)
+    {
+        writeSuccess = writeByteInRegister(imuRegister, dmp6AxisQuaternionEnable[index]);
+        if (writeSuccess)
+        {
+            ROS_INFO("Sucessfully enabled 6 axis quaternions on DMP!");
+        }
+        else
+        {
+            ROS_ERROR("Error while enabling 6 axis quaternions on DMP!");
+            break;
+        }
+    }
+}
+
 void Imu::enableGyroCalibrationOnDMP(void)
 {
 }
