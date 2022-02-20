@@ -13,6 +13,9 @@
 #include "hal_imu/hal_imuGetHandle.h"
 #include "hal_imu/hal_imuMsg.h"
 
+#define IMU_I2C_ADDRESS 0x68
+#define IMU_I2C_BUS 0x0
+
 typedef actionlib::SimpleActionClient<hal_imu::hal_imuWriteDmpAction> imuActionClient_t;
 
 class Imu
@@ -25,8 +28,11 @@ private:
 
 public:
     Imu(ImuPublisher *imuMessagePublisher, ImuServers *imuServiceServers, ImuClients *imuServiceClients);
+    ~Imu();
     bool getHandle(hal_imu::hal_imuGetHandle::Request &req,
                    hal_imu::hal_imuGetHandle::Response &res);
+    void initI2c(void);
+    void writeDmp(void);
 };
 
 #endif
