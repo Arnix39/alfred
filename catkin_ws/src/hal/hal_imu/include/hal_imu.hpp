@@ -18,12 +18,6 @@
 #define IMU_I2C_ADDRESS 0x68
 #define IMU_I2C_BUS 0x0
 
-/* Extracted from Motion Driver 5.1.3 from Invensense */
-#define DMP_FEATURE_6X_LP_QUAT 0xA9E
-#define CFG_MOTION_BIAS 0x4B8
-#define DMP_FEATURE_6X_LP_QUAT_SIZE 4
-#define DMP_FEATURE_GYRO_CAL_SIZE 9
-
 typedef actionlib::SimpleActionClient<hal_imu::hal_imuWriteDmpAction> imuActionClient_t;
 
 class Imu

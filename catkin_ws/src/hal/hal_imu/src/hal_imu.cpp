@@ -1,5 +1,6 @@
 #include "hal_imu.hpp"
 #include "hal_imuInterfaces.hpp"
+#include "hal_imuMPU6050.hpp"
 
 /* Publisher interface implementation */
 ImuPublisherRos::ImuPublisherRos(ros::NodeHandle *node) : imuPublisherRos(node->advertise<hal_imu::hal_imuMsg>("angleValue", 1000))
@@ -126,9 +127,9 @@ void Imu::calibrateAccelerometer(void)
 
 void Imu::enable6AxisQuaternion(void)
 {
-    const unsigned char dmp6AxisQuaternionEnable[DMP_FEATURE_6X_LP_QUAT_SIZE] = {0x20, 0x28, 0x30, 0x38};
+    const unsigned char dmp6AxisQuaternionEnable[MPU6050_DMP_FEATURE_6X_LP_QUAT_SIZE] = {0x20, 0x28, 0x30, 0x38};
 
-    if (writeDataToDmp(DMP_FEATURE_6X_LP_QUAT, DMP_FEATURE_6X_LP_QUAT_SIZE, dmp6AxisQuaternionEnable))
+    if (writeDataToDmp(MPU6050_DMP_FEATURE_6X_LP_QUAT, MPU6050_DMP_FEATURE_6X_LP_QUAT_SIZE, dmp6AxisQuaternionEnable))
     {
         ROS_INFO("Sucessfully enabled 6 axis quaternions on DMP!");
     }
@@ -140,9 +141,9 @@ void Imu::enable6AxisQuaternion(void)
 
 void Imu::enableGyroCalibrationOnDMP(void)
 {
-    const unsigned char gyroscopeCalibrationEnable[DMP_FEATURE_GYRO_CAL_SIZE] = {0xb8, 0xaa, 0xb3, 0x8d, 0xb4, 0x98, 0x0d, 0x35, 0x5d};
+    const unsigned char gyroscopeCalibrationEnable[MPU6050_DMP_FEATURE_GYRO_CAL_SIZE] = {0xb8, 0xaa, 0xb3, 0x8d, 0xb4, 0x98, 0x0d, 0x35, 0x5d};
 
-    if (writeDataToDmp(CFG_MOTION_BIAS, DMP_FEATURE_GYRO_CAL_SIZE, gyroscopeCalibrationEnable))
+    if (writeDataToDmp(MPU6050_CFG_MOTION_BIAS, MPU6050_DMP_FEATURE_GYRO_CAL_SIZE, gyroscopeCalibrationEnable))
     {
         ROS_INFO("Sucessfully enabled gyroscope calibration on DMP!");
     }
@@ -150,6 +151,40 @@ void Imu::enableGyroCalibrationOnDMP(void)
     {
         ROS_ERROR("Error while enabling gyroscope calibration on DMP!");
     }
+}
+
+bool Imu::writeDataToDmp(uint16_t address, uint8_t size, const unsigned char *data)
+{
+    bool writeSuccess = false;
+
+    uint8_t imuRegister = MPU6050_BANK_SELECTION_REGISTER;
+    const uint8_t lsbAddress = (uint8_t)(address >> 8);
+    const uint8_t msbAddress = (uint8_t)(address & 0xFF);
+    writeSuccess = writeByteInRegister(imuRegister, lsbAddress);
+    if (writeSuccess)
+    {
+        writeSuccess = writeByteInRegister(imuRegister, msbAddress);
+        if (!writeSuccess)
+        {
+            return false;
+        }
+    }
+    else
+    {
+        return false;
+    }
+
+    uint8_t imuRegister = MPU6050_READ_WRITE_REGISTER;
+    for (uint8_t index; index < size; ++index)
+    {
+        writeSuccess = writeByteInRegister(imuRegister, data[index]);
+        if (!writeSuccess)
+        {
+            break;
+        }
+    }
+
+    return writeSuccess;
 }
 
 bool Imu::writeByteInRegister(uint8_t chipRegister, uint8_t value)
@@ -174,39 +209,6 @@ bool Imu::writeByteInRegister(uint8_t chipRegister, uint8_t value)
     }
 
     return false;
-}
-
-bool Imu::writeDataToDmp(uint16_t address, uint8_t size, const unsigned char *data)
-{
-    bool writeSuccess = false;
-    uint8_t imuRegister = 0;
-
-    const uint8_t lsbAddress = (uint8_t)(address >> 8);
-    const uint8_t msbAddress = (uint8_t)(address & 0xFF);
-    writeSuccess = writeByteInRegister(imuRegister, lsbAddress);
-    if (writeSuccess)
-    {
-        writeSuccess = writeByteInRegister(imuRegister, msbAddress);
-        if (!writeSuccess)
-        {
-            return false;
-        }
-    }
-    else
-    {
-        return false;
-    }
-
-    for (uint8_t index; index < size; ++index)
-    {
-        writeSuccess = writeByteInRegister(imuRegister, data[index]);
-        if (!writeSuccess)
-        {
-            break;
-        }
-    }
-
-    return writeSuccess;
 }
 
 int main(int argc, char **argv)
