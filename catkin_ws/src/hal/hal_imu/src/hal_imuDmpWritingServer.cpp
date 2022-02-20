@@ -137,12 +137,14 @@ bool ImuDmpWritingServer::writeByteInRegister(uint8_t chipRegister, uint8_t valu
 
     if (i2cWriteByteDataSrv.response.hasSucceeded)
     {
-        return true;
+        imuClients->getReadByteDataClientHandle()->call(i2cReadByteDataSrv);
+        if (i2cReadByteDataSrv.response.hasSucceeded && (i2cReadByteDataSrv.response.value == value))
+        {
+            return true;
+        }
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
 int main(int argc, char **argv)
