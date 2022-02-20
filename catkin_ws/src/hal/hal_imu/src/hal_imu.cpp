@@ -77,6 +77,7 @@ void Imu::init(void)
 {
     this->initI2cCommunication();
     this->writeDmp();
+    this->enable6AxisQuaternion();
     this->calibrateAccelerometer();
     this->enableGyroCalibrationOnDMP();
 }
@@ -126,42 +127,29 @@ void Imu::calibrateAccelerometer(void)
 void Imu::enable6AxisQuaternion(void)
 {
     const unsigned char dmp6AxisQuaternionEnable[DMP_FEATURE_6X_LP_QUAT_SIZE] = {0x20, 0x28, 0x30, 0x38};
-    bool writeSuccess = false;
-    uint8_t imuRegister = 0;
 
-    const uint8_t lsb6AxisQuaternionAddress = (uint8_t)(DMP_FEATURE_6X_LP_QUAT >> 8);
-    const uint8_t msb6AxisQuaternionAddress = (uint8_t)(DMP_FEATURE_6X_LP_QUAT & 0xFF);
-    writeSuccess = writeByteInRegister(imuRegister, lsb6AxisQuaternionAddress);
-    if (writeSuccess)
+    if (writeDataToDmp(DMP_FEATURE_6X_LP_QUAT, DMP_FEATURE_6X_LP_QUAT_SIZE, dmp6AxisQuaternionEnable))
     {
-        writeSuccess = writeByteInRegister(imuRegister, msb6AxisQuaternionAddress);
-        if (!writeSuccess)
-        {
-            ROS_ERROR("Error while enabling 6 axis quaternions on DMP!");
-        }
+        ROS_INFO("Sucessfully enabled 6 axis quaternions on DMP!");
     }
     else
     {
         ROS_ERROR("Error while enabling 6 axis quaternions on DMP!");
     }
-
-    for (uint8_t index; index < DMP_FEATURE_6X_LP_QUAT_SIZE; ++index)
-    {
-        writeSuccess = writeByteInRegister(imuRegister, dmp6AxisQuaternionEnable[index]);
-        if (writeSuccess)
-        {
-            ROS_INFO("Sucessfully enabled 6 axis quaternions on DMP!");
-        }
-        else
-        {
-            ROS_ERROR("Error while enabling 6 axis quaternions on DMP!");
-            break;
-        }
-    }
 }
 
 void Imu::enableGyroCalibrationOnDMP(void)
 {
+    const unsigned char gyroscopeCalibrationEnable[DMP_FEATURE_GYRO_CAL_SIZE] = {0xb8, 0xaa, 0xb3, 0x8d, 0xb4, 0x98, 0x0d, 0x35, 0x5d};
+
+    if (writeDataToDmp(CFG_MOTION_BIAS, DMP_FEATURE_GYRO_CAL_SIZE, gyroscopeCalibrationEnable))
+    {
+        ROS_INFO("Sucessfully enabled gyroscope calibration on DMP!");
+    }
+    else
+    {
+        ROS_ERROR("Error while enabling gyroscope calibration on DMP!");
+    }
 }
 
 bool Imu::writeByteInRegister(uint8_t chipRegister, uint8_t value)
@@ -186,6 +174,39 @@ bool Imu::writeByteInRegister(uint8_t chipRegister, uint8_t value)
     }
 
     return false;
+}
+
+bool Imu::writeDataToDmp(uint16_t address, uint8_t size, const unsigned char *data)
+{
+    bool writeSuccess = false;
+    uint8_t imuRegister = 0;
+
+    const uint8_t lsbAddress = (uint8_t)(address >> 8);
+    const uint8_t msbAddress = (uint8_t)(address & 0xFF);
+    writeSuccess = writeByteInRegister(imuRegister, lsbAddress);
+    if (writeSuccess)
+    {
+        writeSuccess = writeByteInRegister(imuRegister, msbAddress);
+        if (!writeSuccess)
+        {
+            return false;
+        }
+    }
+    else
+    {
+        return false;
+    }
+
+    for (uint8_t index; index < size; ++index)
+    {
+        writeSuccess = writeByteInRegister(imuRegister, data[index]);
+        if (!writeSuccess)
+        {
+            break;
+        }
+    }
+
+    return writeSuccess;
 }
 
 int main(int argc, char **argv)
