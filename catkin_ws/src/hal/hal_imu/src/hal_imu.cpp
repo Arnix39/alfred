@@ -174,7 +174,7 @@ bool Imu::writeDataToDmp(uint16_t address, uint8_t size, const unsigned char *da
         return false;
     }
 
-    uint8_t imuRegister = MPU6050_READ_WRITE_REGISTER;
+    imuRegister = MPU6050_READ_WRITE_REGISTER;
     for (uint8_t index; index < size; ++index)
     {
         writeSuccess = writeByteInRegister(imuRegister, data[index]);
