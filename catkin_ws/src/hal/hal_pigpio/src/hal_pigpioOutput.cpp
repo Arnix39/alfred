@@ -1,11 +1,13 @@
 #include "hal_pigpioOutput.hpp"
 
-// Services headers (generated)
-#include "hal_pigpio/hal_pigpioGetHandle.h"
+PigpioOutput::PigpioOutput(ros::NodeHandle *node) : getPigpioHandleClient(node->serviceClient<hal_pigpio::hal_pigpioGetHandle>("hal_pigpioGetHandle")),
+                                                    getModeClient(node->serviceClient<hal_pigpio::hal_pigpioGetMode>("hal_pigpioGetMode"))
 
-PigpioOutput::PigpioOutput(ros::NodeHandle *node, int handle) : pigpioHandle(handle),
-                                                                getModeClient(node->serviceClient<hal_pigpio::hal_pigpioGetMode>("hal_pigpioGetMode"))
 {
+    hal_pigpio::hal_pigpioGetHandle pigpioHandleRequest;
+    getPigpioHandleClient.call(pigpioHandleRequest);
+    pigpioHandle = pigpioHandleRequest.response.handle;
+
     setPwmDutycycleService = node->advertiseService("hal_pigpioSetPwmDutycycle", &PigpioOutput::setPwmDutycycle, this);
     setPwmFrequencyService = node->advertiseService("hal_pigpioSetPwmFrequency", &PigpioOutput::setPwmFrequency, this);
     setGpioHighService = node->advertiseService("hal_pigpioSetGpioHigh", &PigpioOutput::setGpioHigh, this);
@@ -82,8 +84,7 @@ bool PigpioOutput::setGpioLow(hal_pigpio::hal_pigpioSetGpioLow::Request &req,
 bool PigpioOutput::sendTriggerPulse(hal_pigpio::hal_pigpioSendTriggerPulse::Request &req,
                                     hal_pigpio::hal_pigpioSendTriggerPulse::Response &res)
 {
-    int error = gpio_trigger(pigpioHandle, req.gpioId, req.pulseLengthInUs, PI_HIGH);
-    if (error == 0)
+    if (gpio_trigger(pigpioHandle, req.gpioId, req.pulseLengthInUs, PI_HIGH) == 0)
     {
         res.hasSucceeded = true;
         ROS_INFO("Sent trigger pulse for GPIO %u.", req.gpioId);
@@ -96,20 +97,14 @@ bool PigpioOutput::sendTriggerPulse(hal_pigpio::hal_pigpioSendTriggerPulse::Requ
     return true;
 }
 
-int main(int argc, char **argv)
+/*int main(int argc, char **argv)
 {
     ros::init(argc, argv, "hal_pigpioOutput");
     ros::NodeHandle node;
-    int pigpioHandle;
 
-    ros::ServiceClient getPigpioHandle = node.serviceClient<hal_pigpio::hal_pigpioGetHandle>("hal_pigpioGetHandle");
-    hal_pigpio::hal_pigpioGetHandle pigpioHandleRequest;
-    getPigpioHandle.call(pigpioHandleRequest);
-    pigpioHandle = pigpioHandleRequest.response.handle;
-
-    PigpioOutput pigpioOutput(&node, pigpioHandle);
+    PigpioOutput pigpioOutput(&node);
 
     ros::spin();
 
     return 0;
-}
+}*/

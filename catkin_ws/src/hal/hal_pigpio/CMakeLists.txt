@@ -64,30 +64,27 @@ include_directories(
   ${pigpio_INCLUDE_DIRS}
 )
 
-add_executable(${PROJECT_NAME}Init_node src/hal_pigpioInit.cpp)
-add_dependencies(${PROJECT_NAME}Init_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(${PROJECT_NAME}Init_node
-  ${catkin_LIBRARIES}
-  ${pigpio_LIBRAIRIES}
-)
+add_library(${PROJECT_NAME}_init_lib OBJECT src/hal_pigpioInit.cpp)
+add_dependencies(${PROJECT_NAME}_init_lib ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
-add_executable(${PROJECT_NAME}I2c_node src/hal_pigpioI2c.cpp)
-add_dependencies(${PROJECT_NAME}I2c_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(${PROJECT_NAME}I2c_node
-  ${catkin_LIBRARIES}
-  ${pigpio_LIBRAIRIES}
-)
+add_library(${PROJECT_NAME}_output_lib OBJECT src/hal_pigpioOutput.cpp)
+add_dependencies(${PROJECT_NAME}_output_lib ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
-add_executable(${PROJECT_NAME}Output_node src/hal_pigpioOutput.cpp)
-add_dependencies(${PROJECT_NAME}Output_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(${PROJECT_NAME}Output_node
-  ${catkin_LIBRARIES}
-  ${pigpio_LIBRAIRIES}
-)
+add_library(${PROJECT_NAME}_input_lib OBJECT src/hal_pigpioInput.cpp)
+add_dependencies(${PROJECT_NAME}_input_lib ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
-add_executable(${PROJECT_NAME}Input_node src/hal_pigpioInput.cpp)
-add_dependencies(${PROJECT_NAME}Input_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(${PROJECT_NAME}Input_node
+add_library(${PROJECT_NAME}_i2c_lib OBJECT src/hal_pigpioI2c.cpp)
+add_dependencies(${PROJECT_NAME}_i2c_lib ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
+add_executable(${PROJECT_NAME}_node 
+  src/hal_pigpio.cpp 
+  $<TARGET_OBJECTS:${PROJECT_NAME}_init_lib> 
+  $<TARGET_OBJECTS:${PROJECT_NAME}_output_lib> 
+  $<TARGET_OBJECTS:${PROJECT_NAME}_input_lib>
+  $<TARGET_OBJECTS:${PROJECT_NAME}_i2c_lib>
+)
+add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
   ${pigpio_LIBRAIRIES}
 )
@@ -96,9 +93,6 @@ target_link_libraries(${PROJECT_NAME}Input_node
 ## Install ##
 #############
 install(TARGETS
-  ${PROJECT_NAME}Init_node
-  ${PROJECT_NAME}I2c_node
-  ${PROJECT_NAME}Output_node
-  ${PROJECT_NAME}Input_node
+  ${PROJECT_NAME}_node
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

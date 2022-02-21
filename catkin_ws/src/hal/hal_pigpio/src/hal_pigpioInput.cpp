@@ -3,9 +3,13 @@
 // Services headers (generated)
 #include "hal_pigpio/hal_pigpioGetHandle.h"
 
-PigpioInput::PigpioInput(ros::NodeHandle *node, int handle) : pigpioHandle(handle),
-                                                              gpioEdgeChangePub(node->advertise<hal_pigpio::hal_pigpioEdgeChangeMsg>("gpioEdgeChange", 1000))
+PigpioInput::PigpioInput(ros::NodeHandle *node) : getPigpioHandleClient(node->serviceClient<hal_pigpio::hal_pigpioGetHandle>("hal_pigpioGetHandle")),
+                                                  gpioEdgeChangePub(node->advertise<hal_pigpio::hal_pigpioEdgeChangeMsg>("gpioEdgeChange", 1000))
 {
+    hal_pigpio::hal_pigpioGetHandle pigpioHandleRequest;
+    getPigpioHandleClient.call(pigpioHandleRequest);
+    pigpioHandle = pigpioHandleRequest.response.handle;
+
     readGpioService = node->advertiseService("hal_pigpioReadGpio", &PigpioInput::readGpio, this);
     setCallbackRisingEdgeService = node->advertiseService("hal_pigpioSetCallback", &PigpioInput::setCallback, this);
 }
@@ -72,20 +76,14 @@ bool PigpioInput::setCallback(hal_pigpio::hal_pigpioSetCallback::Request &req,
     return true;
 }
 
-int main(int argc, char **argv)
+/*int main(int argc, char **argv)
 {
     ros::init(argc, argv, "hal_pigpioInput");
     ros::NodeHandle node;
-    int pigpioHandle;
 
-    ros::ServiceClient getPigpioHandle = node.serviceClient<hal_pigpio::hal_pigpioGetHandle>("hal_pigpioGetHandle");
-    hal_pigpio::hal_pigpioGetHandle pigpioHandleRequest;
-    getPigpioHandle.call(pigpioHandleRequest);
-    pigpioHandle = pigpioHandleRequest.response.handle;
-
-    PigpioInput pigpioInput(&node, pigpioHandle);
+    PigpioInput pigpioInput(&node);
 
     ros::spin();
 
     return 0;
-}
+}*/

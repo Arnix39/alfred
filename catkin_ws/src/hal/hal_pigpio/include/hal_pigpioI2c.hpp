@@ -19,10 +19,11 @@ private:
     ros::ServiceServer i2cCloseService;
     ros::ServiceServer i2cWriteByteDataService;
     ros::ServiceServer i2cReadByteDataService;
+    ros::ServiceClient getPigpioHandleClient;
     int pigpioHandle;
 
 public:
-    PigpioI2c(ros::NodeHandle *node, int handle);
+    PigpioI2c(ros::NodeHandle *node);
     ~PigpioI2c() = default;
     bool i2cOpen(hal_pigpio::hal_pigpioI2cOpen::Request &req,
                  hal_pigpio::hal_pigpioI2cOpen::Response &res);

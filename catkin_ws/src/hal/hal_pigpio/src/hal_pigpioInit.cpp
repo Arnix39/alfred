@@ -34,7 +34,7 @@ bool PigpioInit::getMode(hal_pigpio::hal_pigpioGetMode::Request &req,
                          hal_pigpio::hal_pigpioGetMode::Response &res)
 {
     res.mode = get_mode(pigpioHandle, req.gpioId);
-    if (res.mode == 0)
+    if (res.mode >= 0)
     {
         res.hasSucceeded = true;
         ROS_INFO("Retrieved mode for GPIO %u.", req.gpioId);
@@ -78,16 +78,4 @@ bool PigpioInit::setOutputMode(hal_pigpio::hal_pigpioSetOutputMode::Request &req
         ROS_ERROR("Failed to configure GPIO %u as output!", req.gpioId);
     }
     return true;
-}
-
-int main(int argc, char **argv)
-{
-    ros::init(argc, argv, "hal_pigpioInit");
-    ros::NodeHandle node;
-
-    PigpioInit pigpioInit(&node);
-
-    ros::spin();
-
-    return 0;
 }

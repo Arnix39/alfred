@@ -3,9 +3,11 @@
 // Services headers (generated)
 #include "hal_pigpio/hal_pigpioGetHandle.h"
 
-PigpioI2c::PigpioI2c(ros::NodeHandle *node, int handle)
+PigpioI2c::PigpioI2c(ros::NodeHandle *node) : getPigpioHandleClient(node->serviceClient<hal_pigpio::hal_pigpioGetHandle>("hal_pigpioGetHandle"))
 {
-    pigpioHandle = handle;
+    hal_pigpio::hal_pigpioGetHandle pigpioHandleRequest;
+    getPigpioHandleClient.call(pigpioHandleRequest);
+    pigpioHandle = pigpioHandleRequest.response.handle;
 
     i2cOpenService = node->advertiseService("hal_pigpioI2cOpen", &PigpioI2c::i2cOpen, this);
     i2cCloseService = node->advertiseService("hal_pigpioI2cClose", &PigpioI2c::i2cClose, this);
@@ -77,20 +79,14 @@ bool PigpioI2c::i2cWriteByteData(hal_pigpio::hal_pigpioI2cWriteByteData::Request
     return true;
 }
 
-int main(int argc, char **argv)
+/*int main(int argc, char **argv)
 {
     ros::init(argc, argv, "hal_pigpioI2c");
     ros::NodeHandle node;
-    int pigpio_handle;
 
-    ros::ServiceClient getPigpioHandle = node.serviceClient<hal_pigpio::hal_pigpioGetHandle>("hal_pigpioGetHandle");
-    hal_pigpio::hal_pigpioGetHandle pigpioHandleRequest;
-    getPigpioHandle.call(pigpioHandleRequest);
-    pigpio_handle = pigpioHandleRequest.response.handle;
-
-    PigpioI2c pigpioI2c = PigpioI2c(&node, pigpio_handle);
+    PigpioI2c pigpioI2c(&node);
 
     ros::spin();
 
     return 0;
-}
+}*/

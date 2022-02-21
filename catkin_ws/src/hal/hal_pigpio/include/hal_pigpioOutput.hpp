@@ -7,6 +7,7 @@
 #include <pigpiod_if2.h>
 
 // Services and messages headers (generated)
+#include "hal_pigpio/hal_pigpioGetHandle.h"
 #include "hal_pigpio/hal_pigpioSetPwmDutycycle.h"
 #include "hal_pigpio/hal_pigpioSetPwmFrequency.h"
 #include "hal_pigpio/hal_pigpioSetGpioHigh.h"
@@ -23,10 +24,11 @@ private:
     ros::ServiceServer setGpioLowService;
     ros::ServiceServer sendTriggerPulseService;
     ros::ServiceClient getModeClient;
+    ros::ServiceClient getPigpioHandleClient;
     int pigpioHandle;
 
 public:
-    PigpioOutput(ros::NodeHandle *node, int handle);
+    PigpioOutput(ros::NodeHandle *node);
     ~PigpioOutput() = default;
     bool setPwmDutycycle(hal_pigpio::hal_pigpioSetPwmDutycycle::Request &req,
                          hal_pigpio::hal_pigpioSetPwmDutycycle::Response &res);
