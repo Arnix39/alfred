@@ -18,7 +18,7 @@ bool PigpioOutput::setPwmDutycycle(hal_pigpio::hal_pigpioSetPwmDutycycle::Reques
     if ((req.dutycycle != 0) && (set_PWM_dutycycle(pigpioHandle, req.gpioId, req.dutycycle) == 0))
     {
         res.hasSucceeded = true;
-        ROS_INFO("Set PWM duty cycle of %u for GPIO %u!", req.dutycycle, req.gpioId);
+        ROS_INFO("Set PWM duty cycle of %u for GPIO %u.", req.dutycycle, req.gpioId);
     }
     else
     {
@@ -36,7 +36,7 @@ bool PigpioOutput::setPwmFrequency(hal_pigpio::hal_pigpioSetPwmFrequency::Reques
     if ((pwmSettingResult != PI_NOT_PERMITTED) && (pwmSettingResult != PI_BAD_USER_GPIO))
     {
         res.hasSucceeded = true;
-        ROS_INFO("Set PWM frequency of %u for GPIO %u!", req.frequency, req.gpioId);
+        ROS_INFO("Set PWM frequency of %u for GPIO %u.", req.frequency, req.gpioId);
     }
     else
     {
@@ -52,10 +52,12 @@ bool PigpioOutput::setGpioHigh(hal_pigpio::hal_pigpioSetGpioHigh::Request &req,
     if (gpio_write(pigpioHandle, req.gpioId, PI_HIGH) == 0)
     {
         res.hasSucceeded = true;
+        ROS_INFO("Set GPIO %u to high level.", req.gpioId);
     }
     else
     {
         res.hasSucceeded = false;
+        ROS_ERROR("Failed to set GPIO %u to high level!", req.gpioId);
     }
     return true;
 }
@@ -66,10 +68,12 @@ bool PigpioOutput::setGpioLow(hal_pigpio::hal_pigpioSetGpioLow::Request &req,
     if (gpio_write(pigpioHandle, req.gpioId, PI_LOW) == 0)
     {
         res.hasSucceeded = true;
+        ROS_INFO("Set GPIO %u to low level.", req.gpioId);
     }
     else
     {
         res.hasSucceeded = false;
+        ROS_ERROR("Failed to set GPIO %u to low level!", req.gpioId);
     }
     return true;
 }
@@ -81,12 +85,12 @@ bool PigpioOutput::sendTriggerPulse(hal_pigpio::hal_pigpioSendTriggerPulse::Requ
     if (error == 0)
     {
         res.hasSucceeded = true;
-        ROS_INFO("Sent trigger pulse for GPIO %u!", req.gpioId);
+        ROS_INFO("Sent trigger pulse for GPIO %u.", req.gpioId);
     }
     else
     {
         res.hasSucceeded = false;
-        ROS_ERROR("Failed to send trigger pulse for GPIO %u with error %d!", req.gpioId, error);
+        ROS_ERROR("Failed to send trigger pulse for GPIO %u!", req.gpioId, error);
     }
     return true;
 }

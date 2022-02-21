@@ -3,10 +3,9 @@
 // Services headers (generated)
 #include "hal_pigpio/hal_pigpioGetHandle.h"
 
-PigpioInput::PigpioInput(ros::NodeHandle *node, int handle) : pigpioHandle(handle)
+PigpioInput::PigpioInput(ros::NodeHandle *node, int handle) : pigpioHandle(handle),
+                                                              gpioEdgeChangePub(node->advertise<hal_pigpio::hal_pigpioEdgeChangeMsg>("gpioEdgeChange", 1000))
 {
-    gpioEdgeChangePub = node->advertise<hal_pigpio::hal_pigpioEdgeChangeMsg>("gpioEdgeChange", 1000);
-
     readGpioService = node->advertiseService("hal_pigpioReadGpio", &PigpioInput::readGpio, this);
     setCallbackRisingEdgeService = node->advertiseService("hal_pigpioSetCallback", &PigpioInput::setCallback, this);
 }
@@ -26,10 +25,12 @@ bool PigpioInput::readGpio(hal_pigpio::hal_pigpioReadGpio::Request &req,
     if (res.level != PI_BAD_GPIO)
     {
         res.hasSucceeded = true;
+        ROS_INFO("Read GPIO %u.", req.gpioId);
     }
     else
     {
         res.hasSucceeded = false;
+        ROS_INFO("Failed to read GPIO %u!", req.gpioId);
     }
     return true;
 }

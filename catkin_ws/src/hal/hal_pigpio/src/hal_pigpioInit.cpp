@@ -6,10 +6,10 @@ PigpioInit::PigpioInit(ros::NodeHandle *node)
 
     if (pigpioHandle < 0)
     {
-        ROS_ERROR("Failed to start pigpio daemon");
+        ROS_ERROR("Failed to start pigpio daemon!");
     }
 
-    ROS_INFO("Pigpio handle %d.", pigpioHandle);
+    ROS_INFO("Pigpio handle: %d.", pigpioHandle);
 
     getHandleService = node->advertiseService("hal_pigpioGetHandle", &PigpioInit::getHandle, this);
     setInputModeService = node->advertiseService("hal_pigpioSetInputMode", &PigpioInit::setInputMode, this);
@@ -18,6 +18,7 @@ PigpioInit::PigpioInit(ros::NodeHandle *node)
 
 PigpioInit::~PigpioInit()
 {
+    ROS_INFO("Stopping pigpio daemon.");
     pigpio_stop(pigpioHandle);
 }
 
