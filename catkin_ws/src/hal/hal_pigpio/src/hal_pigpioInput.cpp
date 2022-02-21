@@ -5,7 +5,8 @@
 
 PigpioInput::PigpioInput(ros::NodeHandle *node, int handle)
 {
-    pigpio_handle = handle;
+    pigpioHandle = handle;
+    ROS_INFO("Pigpio handle %d.", pigpioHandle);
 
     gpioEdgeChangePub = node->advertise<hal_pigpio::hal_pigpioEdgeChangeMsg>("gpioEdgeChange", 1000);
 
@@ -15,7 +16,7 @@ PigpioInput::PigpioInput(ros::NodeHandle *node, int handle)
 
 PigpioInput::~PigpioInput()
 {
-    for(uint callbackId : callbackList)
+    for (uint callbackId : callbackList)
     {
         callback_cancel(callbackId);
     }
@@ -24,7 +25,7 @@ PigpioInput::~PigpioInput()
 bool PigpioInput::readGpio(hal_pigpio::hal_pigpioReadGpio::Request &req,
                            hal_pigpio::hal_pigpioReadGpio::Response &res)
 {
-    res.level = gpio_read(pigpio_handle, req.gpioId);
+    res.level = gpio_read(pigpioHandle, req.gpioId);
     if (res.level != PI_BAD_GPIO)
     {
         res.hasSucceeded = true;
@@ -58,7 +59,7 @@ bool PigpioInput::setCallback(hal_pigpio::hal_pigpioSetCallback::Request &req,
                               hal_pigpio::hal_pigpioSetCallback::Response &res)
 {
     edgeCallback_t edgeCallback = std::bind(&PigpioInput::gpioEdgeChangeCallback, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
-    res.callbackId = callback_ex(pigpio_handle, req.gpioId, req.edgeChangeType, c_callback_wrapper, &edgeCallback);
+    res.callbackId = callback_ex(pigpioHandle, req.gpioId, req.edgeChangeType, c_callback_wrapper, &edgeCallback);
     if (res.callbackId >= 0)
     {
         res.hasSucceeded = true;
@@ -77,14 +78,14 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "hal_pigpioInput");
     ros::NodeHandle node;
-    int pigpio_handle;
+    int pigpioHandle;
 
     ros::ServiceClient getPigpioHandle = node.serviceClient<hal_pigpio::hal_pigpioGetHandle>("hal_pigpioGetHandle");
     hal_pigpio::hal_pigpioGetHandle pigpioHandleRequest;
     getPigpioHandle.call(pigpioHandleRequest);
-    pigpio_handle = pigpioHandleRequest.response.handle;
+    pigpioHandle = pigpioHandleRequest.response.handle;
 
-    PigpioInput pigpioInput = PigpioInput(&node, pigpio_handle);
+    PigpioInput pigpioInput(&node, pigpioHandle);
 
     ros::spin();
 

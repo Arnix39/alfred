@@ -5,7 +5,7 @@
 
 PigpioI2c::PigpioI2c(ros::NodeHandle *node, int handle)
 {
-    pigpio_handle = handle;
+    pigpioHandle = handle;
 
     i2cOpenService = node->advertiseService("hal_pigpioI2cOpen", &PigpioI2c::i2cOpen, this);
     i2cCloseService = node->advertiseService("hal_pigpioI2cClose", &PigpioI2c::i2cClose, this);
@@ -14,7 +14,7 @@ PigpioI2c::PigpioI2c(ros::NodeHandle *node, int handle)
 bool PigpioI2c::i2cOpen(hal_pigpio::hal_pigpioI2cOpen::Request &req,
                         hal_pigpio::hal_pigpioI2cOpen::Response &res)
 {
-    res.handle = i2c_open(pigpio_handle, req.bus, req.address, 0);
+    res.handle = i2c_open(pigpioHandle, req.bus, req.address, 0);
     if (res.handle >= 0)
     {
         res.hasSucceeded = true;
@@ -31,7 +31,7 @@ bool PigpioI2c::i2cOpen(hal_pigpio::hal_pigpioI2cOpen::Request &req,
 bool PigpioI2c::i2cClose(hal_pigpio::hal_pigpioI2cClose::Request &req,
                          hal_pigpio::hal_pigpioI2cClose::Response &res)
 {
-    if (i2c_close(pigpio_handle, req.handle) == 0)
+    if (i2c_close(pigpioHandle, req.handle) == 0)
     {
         res.hasSucceeded = true;
         ROS_INFO("I2C device with handle %u closed.", req.handle);
@@ -47,7 +47,7 @@ bool PigpioI2c::i2cClose(hal_pigpio::hal_pigpioI2cClose::Request &req,
 bool PigpioI2c::i2cReadByteData(hal_pigpio::hal_pigpioI2cReadByteData::Request &req,
                                 hal_pigpio::hal_pigpioI2cReadByteData::Response &res)
 {
-    res.value = i2c_read_byte_data(pigpio_handle, req.handle, req.deviceRegister);
+    res.value = i2c_read_byte_data(pigpioHandle, req.handle, req.deviceRegister);
     if (res.value >= 0)
     {
         res.hasSucceeded = true;
@@ -64,7 +64,7 @@ bool PigpioI2c::i2cReadByteData(hal_pigpio::hal_pigpioI2cReadByteData::Request &
 bool PigpioI2c::i2cWriteByteData(hal_pigpio::hal_pigpioI2cWriteByteData::Request &req,
                                  hal_pigpio::hal_pigpioI2cWriteByteData::Response &res)
 {
-    if (i2c_write_byte_data(pigpio_handle, req.handle, req.deviceRegister, req.value) == 0)
+    if (i2c_write_byte_data(pigpioHandle, req.handle, req.deviceRegister, req.value) == 0)
     {
         res.hasSucceeded = true;
         ROS_INFO("Successfuly wrote register %u on I2C device %u.", req.deviceRegister, req.handle);

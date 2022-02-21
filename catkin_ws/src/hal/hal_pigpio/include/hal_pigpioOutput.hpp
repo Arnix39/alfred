@@ -21,7 +21,7 @@ private:
     ros::ServiceServer setGpioHighService;
     ros::ServiceServer setGpioLowService;
     ros::ServiceServer sendTriggerPulseService;
-    int pigpio_handle;
+    int pigpioHandle;
 
 public:
     PigpioOutput(ros::NodeHandle *node, int handle);

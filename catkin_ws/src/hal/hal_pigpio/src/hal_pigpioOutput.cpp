@@ -5,7 +5,7 @@
 
 PigpioOutput::PigpioOutput(ros::NodeHandle *node, int handle)
 {
-    pigpio_handle = handle;
+    pigpioHandle = handle;
 
     setPwmDutycycleService = node->advertiseService("hal_pigpioSetPwmDutycycle", &PigpioOutput::setPwmDutycycle, this);
     setPwmFrequencyService = node->advertiseService("hal_pigpioSetPwmFrequency", &PigpioOutput::setPwmFrequency, this);
@@ -17,7 +17,7 @@ PigpioOutput::PigpioOutput(ros::NodeHandle *node, int handle)
 bool PigpioOutput::setPwmDutycycle(hal_pigpio::hal_pigpioSetPwmDutycycle::Request &req,
                                    hal_pigpio::hal_pigpioSetPwmDutycycle::Response &res)
 {
-    if ((req.dutycycle != 0) && (set_PWM_dutycycle(pigpio_handle, req.gpioId, req.dutycycle) == 0))
+    if ((req.dutycycle != 0) && (set_PWM_dutycycle(pigpioHandle, req.gpioId, req.dutycycle) == 0))
     {
         res.hasSucceeded = true;
         ROS_INFO("Set PWM duty cycle of %u for GPIO %u!", req.dutycycle, req.gpioId);
@@ -33,7 +33,7 @@ bool PigpioOutput::setPwmDutycycle(hal_pigpio::hal_pigpioSetPwmDutycycle::Reques
 bool PigpioOutput::setPwmFrequency(hal_pigpio::hal_pigpioSetPwmFrequency::Request &req,
                                    hal_pigpio::hal_pigpioSetPwmFrequency::Response &res)
 {
-    int pwmSettingResult = set_PWM_dutycycle(pigpio_handle, req.gpioId, req.frequency);
+    int pwmSettingResult = set_PWM_dutycycle(pigpioHandle, req.gpioId, req.frequency);
 
     if ((pwmSettingResult != PI_NOT_PERMITTED) && (pwmSettingResult != PI_BAD_USER_GPIO))
     {
@@ -51,7 +51,7 @@ bool PigpioOutput::setPwmFrequency(hal_pigpio::hal_pigpioSetPwmFrequency::Reques
 bool PigpioOutput::setGpioHigh(hal_pigpio::hal_pigpioSetGpioHigh::Request &req,
                                hal_pigpio::hal_pigpioSetGpioHigh::Response &res)
 {
-    if (gpio_write(pigpio_handle, req.gpioId, PI_HIGH) == 0)
+    if (gpio_write(pigpioHandle, req.gpioId, PI_HIGH) == 0)
     {
         res.hasSucceeded = true;
     }
@@ -65,7 +65,7 @@ bool PigpioOutput::setGpioHigh(hal_pigpio::hal_pigpioSetGpioHigh::Request &req,
 bool PigpioOutput::setGpioLow(hal_pigpio::hal_pigpioSetGpioLow::Request &req,
                               hal_pigpio::hal_pigpioSetGpioLow::Response &res)
 {
-    if (gpio_write(pigpio_handle, req.gpioId, PI_LOW) == 0)
+    if (gpio_write(pigpioHandle, req.gpioId, PI_LOW) == 0)
     {
         res.hasSucceeded = true;
     }
@@ -79,7 +79,8 @@ bool PigpioOutput::setGpioLow(hal_pigpio::hal_pigpioSetGpioLow::Request &req,
 bool PigpioOutput::sendTriggerPulse(hal_pigpio::hal_pigpioSendTriggerPulse::Request &req,
                                     hal_pigpio::hal_pigpioSendTriggerPulse::Response &res)
 {
-    if (gpio_trigger(pigpio_handle, req.gpioId, req.pulseLengthInUs, PI_HIGH) == 0)
+    int error = gpio_trigger(pigpioHandle, req.gpioId, req.pulseLengthInUs, PI_HIGH);
+    if (error == 0)
     {
         res.hasSucceeded = true;
         ROS_INFO("Sent trigger pulse for GPIO %u!", req.gpioId);
@@ -87,7 +88,7 @@ bool PigpioOutput::sendTriggerPulse(hal_pigpio::hal_pigpioSendTriggerPulse::Requ
     else
     {
         res.hasSucceeded = false;
-        ROS_ERROR("Failed to send trigger pulse for GPIO %u!", req.gpioId);
+        ROS_ERROR("Failed to send trigger pulse for GPIO %u with error %d!", req.gpioId, error);
     }
     return true;
 }

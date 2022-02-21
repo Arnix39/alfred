@@ -19,7 +19,7 @@ private:
     ros::Publisher gpioEdgeChangePub;
     ros::ServiceServer readGpioService;
     ros::ServiceServer setCallbackRisingEdgeService;
-    int pigpio_handle;
+    int pigpioHandle;
     std::vector<uint> callbackList;
     void gpioEdgeChangeCallback(int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us);
 
