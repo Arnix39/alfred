@@ -3,10 +3,8 @@
 // Services headers (generated)
 #include "hal_pigpio/hal_pigpioGetHandle.h"
 
-PigpioOutput::PigpioOutput(ros::NodeHandle *node, int handle)
+PigpioOutput::PigpioOutput(ros::NodeHandle *node, int handle) : pigpioHandle(handle)
 {
-    pigpioHandle = handle;
-
     setPwmDutycycleService = node->advertiseService("hal_pigpioSetPwmDutycycle", &PigpioOutput::setPwmDutycycle, this);
     setPwmFrequencyService = node->advertiseService("hal_pigpioSetPwmFrequency", &PigpioOutput::setPwmFrequency, this);
     setGpioHighService = node->advertiseService("hal_pigpioSetGpioHigh", &PigpioOutput::setGpioHigh, this);
