@@ -96,15 +96,3 @@ bool PigpioOutput::sendTriggerPulse(hal_pigpio::hal_pigpioSendTriggerPulse::Requ
     }
     return true;
 }
-
-/*int main(int argc, char **argv)
-{
-    ros::init(argc, argv, "hal_pigpioOutput");
-    ros::NodeHandle node;
-
-    PigpioOutput pigpioOutput(&node);
-
-    ros::spin();
-
-    return 0;
-}*/

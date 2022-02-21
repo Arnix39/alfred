@@ -5,7 +5,7 @@
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "hal_pigpioInit");
+    ros::init(argc, argv, "hal_pigpio");
     ros::NodeHandle node;
 
     PigpioInit pigpioInit(&node);

@@ -78,15 +78,3 @@ bool PigpioI2c::i2cWriteByteData(hal_pigpio::hal_pigpioI2cWriteByteData::Request
     }
     return true;
 }
-
-/*int main(int argc, char **argv)
-{
-    ros::init(argc, argv, "hal_pigpioI2c");
-    ros::NodeHandle node;
-
-    PigpioI2c pigpioI2c(&node);
-
-    ros::spin();
-
-    return 0;
-}*/

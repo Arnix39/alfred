@@ -75,15 +75,3 @@ bool PigpioInput::setCallback(hal_pigpio::hal_pigpioSetCallback::Request &req,
     }
     return true;
 }
-
-/*int main(int argc, char **argv)
-{
-    ros::init(argc, argv, "hal_pigpioInput");
-    ros::NodeHandle node;
-
-    PigpioInput pigpioInput(&node);
-
-    ros::spin();
-
-    return 0;
-}*/
