@@ -1,12 +1,11 @@
 #include "hal_pigpioOutput.hpp"
 
-PigpioOutput::PigpioOutput(ros::NodeHandle *node) : getPigpioHandleClient(node->serviceClient<hal_pigpio::hal_pigpioGetHandle>("hal_pigpioGetHandle")),
-                                                    getModeClient(node->serviceClient<hal_pigpio::hal_pigpioGetMode>("hal_pigpioGetMode"))
+PigpioOutput::PigpioOutput(ros::NodeHandle *node, int pigpioHandle) : pigpioHandle(pigpioHandle),
+                                                                      getPigpioHandleClient(node->serviceClient<hal_pigpio::hal_pigpioGetHandle>("hal_pigpioGetHandle")),
+                                                                      getModeClient(node->serviceClient<hal_pigpio::hal_pigpioGetMode>("hal_pigpioGetMode"))
 
 {
-    hal_pigpio::hal_pigpioGetHandle pigpioHandleRequest;
-    getPigpioHandleClient.call(pigpioHandleRequest);
-    pigpioHandle = pigpioHandleRequest.response.handle;
+    ROS_INFO("Pigpio Output object created.");
 
     setPwmDutycycleService = node->advertiseService("hal_pigpioSetPwmDutycycle", &PigpioOutput::setPwmDutycycle, this);
     setPwmFrequencyService = node->advertiseService("hal_pigpioSetPwmFrequency", &PigpioOutput::setPwmFrequency, this);

@@ -22,7 +22,7 @@ private:
     int pigpioHandle;
 
 public:
-    PigpioInit(ros::NodeHandle *node);
+    PigpioInit(ros::NodeHandle *node, int pigpioHandle);
     ~PigpioInit();
     bool getHandle(hal_pigpio::hal_pigpioGetHandle::Request &req,
                    hal_pigpio::hal_pigpioGetHandle::Response &res);

@@ -25,7 +25,7 @@ private:
     void gpioEdgeChangeCallback(int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us);
 
 public:
-    PigpioInput(ros::NodeHandle *node);
+    PigpioInput(ros::NodeHandle *node, int pigpioHandle);
     ~PigpioInput();
     bool readGpio(hal_pigpio::hal_pigpioReadGpio::Request &req,
                   hal_pigpio::hal_pigpioReadGpio::Response &res);

@@ -23,7 +23,7 @@ private:
     int pigpioHandle;
 
 public:
-    PigpioI2c(ros::NodeHandle *node);
+    PigpioI2c(ros::NodeHandle *node, int pigpioHandle);
     ~PigpioI2c() = default;
     bool i2cOpen(hal_pigpio::hal_pigpioI2cOpen::Request &req,
                  hal_pigpio::hal_pigpioI2cOpen::Response &res);

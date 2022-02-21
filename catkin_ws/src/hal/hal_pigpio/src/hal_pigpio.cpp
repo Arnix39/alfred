@@ -7,11 +7,19 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "hal_pigpio");
     ros::NodeHandle node;
+    int pigpioHandle;
 
-    PigpioInit pigpioInit(&node);
-    PigpioOutput pigpioOutput(&node);
-    PigpioInput pigpioInput(&node);
-    PigpioI2c pigpioI2c(&node);
+    pigpioHandle = pigpio_start(NULL, NULL);
+    if (pigpioHandle < 0)
+    {
+        ROS_ERROR("Failed to start pigpio daemon!");
+    }
+    ROS_INFO("Pigpio handle: %d.", pigpioHandle);
+
+    PigpioInit pigpioInit(&node, pigpioHandle);
+    PigpioOutput pigpioOutput(&node, pigpioHandle);
+    PigpioInput pigpioInput(&node, pigpioHandle);
+    PigpioI2c pigpioI2c(&node, pigpioHandle);
 
     ros::spin();
 
