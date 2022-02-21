@@ -36,12 +36,12 @@ ros::ServiceClient *ProxSensClientsRos::getSetInputClientHandle()
 
 ros::ServiceClient *ProxSensClientsRos::getSetCallbackClientHandle()
 {
-    return &gpioSetOutputClientRos;
+    return &gpioSetCallbackClientRos;
 }
 
 ros::ServiceClient *ProxSensClientsRos::getSetOutputClientHandle()
 {
-    return &gpioSetCallbackClientRos;
+    return &gpioSetOutputClientRos;
 }
 
 ros::ServiceClient *ProxSensClientsRos::getSendTriggerPulseClientHandle()
