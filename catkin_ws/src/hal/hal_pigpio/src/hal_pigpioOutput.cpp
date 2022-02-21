@@ -3,7 +3,8 @@
 // Services headers (generated)
 #include "hal_pigpio/hal_pigpioGetHandle.h"
 
-PigpioOutput::PigpioOutput(ros::NodeHandle *node, int handle) : pigpioHandle(handle)
+PigpioOutput::PigpioOutput(ros::NodeHandle *node, int handle) : pigpioHandle(handle),
+                                                                getModeClient(node->serviceClient<hal_pigpio::hal_pigpioGetMode>("hal_pigpioGetMode"))
 {
     setPwmDutycycleService = node->advertiseService("hal_pigpioSetPwmDutycycle", &PigpioOutput::setPwmDutycycle, this);
     setPwmFrequencyService = node->advertiseService("hal_pigpioSetPwmFrequency", &PigpioOutput::setPwmFrequency, this);
@@ -90,7 +91,7 @@ bool PigpioOutput::sendTriggerPulse(hal_pigpio::hal_pigpioSendTriggerPulse::Requ
     else
     {
         res.hasSucceeded = false;
-        ROS_ERROR("Failed to send trigger pulse for GPIO %u!", req.gpioId, error);
+        ROS_ERROR("Failed to send trigger pulse for GPIO %u!", req.gpioId);
     }
     return true;
 }

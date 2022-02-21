@@ -27,6 +27,7 @@ add_message_files(
 add_service_files(
    FILES
    hal_pigpioGetHandle.srv
+   hal_pigpioGetMode.srv
    hal_pigpioSetInputMode.srv
    hal_pigpioSetOutputMode.srv
    hal_pigpioSetGpioHigh.srv

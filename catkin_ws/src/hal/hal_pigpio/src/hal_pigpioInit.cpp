@@ -12,6 +12,7 @@ PigpioInit::PigpioInit(ros::NodeHandle *node)
     ROS_INFO("Pigpio handle: %d.", pigpioHandle);
 
     getHandleService = node->advertiseService("hal_pigpioGetHandle", &PigpioInit::getHandle, this);
+    getModeService = node->advertiseService("hal_pigpioGetMode", &PigpioInit::getMode, this);
     setInputModeService = node->advertiseService("hal_pigpioSetInputMode", &PigpioInit::setInputMode, this);
     setOutputModeService = node->advertiseService("hal_pigpioSetOutputMode", &PigpioInit::setOutputMode, this);
 }
@@ -26,6 +27,23 @@ bool PigpioInit::getHandle(hal_pigpio::hal_pigpioGetHandle::Request &req,
                            hal_pigpio::hal_pigpioGetHandle::Response &res)
 {
     res.handle = pigpioHandle;
+    return true;
+}
+
+bool PigpioInit::getMode(hal_pigpio::hal_pigpioGetMode::Request &req,
+                         hal_pigpio::hal_pigpioGetMode::Response &res)
+{
+    res.mode = get_mode(pigpioHandle, req.gpioId);
+    if (res.mode == 0)
+    {
+        res.hasSucceeded = true;
+        ROS_INFO("Retrieved mode for GPIO %u.", req.gpioId);
+    }
+    else
+    {
+        res.hasSucceeded = false;
+        ROS_ERROR("Failed to retrieve mode for GPIO %u!", req.gpioId);
+    }
     return true;
 }
 

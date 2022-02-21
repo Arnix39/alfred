@@ -1,0 +1,4 @@
+uint16 gpioId
+---
+int32 mode
+bool hasSucceeded

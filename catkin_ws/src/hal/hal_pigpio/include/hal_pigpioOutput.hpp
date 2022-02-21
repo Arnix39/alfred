@@ -12,6 +12,7 @@
 #include "hal_pigpio/hal_pigpioSetGpioHigh.h"
 #include "hal_pigpio/hal_pigpioSetGpioLow.h"
 #include "hal_pigpio/hal_pigpioSendTriggerPulse.h"
+#include "hal_pigpio/hal_pigpioGetMode.h"
 
 class PigpioOutput
 {
@@ -21,6 +22,7 @@ private:
     ros::ServiceServer setGpioHighService;
     ros::ServiceServer setGpioLowService;
     ros::ServiceServer sendTriggerPulseService;
+    ros::ServiceClient getModeClient;
     int pigpioHandle;
 
 public:
