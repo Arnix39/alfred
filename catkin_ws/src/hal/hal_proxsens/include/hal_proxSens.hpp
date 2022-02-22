@@ -9,6 +9,7 @@
 // Services and messages headers (generated)
 #include "hal_pigpio/hal_pigpioSetInputMode.h"
 #include "hal_pigpio/hal_pigpioSetOutputMode.h"
+#include "hal_pigpio/hal_pigpioClearResistor.h"
 #include "hal_pigpio/hal_pigpioSetGpioHigh.h"
 #include "hal_pigpio/hal_pigpioSetGpioLow.h"
 #include "hal_pigpio/hal_pigpioSendTriggerPulse.h"

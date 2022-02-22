@@ -26,7 +26,8 @@ ProxSensClientsRos::ProxSensClientsRos(ros::NodeHandle *node) : gpioSetInputClie
                                                                 gpioSetOutputClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetOutputMode>("hal_pigpioSetOutputMode")),
                                                                 gpioSetCallbackClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetCallback>("hal_pigpioSetCallback")),
                                                                 gpioSendTriggerPulseClientRos(node->serviceClient<hal_pigpio::hal_pigpioSendTriggerPulse>("hal_pigpioSendTriggerPulse")),
-                                                                gpioSetGpioHighClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetGpioHigh>("hal_pigpioSetGpioHigh"))
+                                                                gpioSetGpioHighClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetGpioHigh>("hal_pigpioSetGpioHigh")),
+                                                                gpioClearResistorClientRos(node->serviceClient<hal_pigpio::hal_pigpioClearResistor>("hal_pigpioClearResistor"))
 {
 }
 
@@ -53,6 +54,11 @@ ros::ServiceClient *ProxSensClientsRos::getSendTriggerPulseClientHandle()
 ros::ServiceClient *ProxSensClientsRos::getSetGpioHighClientHandle()
 {
     return &gpioSetGpioHighClientRos;
+}
+
+ros::ServiceClient *ProxSensClientsRos::getClearResistorClientHandle()
+{
+    return &gpioClearResistorClientRos;
 }
 
 /* Proximity sensor implementation */
@@ -113,9 +119,13 @@ void ProxSens::configureGpios(void)
     hal_pigpio::hal_pigpioSetInputMode setInputModeSrv;
     hal_pigpio::hal_pigpioSetCallback setCallbackSrv;
     hal_pigpio::hal_pigpioSetOutputMode setOutputModeSrv;
+    hal_pigpio::hal_pigpioClearResistor clearResistorSrv;
 
     setInputModeSrv.request.gpioId = PROXSENS_ECHO_GPIO;
     proxSensClients->getSetInputClientHandle()->call(setInputModeSrv);
+
+    setInputModeSrv.request.gpioId = PROXSENS_ECHO_GPIO;
+    proxSensClients->getClearResistorClientHandle()->call(setInputModeSrv);
 
     setCallbackSrv.request.gpioId = PROXSENS_ECHO_GPIO;
     setCallbackSrv.request.edgeChangeType = AS_EITHER_EDGE;
