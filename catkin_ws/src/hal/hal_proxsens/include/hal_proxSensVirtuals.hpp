@@ -34,7 +34,6 @@ public:
     virtual ros::ServiceClient *getSetOutputClientHandle() = 0;
     virtual ros::ServiceClient *getSendTriggerPulseClientHandle() = 0;
     virtual ros::ServiceClient *getSetGpioHighClientHandle() = 0;
-    virtual ros::ServiceClient *getClearResistorClientHandle() = 0;
 };
 
 #endif
