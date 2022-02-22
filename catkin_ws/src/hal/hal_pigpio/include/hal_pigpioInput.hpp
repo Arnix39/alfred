@@ -22,7 +22,8 @@ private:
     ros::ServiceClient getPigpioHandleClient;
     int pigpioHandle;
     std::vector<uint> callbackList;
-    void gpioEdgeChangeCallback(int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us);
+    inline void gpioEdgeChangeCallback(int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us);
+    static void c_gpioEdgeChangeCallback(int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us, void *userData);
 
 public:
     PigpioInput(ros::NodeHandle *node, int pigpioHandle);

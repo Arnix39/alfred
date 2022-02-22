@@ -52,7 +52,6 @@ bool PigpioOutput::setGpioHigh(hal_pigpio::hal_pigpioSetGpioHigh::Request &req,
     if (gpio_write(pigpioHandle, req.gpioId, PI_HIGH) == 0)
     {
         res.hasSucceeded = true;
-        ROS_INFO("Set GPIO %u to high level.", req.gpioId);
     }
     else
     {
@@ -68,7 +67,6 @@ bool PigpioOutput::setGpioLow(hal_pigpio::hal_pigpioSetGpioLow::Request &req,
     if (gpio_write(pigpioHandle, req.gpioId, PI_LOW) == 0)
     {
         res.hasSucceeded = true;
-        ROS_INFO("Set GPIO %u to low level.", req.gpioId);
     }
     else
     {
@@ -84,7 +82,6 @@ bool PigpioOutput::sendTriggerPulse(hal_pigpio::hal_pigpioSendTriggerPulse::Requ
     if (gpio_trigger(pigpioHandle, req.gpioId, req.pulseLengthInUs, PI_HIGH) == 0)
     {
         res.hasSucceeded = true;
-        ROS_INFO("Sent trigger pulse for GPIO %u.", req.gpioId);
     }
     else
     {

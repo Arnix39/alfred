@@ -31,7 +31,6 @@ bool PigpioInit::getMode(hal_pigpio::hal_pigpioGetMode::Request &req,
     if (res.mode >= 0)
     {
         res.hasSucceeded = true;
-        ROS_INFO("Retrieved mode for GPIO %u.", req.gpioId);
     }
     else
     {

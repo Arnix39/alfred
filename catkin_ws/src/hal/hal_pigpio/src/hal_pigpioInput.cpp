@@ -26,7 +26,6 @@ bool PigpioInput::readGpio(hal_pigpio::hal_pigpioReadGpio::Request &req,
     if (res.level != PI_BAD_GPIO)
     {
         res.hasSucceeded = true;
-        ROS_INFO("Read GPIO %u.", req.gpioId);
     }
     else
     {
@@ -48,17 +47,16 @@ void PigpioInput::gpioEdgeChangeCallback(int handle, unsigned gpioId, unsigned e
 }
 
 // This is to pass the pointer of the callback function gpioEdgeChangeCallback to the pigpio library API
-void c_callback_wrapper(int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us, void *userData)
+void PigpioInput::c_gpioEdgeChangeCallback(int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us, void *userData)
 {
-    auto &c_edgeCallback = *reinterpret_cast<edgeCallback_t *>(handle, gpioId, edgeChangeType, timeSinceBoot_us, userData);
-    c_edgeCallback(handle, gpioId, edgeChangeType, timeSinceBoot_us);
+    PigpioInput *object = reinterpret_cast<PigpioInput *>(userData);
+    object->gpioEdgeChangeCallback(handle, gpioId, edgeChangeType, timeSinceBoot_us);
 }
 
 bool PigpioInput::setCallback(hal_pigpio::hal_pigpioSetCallback::Request &req,
                               hal_pigpio::hal_pigpioSetCallback::Response &res)
 {
-    edgeCallback_t edgeCallback = std::bind(&PigpioInput::gpioEdgeChangeCallback, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
-    res.callbackId = callback_ex(pigpioHandle, req.gpioId, req.edgeChangeType, c_callback_wrapper, &edgeCallback);
+    res.callbackId = callback_ex(pigpioHandle, req.gpioId, req.edgeChangeType, c_gpioEdgeChangeCallback, reinterpret_cast<void *>(this));
     if (res.callbackId >= 0)
     {
         res.hasSucceeded = true;
