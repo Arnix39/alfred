@@ -5,8 +5,6 @@ PigpioOutput::PigpioOutput(ros::NodeHandle *node, int pigpioHandle) : pigpioHand
                                                                       getModeClient(node->serviceClient<hal_pigpio::hal_pigpioGetMode>("hal_pigpioGetMode"))
 
 {
-    ROS_INFO("Pigpio Output object created.");
-
     setPwmDutycycleService = node->advertiseService("hal_pigpioSetPwmDutycycle", &PigpioOutput::setPwmDutycycle, this);
     setPwmFrequencyService = node->advertiseService("hal_pigpioSetPwmFrequency", &PigpioOutput::setPwmFrequency, this);
     setGpioHighService = node->advertiseService("hal_pigpioSetGpioHigh", &PigpioOutput::setGpioHigh, this);
