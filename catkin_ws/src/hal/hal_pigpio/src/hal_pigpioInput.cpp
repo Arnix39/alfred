@@ -50,9 +50,9 @@ void PigpioInput::gpioEdgeChangeCallback(int handle, unsigned gpioId, unsigned e
 }
 
 // This is to pass the pointer of the callback function gpioEdgeChangeCallback to the pigpio library API
-void c_callback_wrapper(int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us, void *userdata)
+void c_callback_wrapper(int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us, void *userData)
 {
-    auto &c_edgeCallback = *reinterpret_cast<edgeCallback_t *>(handle, gpioId, edgeChangeType, timeSinceBoot_us, userdata);
+    auto &c_edgeCallback = *reinterpret_cast<edgeCallback_t *>(handle, gpioId, edgeChangeType, timeSinceBoot_us, userData);
     c_edgeCallback(handle, gpioId, edgeChangeType, timeSinceBoot_us);
 }
 
