@@ -33,6 +33,7 @@ private:
     ros::ServiceClient gpioSetCallbackClientRos;
     ros::ServiceClient gpioSetOutputClientRos;
     ros::ServiceClient gpioSendTriggerPulseClientRos;
+    ros::ServiceClient gpioSetGpioHighClientRos;
 
 public:
     ProxSensClientsRos(ros::NodeHandle *node);
@@ -41,6 +42,7 @@ public:
     ros::ServiceClient *getSetCallbackClientHandle() override;
     ros::ServiceClient *getSetOutputClientHandle() override;
     ros::ServiceClient *getSendTriggerPulseClientHandle() override;
+    ros::ServiceClient *getSetGpioHighClientHandle() override;
 };
 
 #endif

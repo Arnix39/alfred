@@ -18,6 +18,7 @@
 
 #define PROXSENS_TRIGGER_GPIO 5
 #define PROXSENS_ECHO_GPIO 6
+#define PROXSENS_LEVEL_SHIFTER_OE_GPIO 10
 #define PROXSENS_TRIGGER_LENGTH_US 20
 
 #define AS_RISING_EDGE 0
@@ -44,6 +45,7 @@ public:
     void publishMessage(void);
     void configureGpios(void);
     void trigger(void);
+    void enableOutputLevelShifter(void);
     void edgeChangeCallback(const hal_pigpio::hal_pigpioEdgeChangeMsg &msg);
 };
 

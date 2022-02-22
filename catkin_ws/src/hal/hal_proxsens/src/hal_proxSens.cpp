@@ -25,7 +25,8 @@ void ProxSensSubscriberRos::subscribe(ProxSens *proxSens)
 ProxSensClientsRos::ProxSensClientsRos(ros::NodeHandle *node) : gpioSetInputClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetInputMode>("hal_pigpioSetInputMode")),
                                                                 gpioSetOutputClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetOutputMode>("hal_pigpioSetOutputMode")),
                                                                 gpioSetCallbackClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetCallback>("hal_pigpioSetCallback")),
-                                                                gpioSendTriggerPulseClientRos(node->serviceClient<hal_pigpio::hal_pigpioSendTriggerPulse>("hal_pigpioSendTriggerPulse"))
+                                                                gpioSendTriggerPulseClientRos(node->serviceClient<hal_pigpio::hal_pigpioSendTriggerPulse>("hal_pigpioSendTriggerPulse")),
+                                                                gpioSetGpioHighClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetGpioHigh>("hal_pigpioSetGpioHigh"))
 {
 }
 
@@ -47,6 +48,11 @@ ros::ServiceClient *ProxSensClientsRos::getSetOutputClientHandle()
 ros::ServiceClient *ProxSensClientsRos::getSendTriggerPulseClientHandle()
 {
     return &gpioSendTriggerPulseClientRos;
+}
+
+ros::ServiceClient *ProxSensClientsRos::getSetGpioHighClientHandle()
+{
+    return &gpioSetGpioHighClientRos;
 }
 
 /* Proximity sensor implementation */
@@ -109,20 +115,20 @@ void ProxSens::configureGpios(void)
     hal_pigpio::hal_pigpioSetOutputMode setOutputModeSrv;
 
     setInputModeSrv.request.gpioId = PROXSENS_ECHO_GPIO;
+    proxSensClients->getSetInputClientHandle()->call(setInputModeSrv);
 
     setCallbackSrv.request.gpioId = PROXSENS_ECHO_GPIO;
     setCallbackSrv.request.edgeChangeType = AS_EITHER_EDGE;
-
-    setOutputModeSrv.request.gpioId = PROXSENS_TRIGGER_GPIO;
-
-    proxSensClients->getSetInputClientHandle()->call(setInputModeSrv);
-
     proxSensClients->getSetCallbackClientHandle()->call(setCallbackSrv);
     if (setCallbackSrv.response.hasSucceeded)
     {
         echoCallbackId = setCallbackSrv.response.callbackId;
     }
 
+    setOutputModeSrv.request.gpioId = PROXSENS_TRIGGER_GPIO;
+    proxSensClients->getSetOutputClientHandle()->call(setOutputModeSrv);
+
+    setOutputModeSrv.request.gpioId = PROXSENS_LEVEL_SHIFTER_OE_GPIO;
     proxSensClients->getSetOutputClientHandle()->call(setOutputModeSrv);
 }
 
@@ -136,6 +142,15 @@ void ProxSens::trigger(void)
     proxSensClients->getSendTriggerPulseClientHandle()->call(sendTriggerPulseSrv);
 }
 
+void ProxSens::enableOutputLevelShifter(void)
+{
+    hal_pigpio::hal_pigpioSetGpioHigh setGpioHighSrv;
+
+    setGpioHighSrv.request.gpioId = PROXSENS_LEVEL_SHIFTER_OE_GPIO;
+
+    proxSensClients->getSetGpioHighClientHandle()->call(setGpioHighSrv);
+}
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "hal_proxsens");
@@ -147,6 +162,7 @@ int main(int argc, char **argv)
 
     ProxSens proxSens(&proxSensSubscriberRos, &proxSensPublisherRos, &proxSensServiceClientsRos);
     proxSens.configureGpios();
+    proxSens.enableOutputLevelShifter();
 
     ros::Rate loop_rate(10);
 
