@@ -11,6 +11,9 @@
 #include "hal_pigpio/hal_pigpioGetMode.h"
 #include "hal_pigpio/hal_pigpioSetInputMode.h"
 #include "hal_pigpio/hal_pigpioSetOutputMode.h"
+#include "hal_pigpio/hal_pigpioSetPullUp.h"
+#include "hal_pigpio/hal_pigpioSetPullDown.h"
+#include "hal_pigpio/hal_pigpioClearResistor.h"
 
 class PigpioInit
 {
@@ -19,6 +22,9 @@ private:
     ros::ServiceServer getModeService;
     ros::ServiceServer setInputModeService;
     ros::ServiceServer setOutputModeService;
+    ros::ServiceServer setPullUpService;
+    ros::ServiceServer setPullDownService;
+    ros::ServiceServer clearResistorService;
     int pigpioHandle;
 
 public:
@@ -32,6 +38,12 @@ public:
                       hal_pigpio::hal_pigpioSetInputMode::Response &res);
     bool setOutputMode(hal_pigpio::hal_pigpioSetOutputMode::Request &req,
                        hal_pigpio::hal_pigpioSetOutputMode::Response &res);
+    bool setPullUp(hal_pigpio::hal_pigpioSetPullUp::Request &req,
+                   hal_pigpio::hal_pigpioSetPullUp::Response &res);
+    bool setPullDown(hal_pigpio::hal_pigpioSetPullDown::Request &req,
+                     hal_pigpio::hal_pigpioSetPullDown::Response &res);
+    bool clearResistor(hal_pigpio::hal_pigpioClearResistor::Request &req,
+                       hal_pigpio::hal_pigpioClearResistor::Response &res);
 };
 
 #endif

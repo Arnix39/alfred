@@ -30,6 +30,9 @@ add_service_files(
    hal_pigpioGetMode.srv
    hal_pigpioSetInputMode.srv
    hal_pigpioSetOutputMode.srv
+   hal_pigpioSetPullUp.srv
+   hal_pigpioSetPullDown.srv
+   hal_pigpioClearResistor.srv
    hal_pigpioSetGpioHigh.srv
    hal_pigpioSetGpioLow.srv
    hal_pigpioSetPwmDutycycle.srv

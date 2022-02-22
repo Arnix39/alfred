@@ -6,6 +6,9 @@ PigpioInit::PigpioInit(ros::NodeHandle *node, int pigpioHandle) : pigpioHandle(p
     getModeService = node->advertiseService("hal_pigpioGetMode", &PigpioInit::getMode, this);
     setInputModeService = node->advertiseService("hal_pigpioSetInputMode", &PigpioInit::setInputMode, this);
     setOutputModeService = node->advertiseService("hal_pigpioSetOutputMode", &PigpioInit::setOutputMode, this);
+    setPullUpService = node->advertiseService("hal_pigpioSetPullUp", &PigpioInit::setPullUp, this);
+    setPullDownService = node->advertiseService("hal_pigpioSetPullDown", &PigpioInit::setPullDown, this);
+    clearResistorService = node->advertiseService("hal_pigpioClearResistor", &PigpioInit::clearResistor, this);
 }
 
 PigpioInit::~PigpioInit()
@@ -68,5 +71,56 @@ bool PigpioInit::setOutputMode(hal_pigpio::hal_pigpioSetOutputMode::Request &req
         res.hasSucceeded = false;
         ROS_ERROR("Failed to configure GPIO %u as output!", req.gpioId);
     }
+    return true;
+}
+
+bool PigpioInit::setPullUp(hal_pigpio::hal_pigpioSetPullUp::Request &req,
+                           hal_pigpio::hal_pigpioSetPullUp::Response &res)
+{
+    if (set_pull_up_down(pigpioHandle, req.gpioId, PI_PUD_UP) == 0)
+    {
+        res.hasSucceeded = true;
+        ROS_INFO("Sucessfully set pull-up resistor for GPIO %u.", req.gpioId);
+    }
+    else
+    {
+        res.hasSucceeded = true;
+        ROS_INFO("Failed to set pull-up resistor for GPIO %u!", req.gpioId);
+    }
+
+    return true;
+}
+
+bool PigpioInit::setPullDown(hal_pigpio::hal_pigpioSetPullDown::Request &req,
+                             hal_pigpio::hal_pigpioSetPullDown::Response &res)
+{
+    if (set_pull_up_down(pigpioHandle, req.gpioId, PI_PUD_DOWN) == 0)
+    {
+        res.hasSucceeded = true;
+        ROS_INFO("Sucessfully set pull-down resistor for GPIO %u.", req.gpioId);
+    }
+    else
+    {
+        res.hasSucceeded = true;
+        ROS_INFO("Failed to set pull-down resistor for GPIO %u!", req.gpioId);
+    }
+
+    return true;
+}
+
+bool PigpioInit::clearResistor(hal_pigpio::hal_pigpioClearResistor::Request &req,
+                               hal_pigpio::hal_pigpioClearResistor::Response &res)
+{
+    if (set_pull_up_down(pigpioHandle, req.gpioId, PI_PUD_OFF) == 0)
+    {
+        res.hasSucceeded = true;
+        ROS_INFO("Sucessfully clear resistor for GPIO %u.", req.gpioId);
+    }
+    else
+    {
+        res.hasSucceeded = true;
+        ROS_INFO("Failed to clear resistor for GPIO %u!", req.gpioId);
+    }
+
     return true;
 }
