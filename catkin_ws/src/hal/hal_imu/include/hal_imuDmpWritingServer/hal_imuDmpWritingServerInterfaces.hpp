@@ -3,19 +3,19 @@
 
 #include "hal_imuDmpWritingServerVirtuals.hpp"
 
-class ImuActionServerRos : public ImuActionServer
+class ImuDmpWritingActionServerRos : public ImuDmpWritingActionServer
 {
 private:
-    imuActionServer_t imuWriteDmpServerRos;
+    imuDmpWritingActionServer_t imuWriteDmpServerRos;
 
 public:
-    ImuActionServerRos(ros::NodeHandle *node);
-    ~ImuActionServerRos() = default;
+    ImuDmpWritingActionServerRos(ros::NodeHandle *node);
+    ~ImuDmpWritingActionServerRos() = default;
     void registerCallback(ImuDmpWritingServer *imuDmpWritingServer) override;
-    imuActionServer_t *getActionServerHandle() override;
+    imuDmpWritingActionServer_t *getActionServerHandle() override;
 };
 
-class ImuClientsRos : public ImuClients
+class ImuDmpWritingClientsRos : public ImuDmpWritingClients
 {
 private:
     ros::ServiceClient i2cReadByteDataClientRos;
@@ -23,8 +23,8 @@ private:
     ros::ServiceClient i2cGetHandleClientRos;
 
 public:
-    ImuClientsRos(ros::NodeHandle *node);
-    ~ImuClientsRos() = default;
+    ImuDmpWritingClientsRos(ros::NodeHandle *node);
+    ~ImuDmpWritingClientsRos() = default;
     ros::ServiceClient *getReadByteDataClientHandle() override;
     ros::ServiceClient *getWriteByteDataClientHandle() override;
     ros::ServiceClient *getGetHandleClientHandle() override;

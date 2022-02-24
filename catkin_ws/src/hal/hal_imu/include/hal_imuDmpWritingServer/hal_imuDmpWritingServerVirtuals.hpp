@@ -6,24 +6,24 @@
 // Services and messages headers (generated)
 #include "hal_imu/hal_imuWriteDmpAction.h"
 
-typedef actionlib::SimpleActionServer<hal_imu::hal_imuWriteDmpAction> imuActionServer_t;
+typedef actionlib::SimpleActionServer<hal_imu::hal_imuWriteDmpAction> imuDmpWritingActionServer_t;
 
 class ImuDmpWritingServer;
 
-class ImuActionServer
+class ImuDmpWritingActionServer
 {
 public:
-    ImuActionServer() {}
-    virtual ~ImuActionServer() {}
+    ImuDmpWritingActionServer() {}
+    virtual ~ImuDmpWritingActionServer() {}
     virtual void registerCallback(ImuDmpWritingServer *imuDmpWritingServer) = 0;
-    virtual imuActionServer_t *getActionServerHandle() = 0;
+    virtual imuDmpWritingActionServer_t *getActionServerHandle() = 0;
 };
 
-class ImuClients
+class ImuDmpWritingClients
 {
 public:
-    ImuClients() {}
-    virtual ~ImuClients() {}
+    ImuDmpWritingClients() {}
+    virtual ~ImuDmpWritingClients() {}
     virtual ros::ServiceClient *getReadByteDataClientHandle() = 0;
     virtual ros::ServiceClient *getWriteByteDataClientHandle() = 0;
     virtual ros::ServiceClient *getGetHandleClientHandle() = 0;

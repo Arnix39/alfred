@@ -18,14 +18,14 @@
 class ImuDmpWritingServer
 {
 private:
-    ImuClients *imuClients;
-    ImuActionServer *imuDmpWritingServer;
+    ImuDmpWritingClients *imuClients;
+    ImuDmpWritingActionServer *imuDmpWritingServer;
     hal_imu::hal_imuWriteDmpFeedback feedback;
     hal_imu::hal_imuWriteDmpResult result;
     int32_t imuHandle;
 
 public:
-    ImuDmpWritingServer(ImuActionServer *imuWriteDmpServer, ImuClients *imuServiceClients);
+    ImuDmpWritingServer(ImuDmpWritingActionServer *imuWriteDmpServer, ImuDmpWritingClients *imuServiceClients);
     ~ImuDmpWritingServer() = default;
     void writeDmp(void);
     bool writeByteInRegister(uint8_t chipRegister, uint8_t value);

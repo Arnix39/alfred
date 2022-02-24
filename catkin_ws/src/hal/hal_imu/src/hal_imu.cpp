@@ -49,9 +49,7 @@ Imu::Imu(ImuPublisher *imuMessagePublisher, ImuClients *imuServiceClients) : imu
 Imu::~Imu()
 {
     hal_pigpio::hal_pigpioI2cClose i2cCloseSrv;
-
     i2cCloseSrv.request.handle = imuHandle;
-
     imuClients->getI2cCloseHandle()->call(i2cCloseSrv);
 }
 
