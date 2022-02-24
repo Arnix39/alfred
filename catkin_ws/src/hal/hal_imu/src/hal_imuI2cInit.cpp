@@ -2,53 +2,60 @@
 #include "hal_imuI2cInitInterfaces.hpp"
 
 /* Clients interface implementation */
+ImuI2cInitClientsRos::ImuI2cInitClientsRos(ros::NodeHandle *node) : i2cOpenClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cOpen>("hal_pigpioI2cOpen")),
+                                                                    i2cCloseClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cClose>("hal_pigpioI2cClose"))
+{
+}
 
-imuServers->advertiseGetHandleService(this);
+ros::ServiceClient *ImuI2cInitClientsRos::getI2cOpenHandle()
+{
+    return &i2cOpenClientRos;
+}
 
-bool Imu::getHandle(hal_imu::hal_imuGetHandle::Request &req,
-                    hal_imu::hal_imuGetHandle::Response &res)
+ros::ServiceClient *ImuI2cInitClientsRos::getI2cCloseHandle()
+{
+    return &i2cCloseClientRos;
+}
+
+/* Servers interface implementation */
+ImuI2cInitServersRos::ImuI2cInitServersRos(ros::NodeHandle *node) : nodeHandle(node)
+{
+}
+
+void ImuI2cInitServersRos::advertiseGetHandleService(ImuI2cInit *imuI2cInit)
+{
+    imuGetHandleServerRos = nodeHandle->advertiseService("hal_imuGetHandle", &ImuI2cInit::getHandle, imuI2cInit);
+}
+
+/* Imu I2c Init implementation */
+ImuI2cInit::ImuI2cInit(ImuI2cInitClients *imuI2cInitServiceClients, ImuI2cInitServers *imuI2cInitServiceServers) : imuI2cInitClients(imuI2cInitServiceClients),
+                                                                                                                   imuI2cInitServers(imuI2cInitServiceServers)
+{
+    imuI2cInitServiceServers->advertiseGetHandleService(this);
+}
+
+ImuI2cInit::~ImuI2cInit()
+{
+    hal_pigpio::hal_pigpioI2cClose i2cCloseSrv;
+    i2cCloseSrv.request.handle = imuHandle;
+    imuI2cInitClients->getI2cCloseHandle()->call(i2cCloseSrv);
+}
+
+bool ImuI2cInit::getHandle(hal_imu::hal_imuGetHandle::Request &req,
+                           hal_imu::hal_imuGetHandle::Response &res)
 {
     res.handle = imuHandle;
     return true;
 }
 
-i2cOpenClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cOpen>("hal_pigpioI2cOpen")),
-    i2cCloseClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cClose>("hal_pigpioI2cClose")),
-
-    ros::ServiceClient *ImuClientsRos::getI2cOpenHandle()
-{
-    return &i2cOpenClientRos;
-}
-
-ros::ServiceClient *ImuClientsRos::getI2cCloseHandle()
-{
-    return &i2cCloseClientRos;
-}
-
-/* Services servers interface implementation */
-ImuServersRos::ImuServersRos(ros::NodeHandle *node) : nodeHandle(node)
-{
-}
-
-void ImuServersRos::advertiseGetHandleService(Imu *imu)
-{
-    imuGetHandleServerRos = nodeHandle->advertiseService("hal_imuGetHandle", &Imu::getHandle, imu);
-}
-
-// destructor
-
-hal_pigpio::hal_pigpioI2cClose i2cCloseSrv;
-i2cCloseSrv.request.handle = imuHandle;
-imuClients->getI2cCloseHandle()->call(i2cCloseSrv);
-
-void Imu::initI2cCommunication(void)
+void ImuI2cInit::initI2cCommunication(void)
 {
     hal_pigpio::hal_pigpioI2cOpen i2cOpenSrv;
 
     i2cOpenSrv.request.bus = IMU_I2C_BUS;
-    i2cOpenSrv.request.address = IMU_I2C_ADDRESS;
+    i2cOpenSrv.request.address = MPU6050_I2C_ADDRESS;
 
-    imuClients->getI2cOpenHandle()->call(i2cOpenSrv);
+    imuI2cInitClients->getI2cOpenHandle()->call(i2cOpenSrv);
     if (i2cOpenSrv.response.hasSucceeded)
     {
         imuHandle = i2cOpenSrv.response.handle;
@@ -59,17 +66,16 @@ void Imu::initI2cCommunication(void)
     }
 }
 
-ImuServersRos imuServiceServersRos(&node);
-
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "hal_imuI2cInit");
     ros::NodeHandle node;
 
-    ImuDmpWritingClientsRos imuServiceClients(&node);
-    ImuDmpWritingActionServerRos imuWriteDmpServer(&node);
+    ImuI2cInitClientsRos imuI2cInitServiceClients(&node);
+    ImuI2cInitServersRos imuI2cInitServer(&node);
 
-    ImuDmpWritingServer imuDmpWritingServer(&imuWriteDmpServer, &imuServiceClients);
+    ImuI2cInit imuI2cInit(&imuI2cInitServiceClients, &imuI2cInitServer);
+    imuI2cInit.initI2cCommunication();
 
     ros::spin();
 

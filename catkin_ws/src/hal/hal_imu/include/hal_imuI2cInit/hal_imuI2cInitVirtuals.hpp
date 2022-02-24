@@ -5,12 +5,14 @@
 
 // Services and messages headers (generated)
 
+class ImuI2cInit;
+
 class ImuI2cInitServers
 {
 public:
     ImuI2cInitServers() {}
     virtual ~ImuI2cInitServers() {}
-    virtual void advertiseGetHandleService(Imu *imu) = 0;
+    virtual void advertiseGetHandleService(ImuI2cInit *imuI2cInit) = 0;
 };
 
 class ImuI2cInitClients

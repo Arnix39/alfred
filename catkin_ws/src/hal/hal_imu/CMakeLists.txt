@@ -76,11 +76,11 @@ target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
 )
 
-#add_executable(${PROJECT_NAME}I2cInit_node src/hal_imuI2cInit.cpp)
-#add_dependencies(${PROJECT_NAME}I2cInit_node	${${PROJECT_NAME}_EXPORTED_TARGETS}	${catkin_EXPORTED_TARGETS})
-#target_link_libraries(${PROJECT_NAME}I2cInit_node
-#  ${catkin_LIBRARIES}
-#)
+add_executable(${PROJECT_NAME}I2cInit_node src/hal_imuI2cInit.cpp)
+add_dependencies(${PROJECT_NAME}I2cInit_node	${${PROJECT_NAME}_EXPORTED_TARGETS}	${catkin_EXPORTED_TARGETS})
+target_link_libraries(${PROJECT_NAME}I2cInit_node
+  ${catkin_LIBRARIES}
+)
 
 add_executable(${PROJECT_NAME}DmpWritingServer_node src/hal_imuDmpWritingServer.cpp)
 add_dependencies(${PROJECT_NAME}DmpWritingServer_node	${${PROJECT_NAME}_EXPORTED_TARGETS}	${catkin_EXPORTED_TARGETS})
@@ -94,6 +94,7 @@ target_link_libraries(${PROJECT_NAME}DmpWritingServer_node
 install(TARGETS
   ${PROJECT_NAME}_node
   ${PROJECT_NAME}DmpWritingServer_node
+  ${PROJECT_NAME}I2cInit_node
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

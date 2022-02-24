@@ -39,7 +39,7 @@ ros::ServiceClient *ImuDmpWritingClientsRos::getGetHandleClientHandle()
     return &i2cGetHandleClientRos;
 }
 
-/* IMU implementation */
+/* IMU DMP implementation */
 ImuDmpWritingServer::ImuDmpWritingServer(ImuDmpWritingActionServer *imuWriteDmpServer, ImuDmpWritingClients *imuDmpServiceClients) : imuDmpWritingServer(imuWriteDmpServer),
                                                                                                                                      imuDmpClients(imuDmpServiceClients)
 {

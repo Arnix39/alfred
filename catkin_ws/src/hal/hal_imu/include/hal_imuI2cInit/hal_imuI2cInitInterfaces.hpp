@@ -12,7 +12,7 @@ private:
 public:
     ImuI2cInitServersRos(ros::NodeHandle *node);
     ~ImuI2cInitServersRos() = default;
-    void advertiseGetHandleService(Imu *imu) override;
+    void advertiseGetHandleService(ImuI2cInit *imuI2cInit) override;
 };
 
 class ImuI2cInitClientsRos : public ImuI2cInitClients
