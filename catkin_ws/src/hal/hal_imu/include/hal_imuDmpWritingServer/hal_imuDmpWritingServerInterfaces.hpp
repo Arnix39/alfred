@@ -6,7 +6,6 @@
 class ImuActionServerRos : public ImuActionServer
 {
 private:
-    ros::NodeHandle *nodeHandle;
     imuActionServer_t imuWriteDmpServerRos;
 
 public:

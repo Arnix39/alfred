@@ -16,25 +16,21 @@
 #include "hal_imu/hal_imuMsg.h"
 
 #define IMU_I2C_ADDRESS 0x68
-#define IMU_I2C_BUS 0x0
+#define IMU_I2C_BUS 0x1
 
 typedef actionlib::SimpleActionClient<hal_imu::hal_imuWriteDmpAction> imuActionClient_t;
 
 class Imu
 {
 private:
-    ImuServers *imuServers;
     ImuClients *imuClients;
     ImuPublisher *imuPublisher;
     int32_t imuHandle;
 
 public:
-    Imu(ImuPublisher *imuMessagePublisher, ImuServers *imuServiceServers, ImuClients *imuServiceClients);
+    Imu(ImuPublisher *imuMessagePublisher, ImuClients *imuServiceClients);
     ~Imu();
-    bool getHandle(hal_imu::hal_imuGetHandle::Request &req,
-                   hal_imu::hal_imuGetHandle::Response &res);
     void init(void);
-    void initI2cCommunication(void);
     void writeDmp(void);
     void enable6AxisQuaternion(void);
     void calibrateAccelerometer(void);

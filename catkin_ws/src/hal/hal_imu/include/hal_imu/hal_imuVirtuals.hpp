@@ -16,14 +16,6 @@ public:
     virtual void publish(hal_imu::hal_imuMsg message) = 0;
 };
 
-class ImuServers
-{
-public:
-    ImuServers() {}
-    virtual ~ImuServers() {}
-    virtual void advertiseGetHandleService(Imu *imu) = 0;
-};
-
 class ImuClients
 {
 public:

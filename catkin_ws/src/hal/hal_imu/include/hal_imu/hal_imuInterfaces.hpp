@@ -14,18 +14,6 @@ public:
     void publish(hal_imu::hal_imuMsg message) override;
 };
 
-class ImuServersRos : public ImuServers
-{
-private:
-    ros::ServiceServer imuGetHandleServerRos;
-    ros::NodeHandle *nodeHandle;
-
-public:
-    ImuServersRos(ros::NodeHandle *node);
-    ~ImuServersRos() = default;
-    void advertiseGetHandleService(Imu *imu) override;
-};
-
 class ImuClientsRos : public ImuClients
 {
 private:

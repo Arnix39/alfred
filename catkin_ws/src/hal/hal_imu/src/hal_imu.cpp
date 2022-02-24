@@ -12,16 +12,6 @@ void ImuPublisherRos::publish(hal_imu::hal_imuMsg message)
     imuPublisherRos.publish(message);
 }
 
-/* Services servers interface implementation */
-ImuServersRos::ImuServersRos(ros::NodeHandle *node) : nodeHandle(node)
-{
-}
-
-void ImuServersRos::advertiseGetHandleService(Imu *imu)
-{
-    imuGetHandleServerRos = nodeHandle->advertiseService("hal_imuGetHandle", &Imu::getHandle, imu);
-}
-
 /* Services clients interface implementation */
 ImuClientsRos::ImuClientsRos(ros::NodeHandle *node) : i2cOpenClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cOpen>("hal_pigpioI2cOpen")),
                                                       i2cCloseClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cClose>("hal_pigpioI2cClose")),
@@ -51,11 +41,9 @@ ros::ServiceClient *ImuClientsRos::getWriteByteDataClientHandle()
 }
 
 /* IMU implementation */
-Imu::Imu(ImuPublisher *imuMessagePublisher, ImuServers *imuServiceServers, ImuClients *imuServiceClients) : imuPublisher(imuMessagePublisher),
-                                                                                                            imuServers(imuServiceServers),
-                                                                                                            imuClients(imuServiceClients)
+Imu::Imu(ImuPublisher *imuMessagePublisher, ImuClients *imuServiceClients) : imuPublisher(imuMessagePublisher),
+                                                                             imuClients(imuServiceClients)
 {
-    imuServers->advertiseGetHandleService(this);
 }
 
 Imu::~Imu()
@@ -67,48 +55,25 @@ Imu::~Imu()
     imuClients->getI2cCloseHandle()->call(i2cCloseSrv);
 }
 
-bool Imu::getHandle(hal_imu::hal_imuGetHandle::Request &req,
-                    hal_imu::hal_imuGetHandle::Response &res)
-{
-    res.handle = imuHandle;
-    return true;
-}
-
 void Imu::init(void)
 {
-    this->initI2cCommunication();
     this->writeDmp();
-    this->enable6AxisQuaternion();
-    this->calibrateAccelerometer();
-    this->enableGyroCalibrationOnDMP();
-}
-
-void Imu::initI2cCommunication(void)
-{
-    hal_pigpio::hal_pigpioI2cOpen i2cOpenSrv;
-
-    i2cOpenSrv.request.bus = IMU_I2C_BUS;
-    i2cOpenSrv.request.address = IMU_I2C_ADDRESS;
-
-    imuClients->getI2cOpenHandle()->call(i2cOpenSrv);
-    if (i2cOpenSrv.response.hasSucceeded)
-    {
-        imuHandle = i2cOpenSrv.response.handle;
-    }
-    else
-    {
-        ROS_ERROR("Unable to open I2C communication with device %u on bus %u!", i2cOpenSrv.request.address, i2cOpenSrv.request.bus);
-    }
+    // this->enable6AxisQuaternion();
+    // this->calibrateAccelerometer();
+    // this->enableGyroCalibrationOnDMP();
 }
 
 void Imu::writeDmp(void)
 {
     hal_imu::hal_imuWriteDmpGoal imuDmpWritingGoal;
-    imuActionClient_t imuDmpWritingClient("imuDMPWriting", false);
+    imuActionClient_t imuDmpWritingClient("imuDMPWriting", true);
+    ROS_INFO("Waiting for DMP writing server...");
     imuDmpWritingClient.waitForServer();
-
+    ROS_INFO("Connected to DMP writing server.");
     imuDmpWritingGoal.write = true;
+    ROS_INFO("Requesting DMP code writing...");
     imuDmpWritingClient.sendGoal(imuDmpWritingGoal);
+    ROS_INFO("Request sent.");
 
     imuDmpWritingClient.waitForResult();
     if (imuDmpWritingClient.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
@@ -217,10 +182,9 @@ int main(int argc, char **argv)
     ros::NodeHandle node;
 
     ImuPublisherRos imuMessagePublisherRos(&node);
-    ImuServersRos imuServiceServersRos(&node);
     ImuClientsRos imuServiceClientsRos(&node);
 
-    Imu imu(&imuMessagePublisherRos, &imuServiceServersRos, &imuServiceClientsRos);
+    Imu imu(&imuMessagePublisherRos, &imuServiceClientsRos);
     imu.init();
 
     ros::Rate loop_rate(200);
