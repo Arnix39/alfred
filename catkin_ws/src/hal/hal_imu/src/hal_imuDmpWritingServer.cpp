@@ -40,8 +40,8 @@ ros::ServiceClient *ImuDmpWritingClientsRos::getGetHandleClientHandle()
 }
 
 /* IMU implementation */
-ImuDmpWritingServer::ImuDmpWritingServer(ImuDmpWritingActionServer *imuWriteDmpServer, ImuDmpWritingClients *imuServiceClients) : imuDmpWritingServer(imuWriteDmpServer),
-                                                                                                                                  imuClients(imuServiceClients)
+ImuDmpWritingServer::ImuDmpWritingServer(ImuDmpWritingActionServer *imuWriteDmpServer, ImuDmpWritingClients *imuDmpServiceClients) : imuDmpWritingServer(imuWriteDmpServer),
+                                                                                                                                     imuDmpClients(imuDmpServiceClients)
 {
     imuDmpWritingServer->registerCallback(this);
     imuDmpWritingServer->getActionServerHandle()->start();

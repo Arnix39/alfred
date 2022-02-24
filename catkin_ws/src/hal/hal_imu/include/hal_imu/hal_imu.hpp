@@ -12,7 +12,6 @@
 #include "hal_pigpio/hal_pigpioI2cReadByteData.h"
 #include "hal_pigpio/hal_pigpioI2cWriteByteData.h"
 #include "hal_imu/hal_imuWriteDmpAction.h"
-#include "hal_imu/hal_imuGetHandle.h"
 #include "hal_imu/hal_imuMsg.h"
 
 #define IMU_I2C_ADDRESS 0x68
