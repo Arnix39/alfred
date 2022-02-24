@@ -21,8 +21,6 @@ class ImuClients
 public:
     ImuClients() {}
     virtual ~ImuClients() {}
-    virtual ros::ServiceClient *getI2cOpenHandle() = 0;
-    virtual ros::ServiceClient *getI2cCloseHandle() = 0;
     virtual ros::ServiceClient *getReadByteDataClientHandle() = 0;
     virtual ros::ServiceClient *getWriteByteDataClientHandle() = 0;
 };

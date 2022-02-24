@@ -5,12 +5,21 @@
 
 // Services and messages headers (generated)
 
-class ImuServers
+class ImuI2cInitServers
 {
 public:
-    ImuServers() {}
-    virtual ~ImuServers() {}
+    ImuI2cInitServers() {}
+    virtual ~ImuI2cInitServers() {}
     virtual void advertiseGetHandleService(Imu *imu) = 0;
+};
+
+class ImuI2cInitClients
+{
+public:
+    ImuI2cInitClients() {}
+    virtual ~ImuI2cInitClients() {}
+    virtual ros::ServiceClient *getI2cOpenHandle() = 0;
+    virtual ros::ServiceClient *getI2cCloseHandle() = 0;
 };
 
 #endif

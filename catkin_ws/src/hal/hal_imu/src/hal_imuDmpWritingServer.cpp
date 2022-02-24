@@ -55,7 +55,7 @@ void ImuDmpWritingServer::writeDmp(void)
     uint8_t byteData = 0;
 
     hal_imu::hal_imuGetHandle i2cGetHandleSrv;
-    imuClients->getGetHandleClientHandle()->call(i2cGetHandleSrv);
+    imuDmpClients->getGetHandleClientHandle()->call(i2cGetHandleSrv);
     imuHandle = i2cGetHandleSrv.response.handle;
 
     bool writeRequest = imuDmpWritingServer->getActionServerHandle()->acceptNewGoal()->write;
@@ -142,12 +142,12 @@ bool ImuDmpWritingServer::writeByteInRegister(uint8_t chipRegister, uint8_t valu
     i2cWriteByteDataSrv.request.value = value;
 
     ROS_INFO("Writing byte.");
-    imuClients->getWriteByteDataClientHandle()->call(i2cWriteByteDataSrv);
+    imuDmpClients->getWriteByteDataClientHandle()->call(i2cWriteByteDataSrv);
 
     if (i2cWriteByteDataSrv.response.hasSucceeded)
     {
         ROS_INFO("Reading byte.");
-        imuClients->getReadByteDataClientHandle()->call(i2cReadByteDataSrv);
+        imuDmpClients->getReadByteDataClientHandle()->call(i2cReadByteDataSrv);
         if (i2cReadByteDataSrv.response.hasSucceeded && (i2cReadByteDataSrv.response.value == value))
         {
             ROS_INFO("Byte check OK.");

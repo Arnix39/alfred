@@ -3,16 +3,29 @@
 
 #include "hal_imuI2cInitVirtuals.hpp"
 
-class ImuServersRos : public ImuServers
+class ImuI2cInitServersRos : public ImuI2cInitServers
 {
 private:
     ros::ServiceServer imuGetHandleServerRos;
     ros::NodeHandle *nodeHandle;
 
 public:
-    ImuServersRos(ros::NodeHandle *node);
-    ~ImuServersRos() = default;
+    ImuI2cInitServersRos(ros::NodeHandle *node);
+    ~ImuI2cInitServersRos() = default;
     void advertiseGetHandleService(Imu *imu) override;
+};
+
+class ImuI2cInitClientsRos : public ImuI2cInitClients
+{
+private:
+    ros::ServiceClient i2cOpenClientRos;
+    ros::ServiceClient i2cCloseClientRos;
+
+public:
+    ImuI2cInitClientsRos(ros::NodeHandle *node);
+    ~ImuI2cInitClientsRos() = default;
+    ros::ServiceClient *getI2cOpenHandle() override;
+    ros::ServiceClient *getI2cCloseHandle() override;
 };
 
 #endif

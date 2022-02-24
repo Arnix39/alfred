@@ -7,15 +7,10 @@
 #include "hal_imuVirtuals.hpp"
 
 // Services and messages headers (generated)
-#include "hal_pigpio/hal_pigpioI2cOpen.h"
-#include "hal_pigpio/hal_pigpioI2cClose.h"
 #include "hal_pigpio/hal_pigpioI2cReadByteData.h"
 #include "hal_pigpio/hal_pigpioI2cWriteByteData.h"
 #include "hal_imu/hal_imuWriteDmpAction.h"
 #include "hal_imu/hal_imuMsg.h"
-
-#define IMU_I2C_ADDRESS 0x68
-#define IMU_I2C_BUS 0x1
 
 typedef actionlib::SimpleActionClient<hal_imu::hal_imuWriteDmpAction> imuActionClient_t;
 
@@ -28,7 +23,7 @@ private:
 
 public:
     Imu(ImuPublisher *imuMessagePublisher, ImuClients *imuServiceClients);
-    ~Imu();
+    ~Imu() = default;
     void init(void);
     void writeDmp(void);
     void enable6AxisQuaternion(void);
