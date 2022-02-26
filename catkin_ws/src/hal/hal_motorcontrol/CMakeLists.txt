@@ -39,17 +39,23 @@ catkin_package(
 ###########
 include_directories(
   include
+  include/motor
+  include/motorControl
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(${PROJECT_NAME}_node src/hal_motorControl.cpp)
+add_library(${PROJECT_NAME}_motor_lib OBJECT src/hal_motor.cpp)
+add_dependencies(${PROJECT_NAME}_motor_lib ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
+add_executable(${PROJECT_NAME}_node 
+  src/hal_motorControl.cpp
+  $<TARGET_OBJECTS:${PROJECT_NAME}_motor_lib>
+)
+add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
 )
-add_dependencies(${PROJECT_NAME}_node
-  ${catkin_EXPORTED_TARGETS}
-  ${${PROJECT_NAME}_EXPORTED_TARGETS}
-)
+
 
 #############
 ## Install ##

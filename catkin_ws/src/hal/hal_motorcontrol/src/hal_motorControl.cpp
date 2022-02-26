@@ -18,7 +18,9 @@ MotorControlSubscriberRos::MotorControlSubscriberRos(ros::NodeHandle *node) : no
 
 void MotorControlSubscriberRos::subscribe(MotorControl *motorControl)
 {
-    motorControlSubRos = nodeHandle->subscribe("gpioEdgeChange", 1000, &MotorControl::edgeChangeCallback, motorControl);
+    // TODO: once EC messages from motor classes is implemented, change these calls
+    motorLeftSubRos = nodeHandle->subscribe("gpioEdgeChange", 1000, &MotorControl::edgeChangeCallback, motorControl);
+    motorRightSubRos = nodeHandle->subscribe("gpioEdgeChange", 1000, &MotorControl::edgeChangeCallback, motorControl);
 }
 
 /* Services interface implementation */
@@ -56,7 +58,8 @@ ros::ServiceClient *MotorControlClientsRos::getSetPwmDutycycleClientHandle()
 }
 
 /* Motor control implementation */
-MotorControl::MotorControl(MotorControlSubscriber *motorControlSubscriber, MotorControlPublisher *motorControlPublisher, MotorControlClients *motorControlServiceClients) : edgeChangeType(NO_CHANGE),
+MotorControl::MotorControl(MotorControlSubscriber *motorControlSubscriber, MotorControlPublisher *motorControlPublisher, MotorControlClients *motorControlServiceClients) : rightEncoderCount(0),
+                                                                                                                                                                            leftEncoderCount(0),
                                                                                                                                                                             motorControlPub(motorControlPublisher),
                                                                                                                                                                             motorControlClients(motorControlServiceClients),
                                                                                                                                                                             motorControlSub(motorControlSubscriber)

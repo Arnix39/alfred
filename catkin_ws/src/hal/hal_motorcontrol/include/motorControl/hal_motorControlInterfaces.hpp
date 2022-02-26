@@ -17,7 +17,8 @@ public:
 class MotorControlSubscriberRos : public MotorControlSubscriber
 {
 private:
-    ros::Subscriber motorControlSubRos;
+    ros::Subscriber motorLeftSubRos;
+    ros::Subscriber motorRightSubRos;
     ros::NodeHandle *nodeHandle;
 
 public:
