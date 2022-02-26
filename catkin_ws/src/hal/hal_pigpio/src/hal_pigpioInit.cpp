@@ -1,14 +1,14 @@
 #include "hal_pigpioInit.hpp"
 
-PigpioInit::PigpioInit(ros::NodeHandle *node, int pigpioHandle) : pigpioHandle(pigpioHandle)
+PigpioInit::PigpioInit(ros::NodeHandle *node, int pigpioHandle) : pigpioHandle(pigpioHandle),
+                                                                  getHandleService(node->advertiseService("hal_pigpioGetHandle", &PigpioInit::getHandle, this)),
+                                                                  getModeService(node->advertiseService("hal_pigpioGetMode", &PigpioInit::getMode, this)),
+                                                                  setInputModeService(node->advertiseService("hal_pigpioSetInputMode", &PigpioInit::setInputMode, this)),
+                                                                  setOutputModeService(node->advertiseService("hal_pigpioSetOutputMode", &PigpioInit::setOutputMode, this)),
+                                                                  setPullUpService(node->advertiseService("hal_pigpioSetPullUp", &PigpioInit::setPullUp, this)),
+                                                                  setPullDownService(node->advertiseService("hal_pigpioSetPullDown", &PigpioInit::setPullDown, this)),
+                                                                  clearResistorService(node->advertiseService("hal_pigpioClearResistor", &PigpioInit::clearResistor, this))
 {
-    getHandleService = node->advertiseService("hal_pigpioGetHandle", &PigpioInit::getHandle, this);
-    getModeService = node->advertiseService("hal_pigpioGetMode", &PigpioInit::getMode, this);
-    setInputModeService = node->advertiseService("hal_pigpioSetInputMode", &PigpioInit::setInputMode, this);
-    setOutputModeService = node->advertiseService("hal_pigpioSetOutputMode", &PigpioInit::setOutputMode, this);
-    setPullUpService = node->advertiseService("hal_pigpioSetPullUp", &PigpioInit::setPullUp, this);
-    setPullDownService = node->advertiseService("hal_pigpioSetPullDown", &PigpioInit::setPullDown, this);
-    clearResistorService = node->advertiseService("hal_pigpioClearResistor", &PigpioInit::clearResistor, this);
 }
 
 PigpioInit::~PigpioInit()

@@ -2,14 +2,13 @@
 
 PigpioOutput::PigpioOutput(ros::NodeHandle *node, int pigpioHandle) : pigpioHandle(pigpioHandle),
                                                                       getPigpioHandleClient(node->serviceClient<hal_pigpio::hal_pigpioGetHandle>("hal_pigpioGetHandle")),
-                                                                      getModeClient(node->serviceClient<hal_pigpio::hal_pigpioGetMode>("hal_pigpioGetMode"))
-
+                                                                      getModeClient(node->serviceClient<hal_pigpio::hal_pigpioGetMode>("hal_pigpioGetMode")),
+                                                                      setPwmDutycycleService(node->advertiseService("hal_pigpioSetPwmDutycycle", &PigpioOutput::setPwmDutycycle, this)),
+                                                                      setPwmFrequencyService(node->advertiseService("hal_pigpioSetPwmFrequency", &PigpioOutput::setPwmFrequency, this)),
+                                                                      setGpioHighService(node->advertiseService("hal_pigpioSetGpioHigh", &PigpioOutput::setGpioHigh, this)),
+                                                                      setGpioLowService(node->advertiseService("hal_pigpioSetGpioLow", &PigpioOutput::setGpioLow, this)),
+                                                                      sendTriggerPulseService(node->advertiseService("hal_pigpioSendTriggerPulse", &PigpioOutput::sendTriggerPulse, this))
 {
-    setPwmDutycycleService = node->advertiseService("hal_pigpioSetPwmDutycycle", &PigpioOutput::setPwmDutycycle, this);
-    setPwmFrequencyService = node->advertiseService("hal_pigpioSetPwmFrequency", &PigpioOutput::setPwmFrequency, this);
-    setGpioHighService = node->advertiseService("hal_pigpioSetGpioHigh", &PigpioOutput::setGpioHigh, this);
-    setGpioLowService = node->advertiseService("hal_pigpioSetGpioLow", &PigpioOutput::setGpioLow, this);
-    sendTriggerPulseService = node->advertiseService("hal_pigpioSendTriggerPulse", &PigpioOutput::sendTriggerPulse, this);
 }
 
 bool PigpioOutput::setPwmDutycycle(hal_pigpio::hal_pigpioSetPwmDutycycle::Request &req,
