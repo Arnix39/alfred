@@ -9,17 +9,17 @@ PIN	GPIO	Function		Color
 3	2	Data MPU6050		yellow
 4	5V	5V Ultrasonic sensor	red
 5	3	Clock MPU6050		white
-6	GND	GND Encoder motor 2	green
+6	GND	GND Encoder motor R	green
 7	4		
 8	14		
-9	GND	GND Encoder motor 1	green
+9	GND	GND Encoder motor L	green
 10	15		
-11	17	Encoder ch A motor 1	yellow
-12	18	Encoder ch B motor 1	white
+11	17	Encoder ch A motor L	yellow
+12	18	Encoder ch B motor L	white
 13	27		
 14	GND	GND MPU6050		black
-15	22	Encoder ch A motor 2	yellow
-16	23	Encoder ch B motor 2	white
+15	22	Encoder ch A motor R	yellow
+16	23	Encoder ch B motor R	white
 17	3V3	3V3 Distribution	purple	
 18	24		
 19	10	OE Level Shifter	grey	
