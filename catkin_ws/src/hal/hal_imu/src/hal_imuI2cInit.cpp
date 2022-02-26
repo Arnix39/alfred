@@ -59,10 +59,11 @@ void ImuI2cInit::initI2cCommunication(void)
     if (i2cOpenSrv.response.hasSucceeded)
     {
         imuHandle = i2cOpenSrv.response.handle;
+        ROS_INFO("Handle %u received for communication with device %u on bus %u.", imuHandle, i2cOpenSrv.request.address, i2cOpenSrv.request.bus);
     }
     else
     {
-        ROS_ERROR("Unable to open I2C communication with device %u on bus %u!", i2cOpenSrv.request.address, i2cOpenSrv.request.bus);
+        ROS_ERROR("Unable to receive handle for communication with device %u on bus %u!", i2cOpenSrv.request.address, i2cOpenSrv.request.bus);
     }
 }
 

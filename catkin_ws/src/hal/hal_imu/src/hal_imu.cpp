@@ -14,7 +14,8 @@ void ImuPublisherRos::publish(hal_imu::hal_imuMsg message)
 
 /* Services clients interface implementation */
 ImuClientsRos::ImuClientsRos(ros::NodeHandle *node) : i2cReadByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cReadByteData>("hal_pigpioI2cReadByteData")),
-                                                      i2cWriteByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteByteData>("hal_pigpioI2cWriteByteData"))
+                                                      i2cWriteByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteByteData>("hal_pigpioI2cWriteByteData")),
+                                                      i2cGetHandleClientRos(node->serviceClient<hal_imu::hal_imuGetHandle>("hal_imuGetHandle"))
 {
 }
 
@@ -28,10 +29,18 @@ ros::ServiceClient *ImuClientsRos::getWriteByteDataClientHandle()
     return &i2cWriteByteDataClientRos;
 }
 
+ros::ServiceClient *ImuClientsRos::getGetHandleClientHandle()
+{
+    return &i2cGetHandleClientRos;
+}
+
 /* IMU implementation */
 Imu::Imu(ImuPublisher *imuMessagePublisher, ImuClients *imuServiceClients) : imuPublisher(imuMessagePublisher),
                                                                              imuClients(imuServiceClients)
 {
+    hal_imu::hal_imuGetHandle i2cGetHandleSrv;
+    imuServiceClients->getGetHandleClientHandle()->call(i2cGetHandleSrv);
+    imuHandle = i2cGetHandleSrv.response.handle;
 }
 
 void Imu::init(void)

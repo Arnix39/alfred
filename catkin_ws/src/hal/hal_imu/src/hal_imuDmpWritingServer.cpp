@@ -46,6 +46,10 @@ ImuDmpWritingServer::ImuDmpWritingServer(ImuDmpWritingActionServer *imuWriteDmpS
     imuDmpWritingServer->registerCallback(this);
     imuDmpWritingServer->getActionServerHandle()->start();
     ROS_INFO("Action server started.");
+
+    hal_imu::hal_imuGetHandle i2cGetHandleSrv;
+    imuDmpClients->getGetHandleClientHandle()->call(i2cGetHandleSrv);
+    imuHandle = i2cGetHandleSrv.response.handle;
 }
 
 void ImuDmpWritingServer::writeDmp(void)
@@ -53,10 +57,6 @@ void ImuDmpWritingServer::writeDmp(void)
     uint8_t bank = 0;
     uint8_t addressInBank = 0;
     uint8_t byteData = 0;
-
-    hal_imu::hal_imuGetHandle i2cGetHandleSrv;
-    imuDmpClients->getGetHandleClientHandle()->call(i2cGetHandleSrv);
-    imuHandle = i2cGetHandleSrv.response.handle;
 
     bool writeRequest = imuDmpWritingServer->getActionServerHandle()->acceptNewGoal()->write;
     ROS_INFO("Goal received.");

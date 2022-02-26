@@ -19,12 +19,14 @@ class ImuClientsRos : public ImuClients
 private:
     ros::ServiceClient i2cReadByteDataClientRos;
     ros::ServiceClient i2cWriteByteDataClientRos;
+    ros::ServiceClient i2cGetHandleClientRos;
 
 public:
     ImuClientsRos(ros::NodeHandle *node);
     ~ImuClientsRos() = default;
     ros::ServiceClient *getReadByteDataClientHandle() override;
     ros::ServiceClient *getWriteByteDataClientHandle() override;
+    ros::ServiceClient *getGetHandleClientHandle() override;
 };
 
 #endif
