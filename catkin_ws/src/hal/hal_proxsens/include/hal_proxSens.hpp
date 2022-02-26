@@ -41,6 +41,7 @@ private:
 
 public:
     ProxSens(ProxSensSubscriber *proxSensSubscriber, ProxSensPublisher *proxSensPub, ProxSensClients *proxSensServiceClients);
+    ~ProxSens() = default;
     void publishMessage(void);
     void configureGpios(void);
     void trigger(void);
