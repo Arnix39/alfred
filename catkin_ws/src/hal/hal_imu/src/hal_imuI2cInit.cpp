@@ -94,11 +94,9 @@ bool ImuI2cInit::writeBitInRegister(uint8_t registerToWrite, uint8_t bitToWrite,
     if (i2cReadByteDataSrv.response.hasSucceeded)
     {
         registerValue = i2cReadByteDataSrv.response.value;
-        ROS_INFO("Read value (%u) from register %u on device with handle %u.", registerValue, i2cReadByteDataSrv.request.deviceRegister, i2cReadByteDataSrv.request.handle);
     }
     else
     {
-        ROS_ERROR("Unable to read register %u on device with handle %u", i2cReadByteDataSrv.request.deviceRegister, i2cReadByteDataSrv.request.handle);
         return false;
     }
 
@@ -119,11 +117,10 @@ bool ImuI2cInit::writeBitInRegister(uint8_t registerToWrite, uint8_t bitToWrite,
 
     if (i2cWriteByteDataSrv.response.hasSucceeded)
     {
-        ROS_INFO("Wrote value (%u) on register %u on device with handle %u.", i2cWriteByteDataSrv.request.value, i2cWriteByteDataSrv.request.deviceRegister, i2cWriteByteDataSrv.request.handle);
+        return true;
     }
     else
     {
-        ROS_ERROR("Unable to write value (%u) on register %u on device with handle %u", i2cWriteByteDataSrv.request.value, i2cWriteByteDataSrv.request.deviceRegister, i2cWriteByteDataSrv.request.handle);
         return false;
     }
 

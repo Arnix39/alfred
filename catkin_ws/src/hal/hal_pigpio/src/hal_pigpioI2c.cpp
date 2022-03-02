@@ -54,7 +54,7 @@ bool PigpioI2c::i2cReadByteData(hal_pigpio::hal_pigpioI2cReadByteData::Request &
     {
         res.value = (uint8_t)result;
         res.hasSucceeded = true;
-        ROS_INFO("Successfuly read %u register %u on device with handle %u.", res.value, req.deviceRegister, req.handle);
+        ROS_INFO("Successfuly read %u in register %u on device with handle %u.", res.value, req.deviceRegister, req.handle);
     }
     else
     {
