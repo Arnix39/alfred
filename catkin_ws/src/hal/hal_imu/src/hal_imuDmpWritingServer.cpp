@@ -20,6 +20,7 @@ imuDmpWritingActionServer_t *ImuDmpWritingActionServerRos::getActionServerHandle
 /* Services interface implementation */
 ImuDmpWritingClientsRos::ImuDmpWritingClientsRos(ros::NodeHandle *node) : i2cReadByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cReadByteData>("hal_pigpioI2cReadByteData")),
                                                                           i2cWriteByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteByteData>("hal_pigpioI2cWriteByteData")),
+                                                                          i2cWriteBlockDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteBlockData>("hal_pigpioI2cWriteBlockData")),
                                                                           i2cGetHandleClientRos(node->serviceClient<hal_imu::hal_imuGetHandle>("hal_imuGetHandle"))
 {
 }
@@ -32,6 +33,11 @@ ros::ServiceClient *ImuDmpWritingClientsRos::getReadByteDataClientHandle()
 ros::ServiceClient *ImuDmpWritingClientsRos::getWriteByteDataClientHandle()
 {
     return &i2cWriteByteDataClientRos;
+}
+
+ros::ServiceClient *ImuDmpWritingClientsRos::getWriteBlockDataClientHandle()
+{
+    return &i2cWriteBlockDataClientRos;
 }
 
 ros::ServiceClient *ImuDmpWritingClientsRos::getGetHandleClientHandle()
@@ -55,35 +61,47 @@ ImuDmpWritingServer::ImuDmpWritingServer(ImuDmpWritingActionServer *imuWriteDmpS
 void ImuDmpWritingServer::writeDmp(void)
 {
     uint8_t bank = 0;
-    uint8_t addressInBank = 0;
-    uint8_t byteData = 0;
+    uint8_t byteAddressInBank = 0;
+    uint8_t chunkAddressInBank = 0;
+    uint8_t indexInChunk = 0;
+    std::vector<uint8_t> data;
+    bool readyToWriteChunk = false;
 
     bool writeRequest = imuDmpWritingServer->getActionServerHandle()->acceptNewGoal()->write;
     ROS_INFO("Goal received.");
 
     result.success = true;
 
-    for (uint16_t byte = 0; byte <= DMP_CODE_SIZE; byte++)
+    for (uint16_t byte = 0; byte < DMP_CODE_SIZE; byte++)
     {
         bool writeSuccess = false;
+        indexInChunk = byte % MPU6050_CHUNK_SIZE;
+        byteAddressInBank = byte % MPU6050_BANK_SIZE;
+        bank = (byte - byteAddressInBank) / MPU6050_BANK_SIZE;
 
-        byteData = dmp_memory[byte];
-        addressInBank = byte % MPU6050_BANK_SIZE;
-        bank = (byte - addressInBank) / MPU6050_BANK_SIZE;
+        data.push_back(dmp_memory[byte]);
 
-        if (addressInBank == 0)
+        if (byteAddressInBank == 0)
         {
             feedback.bank = bank;
             ROS_INFO("Writing bank %u...", bank);
             imuDmpWritingServer->getActionServerHandle()->publishFeedback(feedback);
         }
 
-        writeSuccess = writeByte(bank, addressInBank, byteData);
-        if (!writeSuccess)
+        /* The chunk is full and ready to be written or we reached the end of the DMP code */
+        if ((indexInChunk == (MPU6050_CHUNK_SIZE - 1)) || (byte == DMP_CODE_SIZE - 1))
         {
-            ROS_ERROR("Failed to write byte at address %u of bank %u...", addressInBank, bank);
-            result.success = false;
-            break;
+            chunkAddressInBank = byteAddressInBank - indexInChunk;
+            ROS_INFO("Writing chunk at address %u...", chunkAddressInBank);
+            writeSuccess = writeData(bank, chunkAddressInBank, data);
+            if (!writeSuccess)
+            {
+                ROS_ERROR("Failed to write chunk at address %u of bank %u...", chunkAddressInBank, bank);
+                result.success = false;
+                break;
+            }
+
+            data.clear();
         }
     }
 
@@ -97,7 +115,7 @@ void ImuDmpWritingServer::writeDmp(void)
     }
 }
 
-bool ImuDmpWritingServer::writeByte(uint8_t bank, uint8_t addressInBank, uint8_t value)
+bool ImuDmpWritingServer::writeData(uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data)
 {
     bool writeSuccess = false;
     if (addressInBank == 0)
@@ -111,15 +129,15 @@ bool ImuDmpWritingServer::writeByte(uint8_t bank, uint8_t addressInBank, uint8_t
         }
     }
 
-    ROS_INFO("Setting address in bank.");
+    ROS_INFO("Writing address in bank.");
     writeSuccess = writeByteInRegister(MPU6050_ADDRESS_IN_BANK_REGISTER, addressInBank);
     if (!writeSuccess)
     {
         return false;
     }
 
-    ROS_INFO("Setting data to write.");
-    writeSuccess = writeByteInRegister(MPU6050_READ_WRITE_REGISTER, value);
+    ROS_INFO("Writing data.");
+    writeSuccess = writeDataBlock(MPU6050_READ_WRITE_REGISTER, data);
     if (writeSuccess)
     {
         return true;
@@ -130,7 +148,7 @@ bool ImuDmpWritingServer::writeByte(uint8_t bank, uint8_t addressInBank, uint8_t
     }
 }
 
-bool ImuDmpWritingServer::writeByteInRegister(uint8_t chipRegister, uint8_t value)
+bool ImuDmpWritingServer::writeByteInRegister(uint8_t registerToWrite, uint8_t value)
 {
     hal_pigpio::hal_pigpioI2cWriteByteData i2cWriteByteDataSrv;
     hal_pigpio::hal_pigpioI2cReadByteData i2cReadByteDataSrv;
@@ -138,32 +156,46 @@ bool ImuDmpWritingServer::writeByteInRegister(uint8_t chipRegister, uint8_t valu
     i2cWriteByteDataSrv.request.handle = imuHandle;
     i2cReadByteDataSrv.request.handle = imuHandle;
 
-    i2cWriteByteDataSrv.request.deviceRegister = chipRegister;
+    i2cWriteByteDataSrv.request.deviceRegister = registerToWrite;
     i2cWriteByteDataSrv.request.value = value;
 
-    ROS_INFO("Writing byte.");
+    i2cReadByteDataSrv.request.deviceRegister = registerToWrite;
+
     imuDmpClients->getWriteByteDataClientHandle()->call(i2cWriteByteDataSrv);
 
     if (i2cWriteByteDataSrv.response.hasSucceeded)
     {
-        ROS_INFO("Reading byte.");
-        imuDmpClients->getReadByteDataClientHandle()->call(i2cReadByteDataSrv);
-        if (i2cReadByteDataSrv.response.hasSucceeded && (i2cReadByteDataSrv.response.value == value))
-        {
-            ROS_INFO("Byte check OK.");
-            return true;
-        }
-        else
-        {
-            ROS_ERROR("Byte check failed!");
-        }
+        return true;
     }
     else
     {
-        ROS_ERROR("Failed to write byte!");
+        return false;
+    }
+}
+
+bool ImuDmpWritingServer::writeDataBlock(uint8_t registerToWrite, std::vector<uint8_t> data)
+{
+    hal_pigpio::hal_pigpioI2cWriteBlockData i2cWriteBlockDataSrv;
+
+    i2cWriteBlockDataSrv.request.handle = imuHandle;
+    i2cWriteBlockDataSrv.request.deviceRegister = registerToWrite;
+    i2cWriteBlockDataSrv.request.length = data.size();
+
+    for (uint8_t index = 0; index < data.size(); index++)
+    {
+        i2cWriteBlockDataSrv.request.dataBlock.push_back(data.at(index));
     }
 
-    return false;
+    imuDmpClients->getWriteBlockDataClientHandle()->call(i2cWriteBlockDataSrv);
+
+    if (i2cWriteBlockDataSrv.response.hasSucceeded)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 int main(int argc, char **argv)

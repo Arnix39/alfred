@@ -14,6 +14,7 @@
 #include "hal_imu/hal_imuGetHandle.h"
 #include "hal_pigpio/hal_pigpioI2cReadByteData.h"
 #include "hal_pigpio/hal_pigpioI2cWriteByteData.h"
+#include "hal_pigpio/hal_pigpioI2cWriteBlockData.h"
 
 class ImuDmpWritingServer
 {
@@ -28,8 +29,10 @@ public:
     ImuDmpWritingServer(ImuDmpWritingActionServer *imuWriteDmpServer, ImuDmpWritingClients *imuDmpServiceClients);
     ~ImuDmpWritingServer() = default;
     void writeDmp(void);
-    bool writeByteInRegister(uint8_t chipRegister, uint8_t value);
-    bool writeByte(uint8_t bank, uint8_t addressInBank, uint8_t value);
+    bool writeByteInRegister(uint8_t registerToWrite, uint8_t value);
+    bool writeDataInRegister(uint8_t registerToWrite, uint8_t value);
+    bool writeData(uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data);
+    bool writeDataBlock(uint8_t chipRegister, std::vector<uint8_t> data);
 };
 
 #endif
