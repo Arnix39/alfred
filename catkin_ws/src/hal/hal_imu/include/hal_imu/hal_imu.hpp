@@ -29,7 +29,7 @@ public:
     void writeDmp(void);
     void enable6AxisQuaternion(void);
     void calibrateAccelerometer(void);
-    bool writeByteInRegister(uint8_t chipRegister, uint8_t value);
+    bool writeByteInRegister(uint8_t registerToWrite, uint8_t value);
     void enableGyroCalibrationOnDMP(void);
     bool writeDataToDmp(uint16_t address, uint8_t size, const unsigned char *data);
 };
