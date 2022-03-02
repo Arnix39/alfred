@@ -22,6 +22,8 @@ public:
     virtual ~ImuI2cInitClients() {}
     virtual ros::ServiceClient *getI2cOpenHandle() = 0;
     virtual ros::ServiceClient *getI2cCloseHandle() = 0;
+    virtual ros::ServiceClient *getI2cReadByteDataClientHandle() = 0;
+    virtual ros::ServiceClient *getI2cWriteByteDataClientHandle() = 0;
 };
 
 #endif

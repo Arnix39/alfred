@@ -9,6 +9,8 @@
 // Services and messages headers (generated)
 #include "hal_pigpio/hal_pigpioI2cOpen.h"
 #include "hal_pigpio/hal_pigpioI2cClose.h"
+#include "hal_pigpio/hal_pigpioI2cReadByteData.h"
+#include "hal_pigpio/hal_pigpioI2cWriteByteData.h"
 #include "hal_imu/hal_imuGetHandle.h"
 
 #define IMU_I2C_BUS 0x1
@@ -26,6 +28,9 @@ public:
     bool getHandle(hal_imu::hal_imuGetHandle::Request &req,
                    hal_imu::hal_imuGetHandle::Response &res);
     void initI2cCommunication(void);
+    bool writeBitInRegister(uint8_t registerToWrite, uint8_t bitToWrite, uint8_t valueOfBit);
+    void setClockSource(void);
+    void setSleepDisabled(void);
 };
 
 #endif

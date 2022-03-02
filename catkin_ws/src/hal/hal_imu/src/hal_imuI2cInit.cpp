@@ -3,7 +3,9 @@
 
 /* Clients interface implementation */
 ImuI2cInitClientsRos::ImuI2cInitClientsRos(ros::NodeHandle *node) : i2cOpenClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cOpen>("hal_pigpioI2cOpen")),
-                                                                    i2cCloseClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cClose>("hal_pigpioI2cClose"))
+                                                                    i2cCloseClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cClose>("hal_pigpioI2cClose")),
+                                                                    i2cReadByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cReadByteData>("hal_pigpioI2cReadByteData")),
+                                                                    i2cWriteByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteByteData>("hal_pigpioI2cWriteByteData"))
 {
 }
 
@@ -15,6 +17,16 @@ ros::ServiceClient *ImuI2cInitClientsRos::getI2cOpenHandle()
 ros::ServiceClient *ImuI2cInitClientsRos::getI2cCloseHandle()
 {
     return &i2cCloseClientRos;
+}
+
+ros::ServiceClient *ImuI2cInitClientsRos::getI2cReadByteDataClientHandle()
+{
+    return &i2cReadByteDataClientRos;
+}
+
+ros::ServiceClient *ImuI2cInitClientsRos::getI2cWriteByteDataClientHandle()
+{
+    return &i2cWriteByteDataClientRos;
 }
 
 /* Servers interface implementation */
@@ -67,6 +79,85 @@ void ImuI2cInit::initI2cCommunication(void)
     }
 }
 
+bool ImuI2cInit::writeBitInRegister(uint8_t registerToWrite, uint8_t bitToWrite, uint8_t valueOfBit)
+{
+    hal_pigpio::hal_pigpioI2cReadByteData i2cReadByteDataSrv;
+    hal_pigpio::hal_pigpioI2cWriteByteData i2cWriteByteDataSrv;
+    uint8_t registerValue;
+    uint8_t newRegisterValue;
+
+    i2cReadByteDataSrv.request.handle = imuHandle;
+    i2cReadByteDataSrv.request.deviceRegister = registerToWrite;
+
+    imuI2cInitClients->getI2cReadByteDataClientHandle()->call(i2cReadByteDataSrv);
+
+    if (i2cReadByteDataSrv.response.hasSucceeded)
+    {
+        registerValue = i2cReadByteDataSrv.response.value;
+        ROS_INFO("Read value (%u) from register %u on device with handle %u.", registerValue, i2cReadByteDataSrv.request.deviceRegister, i2cReadByteDataSrv.request.handle);
+    }
+    else
+    {
+        ROS_ERROR("Unable to read register %u on device with handle %u", i2cReadByteDataSrv.request.deviceRegister, i2cReadByteDataSrv.request.handle);
+        return false;
+    }
+
+    if (valueOfBit == 1)
+    {
+        newRegisterValue = registerValue | (1 << bitToWrite);
+    }
+    else
+    {
+        newRegisterValue = registerValue & ~(1 << bitToWrite);
+    }
+
+    i2cWriteByteDataSrv.request.handle = imuHandle;
+    i2cWriteByteDataSrv.request.deviceRegister = registerToWrite;
+    i2cWriteByteDataSrv.request.value = newRegisterValue;
+
+    imuI2cInitClients->getI2cWriteByteDataClientHandle()->call(i2cWriteByteDataSrv);
+
+    if (i2cWriteByteDataSrv.response.hasSucceeded)
+    {
+        ROS_INFO("Wrote value (%u) on register %u on device with handle %u.", i2cWriteByteDataSrv.request.value, i2cWriteByteDataSrv.request.deviceRegister, i2cWriteByteDataSrv.request.handle);
+    }
+    else
+    {
+        ROS_ERROR("Unable to write value (%u) on register %u on device with handle %u", i2cWriteByteDataSrv.request.value, i2cWriteByteDataSrv.request.deviceRegister, i2cWriteByteDataSrv.request.handle);
+        return false;
+    }
+
+    return true;
+}
+
+void ImuI2cInit::setClockSource(void)
+{
+    bool writeSuccess;
+
+    writeSuccess = writeBitInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, MPU6050_CLOCK_SOURCE_BIT_1, 1) && writeBitInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, MPU6050_CLOCK_SOURCE_BIT_2, 0) && writeBitInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, MPU6050_CLOCK_SOURCE_BIT_3, 0);
+
+    if (writeSuccess)
+    {
+        ROS_INFO("Successfully enabled PLL_X clock source on device with handle %u.", imuHandle);
+    }
+    else
+    {
+        ROS_ERROR("Unable to enable PLL_X clock source on device with handle %u.", imuHandle);
+    }
+}
+
+void ImuI2cInit::setSleepDisabled(void)
+{
+    if (writeBitInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, MPU6050_ENABLE_SLEEP_BIT, 1))
+    {
+        ROS_INFO("Successfully disabled sleep mode on device with handle %u.", imuHandle);
+    }
+    else
+    {
+        ROS_ERROR("Unable to disable sleep mode on device with handle %u.", imuHandle);
+    }
+}
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "hal_imuI2cInit");
@@ -77,6 +168,8 @@ int main(int argc, char **argv)
 
     ImuI2cInit imuI2cInit(&imuI2cInitServiceClients, &imuI2cInitServer);
     imuI2cInit.initI2cCommunication();
+    imuI2cInit.setClockSource();
+    imuI2cInit.setSleepDisabled();
 
     ros::spin();
 
