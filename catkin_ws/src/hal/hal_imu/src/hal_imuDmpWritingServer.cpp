@@ -104,6 +104,8 @@ void ImuDmpWritingServer::writeDmp(void)
         }
     }
 
+    writeDmpStartAddress();
+
     if (result.success)
     {
         ROS_INFO("Wrote successfully DMP code.");
@@ -113,6 +115,36 @@ void ImuDmpWritingServer::writeDmp(void)
     {
         ROS_ERROR("Failed to write DMP code!");
         imuDmpWritingServer->getActionServerHandle()->setAborted(result);
+    }
+}
+
+bool ImuDmpWritingServer::writeDmpStartAddress(void)
+{
+    /* This address is the start address of DMP code */
+    /* It is coming from InvenSense */
+    static const unsigned short sStartAddress = 0x0400;
+
+    bool writeSuccess = false;
+    const uint8_t lsbAddress = (uint8_t)(sStartAddress >> 8);
+    const uint8_t msbAddress = (uint8_t)(sStartAddress & 0xFF);
+    writeSuccess = writeByteInRegister(MPU6050_DMP_CONFIGURATION_REGISTER, lsbAddress);
+    if (writeSuccess)
+    {
+        writeSuccess = writeByteInRegister(MPU6050_DMP_CONFIGURATION_REGISTER, msbAddress);
+        if (writeSuccess)
+        {
+            return true;
+        }
+        else
+        {
+            ROS_ERROR("Failed to write data address MSB!");
+            return false;
+        }
+    }
+    else
+    {
+        ROS_ERROR("Failed to write data address LSB!");
+        return false;
     }
 }
 

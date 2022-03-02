@@ -33,6 +33,7 @@ public:
     bool writeDataInRegister(uint8_t registerToWrite, uint8_t value);
     bool writeData(uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data);
     bool writeDataBlock(uint8_t chipRegister, std::vector<uint8_t> data);
+    bool writeDmpStartAddress(void);
 };
 
 #endif
