@@ -33,8 +33,12 @@ public:
                   hal_pigpio::hal_pigpioI2cClose::Response &res);
     bool i2cReadByteData(hal_pigpio::hal_pigpioI2cReadByteData::Request &req,
                          hal_pigpio::hal_pigpioI2cReadByteData::Response &res);
+    bool i2cReadWordData(hal_pigpio::hal_pigpioI2cReadWordData::Request &req,
+                         hal_pigpio::hal_pigpioI2cReadWordData::Response &res);
     bool i2cWriteByteData(hal_pigpio::hal_pigpioI2cWriteByteData::Request &req,
                           hal_pigpio::hal_pigpioI2cWriteByteData::Response &res);
+    bool i2cWriteWordData(hal_pigpio::hal_pigpioI2cWriteWordData::Request &req,
+                          hal_pigpio::hal_pigpioI2cWriteWordData::Response &res);
     bool i2cWriteBlockData(hal_pigpio::hal_pigpioI2cWriteBlockData::Request &req,
                            hal_pigpio::hal_pigpioI2cWriteBlockData::Response &res);
 };

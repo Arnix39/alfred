@@ -41,7 +41,9 @@ add_service_files(
    hal_pigpioI2cOpen.srv
    hal_pigpioI2cClose.srv
    hal_pigpioI2cReadByteData.srv
+   hal_pigpioI2cReadWordData.srv
    hal_pigpioI2cWriteByteData.srv
+   hal_pigpioI2cWriteWordData.srv
    hal_pigpioI2cWriteBlockData.srv
    hal_pigpioReadGpio.srv
    hal_pigpioSetCallback.srv

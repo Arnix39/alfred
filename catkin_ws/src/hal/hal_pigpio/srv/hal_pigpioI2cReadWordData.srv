@@ -1,0 +1,5 @@
+int32 handle
+uint8 deviceRegister
+---
+bool hasSucceeded
+uint16 value
