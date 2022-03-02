@@ -119,11 +119,13 @@ bool Imu::writeDataToDmp(uint16_t address, uint8_t size, const unsigned char *da
         writeSuccess = writeByteInRegister(imuRegister, msbAddress);
         if (!writeSuccess)
         {
+            ROS_ERROR("Failed to write data address MSB!");
             return false;
         }
     }
     else
     {
+        ROS_ERROR("Failed to write data address LSB!");
         return false;
     }
 
@@ -133,6 +135,7 @@ bool Imu::writeDataToDmp(uint16_t address, uint8_t size, const unsigned char *da
         writeSuccess = writeByteInRegister(imuRegister, data[index]);
         if (!writeSuccess)
         {
+            ROS_ERROR("Failed to write data!");
             break;
         }
     }
@@ -156,6 +159,7 @@ bool Imu::writeByteInRegister(uint8_t registerToWrite, uint8_t value)
     }
     else
     {
+        ROS_ERROR("Failed to write byte!");
         return false;
     }
 }

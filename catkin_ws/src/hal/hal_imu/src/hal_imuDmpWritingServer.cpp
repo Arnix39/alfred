@@ -68,9 +68,10 @@ void ImuDmpWritingServer::writeDmp(void)
     bool readyToWriteChunk = false;
 
     bool writeRequest = imuDmpWritingServer->getActionServerHandle()->acceptNewGoal()->write;
-    ROS_INFO("Goal received.");
 
     result.success = true;
+
+    ROS_INFO("Started writing DMP code.");
 
     for (uint16_t byte = 0; byte < DMP_CODE_SIZE; byte++)
     {
@@ -84,7 +85,6 @@ void ImuDmpWritingServer::writeDmp(void)
         if (byteAddressInBank == 0)
         {
             feedback.bank = bank;
-            ROS_INFO("Writing bank %u...", bank);
             imuDmpWritingServer->getActionServerHandle()->publishFeedback(feedback);
         }
 
@@ -92,11 +92,10 @@ void ImuDmpWritingServer::writeDmp(void)
         if ((indexInChunk == (MPU6050_CHUNK_SIZE - 1)) || (byte == DMP_CODE_SIZE - 1))
         {
             chunkAddressInBank = byteAddressInBank - indexInChunk;
-            ROS_INFO("Writing chunk at address %u...", chunkAddressInBank);
             writeSuccess = writeData(bank, chunkAddressInBank, data);
             if (!writeSuccess)
             {
-                ROS_ERROR("Failed to write chunk at address %u of bank %u...", chunkAddressInBank, bank);
+                ROS_ERROR("Failed to write chunk at address %u of bank %u!", chunkAddressInBank, bank);
                 result.success = false;
                 break;
             }
@@ -107,10 +106,12 @@ void ImuDmpWritingServer::writeDmp(void)
 
     if (result.success)
     {
+        ROS_INFO("Wrote successfully DMP code.");
         imuDmpWritingServer->getActionServerHandle()->setSucceeded(result);
     }
     else
     {
+        ROS_ERROR("Failed to write DMP code!");
         imuDmpWritingServer->getActionServerHandle()->setAborted(result);
     }
 }
@@ -121,22 +122,21 @@ bool ImuDmpWritingServer::writeData(uint8_t bank, uint8_t addressInBank, std::ve
     if (addressInBank == 0)
     {
         /* A new bank is starting */
-        ROS_INFO("Setting new bank.");
         writeSuccess = writeByteInRegister(MPU6050_BANK_SELECTION_REGISTER, bank);
         if (!writeSuccess)
         {
+            ROS_ERROR("Failed to set new bank!");
             return false;
         }
     }
 
-    ROS_INFO("Writing address in bank.");
     writeSuccess = writeByteInRegister(MPU6050_ADDRESS_IN_BANK_REGISTER, addressInBank);
     if (!writeSuccess)
     {
+        ROS_ERROR("Failed to set address in bank!");
         return false;
     }
 
-    ROS_INFO("Writing data.");
     writeSuccess = writeDataBlock(MPU6050_READ_WRITE_REGISTER, data);
     if (writeSuccess)
     {
@@ -144,6 +144,7 @@ bool ImuDmpWritingServer::writeData(uint8_t bank, uint8_t addressInBank, std::ve
     }
     else
     {
+        ROS_ERROR("Failed to write data!");
         return false;
     }
 }
@@ -164,6 +165,7 @@ bool ImuDmpWritingServer::writeByteInRegister(uint8_t registerToWrite, uint8_t v
     }
     else
     {
+        ROS_ERROR("Failed to write byte!");
         return false;
     }
 }
@@ -189,6 +191,7 @@ bool ImuDmpWritingServer::writeDataBlock(uint8_t registerToWrite, std::vector<ui
     }
     else
     {
+        ROS_ERROR("Failed to write data block!");
         return false;
     }
 }
