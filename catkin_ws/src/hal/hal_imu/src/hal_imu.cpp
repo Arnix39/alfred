@@ -46,9 +46,9 @@ Imu::Imu(ImuPublisher *imuMessagePublisher, ImuClients *imuServiceClients) : imu
 void Imu::init(void)
 {
     this->writeDmp();
-    // this->enable6AxisQuaternion();
-    // this->calibrateAccelerometer();
-    // this->enableGyroCalibrationOnDMP();
+    this->enable6AxisQuaternion();
+    this->calibrateAccelerometer();
+    this->enableGyroCalibrationOnDMP();
 }
 
 void Imu::writeDmp(void)
