@@ -79,82 +79,6 @@ void ImuI2cInit::initI2cCommunication(void)
     }
 }
 
-bool ImuI2cInit::writeBitInRegister(uint8_t registerToWrite, uint8_t bitToWrite, uint8_t valueOfBit)
-{
-    hal_pigpio::hal_pigpioI2cReadByteData i2cReadByteDataSrv;
-    hal_pigpio::hal_pigpioI2cWriteByteData i2cWriteByteDataSrv;
-    uint8_t registerValue;
-    uint8_t newRegisterValue;
-
-    i2cReadByteDataSrv.request.handle = imuHandle;
-    i2cReadByteDataSrv.request.deviceRegister = registerToWrite;
-
-    imuI2cInitClients->getI2cReadByteDataClientHandle()->call(i2cReadByteDataSrv);
-
-    if (i2cReadByteDataSrv.response.hasSucceeded)
-    {
-        registerValue = i2cReadByteDataSrv.response.value;
-    }
-    else
-    {
-        return false;
-    }
-
-    if (valueOfBit == 1)
-    {
-        newRegisterValue = registerValue | (1 << bitToWrite);
-    }
-    else
-    {
-        newRegisterValue = registerValue & ~(1 << bitToWrite);
-    }
-
-    i2cWriteByteDataSrv.request.handle = imuHandle;
-    i2cWriteByteDataSrv.request.deviceRegister = registerToWrite;
-    i2cWriteByteDataSrv.request.value = newRegisterValue;
-
-    imuI2cInitClients->getI2cWriteByteDataClientHandle()->call(i2cWriteByteDataSrv);
-
-    if (i2cWriteByteDataSrv.response.hasSucceeded)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-
-    return true;
-}
-
-void ImuI2cInit::setClockSource(void)
-{
-    bool writeSuccess;
-
-    writeSuccess = writeBitInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, MPU6050_CLOCK_SOURCE_BIT_1, 1) && writeBitInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, MPU6050_CLOCK_SOURCE_BIT_2, 0) && writeBitInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, MPU6050_CLOCK_SOURCE_BIT_3, 0);
-
-    if (writeSuccess)
-    {
-        ROS_INFO("Successfully enabled PLL_X clock source on device with handle %u.", imuHandle);
-    }
-    else
-    {
-        ROS_ERROR("Unable to enable PLL_X clock source on device with handle %u.", imuHandle);
-    }
-}
-
-void ImuI2cInit::setSleepDisabled(void)
-{
-    if (writeBitInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, MPU6050_ENABLE_SLEEP_BIT, 1))
-    {
-        ROS_INFO("Successfully disabled sleep mode on device with handle %u.", imuHandle);
-    }
-    else
-    {
-        ROS_ERROR("Unable to disable sleep mode on device with handle %u.", imuHandle);
-    }
-}
-
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "hal_imuI2cInit");
@@ -165,8 +89,6 @@ int main(int argc, char **argv)
 
     ImuI2cInit imuI2cInit(&imuI2cInitServiceClients, &imuI2cInitServer);
     imuI2cInit.initI2cCommunication();
-    imuI2cInit.setClockSource();
-    imuI2cInit.setSleepDisabled();
 
     ros::spin();
 
