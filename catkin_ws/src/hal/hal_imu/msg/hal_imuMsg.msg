@@ -1,1 +1,1 @@
-uint16 angleInRad
+int16 angleInDeg
