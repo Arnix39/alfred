@@ -10,7 +10,9 @@
 #include "hal_pigpio/hal_pigpioI2cOpen.h"
 #include "hal_pigpio/hal_pigpioI2cClose.h"
 #include "hal_pigpio/hal_pigpioI2cReadByteData.h"
+#include "hal_pigpio/hal_pigpioI2cReadWordData.h"
 #include "hal_pigpio/hal_pigpioI2cWriteByteData.h"
+#include "hal_pigpio/hal_pigpioI2cWriteWordData.h"
 #include "hal_pigpio/hal_pigpioI2cWriteBlockData.h"
 
 class PigpioI2c
@@ -19,8 +21,10 @@ private:
     ros::ServiceServer i2cOpenService;
     ros::ServiceServer i2cCloseService;
     ros::ServiceServer i2cWriteByteDataService;
+    ros::ServiceServer i2cWriteWordDataService;
     ros::ServiceServer i2cWriteBlockDataService;
     ros::ServiceServer i2cReadByteDataService;
+    ros::ServiceServer i2cReadWordDataService;
     ros::ServiceClient getPigpioHandleClient;
     int pigpioHandle;
 
