@@ -20,6 +20,7 @@ imuDmpWritingActionServer_t *ImuDmpWritingActionServerRos::getActionServerHandle
 /* Services interface implementation */
 ImuDmpWritingClientsRos::ImuDmpWritingClientsRos(ros::NodeHandle *node) : i2cReadByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cReadByteData>("hal_pigpioI2cReadByteData")),
                                                                           i2cWriteByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteByteData>("hal_pigpioI2cWriteByteData")),
+                                                                          i2cWriteWordDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteWordData>("hal_pigpioI2cWriteWordData")),
                                                                           i2cWriteBlockDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteBlockData>("hal_pigpioI2cWriteBlockData")),
                                                                           i2cGetHandleClientRos(node->serviceClient<hal_imu::hal_imuGetHandle>("hal_imuGetHandle"))
 {
@@ -33,6 +34,11 @@ ros::ServiceClient *ImuDmpWritingClientsRos::getReadByteDataClientHandle()
 ros::ServiceClient *ImuDmpWritingClientsRos::getWriteByteDataClientHandle()
 {
     return &i2cWriteByteDataClientRos;
+}
+
+ros::ServiceClient *ImuDmpWritingClientsRos::getWriteWordDataClientHandle()
+{
+    return &i2cWriteWordDataClientRos;
 }
 
 ros::ServiceClient *ImuDmpWritingClientsRos::getWriteBlockDataClientHandle()
@@ -60,12 +66,17 @@ ImuDmpWritingServer::ImuDmpWritingServer(ImuDmpWritingActionServer *imuWriteDmpS
 
 void ImuDmpWritingServer::writeDmp(void)
 {
+    /* This address is the start address of DMP code */
+    /* It is coming from InvenSense */
+    const uint16_t startAddress = 0x0400;
+
     uint8_t bank = 0;
     uint8_t byteAddressInBank = 0;
     uint8_t chunkAddressInBank = 0;
     uint8_t indexInChunk = 0;
     std::vector<uint8_t> data;
     bool readyToWriteChunk = false;
+    bool writeSuccess = false;
 
     bool writeRequest = imuDmpWritingServer->getActionServerHandle()->acceptNewGoal()->write;
 
@@ -75,7 +86,6 @@ void ImuDmpWritingServer::writeDmp(void)
 
     for (uint16_t byte = 0; byte < DMP_CODE_SIZE; byte++)
     {
-        bool writeSuccess = false;
         indexInChunk = byte % MPU6050_CHUNK_SIZE;
         byteAddressInBank = byte % MPU6050_BANK_SIZE;
         bank = (byte - byteAddressInBank) / MPU6050_BANK_SIZE;
@@ -104,7 +114,12 @@ void ImuDmpWritingServer::writeDmp(void)
         }
     }
 
-    writeDmpStartAddress();
+    writeSuccess = writeWordInRegister(MPU6050_DMP_START_ADDRESS_H_REGISTER, startAddress);
+    if (!writeSuccess)
+    {
+        result.success = false;
+        ROS_ERROR("Failed to write start address of DMP code!");
+    }
 
     if (result.success)
     {
@@ -115,36 +130,6 @@ void ImuDmpWritingServer::writeDmp(void)
     {
         ROS_ERROR("Failed to write DMP code!");
         imuDmpWritingServer->getActionServerHandle()->setAborted(result);
-    }
-}
-
-bool ImuDmpWritingServer::writeDmpStartAddress(void)
-{
-    /* This address is the start address of DMP code */
-    /* It is coming from InvenSense */
-    static const unsigned short sStartAddress = 0x0400;
-
-    bool writeSuccess = false;
-    const uint8_t lsbAddress = (uint8_t)(sStartAddress >> 8);
-    const uint8_t msbAddress = (uint8_t)(sStartAddress & 0xFF);
-    writeSuccess = writeByteInRegister(MPU6050_DMP_CONFIGURATION_REGISTER, lsbAddress);
-    if (writeSuccess)
-    {
-        writeSuccess = writeByteInRegister(MPU6050_DMP_CONFIGURATION_REGISTER, msbAddress);
-        if (writeSuccess)
-        {
-            return true;
-        }
-        else
-        {
-            ROS_ERROR("Failed to write data address MSB!");
-            return false;
-        }
-    }
-    else
-    {
-        ROS_ERROR("Failed to write data address LSB!");
-        return false;
     }
 }
 
@@ -198,6 +183,27 @@ bool ImuDmpWritingServer::writeByteInRegister(uint8_t registerToWrite, uint8_t v
     else
     {
         ROS_ERROR("Failed to write byte!");
+        return false;
+    }
+}
+
+bool ImuDmpWritingServer::writeWordInRegister(uint8_t registerToWrite, uint16_t value)
+{
+    hal_pigpio::hal_pigpioI2cWriteWordData i2cWriteWordDataSrv;
+
+    i2cWriteWordDataSrv.request.handle = imuHandle;
+    i2cWriteWordDataSrv.request.deviceRegister = registerToWrite;
+    i2cWriteWordDataSrv.request.value = value;
+
+    imuDmpClients->getWriteWordDataClientHandle()->call(i2cWriteWordDataSrv);
+
+    if (i2cWriteWordDataSrv.response.hasSucceeded)
+    {
+        return true;
+    }
+    else
+    {
+        ROS_ERROR("Failed to write word!");
         return false;
     }
 }

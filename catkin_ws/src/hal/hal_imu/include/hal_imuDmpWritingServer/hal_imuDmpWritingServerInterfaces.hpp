@@ -20,6 +20,7 @@ class ImuDmpWritingClientsRos : public ImuDmpWritingClients
 private:
     ros::ServiceClient i2cReadByteDataClientRos;
     ros::ServiceClient i2cWriteByteDataClientRos;
+    ros::ServiceClient i2cWriteWordDataClientRos;
     ros::ServiceClient i2cWriteBlockDataClientRos;
     ros::ServiceClient i2cGetHandleClientRos;
 
@@ -28,6 +29,7 @@ public:
     ~ImuDmpWritingClientsRos() = default;
     ros::ServiceClient *getReadByteDataClientHandle() override;
     ros::ServiceClient *getWriteByteDataClientHandle() override;
+    ros::ServiceClient *getWriteWordDataClientHandle() override;
     ros::ServiceClient *getWriteBlockDataClientHandle() override;
     ros::ServiceClient *getGetHandleClientHandle() override;
 };

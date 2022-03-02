@@ -9,6 +9,9 @@
 // Services and messages headers (generated)
 #include "hal_pigpio/hal_pigpioI2cReadByteData.h"
 #include "hal_pigpio/hal_pigpioI2cWriteByteData.h"
+#include "hal_pigpio/hal_pigpioI2cReadWordData.h"
+#include "hal_pigpio/hal_pigpioI2cWriteWordData.h"
+#include "hal_pigpio/hal_pigpioI2cWriteBlockData.h"
 #include "hal_imu/hal_imuGetHandle.h"
 #include "hal_imu/hal_imuWriteDmpAction.h"
 #include "hal_imu/hal_imuMsg.h"
@@ -32,12 +35,17 @@ public:
     void enable6AxisQuaternion(void);
     void calibrateAccelerometer(void);
     bool writeByteInRegister(uint8_t registerToWrite, uint8_t value);
+    bool writeWordInRegister(uint8_t registerToWrite, uint16_t value);
+    bool writeDataBlock(uint8_t registerToWrite, std::vector<uint8_t> data);
     int16_t readByteFromRegister(uint8_t registerToRead);
+    int32_t readWordFromRegister(uint8_t registerToRead);
     bool writeBitInRegister(uint8_t registerToWrite, uint8_t bitToWrite, uint8_t valueOfBit);
+    void resetImu(void);
+    void writeOrientationMatrix(void);
     void setClockSource(void);
     void setSleepDisabled(void);
     void enableGyroCalibrationOnDMP(void);
-    bool writeDataToDmp(uint16_t address, uint8_t size, const unsigned char *data);
+    bool writeDataToDmp(uint16_t address, std::vector<uint8_t> data);
     void publishMessage(void);
     void readMpuData(void);
 };
