@@ -32,7 +32,7 @@ public:
     void init(void);
     void writeDmp(void);
     void enableDmp(void);
-    void enable6AxisQuaternion(void);
+    void configureDmpFeatures(void);
     void calibrateAccelerometer(void);
     bool writeByteInRegister(uint8_t registerToWrite, uint8_t value);
     bool writeWordInRegister(uint8_t registerToWrite, uint16_t value);
@@ -41,10 +41,10 @@ public:
     int32_t readWordFromRegister(uint8_t registerToRead);
     bool writeBitInRegister(uint8_t registerToWrite, uint8_t bitToWrite, uint8_t valueOfBit);
     void resetImu(void);
+    void resetFifo(void);
     void writeOrientationMatrix(void);
     void setClockSource(void);
     void setSleepDisabled(void);
-    void enableGyroCalibrationOnDMP(void);
     bool writeDataToDmp(uint16_t address, std::vector<uint8_t> data);
     void publishMessage(void);
     void readMpuData(void);
