@@ -151,15 +151,10 @@ bool ImuDmpWritingServer::writeData(uint8_t bank, uint8_t addressInBank, std::ve
 bool ImuDmpWritingServer::writeByteInRegister(uint8_t registerToWrite, uint8_t value)
 {
     hal_pigpio::hal_pigpioI2cWriteByteData i2cWriteByteDataSrv;
-    hal_pigpio::hal_pigpioI2cReadByteData i2cReadByteDataSrv;
 
     i2cWriteByteDataSrv.request.handle = imuHandle;
-    i2cReadByteDataSrv.request.handle = imuHandle;
-
     i2cWriteByteDataSrv.request.deviceRegister = registerToWrite;
     i2cWriteByteDataSrv.request.value = value;
-
-    i2cReadByteDataSrv.request.deviceRegister = registerToWrite;
 
     imuDmpClients->getWriteByteDataClientHandle()->call(i2cWriteByteDataSrv);
 

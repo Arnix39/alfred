@@ -143,25 +143,21 @@ bool Imu::writeDataToDmp(uint16_t address, uint8_t size, const unsigned char *da
 bool Imu::writeByteInRegister(uint8_t chipRegister, uint8_t value)
 {
     hal_pigpio::hal_pigpioI2cWriteByteData i2cWriteByteDataSrv;
-    hal_pigpio::hal_pigpioI2cReadByteData i2cReadByteDataSrv;
 
     i2cWriteByteDataSrv.request.handle = imuHandle;
-    i2cReadByteDataSrv.request.handle = imuHandle;
-
     i2cWriteByteDataSrv.request.deviceRegister = chipRegister;
     i2cWriteByteDataSrv.request.value = value;
+
     imuClients->getWriteByteDataClientHandle()->call(i2cWriteByteDataSrv);
 
     if (i2cWriteByteDataSrv.response.hasSucceeded)
     {
-        imuClients->getReadByteDataClientHandle()->call(i2cReadByteDataSrv);
-        if (i2cReadByteDataSrv.response.hasSucceeded && (i2cReadByteDataSrv.response.value == value))
-        {
-            return true;
-        }
+        return true;
     }
-
-    return false;
+    else
+    {
+        return false;
+    }
 }
 
 int main(int argc, char **argv)
