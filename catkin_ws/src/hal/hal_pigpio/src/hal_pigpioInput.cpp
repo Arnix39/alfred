@@ -30,7 +30,7 @@ bool PigpioInput::readGpio(hal_pigpio::hal_pigpioReadGpio::Request &req,
     else
     {
         res.hasSucceeded = false;
-        ROS_INFO("Failed to read GPIO %u!", req.gpioId);
+        ROS_ERROR("Failed to read GPIO %u!", req.gpioId);
     }
     return true;
 }
