@@ -9,6 +9,7 @@ PigpioI2c::PigpioI2c(ros::NodeHandle *node, int pigpioHandle) : pigpioHandle(pig
                                                                 i2cCloseService(node->advertiseService("hal_pigpioI2cClose", &PigpioI2c::i2cClose, this)),
                                                                 i2cReadByteDataService(node->advertiseService("hal_pigpioI2cReadByteData", &PigpioI2c::i2cReadByteData, this)),
                                                                 i2cReadWordDataService(node->advertiseService("hal_pigpioI2cReadWordData", &PigpioI2c::i2cReadWordData, this)),
+                                                                i2cReadBlockDataService(node->advertiseService("hal_pigpioI2cReadBlockData", &PigpioI2c::i2cReadBlockData, this)),
                                                                 i2cWriteByteDataService(node->advertiseService("hal_pigpioI2cWriteByteData", &PigpioI2c::i2cWriteByteData, this)),
                                                                 i2cWriteWordDataService(node->advertiseService("hal_pigpioI2cWriteWordData", &PigpioI2c::i2cWriteWordData, this)),
                                                                 i2cWriteBlockDataService(node->advertiseService("hal_pigpioI2cWriteBlockData", &PigpioI2c::i2cWriteBlockData, this))
@@ -86,6 +87,30 @@ bool PigpioI2c::i2cReadWordData(hal_pigpio::hal_pigpioI2cReadWordData::Request &
     return true;
 }
 
+bool PigpioI2c::i2cReadBlockData(hal_pigpio::hal_pigpioI2cReadBlockData::Request &req,
+                                 hal_pigpio::hal_pigpioI2cReadBlockData::Response &res)
+{
+    char buffer[I2C_BUFFER_MAX_BYTES];
+    int result = i2c_read_i2c_block_data(pigpioHandle, req.handle, req.deviceRegister, buffer, req.length);
+    if (result > 0)
+    {
+        res.hasSucceeded = true;
+
+        for (uint8_t index = 0; index < result; index++)
+        {
+            res.dataBlock.push_back(buffer[index]);
+        }
+
+        ROS_INFO("Successfuly read data block from register %u on device with handle %u.", req.deviceRegister, req.handle);
+    }
+    else
+    {
+        res.hasSucceeded = false;
+        ROS_ERROR("Failed to read register %u on device with handle %u.", req.deviceRegister, req.handle);
+    }
+    return true;
+}
+
 bool PigpioI2c::i2cWriteByteData(hal_pigpio::hal_pigpioI2cWriteByteData::Request &req,
                                  hal_pigpio::hal_pigpioI2cWriteByteData::Response &res)
 {
@@ -121,14 +146,14 @@ bool PigpioI2c::i2cWriteWordData(hal_pigpio::hal_pigpioI2cWriteWordData::Request
 bool PigpioI2c::i2cWriteBlockData(hal_pigpio::hal_pigpioI2cWriteBlockData::Request &req,
                                   hal_pigpio::hal_pigpioI2cWriteBlockData::Response &res)
 {
-    char dataBlock[16];
+    char dataBlock[I2C_BUFFER_MAX_BYTES];
 
     for (uint8_t byte = 0; byte < req.length; byte++)
     {
         dataBlock[byte] = (char)(req.dataBlock[byte]);
     }
 
-    if (i2c_write_block_data(pigpioHandle, req.handle, req.deviceRegister, dataBlock, req.length) == 0)
+    if (i2c_write_i2c_block_data(pigpioHandle, req.handle, req.deviceRegister, dataBlock, req.length) == 0)
     {
         res.hasSucceeded = true;
         ROS_INFO("Successfuly wrote data block in register %u on device with handle %u.", req.deviceRegister, req.handle);

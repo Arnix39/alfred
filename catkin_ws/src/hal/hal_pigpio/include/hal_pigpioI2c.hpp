@@ -11,9 +11,12 @@
 #include "hal_pigpio/hal_pigpioI2cClose.h"
 #include "hal_pigpio/hal_pigpioI2cReadByteData.h"
 #include "hal_pigpio/hal_pigpioI2cReadWordData.h"
+#include "hal_pigpio/hal_pigpioI2cReadBlockData.h"
 #include "hal_pigpio/hal_pigpioI2cWriteByteData.h"
 #include "hal_pigpio/hal_pigpioI2cWriteWordData.h"
 #include "hal_pigpio/hal_pigpioI2cWriteBlockData.h"
+
+#define I2C_BUFFER_MAX_BYTES 32
 
 class PigpioI2c
 {
@@ -25,6 +28,7 @@ private:
     ros::ServiceServer i2cWriteBlockDataService;
     ros::ServiceServer i2cReadByteDataService;
     ros::ServiceServer i2cReadWordDataService;
+    ros::ServiceServer i2cReadBlockDataService;
     ros::ServiceClient getPigpioHandleClient;
     int pigpioHandle;
 
@@ -39,6 +43,8 @@ public:
                          hal_pigpio::hal_pigpioI2cReadByteData::Response &res);
     bool i2cReadWordData(hal_pigpio::hal_pigpioI2cReadWordData::Request &req,
                          hal_pigpio::hal_pigpioI2cReadWordData::Response &res);
+    bool i2cReadBlockData(hal_pigpio::hal_pigpioI2cReadBlockData::Request &req,
+                          hal_pigpio::hal_pigpioI2cReadBlockData::Response &res);
     bool i2cWriteByteData(hal_pigpio::hal_pigpioI2cWriteByteData::Request &req,
                           hal_pigpio::hal_pigpioI2cWriteByteData::Response &res);
     bool i2cWriteWordData(hal_pigpio::hal_pigpioI2cWriteWordData::Request &req,
