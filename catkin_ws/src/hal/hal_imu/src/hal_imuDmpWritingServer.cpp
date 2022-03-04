@@ -123,7 +123,7 @@ void ImuDmpWritingServer::writeDmp(void)
 
     if (result.success)
     {
-        ROS_INFO("Wrote successfully DMP code.");
+        ROS_INFO("Successfully wrote DMP code.");
         imuDmpWritingServer->getActionServerHandle()->setSucceeded(result);
     }
     else
