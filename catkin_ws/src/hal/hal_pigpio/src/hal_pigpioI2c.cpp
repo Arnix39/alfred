@@ -57,7 +57,6 @@ bool PigpioI2c::i2cReadByteData(hal_pigpio::hal_pigpioI2cReadByteData::Request &
     {
         res.value = (uint8_t)result;
         res.hasSucceeded = true;
-        ROS_INFO("Successfuly read %u in register %u on device with handle %u.", res.value, req.deviceRegister, req.handle);
     }
     else
     {
@@ -76,7 +75,6 @@ bool PigpioI2c::i2cReadWordData(hal_pigpio::hal_pigpioI2cReadWordData::Request &
     {
         res.value = (uint16_t)result;
         res.hasSucceeded = true;
-        ROS_INFO("Successfuly read %u in register %u on device with handle %u.", res.value, req.deviceRegister, req.handle);
     }
     else
     {
@@ -117,7 +115,6 @@ bool PigpioI2c::i2cWriteByteData(hal_pigpio::hal_pigpioI2cWriteByteData::Request
     if (i2c_write_byte_data(pigpioHandle, req.handle, req.deviceRegister, req.value) == 0)
     {
         res.hasSucceeded = true;
-        ROS_INFO("Successfuly wrote %u in register %u on device with handle %u.", req.value, req.deviceRegister, req.handle);
     }
     else
     {
@@ -133,7 +130,6 @@ bool PigpioI2c::i2cWriteWordData(hal_pigpio::hal_pigpioI2cWriteWordData::Request
     if (i2c_write_word_data(pigpioHandle, req.handle, req.deviceRegister, req.value) == 0)
     {
         res.hasSucceeded = true;
-        ROS_INFO("Successfuly wrote %u in register %u on device with handle %u.", req.value, req.deviceRegister, req.handle);
     }
     else
     {
@@ -156,7 +152,6 @@ bool PigpioI2c::i2cWriteBlockData(hal_pigpio::hal_pigpioI2cWriteBlockData::Reque
     if (i2c_write_i2c_block_data(pigpioHandle, req.handle, req.deviceRegister, dataBlock, req.length) == 0)
     {
         res.hasSucceeded = true;
-        ROS_INFO("Successfuly wrote data block in register %u on device with handle %u.", req.deviceRegister, req.handle);
     }
     else
     {
