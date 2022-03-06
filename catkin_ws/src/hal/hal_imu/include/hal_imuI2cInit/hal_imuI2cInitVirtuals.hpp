@@ -27,11 +27,11 @@ public:
     virtual ros::ServiceClient *getI2cWriteByteDataClientHandle() = 0;
 };
 
-class ImuI2cInitPublishers
+class ImuI2cInitPublisher
 {
 public:
-    ImuI2cInitPublishers() {}
-    virtual ~ImuI2cInitPublishers() {}
+    ImuI2cInitPublisher() {}
+    virtual ~ImuI2cInitPublisher() {}
     virtual void publish(hal_imu::hal_imuI2cHeartbeatMsg message) = 0;
 };
 

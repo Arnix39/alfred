@@ -22,13 +22,13 @@ class ImuI2cInit
 private:
     ImuI2cInitClients *imuI2cInitClients;
     ImuI2cInitServers *imuI2cInitServers;
-    ImuI2cInitPublishers *imuI2cInitPubs;
+    ImuI2cInitPublisher *imuI2cInitPub;
     ImuI2cInitSubscribers *imuI2cInitSubs;
     int32_t imuHandle;
     bool pigpioNodeStarted;
 
 public:
-    ImuI2cInit(ImuI2cInitClients *imuI2cInitServiceClients, ImuI2cInitServers *imuI2cInitServiceServers, ImuI2cInitPublishers *imuI2cInitPublisher, ImuI2cInitSubscribers *imuI2cInitSubscriber);
+    ImuI2cInit(ImuI2cInitClients *imuI2cInitServiceClients, ImuI2cInitServers *imuI2cInitServiceServers, ImuI2cInitPublisher *imuI2cInitPublisher, ImuI2cInitSubscribers *imuI2cInitSubscribers);
     ~ImuI2cInit();
     bool getHandle(hal_imu::hal_imuGetHandle::Request &req,
                    hal_imu::hal_imuGetHandle::Response &res);

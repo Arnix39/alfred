@@ -14,6 +14,18 @@ public:
     void publish(hal_imu::hal_imuMsg message) override;
 };
 
+class ImuSubscribersRos : public ImuSubscribers
+{
+private:
+    ros::Subscriber imuImuI2cInitHBSubRos;
+    ros::NodeHandle *nodeHandle;
+
+public:
+    ImuSubscribersRos(ros::NodeHandle *node);
+    ~ImuSubscribersRos() = default;
+    void subscribe(Imu *imu) override;
+};
+
 class ImuClientsRos : public ImuClients
 {
 private:

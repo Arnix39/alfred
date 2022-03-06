@@ -32,14 +32,14 @@ public:
     ros::ServiceClient *getI2cWriteByteDataClientHandle() override;
 };
 
-class ImuI2cInitPublishersRos : public ImuI2cInitPublishers
+class ImuI2cInitPublisherRos : public ImuI2cInitPublisher
 {
 private:
     ros::Publisher imuI2cInitPubRos;
 
 public:
-    ImuI2cInitPublishersRos(ros::NodeHandle *node);
-    ~ImuI2cInitPublishersRos() = default;
+    ImuI2cInitPublisherRos(ros::NodeHandle *node);
+    ~ImuI2cInitPublisherRos() = default;
     void publish(hal_imu::hal_imuI2cHeartbeatMsg message) override;
 };
 

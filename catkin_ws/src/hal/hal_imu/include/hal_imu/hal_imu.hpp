@@ -16,6 +16,7 @@
 #include "hal_imu/hal_imuGetHandle.h"
 #include "hal_imu/hal_imuWriteDmpAction.h"
 #include "hal_imu/hal_imuMsg.h"
+#include "hal_imu/hal_imuI2cHeartbeatMsg.h"
 
 typedef actionlib::SimpleActionClient<hal_imu::hal_imuWriteDmpAction> imuActionClient_t;
 
@@ -24,13 +25,17 @@ class Imu
 private:
     ImuClients *imuClients;
     ImuPublisher *imuPublisher;
+    ImuSubscribers *imuSubs;
     int32_t imuHandle;
     int16_t angle;
     bool dmpEnabled;
+    bool i2cInitialised;
 
 public:
-    Imu(ImuPublisher *imuMessagePublisher, ImuClients *imuServiceClients);
+    Imu(ImuPublisher *imuMessagePublisher, ImuClients *imuServiceClients, ImuSubscribers *imuSubscribers);
     ~Imu() = default;
+    void imuI2cInitHeartbeatCallback(const hal_imu::hal_imuI2cHeartbeatMsg &msg);
+    bool getI2cInitialised(void);
     void init(void);
     void writeDmp(void);
     void setDmpRate(uint16_t rate);

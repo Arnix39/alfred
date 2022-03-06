@@ -12,6 +12,16 @@ void ImuPublisherRos::publish(hal_imu::hal_imuMsg message)
     imuPublisherRos.publish(message);
 }
 
+/* Subscriber interface implementation */
+ImuSubscribersRos::ImuSubscribersRos(ros::NodeHandle *node) : nodeHandle(node)
+{
+}
+
+void ImuSubscribersRos::subscribe(Imu *imu)
+{
+    imuImuI2cInitHBSubRos = nodeHandle->subscribe("hal_imuI2cHeartbeatMsg", 1000, &Imu::imuI2cInitHeartbeatCallback, imu);
+}
+
 /* Services clients interface implementation */
 ImuClientsRos::ImuClientsRos(ros::NodeHandle *node) : i2cReadByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cReadByteData>("hal_pigpioI2cReadByteData")),
                                                       i2cWriteByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteByteData>("hal_pigpioI2cWriteByteData")),
@@ -59,14 +69,28 @@ ros::ServiceClient *ImuClientsRos::getGetHandleClientHandle()
 }
 
 /* IMU implementation */
-Imu::Imu(ImuPublisher *imuMessagePublisher, ImuClients *imuServiceClients) : imuPublisher(imuMessagePublisher),
-                                                                             imuClients(imuServiceClients),
-                                                                             angle(0),
-                                                                             dmpEnabled(false)
+Imu::Imu(ImuPublisher *imuMessagePublisher, ImuClients *imuServiceClients, ImuSubscribers *imuSubscribers) : imuPublisher(imuMessagePublisher),
+                                                                                                             imuClients(imuServiceClients),
+                                                                                                             angle(0),
+                                                                                                             dmpEnabled(false),
+                                                                                                             imuSubs(imuSubscribers),
+                                                                                                             i2cInitialised(false)
 {
     hal_imu::hal_imuGetHandle i2cGetHandleSrv;
     imuServiceClients->getGetHandleClientHandle()->call(i2cGetHandleSrv);
     imuHandle = i2cGetHandleSrv.response.handle;
+
+    imuSubs->subscribe(this);
+}
+
+void Imu::imuI2cInitHeartbeatCallback(const hal_imu::hal_imuI2cHeartbeatMsg &msg)
+{
+    i2cInitialised = msg.isStarted;
+}
+
+bool Imu::getI2cInitialised(void)
+{
+    return i2cInitialised;
 }
 
 void Imu::init(void)
@@ -708,9 +732,19 @@ int main(int argc, char **argv)
 
     ImuPublisherRos imuMessagePublisherRos(&node);
     ImuClientsRos imuServiceClientsRos(&node);
+    ImuSubscribersRos imuSubscribersRos(&node);
 
-    Imu imu(&imuMessagePublisherRos, &imuServiceClientsRos);
+    Imu imu(&imuMessagePublisherRos, &imuServiceClientsRos, &imuSubscribersRos);
+
+    ROS_INFO("imu node waiting for I2C communication to be ready...");
+    while (!imu.getI2cInitialised())
+    {
+        /* Nothing to do */
+    }
+
+    ROS_INFO("imu node initialising...");
     imu.init();
+    ROS_INFO("imu node initialised.");
 
     ros::Rate loop_rate(100);
 

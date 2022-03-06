@@ -2,11 +2,11 @@
 #include "hal_imuI2cInitInterfaces.hpp"
 
 /* Publisher interface implementation */
-ImuI2cInitPublishersRos::ImuI2cInitPublishersRos(ros::NodeHandle *node) : imuI2cInitPubRos(node->advertise<hal_imu::hal_imuI2cHeartbeatMsg>("hal_imuI2cHeartbeatMsg", 1000))
+ImuI2cInitPublisherRos::ImuI2cInitPublisherRos(ros::NodeHandle *node) : imuI2cInitPubRos(node->advertise<hal_imu::hal_imuI2cHeartbeatMsg>("hal_imuI2cHeartbeatMsg", 1000))
 {
 }
 
-void ImuI2cInitPublishersRos::publish(hal_imu::hal_imuI2cHeartbeatMsg message)
+void ImuI2cInitPublisherRos::publish(hal_imu::hal_imuI2cHeartbeatMsg message)
 {
     imuI2cInitPubRos.publish(message);
 }
@@ -60,10 +60,10 @@ void ImuI2cInitServersRos::advertiseGetHandleService(ImuI2cInit *imuI2cInit)
 }
 
 /* Imu I2c Init implementation */
-ImuI2cInit::ImuI2cInit(ImuI2cInitClients *imuI2cInitServiceClients, ImuI2cInitServers *imuI2cInitServiceServers, ImuI2cInitPublishers *imuI2cInitPublishers, ImuI2cInitSubscribers *imuI2cInitSubscribers) : imuI2cInitClients(imuI2cInitServiceClients),
-                                                                                                                                                                                                             imuI2cInitServers(imuI2cInitServiceServers),
-                                                                                                                                                                                                             imuI2cInitPubs(imuI2cInitPublishers),
-                                                                                                                                                                                                             imuI2cInitSubs(imuI2cInitSubscribers)
+ImuI2cInit::ImuI2cInit(ImuI2cInitClients *imuI2cInitServiceClients, ImuI2cInitServers *imuI2cInitServiceServers, ImuI2cInitPublisher *imuI2cInitPublisher, ImuI2cInitSubscribers *imuI2cInitSubscribers) : imuI2cInitClients(imuI2cInitServiceClients),
+                                                                                                                                                                                                           imuI2cInitServers(imuI2cInitServiceServers),
+                                                                                                                                                                                                           imuI2cInitPub(imuI2cInitPublisher),
+                                                                                                                                                                                                           imuI2cInitSubs(imuI2cInitSubscribers)
 {
     imuI2cInitServiceServers->advertiseGetHandleService(this);
     imuI2cInitSubs->subscribe(this);
@@ -116,7 +116,7 @@ void ImuI2cInit::publishHeartbeat(void)
 {
     hal_imu::hal_imuI2cHeartbeatMsg message;
 
-    imuI2cInitPubs->publish(message);
+    imuI2cInitPub->publish(message);
 }
 
 int main(int argc, char **argv)
@@ -126,7 +126,7 @@ int main(int argc, char **argv)
 
     ImuI2cInitClientsRos imuI2cInitServiceClients(&node);
     ImuI2cInitServersRos imuI2cInitServers(&node);
-    ImuI2cInitPublishersRos imuI2cInitPublishers(&node);
+    ImuI2cInitPublisherRos imuI2cInitPublishers(&node);
     ImuI2cInitSubscribersRos imuI2cInitSubscribers(&node);
 
     ImuI2cInit imuI2cInit(&imuI2cInitServiceClients, &imuI2cInitServers, &imuI2cInitPublishers, &imuI2cInitSubscribers);

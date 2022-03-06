@@ -16,6 +16,14 @@ public:
     virtual void publish(hal_imu::hal_imuMsg message) = 0;
 };
 
+class ImuSubscribers
+{
+public:
+    ImuSubscribers() {}
+    virtual ~ImuSubscribers() {}
+    virtual void subscribe(Imu *imu) = 0;
+};
+
 class ImuClients
 {
 public:
