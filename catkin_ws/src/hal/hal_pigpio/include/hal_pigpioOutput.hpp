@@ -24,7 +24,6 @@ private:
     ros::ServiceServer setGpioLowService;
     ros::ServiceServer sendTriggerPulseService;
     ros::ServiceClient getModeClient;
-    ros::ServiceClient getPigpioHandleClient;
     int pigpioHandle;
 
 public:

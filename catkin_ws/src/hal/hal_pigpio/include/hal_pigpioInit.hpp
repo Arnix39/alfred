@@ -14,6 +14,7 @@
 #include "hal_pigpio/hal_pigpioSetPullUp.h"
 #include "hal_pigpio/hal_pigpioSetPullDown.h"
 #include "hal_pigpio/hal_pigpioClearResistor.h"
+#include "hal_pigpio/hal_pigpioHeartbeatMsg.h"
 
 class PigpioInit
 {
@@ -25,6 +26,7 @@ private:
     ros::ServiceServer setPullUpService;
     ros::ServiceServer setPullDownService;
     ros::ServiceServer clearResistorService;
+    ros::Publisher heartbeatpublisher;
     int pigpioHandle;
 
 public:
@@ -44,6 +46,7 @@ public:
                      hal_pigpio::hal_pigpioSetPullDown::Response &res);
     bool clearResistor(hal_pigpio::hal_pigpioClearResistor::Request &req,
                        hal_pigpio::hal_pigpioClearResistor::Response &res);
+    void publishHeartbeat(void);
 };
 
 #endif

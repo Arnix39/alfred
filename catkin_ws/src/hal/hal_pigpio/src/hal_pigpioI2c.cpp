@@ -4,7 +4,6 @@
 #include "hal_pigpio/hal_pigpioGetHandle.h"
 
 PigpioI2c::PigpioI2c(ros::NodeHandle *node, int pigpioHandle) : pigpioHandle(pigpioHandle),
-                                                                getPigpioHandleClient(node->serviceClient<hal_pigpio::hal_pigpioGetHandle>("hal_pigpioGetHandle")),
                                                                 i2cOpenService(node->advertiseService("hal_pigpioI2cOpen", &PigpioI2c::i2cOpen, this)),
                                                                 i2cCloseService(node->advertiseService("hal_pigpioI2cClose", &PigpioI2c::i2cClose, this)),
                                                                 i2cReadByteDataService(node->advertiseService("hal_pigpioI2cReadByteData", &PigpioI2c::i2cReadByteData, this)),

@@ -29,7 +29,6 @@ private:
     ros::ServiceServer i2cReadByteDataService;
     ros::ServiceServer i2cReadWordDataService;
     ros::ServiceServer i2cReadBlockDataService;
-    ros::ServiceClient getPigpioHandleClient;
     int pigpioHandle;
 
 public:

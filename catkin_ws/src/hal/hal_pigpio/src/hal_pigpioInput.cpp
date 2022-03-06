@@ -4,7 +4,6 @@
 #include "hal_pigpio/hal_pigpioGetHandle.h"
 
 PigpioInput::PigpioInput(ros::NodeHandle *node, int pigpioHandle) : pigpioHandle(pigpioHandle),
-                                                                    getPigpioHandleClient(node->serviceClient<hal_pigpio::hal_pigpioGetHandle>("hal_pigpioGetHandle")),
                                                                     gpioEdgeChangePub(node->advertise<hal_pigpio::hal_pigpioEdgeChangeMsg>("gpioEdgeChange", 1000)),
                                                                     readGpioService(node->advertiseService("hal_pigpioReadGpio", &PigpioInput::readGpio, this)),
                                                                     setCallbackRisingEdgeService(node->advertiseService("hal_pigpioSetCallback", &PigpioInput::setCallback, this))

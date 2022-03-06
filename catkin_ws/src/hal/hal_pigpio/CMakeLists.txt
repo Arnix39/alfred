@@ -21,6 +21,7 @@ find_package(pigpio MODULE REQUIRED)
 add_message_files(
    FILES
    hal_pigpioEdgeChangeMsg.msg
+   hal_pigpioHeartbeatMsg.msg
  )
 
 ## Generate services in the 'srv' folder
