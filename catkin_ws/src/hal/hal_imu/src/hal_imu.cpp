@@ -77,11 +77,14 @@ Imu::Imu(ImuPublisher *imuMessagePublisher, ImuClients *imuServiceClients, ImuSu
                                                                                                              i2cInitialised(false),
                                                                                                              isStarted(false)
 {
-    hal_imu::hal_imuGetHandle i2cGetHandleSrv;
-    imuServiceClients->getGetHandleClientHandle()->call(i2cGetHandleSrv);
-    imuHandle = i2cGetHandleSrv.response.handle;
-
     imuSubs->subscribe(this);
+}
+
+void Imu::getI2cHandle(void)
+{
+    hal_imu::hal_imuGetHandle i2cGetHandleSrv;
+    imuClients->getGetHandleClientHandle()->call(i2cGetHandleSrv);
+    imuHandle = i2cGetHandleSrv.response.handle;
 }
 
 void Imu::imuI2cInitHeartbeatCallback(const hal_imu::hal_imuI2cHeartbeatMsg &msg)
@@ -756,7 +759,8 @@ int main(int argc, char **argv)
         {
             if (imu.isI2cInitialised())
             {
-                ROS_INFO("imu node initialising...");
+                imu.getI2cHandle();
+                ROS_INFO("imu I2C communication ready.");
                 imu.init();
                 imu.starts();
                 ROS_INFO("imu node initialised.");

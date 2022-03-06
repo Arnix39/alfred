@@ -293,11 +293,10 @@ int main(int argc, char **argv)
     {
         if (imuDmpWritingServer.isNotStarted())
         {
-            imuDmpWritingServer.getI2cHandle();
-            ROS_INFO("imuDmpWritingServer I2C communication ready.");
-
             if (imuDmpWritingServer.isI2cInitialised())
             {
+                imuDmpWritingServer.getI2cHandle();
+                ROS_INFO("imuDmpWritingServer I2C communication ready.");
                 imuDmpWritingServer.startServer();
                 imuDmpWritingServer.starts();
             }

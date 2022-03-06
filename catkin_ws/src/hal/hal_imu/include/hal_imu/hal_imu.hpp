@@ -39,6 +39,7 @@ public:
     bool isI2cInitialised(void);
     bool isNotStarted(void);
     void starts(void);
+    void getI2cHandle(void);
     void init(void);
     void writeDmp(void);
     void setDmpRate(uint16_t rate);
