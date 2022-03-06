@@ -26,6 +26,7 @@ private:
     ImuI2cInitSubscribers *imuI2cInitSubs;
     int32_t imuHandle;
     bool pigpioNodeStarted;
+    bool isStarted;
 
 public:
     ImuI2cInit(ImuI2cInitClients *imuI2cInitServiceClients, ImuI2cInitServers *imuI2cInitServiceServers, ImuI2cInitPublisher *imuI2cInitPublisher, ImuI2cInitSubscribers *imuI2cInitSubscribers);
@@ -36,7 +37,9 @@ public:
     bool writeBitInRegister(uint8_t registerToWrite, uint8_t bitToWrite, uint8_t valueOfBit);
     void setClockSource(void);
     void setSleepDisabled(void);
-    bool getPigpioNodeStarted(void);
+    bool isPigpioNodeStarted(void);
+    bool isNotStarted(void);
+    void starts(void);
     void publishHeartbeat(void);
     void pigpioHeartbeatCallback(const hal_pigpio::hal_pigpioHeartbeatMsg &msg);
 };

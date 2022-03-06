@@ -40,6 +40,7 @@ private:
     uint32_t echoCallbackId;
     uint16_t distanceInCm;
     bool pigpioNodeStarted;
+    bool isStarted;
 
 public:
     ProxSens(ProxSensSubscriber *proxSensSubscriber, ProxSensPublisher *proxSensPub, ProxSensClients *proxSensServiceClients);
@@ -50,7 +51,9 @@ public:
     void enableOutputLevelShifter(void);
     void edgeChangeCallback(const hal_pigpio::hal_pigpioEdgeChangeMsg &msg);
     void pigpioHeartbeatCallback(const hal_pigpio::hal_pigpioHeartbeatMsg &msg);
-    bool getPigpioNodeStarted(void);
+    bool isPigpioNodeStarted(void);
+    bool isNotStarted(void);
+    void starts(void);
 };
 
 #endif

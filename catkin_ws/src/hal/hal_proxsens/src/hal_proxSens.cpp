@@ -62,6 +62,7 @@ ProxSens::ProxSens(ProxSensSubscriber *proxSensSubscriber, ProxSensPublisher *pr
                                                                                                                                             echoCallbackId(0),
                                                                                                                                             distanceInCm(UINT16_MAX),
                                                                                                                                             pigpioNodeStarted(false),
+                                                                                                                                            isStarted(false),
                                                                                                                                             proxSensPub(proxSensPublisher),
                                                                                                                                             proxSensClients(proxSensServiceClients),
                                                                                                                                             proxSensSub(proxSensSubscriber)
@@ -104,10 +105,10 @@ void ProxSens::edgeChangeCallback(const hal_pigpio::hal_pigpioEdgeChangeMsg &msg
 
 void ProxSens::pigpioHeartbeatCallback(const hal_pigpio::hal_pigpioHeartbeatMsg &msg)
 {
-    pigpioNodeStarted = msg.isStarted;
+    pigpioNodeStarted = msg.isAlive;
 }
 
-bool ProxSens::getPigpioNodeStarted(void)
+bool ProxSens::isPigpioNodeStarted(void)
 {
     return pigpioNodeStarted;
 }
@@ -163,6 +164,16 @@ void ProxSens::enableOutputLevelShifter(void)
     proxSensClients->getSetGpioHighClientHandle()->call(setGpioHighSrv);
 }
 
+void ProxSens::starts(void)
+{
+    isStarted = true;
+}
+
+bool ProxSens::isNotStarted(void)
+{
+    return !isStarted;
+}
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "hal_proxsens");
@@ -174,23 +185,27 @@ int main(int argc, char **argv)
 
     ProxSens proxSens(&proxSensSubscriberRos, &proxSensPublisherRos, &proxSensServiceClientsRos);
 
-    ROS_INFO("proxSens node waiting for pigpio node to start...");
-    while (!proxSens.getPigpioNodeStarted())
-    {
-        /* Nothing to do */
-    }
-
-    ROS_INFO("proxSens node initialising...");
-    proxSens.configureGpios();
-    proxSens.enableOutputLevelShifter();
-    ROS_INFO("proxSens node initialised.");
-
     ros::Rate loop_rate(10);
 
+    ROS_INFO("proxSens node waiting for pigpio node to start...");
     while (ros::ok())
     {
-        proxSens.publishMessage();
-        proxSens.trigger();
+        if (proxSens.isNotStarted())
+        {
+            if (proxSens.isPigpioNodeStarted())
+            {
+                ROS_INFO("proxSens node initialising...");
+                proxSens.configureGpios();
+                proxSens.enableOutputLevelShifter();
+                proxSens.starts();
+                ROS_INFO("proxSens node initialised.");
+            }
+        }
+        else
+        {
+            proxSens.publishMessage();
+            proxSens.trigger();
+        }
 
         ros::spinOnce();
         loop_rate.sleep();

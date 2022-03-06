@@ -30,12 +30,15 @@ private:
     int16_t angle;
     bool dmpEnabled;
     bool i2cInitialised;
+    bool isStarted;
 
 public:
     Imu(ImuPublisher *imuMessagePublisher, ImuClients *imuServiceClients, ImuSubscribers *imuSubscribers);
     ~Imu() = default;
     void imuI2cInitHeartbeatCallback(const hal_imu::hal_imuI2cHeartbeatMsg &msg);
-    bool getI2cInitialised(void);
+    bool isI2cInitialised(void);
+    bool isNotStarted(void);
+    void starts(void);
     void init(void);
     void writeDmp(void);
     void setDmpRate(uint16_t rate);

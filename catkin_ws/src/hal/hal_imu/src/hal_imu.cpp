@@ -74,7 +74,8 @@ Imu::Imu(ImuPublisher *imuMessagePublisher, ImuClients *imuServiceClients, ImuSu
                                                                                                              angle(0),
                                                                                                              dmpEnabled(false),
                                                                                                              imuSubs(imuSubscribers),
-                                                                                                             i2cInitialised(false)
+                                                                                                             i2cInitialised(false),
+                                                                                                             isStarted(false)
 {
     hal_imu::hal_imuGetHandle i2cGetHandleSrv;
     imuServiceClients->getGetHandleClientHandle()->call(i2cGetHandleSrv);
@@ -85,12 +86,22 @@ Imu::Imu(ImuPublisher *imuMessagePublisher, ImuClients *imuServiceClients, ImuSu
 
 void Imu::imuI2cInitHeartbeatCallback(const hal_imu::hal_imuI2cHeartbeatMsg &msg)
 {
-    i2cInitialised = msg.isStarted;
+    i2cInitialised = msg.isAlive;
 }
 
-bool Imu::getI2cInitialised(void)
+bool Imu::isI2cInitialised(void)
 {
     return i2cInitialised;
+}
+
+void Imu::starts(void)
+{
+    isStarted = true;
+}
+
+bool Imu::isNotStarted(void)
+{
+    return !isStarted;
 }
 
 void Imu::init(void)
@@ -736,22 +747,26 @@ int main(int argc, char **argv)
 
     Imu imu(&imuMessagePublisherRos, &imuServiceClientsRos, &imuSubscribersRos);
 
-    ROS_INFO("imu node waiting for I2C communication to be ready...");
-    while (!imu.getI2cInitialised())
-    {
-        /* Nothing to do */
-    }
-
-    ROS_INFO("imu node initialising...");
-    imu.init();
-    ROS_INFO("imu node initialised.");
-
     ros::Rate loop_rate(100);
 
+    ROS_INFO("imu node waiting for I2C communication to be ready...");
     while (ros::ok())
     {
-        imu.readMpuData();
-        imu.publishMessage();
+        if (imu.isNotStarted())
+        {
+            if (imu.isI2cInitialised())
+            {
+                ROS_INFO("imu node initialising...");
+                imu.init();
+                imu.starts();
+                ROS_INFO("imu node initialised.");
+            }
+        }
+        else
+        {
+            imu.readMpuData();
+            imu.publishMessage();
+        }
 
         ros::spinOnce();
         loop_rate.sleep();

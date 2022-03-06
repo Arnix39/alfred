@@ -128,6 +128,6 @@ bool PigpioInit::clearResistor(hal_pigpio::hal_pigpioClearResistor::Request &req
 void PigpioInit::publishHeartbeat(void)
 {
     hal_pigpio::hal_pigpioHeartbeatMsg heartbeat;
-    heartbeat.isStarted = true;
+    heartbeat.isAlive = true;
     heartbeatpublisher.publish(heartbeat);
 }

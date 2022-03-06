@@ -63,7 +63,9 @@ void ImuI2cInitServersRos::advertiseGetHandleService(ImuI2cInit *imuI2cInit)
 ImuI2cInit::ImuI2cInit(ImuI2cInitClients *imuI2cInitServiceClients, ImuI2cInitServers *imuI2cInitServiceServers, ImuI2cInitPublisher *imuI2cInitPublisher, ImuI2cInitSubscribers *imuI2cInitSubscribers) : imuI2cInitClients(imuI2cInitServiceClients),
                                                                                                                                                                                                            imuI2cInitServers(imuI2cInitServiceServers),
                                                                                                                                                                                                            imuI2cInitPub(imuI2cInitPublisher),
-                                                                                                                                                                                                           imuI2cInitSubs(imuI2cInitSubscribers)
+                                                                                                                                                                                                           imuI2cInitSubs(imuI2cInitSubscribers),
+                                                                                                                                                                                                           pigpioNodeStarted(false),
+                                                                                                                                                                                                           isStarted(false)
 {
     imuI2cInitServiceServers->advertiseGetHandleService(this);
     imuI2cInitSubs->subscribe(this);
@@ -104,19 +106,29 @@ void ImuI2cInit::initI2cCommunication(void)
 
 void ImuI2cInit::pigpioHeartbeatCallback(const hal_pigpio::hal_pigpioHeartbeatMsg &msg)
 {
-    pigpioNodeStarted = msg.isStarted;
+    pigpioNodeStarted = msg.isAlive;
 }
 
-bool ImuI2cInit::getPigpioNodeStarted(void)
+bool ImuI2cInit::isPigpioNodeStarted(void)
 {
     return pigpioNodeStarted;
 }
 
 void ImuI2cInit::publishHeartbeat(void)
 {
-    hal_imu::hal_imuI2cHeartbeatMsg message;
+    hal_imu::hal_imuI2cHeartbeatMsg heartbeat;
+    heartbeat.isAlive = true;
+    imuI2cInitPub->publish(heartbeat);
+}
 
-    imuI2cInitPub->publish(message);
+void ImuI2cInit::starts(void)
+{
+    isStarted = true;
+}
+
+bool ImuI2cInit::isNotStarted(void)
+{
+    return !isStarted;
 }
 
 int main(int argc, char **argv)
@@ -131,21 +143,25 @@ int main(int argc, char **argv)
 
     ImuI2cInit imuI2cInit(&imuI2cInitServiceClients, &imuI2cInitServers, &imuI2cInitPublishers, &imuI2cInitSubscribers);
 
-    ROS_INFO("imuI2cInit node waiting for pigpio node to start...");
-    while (!imuI2cInit.getPigpioNodeStarted())
-    {
-        /* Nothing to do */
-    }
-
-    ROS_INFO("imuI2cInit node initialising...");
-    imuI2cInit.initI2cCommunication();
-    ROS_INFO("imuI2cInit node initialising...");
-
     ros::Rate loop_rate(10);
 
+    ROS_INFO("imuI2cInit node waiting for pigpio node to start...");
     while (ros::ok())
     {
-        imuI2cInit.publishHeartbeat();
+        if (imuI2cInit.isNotStarted())
+        {
+            if (imuI2cInit.isPigpioNodeStarted())
+            {
+                ROS_INFO("imuI2cInit node initialising...");
+                imuI2cInit.initI2cCommunication();
+                imuI2cInit.starts();
+                ROS_INFO("imuI2cInit node initialised.");
+            }
+        }
+        else
+        {
+            imuI2cInit.publishHeartbeat();
+        }
 
         ros::spinOnce();
         loop_rate.sleep();
