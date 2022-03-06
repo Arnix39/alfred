@@ -13,6 +13,7 @@
 #include "hal_pigpio/hal_pigpioSendTriggerPulse.h"
 #include "hal_pigpio/hal_pigpioSetCallback.h"
 #include "hal_pigpio/hal_pigpioEdgeChangeMsg.h"
+#include "hal_pigpio/hal_pigpioHeartbeatMsg.h"
 #include "hal_proxsens/hal_proxsensMsg.h"
 
 #define PROXSENS_TRIGGER_GPIO 5
@@ -38,6 +39,7 @@ private:
     uint32_t timestamp;
     uint32_t echoCallbackId;
     uint16_t distanceInCm;
+    bool pigpioNodeStarted;
 
 public:
     ProxSens(ProxSensSubscriber *proxSensSubscriber, ProxSensPublisher *proxSensPub, ProxSensClients *proxSensServiceClients);
@@ -47,6 +49,8 @@ public:
     void trigger(void);
     void enableOutputLevelShifter(void);
     void edgeChangeCallback(const hal_pigpio::hal_pigpioEdgeChangeMsg &msg);
+    void pigpioHeartbeatCallback(const hal_pigpio::hal_pigpioHeartbeatMsg &msg);
+    bool getPigpioNodeStarted(void);
 };
 
 #endif

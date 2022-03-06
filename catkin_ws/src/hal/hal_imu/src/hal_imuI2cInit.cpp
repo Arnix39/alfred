@@ -1,6 +1,26 @@
 #include "hal_imuI2cInit.hpp"
 #include "hal_imuI2cInitInterfaces.hpp"
 
+/* Publisher interface implementation */
+ImuI2cInitPublishersRos::ImuI2cInitPublishersRos(ros::NodeHandle *node) : imuI2cInitPubRos(node->advertise<hal_imu::hal_imuI2cHeartbeatMsg>("hal_imuI2cHeartbeatMsg", 1000))
+{
+}
+
+void ImuI2cInitPublishersRos::publish(hal_imu::hal_imuI2cHeartbeatMsg message)
+{
+    imuI2cInitPubRos.publish(message);
+}
+
+/* Subscriber interface implementation */
+ImuI2cInitSubscribersRos::ImuI2cInitSubscribersRos(ros::NodeHandle *node) : nodeHandle(node)
+{
+}
+
+void ImuI2cInitSubscribersRos::subscribe(ImuI2cInit *imuI2cInit)
+{
+    imuI2cInitPigpioHBSubRos = nodeHandle->subscribe("hal_pigpioHeartbeat", 1000, &ImuI2cInit::pigpioHeartbeatCallback, imuI2cInit);
+}
+
 /* Clients interface implementation */
 ImuI2cInitClientsRos::ImuI2cInitClientsRos(ros::NodeHandle *node) : i2cOpenClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cOpen>("hal_pigpioI2cOpen")),
                                                                     i2cCloseClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cClose>("hal_pigpioI2cClose")),
@@ -40,10 +60,13 @@ void ImuI2cInitServersRos::advertiseGetHandleService(ImuI2cInit *imuI2cInit)
 }
 
 /* Imu I2c Init implementation */
-ImuI2cInit::ImuI2cInit(ImuI2cInitClients *imuI2cInitServiceClients, ImuI2cInitServers *imuI2cInitServiceServers) : imuI2cInitClients(imuI2cInitServiceClients),
-                                                                                                                   imuI2cInitServers(imuI2cInitServiceServers)
+ImuI2cInit::ImuI2cInit(ImuI2cInitClients *imuI2cInitServiceClients, ImuI2cInitServers *imuI2cInitServiceServers, ImuI2cInitPublishers *imuI2cInitPublishers, ImuI2cInitSubscribers *imuI2cInitSubscribers) : imuI2cInitClients(imuI2cInitServiceClients),
+                                                                                                                                                                                                             imuI2cInitServers(imuI2cInitServiceServers),
+                                                                                                                                                                                                             imuI2cInitPubs(imuI2cInitPublishers),
+                                                                                                                                                                                                             imuI2cInitSubs(imuI2cInitSubscribers)
 {
     imuI2cInitServiceServers->advertiseGetHandleService(this);
+    imuI2cInitSubs->subscribe(this);
 }
 
 ImuI2cInit::~ImuI2cInit()
@@ -79,18 +102,54 @@ void ImuI2cInit::initI2cCommunication(void)
     }
 }
 
+void ImuI2cInit::pigpioHeartbeatCallback(const hal_pigpio::hal_pigpioHeartbeatMsg &msg)
+{
+    pigpioNodeStarted = msg.isStarted;
+}
+
+bool ImuI2cInit::getPigpioNodeStarted(void)
+{
+    return pigpioNodeStarted;
+}
+
+void ImuI2cInit::publishHeartbeat(void)
+{
+    hal_imu::hal_imuI2cHeartbeatMsg message;
+
+    imuI2cInitPubs->publish(message);
+}
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "hal_imuI2cInit");
     ros::NodeHandle node;
 
     ImuI2cInitClientsRos imuI2cInitServiceClients(&node);
-    ImuI2cInitServersRos imuI2cInitServer(&node);
+    ImuI2cInitServersRos imuI2cInitServers(&node);
+    ImuI2cInitPublishersRos imuI2cInitPublishers(&node);
+    ImuI2cInitSubscribersRos imuI2cInitSubscribers(&node);
 
-    ImuI2cInit imuI2cInit(&imuI2cInitServiceClients, &imuI2cInitServer);
+    ImuI2cInit imuI2cInit(&imuI2cInitServiceClients, &imuI2cInitServers, &imuI2cInitPublishers, &imuI2cInitSubscribers);
+
+    ROS_INFO("imuI2cInit node waiting for pigpio node to start...");
+    while (!imuI2cInit.getPigpioNodeStarted())
+    {
+        /* Nothing to do */
+    }
+
+    ROS_INFO("imuI2cInit node initialising...");
     imuI2cInit.initI2cCommunication();
+    ROS_INFO("imuI2cInit node initialising...");
 
-    ros::spin();
+    ros::Rate loop_rate(10);
+
+    while (ros::ok())
+    {
+        imuI2cInit.publishHeartbeat();
+
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
 
     return 0;
 }

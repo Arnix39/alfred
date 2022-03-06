@@ -18,6 +18,7 @@ class ProxSensSubscriberRos : public ProxSensSubscriber
 {
 private:
     ros::Subscriber proxSensSubRos;
+    ros::Subscriber proxSensPigpioHBSubRos;
     ros::NodeHandle *nodeHandle;
 
 public:

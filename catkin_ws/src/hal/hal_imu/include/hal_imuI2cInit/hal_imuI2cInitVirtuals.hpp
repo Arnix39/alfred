@@ -4,6 +4,7 @@
 #include "ros/ros.h"
 
 // Services and messages headers (generated)
+#include "hal_imu/hal_imuI2cHeartbeatMsg.h"
 
 class ImuI2cInit;
 
@@ -24,6 +25,22 @@ public:
     virtual ros::ServiceClient *getI2cCloseHandle() = 0;
     virtual ros::ServiceClient *getI2cReadByteDataClientHandle() = 0;
     virtual ros::ServiceClient *getI2cWriteByteDataClientHandle() = 0;
+};
+
+class ImuI2cInitPublishers
+{
+public:
+    ImuI2cInitPublishers() {}
+    virtual ~ImuI2cInitPublishers() {}
+    virtual void publish(hal_imu::hal_imuI2cHeartbeatMsg message) = 0;
+};
+
+class ImuI2cInitSubscribers
+{
+public:
+    ImuI2cInitSubscribers() {}
+    virtual ~ImuI2cInitSubscribers() {}
+    virtual void subscribe(ImuI2cInit *imuI2cInit) = 0;
 };
 
 #endif

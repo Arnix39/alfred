@@ -21,6 +21,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
   hal_imuMsg.msg
+  hal_imuI2cHeartbeatMsg.msg
 )
 
 ## Generate services in the 'srv' folder

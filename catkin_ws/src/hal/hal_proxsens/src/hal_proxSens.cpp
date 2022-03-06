@@ -19,6 +19,7 @@ ProxSensSubscriberRos::ProxSensSubscriberRos(ros::NodeHandle *node) : nodeHandle
 void ProxSensSubscriberRos::subscribe(ProxSens *proxSens)
 {
     proxSensSubRos = nodeHandle->subscribe("gpioEdgeChange", 1000, &ProxSens::edgeChangeCallback, proxSens);
+    proxSensPigpioHBSubRos = nodeHandle->subscribe("hal_pigpioHeartbeat", 1000, &ProxSens::pigpioHeartbeatCallback, proxSens);
 }
 
 /* Services interface implementation */
@@ -60,6 +61,7 @@ ProxSens::ProxSens(ProxSensSubscriber *proxSensSubscriber, ProxSensPublisher *pr
                                                                                                                                             timestamp(0),
                                                                                                                                             echoCallbackId(0),
                                                                                                                                             distanceInCm(UINT16_MAX),
+                                                                                                                                            pigpioNodeStarted(false),
                                                                                                                                             proxSensPub(proxSensPublisher),
                                                                                                                                             proxSensClients(proxSensServiceClients),
                                                                                                                                             proxSensSub(proxSensSubscriber)
@@ -98,6 +100,16 @@ void ProxSens::edgeChangeCallback(const hal_pigpio::hal_pigpioEdgeChangeMsg &msg
             lastTimestamp = timestamp;
         }
     }
+}
+
+void ProxSens::pigpioHeartbeatCallback(const hal_pigpio::hal_pigpioHeartbeatMsg &msg)
+{
+    pigpioNodeStarted = msg.isStarted;
+}
+
+bool ProxSens::getPigpioNodeStarted(void)
+{
+    return pigpioNodeStarted;
 }
 
 void ProxSens::publishMessage(void)
@@ -161,8 +173,17 @@ int main(int argc, char **argv)
     ProxSensClientsRos proxSensServiceClientsRos(&node);
 
     ProxSens proxSens(&proxSensSubscriberRos, &proxSensPublisherRos, &proxSensServiceClientsRos);
+
+    ROS_INFO("proxSens node waiting for pigpio node to start...");
+    while (!proxSens.getPigpioNodeStarted())
+    {
+        /* Nothing to do */
+    }
+
+    ROS_INFO("proxSens node initialising...");
     proxSens.configureGpios();
     proxSens.enableOutputLevelShifter();
+    ROS_INFO("proxSens node initialised.");
 
     ros::Rate loop_rate(10);
 
