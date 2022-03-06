@@ -51,17 +51,49 @@ ros::ServiceClient *ImuDmpWritingClientsRos::getGetHandleClientHandle()
     return &i2cGetHandleClientRos;
 }
 
-/* IMU DMP implementation */
-ImuDmpWritingServer::ImuDmpWritingServer(ImuDmpWritingActionServer *imuWriteDmpServer, ImuDmpWritingClients *imuDmpServiceClients) : imuDmpWritingServer(imuWriteDmpServer),
-                                                                                                                                     imuDmpClients(imuDmpServiceClients)
+/* Subscriber interface implementation */
+ImuDmpWritingServerSubscribersRos::ImuDmpWritingServerSubscribersRos(ros::NodeHandle *node) : nodeHandle(node)
 {
-    imuDmpWritingServer->registerCallback(this);
-    imuDmpWritingServer->getActionServerHandle()->start();
-    ROS_INFO("Action server started.");
+}
 
+void ImuDmpWritingServerSubscribersRos::subscribe(ImuDmpWritingServer *imuDmpWritingServer)
+{
+    imuDmpWritingServerImuI2cInitHBSubRos = nodeHandle->subscribe("hal_imuI2cHeartbeatMsg", 1000, &ImuDmpWritingServer::imuDmpWritingServerI2cInitHeartbeatCallback, imuDmpWritingServer);
+}
+
+/* IMU DMP implementation */
+ImuDmpWritingServer::ImuDmpWritingServer(ImuDmpWritingActionServer *imuWriteDmpServer, ImuDmpWritingClients *imuDmpServiceClients, ImuDmpWritingServerSubscribers *imuDmpWritingServerSubscribers) : imuDmpWritingServer(imuWriteDmpServer),
+                                                                                                                                                                                                     imuDmpClients(imuDmpServiceClients),
+                                                                                                                                                                                                     imuDmpWritingServerSubs(imuDmpWritingServerSubscribers),
+                                                                                                                                                                                                     i2cInitialised(false),
+                                                                                                                                                                                                     imuHandle(-1)
+{
+    imuDmpWritingServerSubs->subscribe(this);
+
+    imuDmpWritingServer->registerCallback(this);
+}
+
+void ImuDmpWritingServer::getI2cHandle(void)
+{
     hal_imu::hal_imuGetHandle i2cGetHandleSrv;
     imuDmpClients->getGetHandleClientHandle()->call(i2cGetHandleSrv);
     imuHandle = i2cGetHandleSrv.response.handle;
+}
+
+void ImuDmpWritingServer::startServer(void)
+{
+    imuDmpWritingServer->getActionServerHandle()->start();
+    ROS_INFO("Action server started.");
+}
+
+bool ImuDmpWritingServer::getI2cInitialised(void)
+{
+    return i2cInitialised;
+}
+
+void ImuDmpWritingServer::imuDmpWritingServerI2cInitHeartbeatCallback(const hal_imu::hal_imuI2cHeartbeatMsg &msg)
+{
+    i2cInitialised = msg.isStarted;
 }
 
 void ImuDmpWritingServer::writeDmp(void)
@@ -241,8 +273,19 @@ int main(int argc, char **argv)
 
     ImuDmpWritingClientsRos imuServiceClients(&node);
     ImuDmpWritingActionServerRos imuWriteDmpServer(&node);
+    ImuDmpWritingServerSubscribersRos imuDmpWritingServerSubscribers(&node);
 
-    ImuDmpWritingServer imuDmpWritingServer(&imuWriteDmpServer, &imuServiceClients);
+    ImuDmpWritingServer imuDmpWritingServer(&imuWriteDmpServer, &imuServiceClients, &imuDmpWritingServerSubscribers);
+
+    ROS_INFO("imuDmpWritingServer node waiting for I2C communication to be ready...");
+    while (!imuDmpWritingServer.getI2cInitialised())
+    {
+        /* Nothing to do */
+    }
+
+    imuDmpWritingServer.getI2cHandle();
+    ROS_INFO("imuDmpWritingServer I2C communication ready.");
+    imuDmpWritingServer.startServer();
 
     ros::spin();
 

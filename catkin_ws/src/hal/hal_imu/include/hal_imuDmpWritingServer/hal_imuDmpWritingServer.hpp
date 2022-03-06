@@ -16,19 +16,26 @@
 #include "hal_pigpio/hal_pigpioI2cWriteByteData.h"
 #include "hal_pigpio/hal_pigpioI2cWriteWordData.h"
 #include "hal_pigpio/hal_pigpioI2cWriteBlockData.h"
+#include "hal_imu/hal_imuI2cHeartbeatMsg.h"
 
 class ImuDmpWritingServer
 {
 private:
     ImuDmpWritingClients *imuDmpClients;
     ImuDmpWritingActionServer *imuDmpWritingServer;
+    ImuDmpWritingServerSubscribers *imuDmpWritingServerSubs;
     hal_imu::hal_imuWriteDmpFeedback feedback;
     hal_imu::hal_imuWriteDmpResult result;
+    bool i2cInitialised;
     int32_t imuHandle;
 
 public:
-    ImuDmpWritingServer(ImuDmpWritingActionServer *imuWriteDmpServer, ImuDmpWritingClients *imuDmpServiceClients);
+    ImuDmpWritingServer(ImuDmpWritingActionServer *imuWriteDmpServer, ImuDmpWritingClients *imuDmpServiceClients, ImuDmpWritingServerSubscribers *imuDmpWritingServerSubscribers);
     ~ImuDmpWritingServer() = default;
+    void getI2cHandle(void);
+    void startServer(void);
+    bool getI2cInitialised(void);
+    void imuDmpWritingServerI2cInitHeartbeatCallback(const hal_imu::hal_imuI2cHeartbeatMsg &msg);
     void writeDmp(void);
     bool writeByteInRegister(uint8_t registerToWrite, uint8_t value);
     bool writeWordInRegister(uint8_t registerToWrite, uint16_t value);

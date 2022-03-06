@@ -34,4 +34,16 @@ public:
     ros::ServiceClient *getGetHandleClientHandle() override;
 };
 
+class ImuDmpWritingServerSubscribersRos : public ImuDmpWritingServerSubscribers
+{
+private:
+    ros::Subscriber imuDmpWritingServerImuI2cInitHBSubRos;
+    ros::NodeHandle *nodeHandle;
+
+public:
+    ImuDmpWritingServerSubscribersRos(ros::NodeHandle *node);
+    ~ImuDmpWritingServerSubscribersRos() = default;
+    void subscribe(ImuDmpWritingServer *imuDmpWritingServer) override;
+};
+
 #endif

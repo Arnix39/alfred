@@ -31,4 +31,12 @@ public:
     virtual ros::ServiceClient *getGetHandleClientHandle() = 0;
 };
 
+class ImuDmpWritingServerSubscribers
+{
+public:
+    ImuDmpWritingServerSubscribers() {}
+    virtual ~ImuDmpWritingServerSubscribers() {}
+    virtual void subscribe(ImuDmpWritingServer *imuDmpWritingServer) = 0;
+};
+
 #endif
