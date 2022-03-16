@@ -59,7 +59,7 @@ public:
     void writeOrientationMatrix(void);
     void setClockSource(void);
     void setSleepDisabled(void);
-    bool writeDataToDmp(uint16_t address, std::vector<uint8_t> data);
+    bool writeDataToDmp(uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data);
     void publishMessage(void);
     void readMpuData(void);
 };

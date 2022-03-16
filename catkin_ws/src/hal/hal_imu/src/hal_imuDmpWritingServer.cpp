@@ -101,7 +101,8 @@ void ImuDmpWritingServer::writeDmp(void)
 {
     /* This address is the start address of DMP code */
     /* It is coming from InvenSense */
-    const uint16_t startAddress = 0x0400;
+    const uint8_t startAddressMsb = 0x04;
+    const uint8_t startAddressLsb = 0x00;
 
     uint8_t bank = 0;
     uint8_t byteAddressInBank = 0;
@@ -147,7 +148,8 @@ void ImuDmpWritingServer::writeDmp(void)
         }
     }
 
-    writeSuccess = writeWordInRegister(MPU6050_DMP_START_ADDRESS_H_REGISTER, startAddress);
+    writeSuccess = writeByteInRegister(MPU6050_DMP_START_ADDRESS_H_REGISTER, startAddressMsb);
+    writeSuccess &= writeByteInRegister(MPU6050_DMP_START_ADDRESS_L_REGISTER, startAddressLsb);
     if (!writeSuccess)
     {
         result.success = false;

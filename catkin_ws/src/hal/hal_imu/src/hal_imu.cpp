@@ -111,13 +111,13 @@ void Imu::init(void)
 {
     resetImu();
     setClockSource();
-    writeByteInRegister(MPU6050_FIFO_ENABLE_REGISTER, MPU6050_ACCELEROMETER_FIFO_ENABLE_BIT);
     resetFifo();
-    /*writeDmp();
+    setMpuRate(MPU6050_DMP_SAMPLE_RATE / 10);
+    writeDmp();
+    setDmpRate(MPU6050_DMP_SAMPLE_RATE / 10);
     writeOrientationMatrix();
     configureDmpFeatures();
-    setDmpRate(100);
-    enableDmp();*/
+    enableDmp();
     // calibrateAccelerometer();
 }
 
@@ -129,7 +129,7 @@ void Imu::resetImu(void)
     if (writeSuccess)
     {
         ROS_INFO("IMU resetting...");
-        ros::Duration(0.1).sleep();
+        ros::Duration(0.3).sleep();
 
         writeSuccess = writeByteInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, 0x00);
         if (writeSuccess)
@@ -151,9 +151,7 @@ void Imu::setClockSource(void)
 {
     bool writeSuccess;
 
-    writeSuccess = writeBitInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, MPU6050_CLOCK_SOURCE_BIT_1, 1);
-    writeSuccess &= writeBitInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, MPU6050_CLOCK_SOURCE_BIT_2, 0);
-    writeSuccess &= writeBitInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, MPU6050_CLOCK_SOURCE_BIT_3, 0);
+    writeSuccess = writeByteInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, MPU6050_CLOCK_SOURCE_PLL_X);
 
     if (writeSuccess)
     {
@@ -208,25 +206,25 @@ void Imu::writeOrientationMatrix(void)
 
     bool writeSuccess = true;
 
-    if (!writeDataToDmp(MPU6050_DMP_ORIENTATION_MATRIX_GYRO_AXES, dmpOrientationMatrixGyroAxes))
+    if (!writeDataToDmp(MPU6050_DMP_ORIENTATION_MATRIX_GYRO_AXES_BANK, MPU6050_DMP_ORIENTATION_MATRIX_GYRO_AXES_ADDRESS, dmpOrientationMatrixGyroAxes))
     {
         writeSuccess = false;
         ROS_ERROR("Failed to write the gyroscope axes of the orientation matrix!");
     }
 
-    if (!writeDataToDmp(MPU6050_DMP_ORIENTATION_MATRIX_GYRO_SIGNS, dmpOrientationMatrixGyroSigns))
+    if (!writeDataToDmp(MPU6050_DMP_ORIENTATION_MATRIX_GYRO_SIGNS_BANK, MPU6050_DMP_ORIENTATION_MATRIX_GYRO_SIGNS_ADDRESS, dmpOrientationMatrixGyroSigns))
     {
         writeSuccess = false;
         ROS_ERROR("Failed to write the gyroscope signs of the orientation matrix!");
     }
 
-    if (!writeDataToDmp(MPU6050_DMP_ORIENTATION_MATRIX_ACCEL_AXES, dmpOrientationMatrixAccelAxes))
+    if (!writeDataToDmp(MPU6050_DMP_ORIENTATION_MATRIX_ACCEL_AXES_BANK, MPU6050_DMP_ORIENTATION_MATRIX_ACCEL_AXES_ADDRESS, dmpOrientationMatrixAccelAxes))
     {
         writeSuccess = false;
         ROS_ERROR("Failed to write the accelerometer axes of the orientation matrix!");
     }
 
-    if (!writeDataToDmp(MPU6050_DMP_ORIENTATION_MATRIX_ACCEL_SIGNS, dmpOrientationMatrixAccelSigns))
+    if (!writeDataToDmp(MPU6050_DMP_ORIENTATION_MATRIX_ACCEL_SIGNS_BANK, MPU6050_DMP_ORIENTATION_MATRIX_ACCEL_SIGNS_ADDRESS, dmpOrientationMatrixAccelSigns))
     {
         writeSuccess = false;
         ROS_ERROR("Failed to write the accelerometer signs of the orientation matrix!");
@@ -242,25 +240,11 @@ void Imu::resetFifo()
 {
     bool resetSuccessful = true;
 
-    /* Disable interrupts */
-    if (!writeByteInRegister(MPU6050_INTERRUPT_ENABLE_REGISTER, 0x00))
-    {
-        resetSuccessful = false;
-        ROS_ERROR("Failed to disable interrupts!");
-    }
-
-    /* Disable FIFO for accelerometer and gyroscope */
-    if (!writeByteInRegister(MPU6050_FIFO_ENABLE_REGISTER, 0x00))
-    {
-        resetSuccessful = false;
-        ROS_ERROR("Failed to disable FIFO for accelerometer and gyroscope!");
-    }
-
-    /* Set user control register to 0 */
+    /* Disable FIFO */
     if (!writeByteInRegister(MPU6050_USER_CONTROL_REGISTER, 0x00))
     {
         resetSuccessful = false;
-        ROS_ERROR("Failed to set user control register to zero!");
+        ROS_ERROR("Failed to disable FIFO!");
     }
 
     if (dmpEnabled)
@@ -280,20 +264,6 @@ void Imu::resetFifo()
             resetSuccessful = false;
             ROS_ERROR("Failed to enable DMP and FIFO!");
         }
-
-        /* Disable interrupts */
-        if (!writeByteInRegister(MPU6050_INTERRUPT_ENABLE_REGISTER, 0x00))
-        {
-            resetSuccessful = false;
-            ROS_ERROR("Failed to disable interrupts!");
-        }
-
-        /* Enable FIFO */
-        if (!writeByteInRegister(MPU6050_USER_CONTROL_REGISTER, MPU6050_FIFO_ENABLE_BIT))
-        {
-            resetSuccessful = false;
-            ROS_ERROR("Failed to enable auxiliary master and FIFO!");
-        }
     }
     else
     {
@@ -304,27 +274,13 @@ void Imu::resetFifo()
             ROS_ERROR("Failed to reset FIFO!");
         }
 
+        ros::Duration(0.05).sleep();
+
         /* Enable FIFO */
         if (!writeByteInRegister(MPU6050_USER_CONTROL_REGISTER, MPU6050_FIFO_ENABLE_BIT))
         {
             resetSuccessful = false;
             ROS_ERROR("Failed to enable FIFO!");
-        }
-
-        ros::Duration(0.05).sleep();
-
-        /* Disable interrupts */
-        if (!writeByteInRegister(MPU6050_INTERRUPT_ENABLE_REGISTER, 0x00))
-        {
-            resetSuccessful = false;
-            ROS_ERROR("Failed to disable interrupts!");
-        }
-
-        /* Disable FIFO for accelerometer and gyroscope */
-        if (!writeByteInRegister(MPU6050_FIFO_ENABLE_REGISTER, 0x00))
-        {
-            resetSuccessful = false;
-            ROS_ERROR("Failed to disable FIFO for accelerometer and gyroscope!");
         }
     }
 
@@ -345,8 +301,6 @@ void Imu::enableDmp(void)
         ROS_ERROR("Failed to disable interrupts!");
     }
 
-    setMpuRate(MPU6050_DMP_SAMPLE_RATE);
-
     /* Disable FIFO for accelerometer and gyroscope */
     if (!writeByteInRegister(MPU6050_FIFO_ENABLE_REGISTER, 0x00))
     {
@@ -361,16 +315,40 @@ void Imu::enableDmp(void)
         ROS_ERROR("Failed to set user control register to zero!");
     }
 
-    /* Disable interrupts */
-    if (!writeByteInRegister(MPU6050_INTERRUPT_ENABLE_REGISTER, 0x00))
+    /* Enable FIFO */
+    if (!writeByteInRegister(MPU6050_USER_CONTROL_REGISTER, MPU6050_FIFO_ENABLE_BIT))
     {
         enablingHasSucceeded = false;
-        ROS_ERROR("Failed to disable interrupts!");
+        ROS_ERROR("Failed to enable FIFO!");
     }
 
-    dmpEnabled = true;
+    /* Reset DMP */
+    if (!writeByteInRegister(MPU6050_USER_CONTROL_REGISTER, MPU6050_DMP_RESET_BIT))
+    {
+        enablingHasSucceeded = false;
+        ROS_ERROR("Failed to reset DMP!");
+    }
+
+    /* Enable DMP */
+    if (!writeByteInRegister(MPU6050_USER_CONTROL_REGISTER, MPU6050_DMP_EMABLE_BIT))
+    {
+        enablingHasSucceeded = false;
+        dmpEnabled = false;
+        ROS_ERROR("Failed to enable DMP!");
+    }
+    else
+    {
+        dmpEnabled = true;
+    }
 
     resetFifo();
+
+    /* Clearing interrupts statuses */
+    if (readByteFromRegister(MPU6050_INTERRUPT_STATUS_REGISTER) < 0)
+    {
+        enablingHasSucceeded = false;
+        ROS_ERROR("Failed to read interrupt status!");
+    }
 
     if (enablingHasSucceeded)
     {
@@ -394,37 +372,37 @@ void Imu::configureDmpFeatures(void)
 
     bool configurationSuccessful = true;
 
-    if (!writeDataToDmp(MPU6050_DMP_FEATURE_SEND_SENSOR_DATA, dmpSendSensorData))
+    if (!writeDataToDmp(MPU6050_DMP_FEATURE_SEND_SENSOR_DATA_BANK, MPU6050_DMP_FEATURE_SEND_SENSOR_DATA_ADDRESS, dmpSendSensorData))
     {
         configurationSuccessful = false;
         ROS_ERROR("Error while disabling sensor data on DMP!");
     }
 
-    if (!writeDataToDmp(MPU6050_DMP_FEATURE_SEND_GESTURE_DATA, dmpSendGestureData))
+    if (!writeDataToDmp(MPU6050_DMP_FEATURE_SEND_GESTURE_DATA_BANK, MPU6050_DMP_FEATURE_SEND_GESTURE_DATA_ADDRESS, dmpSendGestureData))
     {
         configurationSuccessful = false;
         ROS_ERROR("Error while disabling gesture data on DMP!");
     }
 
-    if (!writeDataToDmp(MPU6050_CFG_MOTION_BIAS, gyroscopeCalibrationEnable))
+    if (!writeDataToDmp(MPU6050_CFG_MOTION_BIAS_BANK, MPU6050_CFG_MOTION_BIAS_ADDRESS, gyroscopeCalibrationEnable))
     {
         configurationSuccessful = false;
         ROS_ERROR("Error while enabling gyroscope calibration on DMP!");
     }
 
-    if (!writeDataToDmp(MPU6050_DMP_FEATURE_SEND_TAP_DATA, dmpSendTapData))
+    if (!writeDataToDmp(MPU6050_DMP_FEATURE_SEND_TAP_DATA_BANK, MPU6050_DMP_FEATURE_SEND_TAP_DATA_ADDRESS, dmpSendTapData))
     {
         configurationSuccessful = false;
         ROS_ERROR("Error while disabling tap data on DMP!");
     }
 
-    if (!writeDataToDmp(MPU6050_DMP_FEATURE_SEND_ANDROID_ORIENTATION, dmpSendAndroidOrientation))
+    if (!writeDataToDmp(MPU6050_DMP_FEATURE_SEND_ANDROID_ORIENTATION_BANK, MPU6050_DMP_FEATURE_SEND_ANDROID_ORIENTATION_ADDRESS, dmpSendAndroidOrientation))
     {
         configurationSuccessful = false;
         ROS_ERROR("Error while disabling android orientation on DMP!");
     }
 
-    if (!writeDataToDmp(MPU6050_DMP_FEATURE_QUATERNION_SIZE, dmpQuaternionDisable))
+    if (!writeDataToDmp(MPU6050_DMP_FEATURE_QUATERNION_BANK, MPU6050_DMP_FEATURE_QUATERNION_ADDRESS, dmpQuaternionDisable))
     {
         configurationSuccessful = false;
         ROS_ERROR("Error while disabling quaternion computation on DMP!");
@@ -432,7 +410,7 @@ void Imu::configureDmpFeatures(void)
 
     resetFifo();
 
-    if (!writeDataToDmp(MPU6050_DMP_FEATURE_6X_LP_QUAT, dmp6AxisQuaternionEnable))
+    if (!writeDataToDmp(MPU6050_DMP_FEATURE_6X_LP_QUAT_BANK, MPU6050_DMP_FEATURE_6X_LP_QUAT_ADDRESS, dmp6AxisQuaternionEnable))
     {
         configurationSuccessful = false;
         ROS_ERROR("Error while enabling 6 axis quaternion computation on DMP!");
@@ -452,8 +430,6 @@ void Imu::configureDmpFeatures(void)
 
 void Imu::setDmpRate(uint16_t rate)
 {
-    std::vector<uint8_t> rateRegisterData{0xfe, 0xf2, 0xab, 0xc4, 0xaa, 0xf1, 0xdf, 0xdf, 0xbb, 0xaf, 0xdf, 0xdf};
-
     uint16_t div;
     std::vector<uint8_t> div_vec;
 
@@ -469,8 +445,7 @@ void Imu::setDmpRate(uint16_t rate)
     div_vec.push_back((uint8_t)(div >> 8));
     div_vec.push_back((uint8_t)(div & 0xFF));
 
-    writeDataToDmp(MPU6050_DMP_SAMPLE_RATE_ADDRESS, div_vec);
-    writeDataToDmp(MPU6050_DMP_RATE_REGISTER, rateRegisterData);
+    writeDataToDmp(MPU6050_DMP_SAMPLE_RATE_BANK, MPU6050_DMP_SAMPLE_RATE_ADDRESS, div_vec);
 }
 
 void Imu::setMpuRate(uint16_t rate)
@@ -539,22 +514,23 @@ bool Imu::writeBitInRegister(uint8_t registerToWrite, uint8_t bitToWrite, uint8_
     return true;
 }
 
-bool Imu::writeDataToDmp(uint16_t address, std::vector<uint8_t> data)
+bool Imu::writeDataToDmp(uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data)
 {
-    bool writeSuccess = false;
-
-    uint8_t imuRegister = MPU6050_BANK_SELECTION_REGISTER;
-    if (writeWordInRegister(imuRegister, address))
+    if (!writeByteInRegister(MPU6050_BANK_SELECTION_REGISTER, bank))
     {
-        if (!writeDataBlock(MPU6050_READ_WRITE_REGISTER, data))
-        {
-            ROS_ERROR("Failed to write data!");
-            return false;
-        }
+        ROS_ERROR("Failed to write bank!");
+        return false;
     }
-    else
+
+    if (!writeByteInRegister(MPU6050_ADDRESS_IN_BANK_REGISTER, addressInBank))
     {
         ROS_ERROR("Failed to write address!");
+        return false;
+    }
+
+    if (!writeDataBlock(MPU6050_READ_WRITE_REGISTER, data))
+    {
+        ROS_ERROR("Failed to write data!");
         return false;
     }
 
@@ -701,8 +677,8 @@ void Imu::publishMessage(void)
 void Imu::readMpuData(void)
 {
     int16_t interruptStatus;
-    int32_t valueRead;
-    uint16_t fifoCount;
+    int16_t valueRead;
+    uint16_t fifoCount = 0;
     std::vector<uint8_t> fifoData;
 
     interruptStatus = readByteFromRegister(MPU6050_INTERRUPT_STATUS_REGISTER);
@@ -713,28 +689,50 @@ void Imu::readMpuData(void)
     }
     else if ((uint8_t)interruptStatus & MPU6050_FIFO_OVERFLOW)
     {
-        ROS_ERROR("FIFO has overflowed!");
+        ROS_ERROR("FIFO has overflowed: %d!", interruptStatus);
         resetFifo();
     }
     else
     {
-        valueRead = readWordFromRegister(MPU6050_FIFO_COUNT_H_REGISTER);
-
-        ROS_INFO("Fifo count: %d.", valueRead);
-
-        if (valueRead > 0)
-        {
-            fifoCount = (uint16_t)valueRead;
-            fifoData = readBlockFromRegister(MPU6050_FIFO_REGISTER, fifoCount);
-
-            if (fifoData.size() != fifoCount)
-            {
-                ROS_ERROR("Failed to read FIFO!");
-            }
-        }
-        else if (valueRead < 0)
+        valueRead = readByteFromRegister(MPU6050_FIFO_COUNT_H_REGISTER);
+        if (valueRead < 0)
         {
             ROS_ERROR("Failed to read the number of bytes in the FIFO!");
+            return;
+        }
+        else
+        {
+            fifoCount = ((uint16_t)valueRead << 8);
+        }
+
+        valueRead = readByteFromRegister(MPU6050_FIFO_COUNT_L_REGISTER);
+        if (valueRead < 0)
+        {
+            ROS_ERROR("Failed to read the number of bytes in the FIFO!");
+            return;
+        }
+        else
+        {
+            fifoCount += (uint16_t)valueRead;
+        }
+
+        ROS_INFO("Number of samples in FIFO: %u.", fifoCount);
+
+        if (fifoCount >= MPU6050_DMP_FIFO_QUAT_SIZE)
+        {
+            fifoData = readBlockFromRegister(MPU6050_FIFO_REGISTER, MPU6050_DMP_FIFO_QUAT_SIZE);
+
+            if (fifoData.size() != MPU6050_DMP_FIFO_QUAT_SIZE)
+            {
+                ROS_ERROR("Failed to read FIFO! %lu bytes read.", fifoData.size());
+            }
+            else
+            {
+            }
+        }
+        else
+        {
+            ROS_INFO("Not enough sample in FIFO.");
         }
     }
 }
@@ -750,7 +748,7 @@ int main(int argc, char **argv)
 
     Imu imu(&imuMessagePublisherRos, &imuServiceClientsRos, &imuSubscribersRos);
 
-    ros::Rate loop_rate(100);
+    ros::Rate loop_rate(20);
 
     ROS_INFO("imu node waiting for I2C communication to be ready...");
     while (ros::ok())
@@ -768,6 +766,7 @@ int main(int argc, char **argv)
         }
         else
         {
+            ROS_INFO("Reading MPU data...");
             imu.readMpuData();
             imu.publishMessage();
         }
