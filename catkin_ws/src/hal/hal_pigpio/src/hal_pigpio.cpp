@@ -22,15 +22,7 @@ int main(int argc, char **argv)
     PigpioInput pigpioInput(&node, pigpioHandle);
     PigpioI2c pigpioI2c(&node, pigpioHandle);
 
-    ros::Rate loop_rate(10);
-
-    while (ros::ok())
-    {
-        pigpioInit.publishHeartbeat();
-
-        ros::spinOnce();
-        loop_rate.sleep();
-    }
+    ros::spin();
 
     return 0;
 }

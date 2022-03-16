@@ -40,7 +40,7 @@ public:
     bool isPigpioNodeStarted(void);
     bool isNotStarted(void);
     void starts(void);
-    void publishHeartbeat(void);
+    void publishHeartbeat(const ros::TimerEvent &timerEvent);
     void pigpioHeartbeatCallback(const hal_pigpio::hal_pigpioHeartbeatMsg &msg);
 };
 

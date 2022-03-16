@@ -114,7 +114,7 @@ bool ImuI2cInit::isPigpioNodeStarted(void)
     return pigpioNodeStarted;
 }
 
-void ImuI2cInit::publishHeartbeat(void)
+void ImuI2cInit::publishHeartbeat(const ros::TimerEvent &timerEvent)
 {
     hal_imu::hal_imuI2cHeartbeatMsg heartbeat;
     heartbeat.isAlive = true;
@@ -135,6 +135,7 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "hal_imuI2cInit");
     ros::NodeHandle node;
+    ros::Timer heartbeatTimer;
 
     ImuI2cInitClientsRos imuI2cInitServiceClients(&node);
     ImuI2cInitServersRos imuI2cInitServers(&node);
@@ -143,28 +144,19 @@ int main(int argc, char **argv)
 
     ImuI2cInit imuI2cInit(&imuI2cInitServiceClients, &imuI2cInitServers, &imuI2cInitPublishers, &imuI2cInitSubscribers);
 
-    ros::Rate loop_rate(10);
-
     ROS_INFO("imuI2cInit node waiting for pigpio node to start...");
     while (ros::ok())
     {
-        if (imuI2cInit.isNotStarted())
+        if (imuI2cInit.isNotStarted() && imuI2cInit.isPigpioNodeStarted())
         {
-            if (imuI2cInit.isPigpioNodeStarted())
-            {
-                ROS_INFO("imuI2cInit node initialising...");
-                imuI2cInit.initI2cCommunication();
-                imuI2cInit.starts();
-                ROS_INFO("imuI2cInit node initialised.");
-            }
-        }
-        else
-        {
-            imuI2cInit.publishHeartbeat();
+            ROS_INFO("imuI2cInit node initialising...");
+            imuI2cInit.initI2cCommunication();
+            imuI2cInit.starts();
+            heartbeatTimer = node.createTimer(ros::Duration(0.1), &ImuI2cInit::publishHeartbeat, &imuI2cInit);
+            ROS_INFO("imuI2cInit node initialised.");
         }
 
         ros::spinOnce();
-        loop_rate.sleep();
     }
 
     return 0;

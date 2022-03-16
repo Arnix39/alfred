@@ -8,7 +8,8 @@ PigpioInit::PigpioInit(ros::NodeHandle *node, int pigpioHandle) : pigpioHandle(p
                                                                   setPullUpService(node->advertiseService("hal_pigpioSetPullUp", &PigpioInit::setPullUp, this)),
                                                                   setPullDownService(node->advertiseService("hal_pigpioSetPullDown", &PigpioInit::setPullDown, this)),
                                                                   clearResistorService(node->advertiseService("hal_pigpioClearResistor", &PigpioInit::clearResistor, this)),
-                                                                  heartbeatpublisher(node->advertise<hal_pigpio::hal_pigpioHeartbeatMsg>("hal_pigpioHeartbeat", 1000))
+                                                                  heartbeatPublisher(node->advertise<hal_pigpio::hal_pigpioHeartbeatMsg>("hal_pigpioHeartbeat", 1000)),
+                                                                  heartbeatTimer(node->createTimer(ros::Duration(0.1), &PigpioInit::publishHeartbeat, this))
 {
 }
 
@@ -125,9 +126,9 @@ bool PigpioInit::clearResistor(hal_pigpio::hal_pigpioClearResistor::Request &req
     return true;
 }
 
-void PigpioInit::publishHeartbeat(void)
+void PigpioInit::publishHeartbeat(const ros::TimerEvent &timerEvent)
 {
     hal_pigpio::hal_pigpioHeartbeatMsg heartbeat;
     heartbeat.isAlive = true;
-    heartbeatpublisher.publish(heartbeat);
+    heartbeatPublisher.publish(heartbeat);
 }

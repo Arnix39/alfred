@@ -26,7 +26,8 @@ private:
     ros::ServiceServer setPullUpService;
     ros::ServiceServer setPullDownService;
     ros::ServiceServer clearResistorService;
-    ros::Publisher heartbeatpublisher;
+    ros::Publisher heartbeatPublisher;
+    ros::Timer heartbeatTimer;
     int pigpioHandle;
 
 public:
@@ -46,7 +47,7 @@ public:
                      hal_pigpio::hal_pigpioSetPullDown::Response &res);
     bool clearResistor(hal_pigpio::hal_pigpioClearResistor::Request &req,
                        hal_pigpio::hal_pigpioClearResistor::Response &res);
-    void publishHeartbeat(void);
+    void publishHeartbeat(const ros::TimerEvent &timerEvent);
 };
 
 #endif
