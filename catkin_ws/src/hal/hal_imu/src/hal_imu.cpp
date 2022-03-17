@@ -74,8 +74,7 @@ Imu::Imu(ImuPublisher *imuMessagePublisher, ImuClients *imuServiceClients, ImuSu
                                                                                                              angle(0),
                                                                                                              dmpEnabled(false),
                                                                                                              imuSubs(imuSubscribers),
-                                                                                                             i2cInitialised(false),
-                                                                                                             isStarted(false)
+                                                                                                             i2cInitialised(false)
 {
     imuSubs->subscribe(this);
 }
@@ -97,24 +96,14 @@ bool Imu::isI2cInitialised(void)
     return i2cInitialised;
 }
 
-void Imu::starts(void)
-{
-    isStarted = true;
-}
-
-bool Imu::isNotStarted(void)
-{
-    return !isStarted;
-}
-
 void Imu::init(void)
 {
     resetImu();
     setClockSource();
     resetFifo();
-    setMpuRate(MPU6050_DMP_SAMPLE_RATE / 10);
+    setMpuRate(MPU6050_DMP_SAMPLE_RATE / 5);
     writeDmp();
-    setDmpRate(MPU6050_DMP_SAMPLE_RATE / 10);
+    setDmpRate(MPU6050_DMP_SAMPLE_RATE / 5);
     writeOrientationMatrix();
     configureDmpFeatures();
     enableDmp();
@@ -238,53 +227,11 @@ void Imu::writeOrientationMatrix(void)
 
 void Imu::resetFifo()
 {
-    bool resetSuccessful = true;
-
-    /* Disable FIFO */
-    if (!writeByteInRegister(MPU6050_USER_CONTROL_REGISTER, 0x00))
+    if (!writeBitInRegister(MPU6050_USER_CONTROL_REGISTER, MPU6050_FIFO_RESET_BIT, 1))
     {
-        resetSuccessful = false;
-        ROS_ERROR("Failed to disable FIFO!");
-    }
-
-    if (dmpEnabled)
-    {
-        /* Reset DMP and FIFO */
-        if (!writeByteInRegister(MPU6050_USER_CONTROL_REGISTER, (MPU6050_DMP_RESET_BIT | MPU6050_FIFO_RESET_BIT)))
-        {
-            resetSuccessful = false;
-            ROS_ERROR("Failed to reset DMP and FIFO!");
-        }
-
-        ros::Duration(0.05).sleep();
-
-        /* Enable DMP and FIFO */
-        if (!writeByteInRegister(MPU6050_USER_CONTROL_REGISTER, (MPU6050_DMP_EMABLE_BIT | MPU6050_FIFO_ENABLE_BIT)))
-        {
-            resetSuccessful = false;
-            ROS_ERROR("Failed to enable DMP and FIFO!");
-        }
+        ROS_ERROR("Failed to reset FIFO!");
     }
     else
-    {
-        /* Reset FIFO */
-        if (!writeByteInRegister(MPU6050_USER_CONTROL_REGISTER, MPU6050_FIFO_RESET_BIT))
-        {
-            resetSuccessful = false;
-            ROS_ERROR("Failed to reset FIFO!");
-        }
-
-        ros::Duration(0.05).sleep();
-
-        /* Enable FIFO */
-        if (!writeByteInRegister(MPU6050_USER_CONTROL_REGISTER, MPU6050_FIFO_ENABLE_BIT))
-        {
-            resetSuccessful = false;
-            ROS_ERROR("Failed to enable FIFO!");
-        }
-    }
-
-    if (resetSuccessful)
     {
         ROS_INFO("Successfully resetted FIFO.");
     }
@@ -316,21 +263,21 @@ void Imu::enableDmp(void)
     }
 
     /* Enable FIFO */
-    if (!writeByteInRegister(MPU6050_USER_CONTROL_REGISTER, MPU6050_FIFO_ENABLE_BIT))
+    if (!writeByteInRegister(MPU6050_USER_CONTROL_REGISTER, MPU6050_FIFO_ENABLE))
     {
         enablingHasSucceeded = false;
         ROS_ERROR("Failed to enable FIFO!");
     }
 
     /* Reset DMP */
-    if (!writeByteInRegister(MPU6050_USER_CONTROL_REGISTER, MPU6050_DMP_RESET_BIT))
+    if (!writeByteInRegister(MPU6050_USER_CONTROL_REGISTER, MPU6050_DMP_RESET))
     {
         enablingHasSucceeded = false;
         ROS_ERROR("Failed to reset DMP!");
     }
 
     /* Enable DMP */
-    if (!writeByteInRegister(MPU6050_USER_CONTROL_REGISTER, MPU6050_DMP_EMABLE_BIT))
+    if (!writeByteInRegister(MPU6050_USER_CONTROL_REGISTER, MPU6050_DMP_EMABLE))
     {
         enablingHasSucceeded = false;
         dmpEnabled = false;
@@ -674,69 +621,6 @@ void Imu::publishMessage(void)
     imuPublisher->publish(message);
 }
 
-void Imu::readMpuData(void)
-{
-    int16_t interruptStatus;
-    int16_t valueRead;
-    uint16_t fifoCount = 0;
-    std::vector<uint8_t> fifoData;
-
-    interruptStatus = readByteFromRegister(MPU6050_INTERRUPT_STATUS_REGISTER);
-
-    if (interruptStatus < 0)
-    {
-        ROS_ERROR("Failed to read interrupt status!");
-    }
-    else if ((uint8_t)interruptStatus & MPU6050_FIFO_OVERFLOW)
-    {
-        ROS_ERROR("FIFO has overflowed: %d!", interruptStatus);
-        resetFifo();
-    }
-    else
-    {
-        valueRead = readByteFromRegister(MPU6050_FIFO_COUNT_H_REGISTER);
-        if (valueRead < 0)
-        {
-            ROS_ERROR("Failed to read the number of bytes in the FIFO!");
-            return;
-        }
-        else
-        {
-            fifoCount = ((uint16_t)valueRead << 8);
-        }
-
-        valueRead = readByteFromRegister(MPU6050_FIFO_COUNT_L_REGISTER);
-        if (valueRead < 0)
-        {
-            ROS_ERROR("Failed to read the number of bytes in the FIFO!");
-            return;
-        }
-        else
-        {
-            fifoCount += (uint16_t)valueRead;
-        }
-
-        ROS_INFO("Number of samples in FIFO: %u.", fifoCount);
-
-        if (fifoCount >= MPU6050_DMP_FIFO_QUAT_SIZE)
-        {
-            fifoData = readBlockFromRegister(MPU6050_FIFO_REGISTER, MPU6050_DMP_FIFO_QUAT_SIZE);
-
-            if (fifoData.size() != MPU6050_DMP_FIFO_QUAT_SIZE)
-            {
-                ROS_ERROR("Failed to read FIFO! %lu bytes read.", fifoData.size());
-            }
-            else
-            {
-            }
-        }
-        else
-        {
-            ROS_INFO("Not enough sample in FIFO.");
-        }
-    }
-}
-
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "hal_imu");
@@ -748,31 +632,18 @@ int main(int argc, char **argv)
 
     Imu imu(&imuMessagePublisherRos, &imuServiceClientsRos, &imuSubscribersRos);
 
-    ros::Rate loop_rate(20);
-
     ROS_INFO("imu node waiting for I2C communication to be ready...");
     while (ros::ok())
     {
-        if (imu.isNotStarted())
+        if (imu.isI2cInitialised())
         {
-            if (imu.isI2cInitialised())
-            {
-                imu.getI2cHandle();
-                ROS_INFO("imu I2C communication ready.");
-                imu.init();
-                imu.starts();
-                ROS_INFO("imu node initialised.");
-            }
-        }
-        else
-        {
-            ROS_INFO("Reading MPU data...");
-            imu.readMpuData();
-            imu.publishMessage();
+            imu.getI2cHandle();
+            ROS_INFO("imu I2C communication ready.");
+            imu.init();
+            ROS_INFO("imu node initialised.");
         }
 
         ros::spinOnce();
-        loop_rate.sleep();
     }
 
     return 0;

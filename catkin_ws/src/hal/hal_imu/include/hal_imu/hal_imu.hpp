@@ -30,15 +30,12 @@ private:
     int16_t angle;
     bool dmpEnabled;
     bool i2cInitialised;
-    bool isStarted;
 
 public:
     Imu(ImuPublisher *imuMessagePublisher, ImuClients *imuServiceClients, ImuSubscribers *imuSubscribers);
     ~Imu() = default;
     void imuI2cInitHeartbeatCallback(const hal_imu::hal_imuI2cHeartbeatMsg &msg);
     bool isI2cInitialised(void);
-    bool isNotStarted(void);
-    void starts(void);
     void getI2cHandle(void);
     void init(void);
     void writeDmp(void);
@@ -55,13 +52,12 @@ public:
     std::vector<uint8_t> readBlockFromRegister(uint8_t registerToRead, uint8_t bytesToRead);
     bool writeBitInRegister(uint8_t registerToWrite, uint8_t bitToWrite, uint8_t valueOfBit);
     void resetImu(void);
-    void resetFifo();
+    void resetFifo(void);
     void writeOrientationMatrix(void);
     void setClockSource(void);
     void setSleepDisabled(void);
     bool writeDataToDmp(uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data);
     void publishMessage(void);
-    void readMpuData(void);
 };
 
 #endif
