@@ -27,7 +27,6 @@ private:
     hal_imu::hal_imuWriteDmpFeedback feedback;
     hal_imu::hal_imuWriteDmpResult result;
     bool i2cInitialised;
-    bool isStarted;
     int32_t imuHandle;
 
 public:
@@ -36,8 +35,6 @@ public:
     void getI2cHandle(void);
     void startServer(void);
     bool isI2cInitialised(void);
-    bool isNotStarted(void);
-    void starts(void);
     void imuDmpWritingServerI2cInitHeartbeatCallback(const hal_imu::hal_imuI2cHeartbeatMsg &msg);
     void writeDmp(void);
     bool writeByteInRegister(uint8_t registerToWrite, uint8_t value);

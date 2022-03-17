@@ -62,7 +62,6 @@ ProxSens::ProxSens(ProxSensSubscriber *proxSensSubscriber, ProxSensPublisher *pr
                                                                                                                                             echoCallbackId(0),
                                                                                                                                             distanceInCm(UINT16_MAX),
                                                                                                                                             pigpioNodeStarted(false),
-                                                                                                                                            isStarted(false),
                                                                                                                                             proxSensPub(proxSensPublisher),
                                                                                                                                             proxSensClients(proxSensServiceClients),
                                                                                                                                             proxSensSub(proxSensSubscriber)
@@ -164,16 +163,6 @@ void ProxSens::enableOutputLevelShifter(void)
     proxSensClients->getSetGpioHighClientHandle()->call(setGpioHighSrv);
 }
 
-void ProxSens::starts(void)
-{
-    isStarted = true;
-}
-
-bool ProxSens::isNotStarted(void)
-{
-    return !isStarted;
-}
-
 void ProxSens::publishAndGetDistance(const ros::TimerEvent &timerEvent)
 {
     publishMessage();
@@ -195,12 +184,11 @@ int main(int argc, char **argv)
     ROS_INFO("proxSens node waiting for pigpio node to start...");
     while (ros::ok())
     {
-        if (proxSens.isNotStarted() && proxSens.isPigpioNodeStarted())
+        if (proxSens.isPigpioNodeStarted())
         {
             ROS_INFO("proxSens node initialising...");
             proxSens.configureGpios();
             proxSens.enableOutputLevelShifter();
-            proxSens.starts();
             proxSensTimer = node.createTimer(ros::Duration(0.1), &ProxSens::publishAndGetDistance, &proxSens);
             ROS_INFO("proxSens node initialised.");
         }

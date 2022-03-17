@@ -66,7 +66,6 @@ ImuDmpWritingServer::ImuDmpWritingServer(ImuDmpWritingActionServer *imuWriteDmpS
                                                                                                                                                                                                      imuDmpClients(imuDmpServiceClients),
                                                                                                                                                                                                      imuDmpWritingServerSubs(imuDmpWritingServerSubscribers),
                                                                                                                                                                                                      i2cInitialised(false),
-                                                                                                                                                                                                     isStarted(false),
                                                                                                                                                                                                      imuHandle(-1)
 {
     imuDmpWritingServerSubs->subscribe(this);
@@ -269,16 +268,6 @@ bool ImuDmpWritingServer::writeDataBlock(uint8_t registerToWrite, std::vector<ui
     }
 }
 
-void ImuDmpWritingServer::starts(void)
-{
-    isStarted = true;
-}
-
-bool ImuDmpWritingServer::isNotStarted(void)
-{
-    return !isStarted;
-}
-
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "hal_imuDmpWritingServer");
@@ -293,15 +282,11 @@ int main(int argc, char **argv)
     ROS_INFO("imuDmpWritingServer node waiting for I2C communication to be ready...");
     while (ros::ok())
     {
-        if (imuDmpWritingServer.isNotStarted())
+        if (imuDmpWritingServer.isI2cInitialised())
         {
-            if (imuDmpWritingServer.isI2cInitialised())
-            {
-                imuDmpWritingServer.getI2cHandle();
-                ROS_INFO("imuDmpWritingServer I2C communication ready.");
-                imuDmpWritingServer.startServer();
-                imuDmpWritingServer.starts();
-            }
+            imuDmpWritingServer.getI2cHandle();
+            ROS_INFO("imuDmpWritingServer I2C communication ready.");
+            imuDmpWritingServer.startServer();
         }
 
         ros::spinOnce();
