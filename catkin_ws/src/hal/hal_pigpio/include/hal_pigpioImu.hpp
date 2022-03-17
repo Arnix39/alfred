@@ -7,6 +7,9 @@
 // Pigpio library
 #include <pigpiod_if2.h>
 
+// Services and messages headers (generated)
+#include "hal_pigpio/hal_pigpioImuReading.h"
+
 #define I2C_BUFFER_MAX_BYTES 32
 
 #define MPU6050_USER_CONTROL_REGISTER 0x6A
@@ -23,8 +26,10 @@ class PigpioImu
 private:
     int pigpioHandle;
     int32_t i2cHandle;
-    ros::Timer readAndPublishQuaternionsTimer;
     std::vector<uint32_t> quaternions;
+    bool isImuReady;
+    ros::ServiceServer imuReadingService;
+    ros::Timer readAndPublishQuaternionsTimer;
 
 public:
     PigpioImu(ros::NodeHandle *node, int pigpioHandle);
@@ -33,6 +38,8 @@ public:
     void publishQuaternions(void);
     void readAndPublishQuaternions(const ros::TimerEvent &event);
     void resetFifo(void);
+    bool imuReading(hal_pigpio::hal_pigpioImuReading::Request &req,
+                    hal_pigpio::hal_pigpioImuReading::Response &res);
 };
 
 #endif

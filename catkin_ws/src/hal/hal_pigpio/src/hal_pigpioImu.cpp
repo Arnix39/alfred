@@ -1,7 +1,11 @@
 #include "hal_pigpioImu.hpp"
 
 PigpioImu::PigpioImu(ros::NodeHandle *node, int pigpioHandle) : pigpioHandle(pigpioHandle),
-                                                                readAndPublishQuaternionsTimer(node->createTimer(ros::Duration(0.01), &PigpioImu::readAndPublishQuaternions, this))
+                                                                i2cHandle(-1),
+                                                                quaternions({}),
+                                                                readAndPublishQuaternionsTimer(node->createTimer(ros::Duration(0.01), &PigpioImu::readAndPublishQuaternions, this)),
+                                                                isImuReady(false),
+                                                                imuReadingService(node->advertiseService("hal_pigpioImuReading", &PigpioImu::imuReading, this))
 {
 }
 
@@ -100,6 +104,17 @@ void PigpioImu::publishQuaternions(void)
 
 void PigpioImu::readAndPublishQuaternions(const ros::TimerEvent &event)
 {
-    readImuData();
+    if (isImuReady)
+    {
+        readImuData();
+    }
     publishQuaternions();
+}
+
+bool PigpioImu::imuReading(hal_pigpio::hal_pigpioImuReading::Request &req,
+                           hal_pigpio::hal_pigpioImuReading::Response &res)
+{
+    isImuReady = req.isImuReady;
+
+    return true;
 }
