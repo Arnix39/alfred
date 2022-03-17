@@ -1,8 +1,5 @@
 #include "hal_pigpioInput.hpp"
 
-// Services headers (generated)
-#include "hal_pigpio/hal_pigpioGetHandle.h"
-
 PigpioInput::PigpioInput(ros::NodeHandle *node, int pigpioHandle) : pigpioHandle(pigpioHandle),
                                                                     gpioEdgeChangePub(node->advertise<hal_pigpio::hal_pigpioEdgeChangeMsg>("gpioEdgeChange", 1000)),
                                                                     readGpioService(node->advertiseService("hal_pigpioReadGpio", &PigpioInput::readGpio, this)),

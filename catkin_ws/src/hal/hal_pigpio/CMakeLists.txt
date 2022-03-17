@@ -84,12 +84,16 @@ add_dependencies(${PROJECT_NAME}_input_lib ${catkin_EXPORTED_TARGETS} ${${PROJEC
 add_library(${PROJECT_NAME}_i2c_lib OBJECT src/hal_pigpioI2c.cpp)
 add_dependencies(${PROJECT_NAME}_i2c_lib ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
+add_library(${PROJECT_NAME}_imu_lib OBJECT src/hal_pigpioImu.cpp)
+add_dependencies(${PROJECT_NAME}_imu_lib ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
 add_executable(${PROJECT_NAME}_node 
   src/hal_pigpio.cpp 
   $<TARGET_OBJECTS:${PROJECT_NAME}_init_lib> 
   $<TARGET_OBJECTS:${PROJECT_NAME}_output_lib> 
   $<TARGET_OBJECTS:${PROJECT_NAME}_input_lib>
   $<TARGET_OBJECTS:${PROJECT_NAME}_i2c_lib>
+  $<TARGET_OBJECTS:${PROJECT_NAME}_imu_lib> 
 )
 add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME}_node

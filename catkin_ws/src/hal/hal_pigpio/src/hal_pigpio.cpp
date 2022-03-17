@@ -2,6 +2,7 @@
 #include "hal_pigpioInput.hpp"
 #include "hal_pigpioOutput.hpp"
 #include "hal_pigpioI2c.hpp"
+#include "hal_pigpioImu.hpp"
 
 int main(int argc, char **argv)
 {
@@ -21,6 +22,7 @@ int main(int argc, char **argv)
     PigpioOutput pigpioOutput(&node, pigpioHandle);
     PigpioInput pigpioInput(&node, pigpioHandle);
     PigpioI2c pigpioI2c(&node, pigpioHandle);
+    PigpioImu pigpioimu(&node, pigpioHandle);
 
     ros::Timer heartbeatTimer(node.createTimer(ros::Duration(0.1), &PigpioInit::publishHeartbeat, &pigpioInit));
 
