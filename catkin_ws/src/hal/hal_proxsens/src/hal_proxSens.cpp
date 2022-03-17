@@ -174,10 +174,17 @@ bool ProxSens::isNotStarted(void)
     return !isStarted;
 }
 
+void ProxSens::publishAndGetDistance(const ros::TimerEvent &timerEvent)
+{
+    publishMessage();
+    trigger();
+}
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "hal_proxsens");
     ros::NodeHandle node;
+    ros::Timer proxSensTimer;
 
     ProxSensPublisherRos proxSensPublisherRos(&node);
     ProxSensSubscriberRos proxSensSubscriberRos(&node);
@@ -185,30 +192,20 @@ int main(int argc, char **argv)
 
     ProxSens proxSens(&proxSensSubscriberRos, &proxSensPublisherRos, &proxSensServiceClientsRos);
 
-    ros::Rate loop_rate(10);
-
     ROS_INFO("proxSens node waiting for pigpio node to start...");
     while (ros::ok())
     {
-        if (proxSens.isNotStarted())
+        if (proxSens.isNotStarted() && proxSens.isPigpioNodeStarted())
         {
-            if (proxSens.isPigpioNodeStarted())
-            {
-                ROS_INFO("proxSens node initialising...");
-                proxSens.configureGpios();
-                proxSens.enableOutputLevelShifter();
-                proxSens.starts();
-                ROS_INFO("proxSens node initialised.");
-            }
-        }
-        else
-        {
-            proxSens.publishMessage();
-            proxSens.trigger();
+            ROS_INFO("proxSens node initialising...");
+            proxSens.configureGpios();
+            proxSens.enableOutputLevelShifter();
+            proxSens.starts();
+            proxSensTimer = node.createTimer(ros::Duration(0.1), &ProxSens::publishAndGetDistance, &proxSens);
+            ROS_INFO("proxSens node initialised.");
         }
 
         ros::spinOnce();
-        loop_rate.sleep();
     }
 
     return 0;

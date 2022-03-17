@@ -22,6 +22,8 @@ int main(int argc, char **argv)
     PigpioInput pigpioInput(&node, pigpioHandle);
     PigpioI2c pigpioI2c(&node, pigpioHandle);
 
+    ros::Timer heartbeatTimer(node.createTimer(ros::Duration(0.1), &PigpioInit::publishHeartbeat, &pigpioInit));
+
     ros::spin();
 
     return 0;

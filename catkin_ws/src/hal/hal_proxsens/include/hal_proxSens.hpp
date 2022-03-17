@@ -54,6 +54,7 @@ public:
     bool isPigpioNodeStarted(void);
     bool isNotStarted(void);
     void starts(void);
+    void publishAndGetDistance(const ros::TimerEvent &timerEvent);
 };
 
 #endif

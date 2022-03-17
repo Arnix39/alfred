@@ -27,7 +27,6 @@ private:
     ros::ServiceServer setPullDownService;
     ros::ServiceServer clearResistorService;
     ros::Publisher heartbeatPublisher;
-    ros::Timer heartbeatTimer;
     int pigpioHandle;
 
 public:
