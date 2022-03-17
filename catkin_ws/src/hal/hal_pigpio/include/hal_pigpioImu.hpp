@@ -9,6 +9,7 @@
 
 // Services and messages headers (generated)
 #include "hal_pigpio/hal_pigpioI2cImuReading.h"
+#include "hal_pigpio/hal_pigpioQuaternionsMsg.h"
 
 #define I2C_BUFFER_MAX_BYTES 32
 
@@ -19,6 +20,7 @@
 #define MPU6050_FIFO_COUNT_H_REGISTER 0x72
 #define MPU6050_FIFO_COUNT_L_REGISTER 0x73
 #define MPU6050_FIFO_REGISTER 0x74
+#define MPU6050_MAX_FIFO_SAMPLES 1024
 #define MPU6050_DMP_FIFO_QUAT_SIZE 16
 
 class PigpioImu
@@ -30,6 +32,7 @@ private:
     bool isImuReady;
     ros::ServiceServer imuReadingService;
     ros::Timer readAndPublishQuaternionsTimer;
+    ros::Publisher quaternionsPublisher;
 
 public:
     PigpioImu(ros::NodeHandle *node, int pigpioHandle);

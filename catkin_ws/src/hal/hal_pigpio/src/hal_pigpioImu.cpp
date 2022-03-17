@@ -5,7 +5,8 @@ PigpioImu::PigpioImu(ros::NodeHandle *node, int pigpioHandle) : pigpioHandle(pig
                                                                 quaternions({}),
                                                                 readAndPublishQuaternionsTimer(node->createTimer(ros::Duration(0.01), &PigpioImu::readAndPublishQuaternions, this)),
                                                                 isImuReady(false),
-                                                                imuReadingService(node->advertiseService("hal_pigpioI2cImuReading", &PigpioImu::i2cImuReading, this))
+                                                                imuReadingService(node->advertiseService("hal_pigpioI2cImuReading", &PigpioImu::i2cImuReading, this)),
+                                                                quaternionsPublisher(node->advertise<hal_pigpio::hal_pigpioQuaternionsMsg>("hal_pigpioQuaternions", 1000))
 {
 }
 
@@ -18,11 +19,7 @@ void PigpioImu::resetFifo()
     {
         ROS_ERROR("Failed to reset FIFO!");
     }
-    else if (i2c_write_byte_data(pigpioHandle, i2cHandle, MPU6050_USER_CONTROL_REGISTER, ((uint8_t)valueRead | (1 << MPU6050_FIFO_RESET_BIT))) == 0)
-    {
-        ROS_INFO("Successfully resetted FIFO.");
-    }
-    else
+    else if (i2c_write_byte_data(pigpioHandle, i2cHandle, MPU6050_USER_CONTROL_REGISTER, ((uint8_t)valueRead | (1 << MPU6050_FIFO_RESET_BIT))) != 0)
     {
         ROS_ERROR("Failed to reset FIFO!");
     }
@@ -33,7 +30,7 @@ void PigpioImu::readImuData(void)
     int16_t interruptStatus;
     int16_t valueRead;
     uint16_t fifoCount = 0;
-    std::vector<uint8_t> fifoData;
+    // std::vector<uint8_t> fifoData;
     char buffer[I2C_BUFFER_MAX_BYTES];
     int result;
 
@@ -71,24 +68,31 @@ void PigpioImu::readImuData(void)
             fifoCount += (uint16_t)valueRead;
         }
 
-        ROS_INFO("Number of samples in FIFO: %u.", fifoCount);
-
         if (fifoCount >= MPU6050_DMP_FIFO_QUAT_SIZE)
         {
             result = i2c_read_i2c_block_data(pigpioHandle, i2cHandle, MPU6050_FIFO_REGISTER, buffer, MPU6050_DMP_FIFO_QUAT_SIZE);
-            resetFifo();
 
             if ((result > 0) && (result == MPU6050_DMP_FIFO_QUAT_SIZE))
             {
-                for (uint8_t index = 0; index < result; index++)
+                /*for (uint8_t index = 0; index < result; index++)
                 {
                     fifoData.push_back(buffer[index]);
-                }
+                }*/
+
+                quaternions.push_back(((uint32_t)buffer[0] << 24) | ((uint32_t)buffer[1] << 16) | ((uint32_t)buffer[2] << 8) | buffer[3]);
+                quaternions.push_back(((uint32_t)buffer[4] << 24) | ((uint32_t)buffer[5] << 16) | ((uint32_t)buffer[6] << 8) | buffer[7]);
+                quaternions.push_back(((uint32_t)buffer[8] << 24) | ((uint32_t)buffer[9] << 16) | ((uint32_t)buffer[10] << 8) | buffer[11]);
+                quaternions.push_back(((uint32_t)buffer[12] << 24) | ((uint32_t)buffer[13] << 16) | ((uint32_t)buffer[14] << 8) | buffer[15]);
             }
             else
             {
                 ROS_ERROR("Failed to read FIFO!");
                 return;
+            }
+
+            if (fifoCount > MPU6050_MAX_FIFO_SAMPLES / 2)
+            {
+                resetFifo();
             }
         }
         else
@@ -100,6 +104,10 @@ void PigpioImu::readImuData(void)
 
 void PigpioImu::publishQuaternions(void)
 {
+    hal_pigpio::hal_pigpioQuaternionsMsg message;
+
+    message.quaternions = quaternions;
+    quaternionsPublisher.publish(message);
 }
 
 void PigpioImu::readAndPublishQuaternions(const ros::TimerEvent &event)
