@@ -1,5 +1,5 @@
-#ifndef HAL_IMUDMPMEMORY
-#define HAL_IMUDMPMEMORY
+#ifndef HAL_IMU_DMP_MEMORY
+#define HAL_IMU_DMP_MEMORY
 
 /* This is the DMP (Digital Motion Processor) code that needs to be copied on the IMU chip at startup */
 /* This is coming from InvenSense */

@@ -1,5 +1,5 @@
-#ifndef HAL_IMUI2CINITVIRTUALS
-#define HAL_IMUI2CINITVIRTUALS
+#ifndef HAL_IMU_I2C_INIT_VIRTUALS
+#define HAL_IMU_I2C_INIT_VIRTUALS
 
 #include "ros/ros.h"
 

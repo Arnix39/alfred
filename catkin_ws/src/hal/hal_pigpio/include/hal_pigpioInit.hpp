@@ -1,5 +1,5 @@
-#ifndef HAL_PIGPIOINIT
-#define HAL_PIGPIOINIT
+#ifndef HAL_PIGPIO_INIT
+#define HAL_PIGPIO_INIT
 
 #include "ros/ros.h"
 

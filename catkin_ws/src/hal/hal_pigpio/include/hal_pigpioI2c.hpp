@@ -1,5 +1,5 @@
-#ifndef HAL_PIGPIOI2C
-#define HAL_PIGPIOI2C
+#ifndef HAL_PIGPIO_I2C
+#define HAL_PIGPIO_I2C
 
 #include "ros/ros.h"
 

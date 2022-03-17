@@ -1,5 +1,5 @@
-#ifndef HAL_IMUDMPWRITINGSERVER
-#define HAL_IMUDMPWRITINGSERVER
+#ifndef HAL_IMU_DMP_WRITING_SERVER
+#define HAL_IMU_DMP_WRITING_SERVER
 
 #include "ros/ros.h"
 #include <actionlib/server/simple_action_server.h>

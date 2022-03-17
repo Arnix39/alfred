@@ -1,5 +1,5 @@
-#ifndef HAL_IMUVIRTUALS
-#define HAL_IMUVIRTUALS
+#ifndef HAL_IMU_VIRTUALS
+#define HAL_IMU_VIRTUALS
 
 #include "ros/ros.h"
 

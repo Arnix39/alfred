@@ -1,5 +1,5 @@
-#ifndef HAL_PROXSENSINTERFACES
-#define HAL_PROXSENSINTERFACES
+#ifndef HAL_PROXSENS_INTERFACES
+#define HAL_PROXSENS_INTERFACES
 
 #include "hal_proxSensVirtuals.hpp"
 

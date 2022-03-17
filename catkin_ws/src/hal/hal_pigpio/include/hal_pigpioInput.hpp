@@ -1,5 +1,5 @@
-#ifndef HAL_PIGPIOINPUT
-#define HAL_PIGPIOINPUT
+#ifndef HAL_PIGPIO_INPUT
+#define HAL_PIGPIO_INPUT
 
 #include "ros/ros.h"
 

@@ -1,5 +1,5 @@
-#ifndef HAL_IMUI2CINIT
-#define HAL_IMUI2CINIT
+#ifndef HAL_IMU_I2C_INIT
+#define HAL_IMU_I2C_INIT
 
 #include "ros/ros.h"
 

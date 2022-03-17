@@ -1,5 +1,5 @@
-#ifndef HAL_MOTORCONTROL
-#define HAL_MOTORCONTROL
+#ifndef HAL_MOTOR_CONTROL
+#define HAL_MOTOR_CONTROL
 
 #include "ros/ros.h"
 #include "hal_motorControlVirtuals.hpp"

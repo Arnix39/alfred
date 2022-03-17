@@ -1,5 +1,5 @@
-#ifndef HAL_PROXSENSVIRTUALS
-#define HAL_PROXSENSVIRTUALS
+#ifndef HAL_PROXSENS_VIRTUALS
+#define HAL_PROXSENS_VIRTUALS
 
 #include "ros/ros.h"
 

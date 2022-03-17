@@ -1,5 +1,5 @@
-#ifndef HAL_IMUI2CINITINTERFACES
-#define HAL_IMUI2CINITINTERFACES
+#ifndef HAL_IMU_I2C_INIT_INTERFACES
+#define HAL_IMU_I2C_INIT_INTERFACES
 
 #include "hal_imuI2cInitVirtuals.hpp"
 

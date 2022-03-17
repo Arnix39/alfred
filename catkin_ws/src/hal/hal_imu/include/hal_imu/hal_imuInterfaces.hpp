@@ -1,5 +1,5 @@
-#ifndef HAL_IMUINTERFACES
-#define HAL_IMUINTERFACES
+#ifndef HAL_IMU_INTERFACES
+#define HAL_IMU_INTERFACES
 
 #include "hal_imuVirtuals.hpp"
 
