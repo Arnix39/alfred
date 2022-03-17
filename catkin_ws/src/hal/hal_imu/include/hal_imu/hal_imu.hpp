@@ -31,6 +31,7 @@ private:
     int16_t angle;
     bool dmpEnabled;
     bool i2cInitialised;
+    bool isStarted;
 
 public:
     Imu(ImuPublisher *imuMessagePublisher, ImuClients *imuServiceClients, ImuSubscribers *imuSubscribers);
@@ -61,6 +62,8 @@ public:
     void publishMessage(void);
     void startImuReading(void);
     void stopImuReading(void);
+    bool isNotStarted(void);
+    void starts(void);
 };
 
 #endif

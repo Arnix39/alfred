@@ -80,7 +80,8 @@ Imu::Imu(ImuPublisher *imuMessagePublisher, ImuClients *imuServiceClients, ImuSu
                                                                                                              angle(0),
                                                                                                              dmpEnabled(false),
                                                                                                              imuSubs(imuSubscribers),
-                                                                                                             i2cInitialised(false)
+                                                                                                             i2cInitialised(false),
+                                                                                                             isStarted(false)
 {
     imuSubs->subscribe(this);
 }
@@ -107,9 +108,9 @@ void Imu::init(void)
     resetImu();
     setClockSource();
     resetFifo();
-    setMpuRate(MPU6050_DMP_SAMPLE_RATE / 5);
+    setMpuRate(MPU6050_DMP_SAMPLE_RATE);
     writeDmp();
-    setDmpRate(MPU6050_DMP_SAMPLE_RATE / 5);
+    setDmpRate(MPU6050_DMP_SAMPLE_RATE);
     writeOrientationMatrix();
     configureDmpFeatures();
     enableDmp();
@@ -647,6 +648,16 @@ void Imu::publishMessage(void)
     imuPublisher->publish(message);
 }
 
+void Imu::starts(void)
+{
+    isStarted = true;
+}
+
+bool Imu::isNotStarted(void)
+{
+    return !isStarted;
+}
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "hal_imu");
@@ -661,11 +672,12 @@ int main(int argc, char **argv)
     ROS_INFO("imu node waiting for I2C communication to be ready...");
     while (ros::ok())
     {
-        if (imu.isI2cInitialised())
+        if (imu.isNotStarted() && imu.isI2cInitialised())
         {
             imu.getI2cHandle();
             ROS_INFO("imu I2C communication ready.");
             imu.init();
+            imu.starts();
             ROS_INFO("imu node initialised.");
             imu.startImuReading();
         }
