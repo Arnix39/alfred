@@ -36,6 +36,7 @@ public:
     virtual ros::ServiceClient *getReadBlockDataClientHandle() = 0;
     virtual ros::ServiceClient *getWriteBlockDataClientHandle() = 0;
     virtual ros::ServiceClient *getGetHandleClientHandle() = 0;
+    virtual ros::ServiceClient *getImuReadingClientHandle() = 0;
 };
 
 #endif

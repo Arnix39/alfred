@@ -8,7 +8,7 @@
 #include <pigpiod_if2.h>
 
 // Services and messages headers (generated)
-#include "hal_pigpio/hal_pigpioImuReading.h"
+#include "hal_pigpio/hal_pigpioI2cImuReading.h"
 
 #define I2C_BUFFER_MAX_BYTES 32
 
@@ -38,8 +38,8 @@ public:
     void publishQuaternions(void);
     void readAndPublishQuaternions(const ros::TimerEvent &event);
     void resetFifo(void);
-    bool imuReading(hal_pigpio::hal_pigpioImuReading::Request &req,
-                    hal_pigpio::hal_pigpioImuReading::Response &res);
+    bool i2cImuReading(hal_pigpio::hal_pigpioI2cImuReading::Request &req,
+                       hal_pigpio::hal_pigpioI2cImuReading::Response &res);
 };
 
 #endif

@@ -13,6 +13,7 @@
 #include "hal_pigpio/hal_pigpioI2cWriteWordData.h"
 #include "hal_pigpio/hal_pigpioI2cReadBlockData.h"
 #include "hal_pigpio/hal_pigpioI2cWriteBlockData.h"
+#include "hal_pigpio/hal_pigpioI2cImuReading.h"
 #include "hal_imu/hal_imuGetHandle.h"
 #include "hal_imu/hal_imuWriteDmpAction.h"
 #include "hal_imu/hal_imuMsg.h"
@@ -58,6 +59,8 @@ public:
     void setSleepDisabled(void);
     bool writeDataToDmp(uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data);
     void publishMessage(void);
+    void startImuReading(void);
+    void stopImuReading(void);
 };
 
 #endif

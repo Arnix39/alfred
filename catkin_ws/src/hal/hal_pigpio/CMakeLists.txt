@@ -50,7 +50,7 @@ add_service_files(
    hal_pigpioI2cWriteBlockData.srv
    hal_pigpioReadGpio.srv
    hal_pigpioSetCallback.srv
-   hal_pigpioImuReading.srv
+   hal_pigpioI2cImuReading.srv
  )
 
 ## Generate added messages and services with any dependencies listed here

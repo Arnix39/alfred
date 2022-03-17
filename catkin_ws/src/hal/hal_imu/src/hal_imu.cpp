@@ -29,6 +29,7 @@ ImuClientsRos::ImuClientsRos(ros::NodeHandle *node) : i2cReadByteDataClientRos(n
                                                       i2cWriteWordDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteWordData>("hal_pigpioI2cWriteWordData")),
                                                       i2cReadBlockDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cReadBlockData>("hal_pigpioI2cReadBlockData")),
                                                       i2cWriteBlockDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteBlockData>("hal_pigpioI2cWriteBlockData")),
+                                                      i2cImuReadingClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cImuReading>("hal_pigpioI2cImuReading")),
                                                       i2cGetHandleClientRos(node->serviceClient<hal_imu::hal_imuGetHandle>("hal_imuGetHandle"))
 {
 }
@@ -66,6 +67,11 @@ ros::ServiceClient *ImuClientsRos::getWriteBlockDataClientHandle()
 ros::ServiceClient *ImuClientsRos::getGetHandleClientHandle()
 {
     return &i2cGetHandleClientRos;
+}
+
+ros::ServiceClient *ImuClientsRos::getImuReadingClientHandle()
+{
+    return &i2cImuReadingClientRos;
 }
 
 /* IMU implementation */
@@ -484,6 +490,26 @@ bool Imu::writeDataToDmp(uint8_t bank, uint8_t addressInBank, std::vector<uint8_
     return true;
 }
 
+void Imu::startImuReading()
+{
+    hal_pigpio::hal_pigpioI2cImuReading i2cImuReadingSrv;
+
+    i2cImuReadingSrv.request.isImuReady = true;
+    i2cImuReadingSrv.request.imuHandle = imuHandle;
+
+    imuClients->getImuReadingClientHandle()->call(i2cImuReadingSrv);
+}
+
+void Imu::stopImuReading()
+{
+    hal_pigpio::hal_pigpioI2cImuReading i2cImuReadingSrv;
+
+    i2cImuReadingSrv.request.isImuReady = false;
+    i2cImuReadingSrv.request.imuHandle = imuHandle;
+
+    imuClients->getImuReadingClientHandle()->call(i2cImuReadingSrv);
+}
+
 bool Imu::writeByteInRegister(uint8_t registerToWrite, uint8_t value)
 {
     hal_pigpio::hal_pigpioI2cWriteByteData i2cWriteByteDataSrv;
@@ -641,6 +667,7 @@ int main(int argc, char **argv)
             ROS_INFO("imu I2C communication ready.");
             imu.init();
             ROS_INFO("imu node initialised.");
+            imu.startImuReading();
         }
 
         ros::spinOnce();
