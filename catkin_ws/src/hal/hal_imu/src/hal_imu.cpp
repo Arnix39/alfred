@@ -107,40 +107,47 @@ void Imu::init(void)
 {
     resetImu();
     setClockSource();
-    resetFifo();
     setMpuRate(MPU6050_DMP_SAMPLE_RATE);
+    setConfiguration();
     writeDmp();
     setDmpRate(MPU6050_DMP_SAMPLE_RATE);
     writeOrientationMatrix();
     configureDmpFeatures();
     enableDmp();
-    // calibrateAccelerometer();
+    resetFifo();
+    //  calibrateAccelerometer();
 }
 
 void Imu::resetImu(void)
 {
-    bool writeSuccess;
+    ROS_INFO("IMU resetting...");
 
-    writeSuccess = writeBitInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, MPU6050_RESET_BIT, 1);
-    if (writeSuccess)
+    /* Reset MPU6050 */
+    if (!writeByteInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, MPU6050_RESET))
     {
-        ROS_INFO("IMU resetting...");
-        ros::Duration(0.3).sleep();
+        ROS_ERROR("Failed to reset IMU because chip couldn't be resetted.");
+        return;
+    }
 
-        writeSuccess = writeByteInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, 0x00);
-        if (writeSuccess)
-        {
-            ROS_INFO("Successfully resetted IMU.");
-        }
-        else
-        {
-            ROS_ERROR("Failed to reset IMU.");
-        }
-    }
-    else
+    ros::Duration(0.1).sleep();
+
+    /* Reset signal paths */
+    if (!writeByteInRegister(MPU6050_SIGNAL_PATH_RESET_REGISTER, MPU6050_SIGNAL_PATH_RESET))
     {
-        ROS_ERROR("Failed to reset IMU.");
+        ROS_ERROR("Failed to reset IMU because signal paths couldn't be resetted.");
+        return;
     }
+
+    ros::Duration(0.1).sleep();
+
+    /* Disable sleep mode */
+    if (!writeByteInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, 0x00))
+    {
+        ROS_ERROR("Failed to reset IMU because sleep mode couldn't be disabled.");
+        return;
+    }
+
+    ROS_INFO("Successfully resetted IMU.");
 }
 
 void Imu::setClockSource(void)
@@ -159,15 +166,19 @@ void Imu::setClockSource(void)
     }
 }
 
-void Imu::setSleepDisabled(void)
+void Imu::setConfiguration(void)
 {
-    if (writeBitInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, MPU6050_ENABLE_SLEEP_BIT, 0))
+    bool writeSuccess;
+
+    writeSuccess = writeByteInRegister(MPU6050_CONFIGURATION_REGISTER, MPU6050_DLPF_BANDWITH_42);
+
+    if (writeSuccess)
     {
-        ROS_INFO("Successfully disabled sleep mode.");
+        ROS_INFO("Successfully wrote configuration of MPU.");
     }
     else
     {
-        ROS_ERROR("Failed to disable sleep mode.");
+        ROS_ERROR("Failed to write configuration of MPU.");
     }
 }
 
@@ -246,68 +257,22 @@ void Imu::resetFifo()
 
 void Imu::enableDmp(void)
 {
-    bool enablingHasSucceeded = true;
-
-    /* Disable interrupts */
-    if (!writeByteInRegister(MPU6050_INTERRUPT_ENABLE_REGISTER, 0x00))
-    {
-        enablingHasSucceeded = false;
-        ROS_ERROR("Failed to disable interrupts!");
-    }
-
-    /* Disable FIFO for accelerometer and gyroscope */
-    if (!writeByteInRegister(MPU6050_FIFO_ENABLE_REGISTER, 0x00))
-    {
-        enablingHasSucceeded = false;
-        ROS_ERROR("Failed to disable FIFO for accelerometer and gyroscope!");
-    }
-
-    /* Set user control register to 0 */
-    if (!writeByteInRegister(MPU6050_USER_CONTROL_REGISTER, 0x00))
-    {
-        enablingHasSucceeded = false;
-        ROS_ERROR("Failed to set user control register to zero!");
-    }
-
     /* Enable FIFO */
     if (!writeByteInRegister(MPU6050_USER_CONTROL_REGISTER, MPU6050_FIFO_ENABLE))
     {
-        enablingHasSucceeded = false;
-        ROS_ERROR("Failed to enable FIFO!");
-    }
-
-    /* Reset DMP */
-    if (!writeByteInRegister(MPU6050_USER_CONTROL_REGISTER, MPU6050_DMP_RESET))
-    {
-        enablingHasSucceeded = false;
-        ROS_ERROR("Failed to reset DMP!");
+        ROS_ERROR("Failed to enable DMP because FIFO could not be enabled!");
+        return;
     }
 
     /* Enable DMP */
     if (!writeByteInRegister(MPU6050_USER_CONTROL_REGISTER, MPU6050_DMP_EMABLE))
     {
-        enablingHasSucceeded = false;
-        dmpEnabled = false;
         ROS_ERROR("Failed to enable DMP!");
-    }
-    else
-    {
-        dmpEnabled = true;
+        return;
     }
 
-    resetFifo();
-
-    /* Clearing interrupts statuses */
-    if (readByteFromRegister(MPU6050_INTERRUPT_STATUS_REGISTER) < 0)
-    {
-        enablingHasSucceeded = false;
-        ROS_ERROR("Failed to read interrupt status!");
-    }
-
-    if (enablingHasSucceeded)
-    {
-        ROS_INFO("Successfully enabled DMP.");
-    }
+    dmpEnabled = true;
+    ROS_INFO("Successfully enabled DMP.");
 }
 
 void Imu::calibrateAccelerometer(void)

@@ -57,13 +57,13 @@ public:
     void resetFifo(void);
     void writeOrientationMatrix(void);
     void setClockSource(void);
-    void setSleepDisabled(void);
     bool writeDataToDmp(uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data);
     void publishMessage(void);
     void startImuReading(void);
     void stopImuReading(void);
     bool isNotStarted(void);
     void starts(void);
+    void setConfiguration(void);
 };
 
 #endif
