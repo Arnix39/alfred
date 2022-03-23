@@ -4,6 +4,9 @@
 #include "ros/ros.h"
 #include <vector>
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 // Pigpio library
 #include <pigpiod_if2.h>
 
@@ -12,6 +15,8 @@
 #include "hal_pigpio/hal_pigpioQuaternionsMsg.h"
 
 #define I2C_BUFFER_MAX_BYTES 32
+
+#define MPU6050_POWER_MANAGEMENT_1_REGISTER 0x6B
 
 #define MPU6050_USER_CONTROL_REGISTER 0x6A
 #define MPU6050_FIFO_RESET_BIT 2
