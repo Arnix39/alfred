@@ -19,7 +19,7 @@ void PigpioImu::resetFifo()
     {
         ROS_ERROR("Failed to reset FIFO!");
     }
-    else if (i2c_write_byte_data(pigpioHandle, i2cHandle, MPU6050_USER_CONTROL_REGISTER, ((uint8_t)valueRead | (1 << MPU6050_FIFO_RESET_BIT))) != 0)
+    else if (i2c_write_byte_data(pigpioHandle, i2cHandle, MPU6050_USER_CONTROL_REGISTER, (static_cast<uint8_t>(valueRead) | (1 << MPU6050_FIFO_RESET_BIT))) != 0)
     {
         ROS_ERROR("Failed to reset FIFO!");
     }
@@ -38,7 +38,7 @@ void PigpioImu::readImuData(void)
     {
         ROS_ERROR("Failed to read interrupt status!");
     }
-    else if ((uint8_t)interruptStatus & MPU6050_FIFO_OVERFLOW)
+    else if (static_cast<uint8_t>(interruptStatus) & MPU6050_FIFO_OVERFLOW)
     {
         ROS_ERROR("FIFO has overflowed!");
         resetFifo();
@@ -53,7 +53,7 @@ void PigpioImu::readImuData(void)
         }
         else
         {
-            fifoCount = ((uint16_t)valueRead << 8);
+            fifoCount = static_cast<uint16_t>(valueRead) << 8;
         }
 
         valueRead = i2c_read_byte_data(pigpioHandle, i2cHandle, MPU6050_FIFO_COUNT_L_REGISTER);
@@ -64,7 +64,7 @@ void PigpioImu::readImuData(void)
         }
         else
         {
-            fifoCount += (uint16_t)valueRead;
+            fifoCount += static_cast<uint16_t>(valueRead);
         }
 
         if (fifoCount >= MPU6050_DMP_FIFO_QUAT_SIZE)
@@ -73,10 +73,10 @@ void PigpioImu::readImuData(void)
 
             if ((result > 0) && (result == MPU6050_DMP_FIFO_QUAT_SIZE))
             {
-                quaternions.push_back(((uint32_t)fifoData[0] << 24) | ((uint32_t)fifoData[1] << 16) | ((uint32_t)fifoData[2] << 8) | fifoData[3]);
-                quaternions.push_back(((uint32_t)fifoData[4] << 24) | ((uint32_t)fifoData[5] << 16) | ((uint32_t)fifoData[6] << 8) | fifoData[7]);
-                quaternions.push_back(((uint32_t)fifoData[8] << 24) | ((uint32_t)fifoData[9] << 16) | ((uint32_t)fifoData[10] << 8) | fifoData[11]);
-                quaternions.push_back(((uint32_t)fifoData[12] << 24) | ((uint32_t)fifoData[13] << 16) | ((uint32_t)fifoData[14] << 8) | fifoData[15]);
+                quaternions.push_back((static_cast<uint32_t>(fifoData[0]) << 24) | (static_cast<uint32_t>(fifoData[1]) << 16) | (static_cast<uint32_t>(fifoData[2]) << 8) | fifoData[3]);
+                quaternions.push_back((static_cast<uint32_t>(fifoData[4]) << 24) | (static_cast<uint32_t>(fifoData[5]) << 16) | (static_cast<uint32_t>(fifoData[6]) << 8) | fifoData[7]);
+                quaternions.push_back((static_cast<uint32_t>(fifoData[8]) << 24) | (static_cast<uint32_t>(fifoData[9]) << 16) | (static_cast<uint32_t>(fifoData[10]) << 8) | fifoData[11]);
+                quaternions.push_back((static_cast<uint32_t>(fifoData[12]) << 24) | (static_cast<uint32_t>(fifoData[13]) << 16) | (static_cast<uint32_t>(fifoData[14]) << 8) | fifoData[15]);
             }
             else
             {
@@ -111,10 +111,10 @@ void PigpioImu::publishQuaternions(void)
 
     if (quaternions.size() >= 4)
     {
-        quaternionsFloat.push_back((double)quaternions.at(0) / 16384.0f);
-        quaternionsFloat.push_back((double)quaternions.at(1) / 16384.0f);
-        quaternionsFloat.push_back((double)quaternions.at(2) / 16384.0f);
-        quaternionsFloat.push_back((double)quaternions.at(3) / 16384.0f);
+        quaternionsFloat.push_back(static_cast<double>(quaternions.at(0)) / 16384.0f);
+        quaternionsFloat.push_back(static_cast<double>(quaternions.at(1)) / 16384.0f);
+        quaternionsFloat.push_back(static_cast<double>(quaternions.at(2)) / 16384.0f);
+        quaternionsFloat.push_back(static_cast<double>(quaternions.at(3)) / 16384.0f);
 
         // roll (x-axis rotation)
         double sinr_cosp = 2 * (quaternionsFloat.at(0) * quaternionsFloat.at(1) + quaternionsFloat.at(2) * quaternionsFloat.at(3));

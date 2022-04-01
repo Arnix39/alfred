@@ -54,7 +54,7 @@ bool PigpioI2c::i2cReadByteData(hal_pigpio::hal_pigpioI2cReadByteData::Request &
     int result = i2c_read_byte_data(pigpioHandle, req.handle, req.deviceRegister);
     if (result >= 0)
     {
-        res.value = (uint8_t)result;
+        res.value = static_cast<uint8_t>(result);
         res.hasSucceeded = true;
     }
     else
@@ -72,7 +72,7 @@ bool PigpioI2c::i2cReadWordData(hal_pigpio::hal_pigpioI2cReadWordData::Request &
     int result = i2c_read_word_data(pigpioHandle, req.handle, req.deviceRegister);
     if (result >= 0)
     {
-        res.value = (uint16_t)result;
+        res.value = static_cast<uint16_t>(result);
         res.hasSucceeded = true;
     }
     else

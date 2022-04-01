@@ -361,8 +361,8 @@ void Imu::setDmpRate(uint16_t rate)
         div = MPU6050_DMP_SAMPLE_RATE / rate - 1;
     }
 
-    div_vec.push_back((uint8_t)(div >> 8));
-    div_vec.push_back((uint8_t)(div & 0xFF));
+    div_vec.push_back(static_cast<uint8_t>(div >> 8));
+    div_vec.push_back(static_cast<uint8_t>(div & 0xFF));
 
     writeDataToDmp(MPU6050_DMP_SAMPLE_RATE_BANK, MPU6050_DMP_SAMPLE_RATE_ADDRESS, div_vec);
 }
