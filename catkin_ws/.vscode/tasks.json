@@ -16,6 +16,23 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "ROS: catkin_make_tests",
+            "type": "catkin_make",
+            "args": [
+                "--directory",
+                "${workspaceFolder}/",
+                "-j4",
+                "-DCMAKE_BUILD_TYPE=Debug",
+                "-DCMAKE_EXPORT_COMPILE_COMMANDS=1",
+                "tests"
+            ],
+            "problemMatcher": "$catkin-gcc",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }
