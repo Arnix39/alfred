@@ -26,6 +26,7 @@
 #define MPU6050_FIFO_COUNT_L_REGISTER 0x73
 #define MPU6050_FIFO_REGISTER 0x74
 #define MPU6050_MAX_FIFO_SAMPLES 1024
+#define MPU6050_MAX_QUATERNIONS_SAMPLES 160
 #define MPU6050_DMP_FIFO_QUAT_SIZE 16
 
 class PigpioImu
@@ -46,6 +47,8 @@ public:
     void publishQuaternions(void);
     void readAndPublishQuaternions(const ros::TimerEvent &event);
     void resetFifo(void);
+    uint16_t readFifoCount(void);
+    bool isFifoOverflowed(void);
     bool i2cImuReading(hal_pigpio::hal_pigpioI2cImuReading::Request &req,
                        hal_pigpio::hal_pigpioI2cImuReading::Response &res);
 };

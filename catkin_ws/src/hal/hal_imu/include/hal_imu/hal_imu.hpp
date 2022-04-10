@@ -29,7 +29,6 @@ private:
     ImuSubscribers *imuSubs;
     int32_t imuHandle;
     int16_t angle;
-    bool dmpEnabled;
     bool i2cInitialised;
     bool isStarted;
 
@@ -64,6 +63,8 @@ public:
     bool isNotStarted(void);
     void starts(void);
     void setConfiguration(void);
+    void setGyroscopeSensitivity(void);
+    void setAccelerometerSensitivity(void);
 };
 
 #endif
