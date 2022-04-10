@@ -33,7 +33,7 @@ PIN	GPIO	Function		Color
 27	0	Reserved		NA
 28	1	Reserved		NA
 29	5	Trigger Ultra. sensor	green	
-30	GND	Address selec. MPU6050	brown
+30	GND		
 31	6	Echo Ultra. sensor	blue	
 32	12		
 33	13		

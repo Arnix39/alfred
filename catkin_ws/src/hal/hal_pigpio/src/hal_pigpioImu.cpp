@@ -180,7 +180,7 @@ void PigpioImu::publishQuaternions(void)
         double quadrantYaw = 2 * (quaternionsFloat.at(0) * quaternionsFloat.at(0) + quaternionsFloat.at(1) * quaternionsFloat.at(1)) - 1;
         yaw = std::atan2(tanYaw, quadrantYaw) * 180 / M_PI;
 
-        ROS_INFO("roll: %lf, pitch: %lf, psi: %lf.", roll, pitch, yaw);
+        ROS_INFO("roll: %lf, pitch: %lf, yaw: %lf.", roll, pitch, yaw);
 
         quaternions.clear();
     }
