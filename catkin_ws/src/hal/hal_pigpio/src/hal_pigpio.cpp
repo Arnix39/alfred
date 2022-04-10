@@ -22,7 +22,7 @@ int main(int argc, char **argv)
     PigpioOutput pigpioOutput(&node, pigpioHandle);
     PigpioInput pigpioInput(&node, pigpioHandle);
     PigpioI2c pigpioI2c(&node, pigpioHandle);
-    PigpioImu pigpioimu(&node, pigpioHandle);
+    PigpioImu pigpioImu(&node, pigpioHandle);
 
     ros::Timer heartbeatTimer(node.createTimer(ros::Duration(0.1), &PigpioInit::publishHeartbeat, &pigpioInit));
 
