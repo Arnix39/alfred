@@ -22,7 +22,7 @@ add_message_files(
    FILES
    hal_pigpioEdgeChangeMsg.msg
    hal_pigpioHeartbeatMsg.msg
-   hal_pigpioQuaternionsMsg.msg
+   hal_pigpioAnglesMsg.msg
  )
 
 ## Generate services in the 'srv' folder

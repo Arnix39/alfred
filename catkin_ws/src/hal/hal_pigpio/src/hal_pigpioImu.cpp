@@ -3,10 +3,10 @@
 PigpioImu::PigpioImu(ros::NodeHandle *node, int pigpioHandle) : pigpioHandle(pigpioHandle),
                                                                 i2cHandle(-1),
                                                                 quaternions({0, 0, 0, 0}),
-                                                                readAndPublishQuaternionsTimer(node->createTimer(ros::Duration(0.005), &PigpioImu::readAndPublishQuaternions, this)),
+                                                                readQuaternionsAndPublishAnglesTimer(node->createTimer(ros::Duration(0.005), &PigpioImu::readQuaternionsAndPublishAngles, this)),
                                                                 isImuReady(false),
                                                                 imuReadingService(node->advertiseService("hal_pigpioI2cImuReading", &PigpioImu::i2cImuReading, this)),
-                                                                quaternionsPublisher(node->advertise<hal_pigpio::hal_pigpioQuaternionsMsg>("hal_pigpioQuaternions", 1000))
+                                                                anglesPublisher(node->advertise<hal_pigpio::hal_pigpioAnglesMsg>("hal_pigpioAngles", 1000))
 {
 }
 
@@ -113,12 +113,12 @@ void PigpioImu::readImuData(void)
     }
 }
 
-void PigpioImu::publishQuaternions(void)
+void PigpioImu::publishAngles(void)
 {
-    hal_pigpio::hal_pigpioQuaternionsMsg message;
+    /*hal_pigpio::hal_pigpioAnglesMsg message;
 
-    message.quaternions = quaternions;
-    quaternionsPublisher.publish(message);
+    message.angles = quaternions;
+    anglesPublisher.publish(message);*/
 
     double phi;
     double theta;
@@ -186,12 +186,12 @@ void PigpioImu::publishQuaternions(void)
     }
 }
 
-void PigpioImu::readAndPublishQuaternions(const ros::TimerEvent &event)
+void PigpioImu::readQuaternionsAndPublishAngles(const ros::TimerEvent &event)
 {
     if (isImuReady)
     {
         readImuData();
-        publishQuaternions();
+        publishAngles();
     }
 }
 

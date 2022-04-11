@@ -12,7 +12,7 @@
 
 // Services and messages headers (generated)
 #include "hal_pigpio/hal_pigpioI2cImuReading.h"
-#include "hal_pigpio/hal_pigpioQuaternionsMsg.h"
+#include "hal_pigpio/hal_pigpioAnglesMsg.h"
 
 #define I2C_BUFFER_MAX_BYTES 32
 
@@ -37,15 +37,15 @@ private:
     std::vector<uint32_t> quaternions;
     bool isImuReady;
     ros::ServiceServer imuReadingService;
-    ros::Timer readAndPublishQuaternionsTimer;
-    ros::Publisher quaternionsPublisher;
+    ros::Timer readQuaternionsAndPublishAnglesTimer;
+    ros::Publisher anglesPublisher;
 
 public:
     PigpioImu(ros::NodeHandle *node, int pigpioHandle);
     ~PigpioImu() = default;
     void readImuData(void);
-    void publishQuaternions(void);
-    void readAndPublishQuaternions(const ros::TimerEvent &event);
+    void publishAngles(void);
+    void readQuaternionsAndPublishAngles(const ros::TimerEvent &event);
     void resetFifo(void);
     uint16_t readFifoCount(void);
     bool isFifoOverflowed(void);
