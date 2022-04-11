@@ -34,7 +34,7 @@ class PigpioImu
 private:
     int pigpioHandle;
     int32_t i2cHandle;
-    std::vector<uint32_t> quaternions;
+    std::vector<int32_t> quaternions;
     bool isImuReady;
     ros::ServiceServer imuReadingService;
     ros::Timer readQuaternionsAndPublishAnglesTimer;

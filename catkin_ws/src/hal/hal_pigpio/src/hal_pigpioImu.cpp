@@ -90,14 +90,15 @@ void PigpioImu::readImuData(void)
         {
             if (i2c_read_i2c_block_data(pigpioHandle, i2cHandle, MPU6050_FIFO_REGISTER, fifoData, MPU6050_DMP_FIFO_QUAT_SIZE) == MPU6050_DMP_FIFO_QUAT_SIZE)
             {
-                quaternions.push_back((static_cast<uint32_t>(fifoData[0]) << 24) | (static_cast<uint32_t>(fifoData[1]) << 16) | (static_cast<uint32_t>(fifoData[2]) << 8) | fifoData[3]);
-                quaternions.push_back((static_cast<uint32_t>(fifoData[4]) << 24) | (static_cast<uint32_t>(fifoData[5]) << 16) | (static_cast<uint32_t>(fifoData[6]) << 8) | fifoData[7]);
-                quaternions.push_back((static_cast<uint32_t>(fifoData[8]) << 24) | (static_cast<uint32_t>(fifoData[9]) << 16) | (static_cast<uint32_t>(fifoData[10]) << 8) | fifoData[11]);
-                quaternions.push_back((static_cast<uint32_t>(fifoData[12]) << 24) | (static_cast<uint32_t>(fifoData[13]) << 16) | (static_cast<uint32_t>(fifoData[14]) << 8) | fifoData[15]);
+                quaternions.push_back((static_cast<int32_t>(fifoData[0]) << 24) | (static_cast<int32_t>(fifoData[1]) << 16) | (static_cast<int32_t>(fifoData[2]) << 8) | fifoData[3]);
+                quaternions.push_back((static_cast<int32_t>(fifoData[4]) << 24) | (static_cast<int32_t>(fifoData[5]) << 16) | (static_cast<int32_t>(fifoData[6]) << 8) | fifoData[7]);
+                quaternions.push_back((static_cast<int32_t>(fifoData[8]) << 24) | (static_cast<int32_t>(fifoData[9]) << 16) | (static_cast<int32_t>(fifoData[10]) << 8) | fifoData[11]);
+                quaternions.push_back((static_cast<int32_t>(fifoData[12]) << 24) | (static_cast<int32_t>(fifoData[13]) << 16) | (static_cast<int32_t>(fifoData[14]) << 8) | fifoData[15]);
             }
             else
             {
                 ROS_ERROR("Failed to read FIFO!");
+                resetFifo();
                 return;
             }
 
@@ -120,67 +121,35 @@ void PigpioImu::publishAngles(void)
     message.angles = quaternions;
     anglesPublisher.publish(message);*/
 
-    double phi;
-    double theta;
-    double psi;
+    float phi = 0.0f;
+    float theta = 0.0f;
+    float psi = 0.0f;
 
-    double roll;
-    double pitch;
-    double yaw;
-
-    std::vector<double> quaternionsFloat;
-    std::vector<double> gravity;
+    std::vector<float> quaternionsFloat;
+    std::vector<float> gravity;
 
     if (quaternions.size() >= 4)
     {
-        quaternionsFloat.push_back(static_cast<double>(quaternions.at(0)) / 16384.0f);
-        quaternionsFloat.push_back(static_cast<double>(quaternions.at(1)) / 16384.0f);
-        quaternionsFloat.push_back(static_cast<double>(quaternions.at(2)) / 16384.0f);
-        quaternionsFloat.push_back(static_cast<double>(quaternions.at(3)) / 16384.0f);
+        quaternionsFloat.push_back(static_cast<float>(quaternions.at(0)) / 1073741824.0f);
+        quaternionsFloat.push_back(static_cast<float>(quaternions.at(1)) / 1073741824.0f);
+        quaternionsFloat.push_back(static_cast<float>(quaternions.at(2)) / 1073741824.0f);
+        quaternionsFloat.push_back(static_cast<float>(quaternions.at(3)) / 1073741824.0f);
 
-        /*// theta (x-axis rotation)
-        double sinTheta = 2 * (quaternionsFloat.at(0) * quaternionsFloat.at(2) + quaternionsFloat.at(1) * quaternionsFloat.at(3));
-        theta = -std::asin(sinTheta) * 180 / M_PI;
-
-        // phi (y-axis rotation)
-        double tanPhi = 2 * (quaternionsFloat.at(2) * quaternionsFloat.at(3) - quaternionsFloat.at(0) * quaternionsFloat.at(1));
-        double quadrantPhi = 2 * (quaternionsFloat.at(0) * quaternionsFloat.at(0) + quaternionsFloat.at(3) * quaternionsFloat.at(3)) - 1;
+        // phi (x-axis rotation)
+        float tanPhi = 2 * (quaternionsFloat.at(2) * quaternionsFloat.at(3) - quaternionsFloat.at(0) * quaternionsFloat.at(1));
+        float quadrantPhi = 2 * (quaternionsFloat.at(0) * quaternionsFloat.at(0) + quaternionsFloat.at(3) * quaternionsFloat.at(3)) - 1;
         phi = std::atan2(tanPhi, quadrantPhi) * 180 / M_PI;
 
+        // theta (y-axis rotation)
+        float sinTheta = 2 * (quaternionsFloat.at(1) * quaternionsFloat.at(3) + quaternionsFloat.at(0) * quaternionsFloat.at(2));
+        theta = -std::asin(sinTheta) * 180 / M_PI;
+
         // psi (z-axis rotation)
-        double tanPsi = 2 * (quaternionsFloat.at(1) * quaternionsFloat.at(2) - quaternionsFloat.at(0) * quaternionsFloat.at(3));
-        double quadrantPsi = 2 * (quaternionsFloat.at(0) * quaternionsFloat.at(0) + quaternionsFloat.at(1) * quaternionsFloat.at(1)) - 1;
+        float tanPsi = 2 * (quaternionsFloat.at(1) * quaternionsFloat.at(2) - quaternionsFloat.at(0) * quaternionsFloat.at(3));
+        float quadrantPsi = 2 * (quaternionsFloat.at(0) * quaternionsFloat.at(0) + quaternionsFloat.at(1) * quaternionsFloat.at(1)) - 1;
         psi = std::atan2(tanPsi, quadrantPsi) * 180 / M_PI;
 
-        ROS_INFO("theta: %lf, phi: %lf, psi: %lf.", theta, phi, psi);*/
-
-        gravity.push_back(quaternionsFloat.at(1) * quaternionsFloat.at(3) - quaternionsFloat.at(0) * quaternionsFloat.at(2));
-        gravity.push_back(quaternionsFloat.at(0) * quaternionsFloat.at(1) + quaternionsFloat.at(2) * quaternionsFloat.at(3));
-        gravity.push_back(1/2 * (quaternionsFloat.at(0) * quaternionsFloat.at(0) + quaternionsFloat.at(3) * quaternionsFloat.at(3) - (quaternionsFloat.at(1) * quaternionsFloat.at(1) + quaternionsFloat.at(2) * quaternionsFloat.at(2))));
-
-        // roll (x-axis rotation)
-        double tanRoll = gravity.at(1);
-        double quadrantRoll = gravity.at(2);
-        roll = std::atan2(tanRoll, quadrantRoll) * 180 / M_PI;
-
-        // pitch (y-axis rotation)
-        double tanPitch = gravity.at(0);
-        double quadrantPitch = sqrt(gravity.at(1) * gravity.at(1) + gravity.at(2) * gravity.at(2));
-        if(gravity.at(2) < 0)
-        {
-            pitch = 180 - std::atan2(tanPitch, quadrantPitch) * 180 / M_PI;
-        }
-        else
-        {
-            pitch = -180 - std::atan2(tanPitch, quadrantPitch) * 180 / M_PI;
-        }
-
-        // yaw (z-axis rotation)
-        double tanYaw = 2 * (quaternionsFloat.at(1) * quaternionsFloat.at(2) - quaternionsFloat.at(0) * quaternionsFloat.at(3));
-        double quadrantYaw = 2 * (quaternionsFloat.at(0) * quaternionsFloat.at(0) + quaternionsFloat.at(1) * quaternionsFloat.at(1)) - 1;
-        yaw = std::atan2(tanYaw, quadrantYaw) * 180 / M_PI;
-
-        ROS_INFO("roll: %lf, pitch: %lf, yaw: %lf.", roll, pitch, yaw);
+        ROS_INFO("phi: %lf, theta: %lf, psi: %lf.", phi, theta, psi);
 
         quaternions.clear();
     }
