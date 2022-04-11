@@ -19,7 +19,23 @@
 #include "hal_imu/hal_imuMsg.h"
 #include "hal_imu/hal_imuI2cHeartbeatMsg.h"
 
+#define IMU_GYROSCOPE_X_OFFSET 0
+#define IMU_GYROSCOPE_Y_OFFSET -34
+#define IMU_GYROSCOPE_Z_OFFSET -9
+
+#define IMU_ACCELEROMETER_X_OFFSET -556
+#define IMU_ACCELEROMETER_Y_OFFSET -1188
+#define IMU_ACCELEROMETER_Z_OFFSET 873
+
 typedef actionlib::SimpleActionClient<hal_imu::hal_imuWriteDmpAction> imuActionClient_t;
+
+struct SensorBias
+{
+    const char axis;
+    const int16_t bias;
+    const uint8_t msbRegister;
+    const uint8_t lsbRegister;
+};
 
 class Imu
 {
@@ -65,6 +81,9 @@ public:
     void setConfiguration(void);
     void setGyroscopeSensitivity(void);
     void setAccelerometerSensitivity(void);
+    void setAccelerometerOffsets(void);
+    void setGyroscopeOffsets(void);
+    bool writeSensorBiases(const std::vector<SensorBias> sensorBiases);
 };
 
 #endif

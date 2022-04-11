@@ -113,6 +113,8 @@ void Imu::init(void)
     writeDmp();
     setDmpRate(MPU6050_DMP_SAMPLE_RATE);
     //writeOrientationMatrix();
+    setAccelerometerOffsets();
+    setGyroscopeOffsets();
     configureDmpFeatures();
     enableDmp();
     //  calibrateAccelerometer();
@@ -322,6 +324,65 @@ void Imu::resetFifo()
     {
         ROS_INFO("Successfully resetted FIFO.");
     }
+}
+
+void Imu::setAccelerometerOffsets(void)
+{
+    SensorBias accelerometerXBias{'X', -IMU_ACCELEROMETER_X_OFFSET, MPU6050_ACCELEROMETER_X_OFFSET_MSB_REGISTER, MPU6050_ACCELEROMETER_X_OFFSET_LSB_REGISTER};
+    SensorBias accelerometerYBias{'Y', -IMU_ACCELEROMETER_Y_OFFSET, MPU6050_ACCELEROMETER_Y_OFFSET_MSB_REGISTER, MPU6050_ACCELEROMETER_Y_OFFSET_LSB_REGISTER};
+    SensorBias accelerometerZBias{'Z', -IMU_ACCELEROMETER_Z_OFFSET, MPU6050_ACCELEROMETER_Z_OFFSET_MSB_REGISTER, MPU6050_ACCELEROMETER_Z_OFFSET_LSB_REGISTER};
+    
+    const std::vector<SensorBias> accelerometerBiases{accelerometerXBias, accelerometerYBias, accelerometerZBias};
+    
+    if (!writeSensorBiases(accelerometerBiases))
+    {
+        ROS_ERROR("Failed to set accelerometer offsets.");
+    }
+    else
+    {
+        ROS_INFO("Successfully set accelerometer offsets.");
+    }
+}
+
+void Imu::setGyroscopeOffsets(void)
+{
+    SensorBias gyroscopeXBias{'X', -IMU_GYROSCOPE_X_OFFSET, MPU6050_GYROSCOPE_X_OFFSET_MSB_REGISTER, MPU6050_GYROSCOPE_X_OFFSET_LSB_REGISTER};
+    SensorBias gyroscopeYBias{'Y', -IMU_GYROSCOPE_Y_OFFSET, MPU6050_GYROSCOPE_Y_OFFSET_MSB_REGISTER, MPU6050_GYROSCOPE_Y_OFFSET_LSB_REGISTER};
+    SensorBias gyroscopeZBias{'Z', -IMU_GYROSCOPE_Z_OFFSET, MPU6050_GYROSCOPE_Z_OFFSET_MSB_REGISTER, MPU6050_GYROSCOPE_Z_OFFSET_LSB_REGISTER};
+    
+    const std::vector<SensorBias> gyroscopeBiases{gyroscopeXBias, gyroscopeYBias, gyroscopeZBias};
+    
+    if (!writeSensorBiases(gyroscopeBiases))
+    {
+        ROS_ERROR("Failed to set gyroscope offsets.");
+    }
+    else
+    {
+        ROS_INFO("Successfully set gyroscope offsets.");
+    }
+}
+
+bool Imu::writeSensorBiases(const std::vector<SensorBias> sensorBiases)
+{
+    for (auto sensorBias : sensorBiases)
+    {
+        uint8_t sensorBiasMsb = static_cast<uint8_t>((sensorBias.bias >> 8) & 0xFF);
+        uint8_t sensorBiasLsb = static_cast<uint8_t>(sensorBias.bias & 0xFF);
+
+        if (!writeByteInRegister(sensorBias.msbRegister, sensorBiasMsb))
+        {
+            ROS_ERROR("Failed to set sensor %c offset!", sensorBias.axis);
+            return false;
+        }
+
+        if (!writeByteInRegister(sensorBias.lsbRegister, sensorBiasLsb))
+        {
+            ROS_ERROR("Failed to set sensor %c offset!", sensorBias.axis);
+            return false;
+        }
+    }
+
+    return true;
 }
 
 void Imu::configureDmpFeatures(void)
