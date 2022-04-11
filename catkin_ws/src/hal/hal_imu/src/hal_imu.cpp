@@ -112,7 +112,6 @@ void Imu::init(void)
     setMpuRate(MPU6050_DMP_SAMPLE_RATE);
     writeDmp();
     setDmpRate(MPU6050_DMP_SAMPLE_RATE);
-    //writeOrientationMatrix();
     setAccelerometerOffsets();
     setGyroscopeOffsets();
     configureDmpFeatures();
@@ -202,7 +201,7 @@ void Imu::setConfiguration(void)
 
 void Imu::setAccelerometerSensitivity(void)
 {
-    if (!writeByteInRegister(MPU6050_ACCELEROMETER_CONFIGURATION, MPU6050_ACCELEROMETER_FULL_SENSITIVITY))
+    if (!writeByteInRegister(MPU6050_ACCELEROMETER_CONFIGURATION_REGISTER, MPU6050_ACCELEROMETER_FULL_SENSITIVITY))
     {
         ROS_ERROR("Failed to set accelerometer sensitivity!");
     }
@@ -214,7 +213,7 @@ void Imu::setAccelerometerSensitivity(void)
 
 void Imu::setGyroscopeSensitivity(void)
 {
-    if (!writeByteInRegister(MPU6050_GYROSCOPE_CONFIGURATION, MPU6050_GYROSCOPE_FULL_SENSITIVITY))
+    if (!writeByteInRegister(MPU6050_GYROSCOPE_CONFIGURATION_REGISTER, MPU6050_GYROSCOPE_FULL_SENSITIVITY))
     {
         ROS_ERROR("Failed to set gyroscope sensitivity!");
     }
@@ -277,40 +276,6 @@ void Imu::setDmpRate(uint16_t rate)
     }
 
     ROS_INFO("Successfully set DMP sample rate.");
-}
-
-void Imu::writeOrientationMatrix(void)
-{
-    std::vector<uint8_t> dmpOrientationMatrixGyroAxes{0x4C, 0xCD, 0x6C};
-    std::vector<uint8_t> dmpOrientationMatrixGyroSigns{0x36, 0x56, 0x76};
-    std::vector<uint8_t> dmpOrientationMatrixAccelAxes{0x0C, 0xC9, 0x2C};
-    std::vector<uint8_t> dmpOrientationMatrixAccelSigns{0x26, 0x46, 0x66};
-
-    if (!writeDataToDmp(MPU6050_DMP_ORIENTATION_MATRIX_GYRO_AXES_BANK, MPU6050_DMP_ORIENTATION_MATRIX_GYRO_AXES_ADDRESS, dmpOrientationMatrixGyroAxes))
-    {
-        ROS_ERROR("Failed to write the gyroscope axes of the orientation matrix!");
-        return;
-    }
-
-    if (!writeDataToDmp(MPU6050_DMP_ORIENTATION_MATRIX_GYRO_SIGNS_BANK, MPU6050_DMP_ORIENTATION_MATRIX_GYRO_SIGNS_ADDRESS, dmpOrientationMatrixGyroSigns))
-    {
-        ROS_ERROR("Failed to write the gyroscope signs of the orientation matrix!");
-        return;
-    }
-
-    if (!writeDataToDmp(MPU6050_DMP_ORIENTATION_MATRIX_ACCEL_AXES_BANK, MPU6050_DMP_ORIENTATION_MATRIX_ACCEL_AXES_ADDRESS, dmpOrientationMatrixAccelAxes))
-    {
-        ROS_ERROR("Failed to write the accelerometer axes of the orientation matrix!");
-        return;
-    }
-
-    if (!writeDataToDmp(MPU6050_DMP_ORIENTATION_MATRIX_ACCEL_SIGNS_BANK, MPU6050_DMP_ORIENTATION_MATRIX_ACCEL_SIGNS_ADDRESS, dmpOrientationMatrixAccelSigns))
-    {
-        ROS_ERROR("Failed to write the accelerometer signs of the orientation matrix!");
-        return;
-    }
-
-    ROS_INFO("Successfully wrote orientation matrix.");
 }
 
 void Imu::resetFifo()

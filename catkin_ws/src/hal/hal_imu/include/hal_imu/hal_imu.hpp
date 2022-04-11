@@ -69,7 +69,6 @@ public:
     bool writeBitInRegister(uint8_t registerToWrite, uint8_t bitToWrite, uint8_t valueOfBit);
     void resetImu(void);
     void resetFifo(void);
-    void writeOrientationMatrix(void);
     void setClockSource(void);
     bool writeDataToDmp(uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data);
     void publishMessage(void);
