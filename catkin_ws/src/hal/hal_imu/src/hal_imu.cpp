@@ -117,7 +117,6 @@ void Imu::init(void)
     setGyroscopeOffsets();
     configureDmpFeatures();
     enableDmp();
-    //  calibrateAccelerometer();
 }
 
 void Imu::resetImu(void)
@@ -454,10 +453,6 @@ void Imu::enableDmp(void)
     resetFifo();
 
     ROS_INFO("Successfully enabled DMP.");
-}
-
-void Imu::calibrateAccelerometer(void)
-{
 }
 
 bool Imu::writeBitInRegister(uint8_t registerToWrite, uint8_t bitToWrite, uint8_t valueOfBit)

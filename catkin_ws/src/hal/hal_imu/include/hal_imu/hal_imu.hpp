@@ -60,7 +60,6 @@ public:
     void setMpuRate(uint16_t rate);
     void enableDmp(void);
     void configureDmpFeatures(void);
-    void calibrateAccelerometer(void);
     bool writeByteInRegister(uint8_t registerToWrite, uint8_t value);
     bool writeWordInRegister(uint8_t registerToWrite, uint16_t value);
     bool writeDataBlock(uint8_t registerToWrite, std::vector<uint8_t> data);
