@@ -13,10 +13,41 @@
 #include "hal_pigpio/hal_pigpioSetPwmDutycycle.h"
 #include "hal_pigpio/hal_pigpioEdgeChangeMsg.h"
 
+struct EncoderChannel
+{
+    uint8_t gpio;
+    Channel channel;
+};
+
+struct Encoder
+{
+    EncoderChannel channelA;
+    EncoderChannel channelB;
+    uint32_t encoderCounts;
+};
+
+struct Pwm
+{
+    uint8_t gpio;
+    uint16_t dutycycle;
+};
+
+
 class Motor
 {
 private:
+    Encoder encoder;
+    Pwm pwmA;
+    Pwm pwmB;
+    bool isDirectionForward;
+
 public:
+    Motor(uint8_t gpioPwmChannelA, uint8_t gpioPwmChannelB, uint8_t gpioEncoderChannelA, uint8_t gpioEncoderChannelB);
+    ~Motor() = default;
+    uint32_t getEncoderCounts(void);
+    void setPwmDutyCycle(Channel channel, uint16_t dutycycle);
+    void setDirectionForward(void);
+    void setDirectionBackward(void);
 };
 
 #endif

@@ -24,10 +24,10 @@ PIN	GPIO	Function		Color
 18	24		
 19	10	OE Level Shifter	grey	
 20	GND	GND Level shifter	black	
-21	9	PWM A motor 1		brown
-22	25	PWM B motor 1		orange
-23	11	PWM A motor 2		brown
-24	8	PWM B motor 2		orange
+21	9	PWM A motor L		brown
+22	25	PWM B motor L		orange
+23	11	PWM A motor R		brown
+24	8	PWM B motor R		orange
 25	GND	GND Ultrasonic sensor	black	
 26	7		
 27	0	Reserved		NA

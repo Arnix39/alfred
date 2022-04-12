@@ -19,4 +19,10 @@
 #define RISING_EDGE 1
 #define NO_CHANGE 2
 
+enum Channel
+{ 
+    chA, 
+    chB
+};
+
 #endif
