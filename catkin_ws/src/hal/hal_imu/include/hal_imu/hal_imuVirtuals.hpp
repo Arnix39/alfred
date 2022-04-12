@@ -8,14 +8,6 @@
 
 class Imu;
 
-class ImuPublisher
-{
-public:
-    ImuPublisher() {}
-    virtual ~ImuPublisher() {}
-    virtual void publish(hal_imu::hal_imuMsg message) = 0;
-};
-
 class ImuSubscribers
 {
 public:

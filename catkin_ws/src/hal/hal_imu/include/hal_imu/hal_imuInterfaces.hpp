@@ -3,17 +3,6 @@
 
 #include "hal_imuVirtuals.hpp"
 
-class ImuPublisherRos : public ImuPublisher
-{
-private:
-    ros::Publisher imuPublisherRos;
-
-public:
-    ImuPublisherRos(ros::NodeHandle *node);
-    ~ImuPublisherRos() = default;
-    void publish(hal_imu::hal_imuMsg message) override;
-};
-
 class ImuSubscribersRos : public ImuSubscribers
 {
 private:

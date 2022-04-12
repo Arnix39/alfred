@@ -41,15 +41,13 @@ class Imu
 {
 private:
     ImuClients *imuClients;
-    ImuPublisher *imuPublisher;
     ImuSubscribers *imuSubs;
     int32_t imuHandle;
-    int16_t angle;
     bool i2cInitialised;
     bool isStarted;
 
 public:
-    Imu(ImuPublisher *imuMessagePublisher, ImuClients *imuServiceClients, ImuSubscribers *imuSubscribers);
+    Imu(ImuClients *imuServiceClients, ImuSubscribers *imuSubscribers);
     ~Imu() = default;
     void imuI2cInitHeartbeatCallback(const hal_imu::hal_imuI2cHeartbeatMsg &msg);
     bool isI2cInitialised(void);
@@ -60,18 +58,10 @@ public:
     void setMpuRate(uint16_t rate);
     void enableDmp(void);
     void configureDmpFeatures(void);
-    bool writeByteInRegister(uint8_t registerToWrite, uint8_t value);
-    bool writeWordInRegister(uint8_t registerToWrite, uint16_t value);
-    bool writeDataBlock(uint8_t registerToWrite, std::vector<uint8_t> data);
-    int16_t readByteFromRegister(uint8_t registerToRead);
-    int32_t readWordFromRegister(uint8_t registerToRead);
-    std::vector<uint8_t> readBlockFromRegister(uint8_t registerToRead, uint8_t bytesToRead);
-    bool writeBitInRegister(uint8_t registerToWrite, uint8_t bitToWrite, uint8_t valueOfBit);
     void resetImu(void);
     void resetFifo(void);
     void setClockSource(void);
     bool writeDataToDmp(uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data);
-    void publishMessage(void);
     void startImuReading(void);
     void stopImuReading(void);
     bool isNotStarted(void);
@@ -82,6 +72,10 @@ public:
     void setAccelerometerOffsets(void);
     void setGyroscopeOffsets(void);
     bool writeSensorBiases(const std::vector<SensorBias> sensorBiases);
+    int16_t readByteFromRegister(uint8_t registerToRead);
+    bool writeBitInRegister(uint8_t registerToWrite, uint8_t bitToWrite, uint8_t valueOfBit);
+    bool writeByteInRegister(uint8_t registerToWrite, uint8_t value);
+    bool writeDataBlock(uint8_t registerToWrite, std::vector<uint8_t> data);
 };
 
 #endif

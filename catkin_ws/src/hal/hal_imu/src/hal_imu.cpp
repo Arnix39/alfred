@@ -2,16 +2,6 @@
 #include "hal_imuInterfaces.hpp"
 #include "hal_imuMPU6050.hpp"
 
-/* Publisher interface implementation */
-ImuPublisherRos::ImuPublisherRos(ros::NodeHandle *node) : imuPublisherRos(node->advertise<hal_imu::hal_imuMsg>("angleValue", 1000))
-{
-}
-
-void ImuPublisherRos::publish(hal_imu::hal_imuMsg message)
-{
-    imuPublisherRos.publish(message);
-}
-
 /* Subscriber interface implementation */
 ImuSubscribersRos::ImuSubscribersRos(ros::NodeHandle *node) : nodeHandle(node)
 {
@@ -75,12 +65,10 @@ ros::ServiceClient *ImuClientsRos::getImuReadingClientHandle()
 }
 
 /* IMU implementation */
-Imu::Imu(ImuPublisher *imuMessagePublisher, ImuClients *imuServiceClients, ImuSubscribers *imuSubscribers) : imuPublisher(imuMessagePublisher),
-                                                                                                             imuClients(imuServiceClients),
-                                                                                                             angle(0),
-                                                                                                             imuSubs(imuSubscribers),
-                                                                                                             i2cInitialised(false),
-                                                                                                             isStarted(false)
+Imu::Imu(ImuClients *imuServiceClients, ImuSubscribers *imuSubscribers) : imuClients(imuServiceClients),
+                                                                          imuSubs(imuSubscribers),
+                                                                          i2cInitialised(false),
+                                                                          isStarted(false)
 {
     imuSubs->subscribe(this);
 }
@@ -420,25 +408,40 @@ void Imu::enableDmp(void)
     ROS_INFO("Successfully enabled DMP.");
 }
 
-bool Imu::writeBitInRegister(uint8_t registerToWrite, uint8_t bitToWrite, uint8_t valueOfBit)
+int16_t Imu::readByteFromRegister(uint8_t registerToRead)
 {
     hal_pigpio::hal_pigpioI2cReadByteData i2cReadByteDataSrv;
-    hal_pigpio::hal_pigpioI2cWriteByteData i2cWriteByteDataSrv;
-    uint8_t registerValue;
-    uint8_t newRegisterValue;
 
     i2cReadByteDataSrv.request.handle = imuHandle;
-    i2cReadByteDataSrv.request.deviceRegister = registerToWrite;
+    i2cReadByteDataSrv.request.deviceRegister = registerToRead;
 
     imuClients->getReadByteDataClientHandle()->call(i2cReadByteDataSrv);
 
     if (i2cReadByteDataSrv.response.hasSucceeded)
     {
-        registerValue = i2cReadByteDataSrv.response.value;
+        return i2cReadByteDataSrv.response.value;
     }
     else
     {
+        ROS_ERROR("Failed to read byte!");
+        return -1;
+    }
+}
+
+bool Imu::writeBitInRegister(uint8_t registerToWrite, uint8_t bitToWrite, uint8_t valueOfBit)
+{
+    uint8_t registerValue;
+    int16_t valueRead;
+    uint8_t newRegisterValue;
+
+    valueRead = readByteFromRegister(registerToWrite);
+    if (valueRead < 0)
+    {
         return false;
+    }
+    else
+    {
+        registerValue = static_cast<uint8_t>(valueRead);
     }
 
     if (valueOfBit == 1)
@@ -450,13 +453,38 @@ bool Imu::writeBitInRegister(uint8_t registerToWrite, uint8_t bitToWrite, uint8_
         newRegisterValue = registerValue & ~(1 << bitToWrite);
     }
 
+    return writeByteInRegister(registerToWrite, newRegisterValue);
+}
+
+bool Imu::writeByteInRegister(uint8_t registerToWrite, uint8_t value)
+{
+    hal_pigpio::hal_pigpioI2cWriteByteData i2cWriteByteDataSrv;
+
     i2cWriteByteDataSrv.request.handle = imuHandle;
     i2cWriteByteDataSrv.request.deviceRegister = registerToWrite;
-    i2cWriteByteDataSrv.request.value = newRegisterValue;
+    i2cWriteByteDataSrv.request.value = value;
 
     imuClients->getWriteByteDataClientHandle()->call(i2cWriteByteDataSrv);
 
     return i2cWriteByteDataSrv.response.hasSucceeded;
+}
+
+bool Imu::writeDataBlock(uint8_t registerToWrite, std::vector<uint8_t> data)
+{
+    hal_pigpio::hal_pigpioI2cWriteBlockData i2cWriteBlockDataSrv;
+
+    i2cWriteBlockDataSrv.request.handle = imuHandle;
+    i2cWriteBlockDataSrv.request.deviceRegister = registerToWrite;
+    i2cWriteBlockDataSrv.request.length = data.size();
+
+    for (uint8_t index = 0; index < data.size(); ++index)
+    {
+        i2cWriteBlockDataSrv.request.dataBlock.push_back(data.at(index));
+    }
+
+    imuClients->getWriteBlockDataClientHandle()->call(i2cWriteBlockDataSrv);
+
+    return i2cWriteBlockDataSrv.response.hasSucceeded;
 }
 
 bool Imu::writeDataToDmp(uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data)
@@ -482,111 +510,6 @@ bool Imu::writeDataToDmp(uint8_t bank, uint8_t addressInBank, std::vector<uint8_
     return true;
 }
 
-bool Imu::writeByteInRegister(uint8_t registerToWrite, uint8_t value)
-{
-    hal_pigpio::hal_pigpioI2cWriteByteData i2cWriteByteDataSrv;
-
-    i2cWriteByteDataSrv.request.handle = imuHandle;
-    i2cWriteByteDataSrv.request.deviceRegister = registerToWrite;
-    i2cWriteByteDataSrv.request.value = value;
-
-    imuClients->getWriteByteDataClientHandle()->call(i2cWriteByteDataSrv);
-
-    return i2cWriteByteDataSrv.response.hasSucceeded;
-}
-
-bool Imu::writeWordInRegister(uint8_t registerToWrite, uint16_t value)
-{
-    hal_pigpio::hal_pigpioI2cWriteWordData i2cWriteWordDataSrv;
-
-    i2cWriteWordDataSrv.request.handle = imuHandle;
-    i2cWriteWordDataSrv.request.deviceRegister = registerToWrite;
-    i2cWriteWordDataSrv.request.value = value;
-
-    imuClients->getWriteWordDataClientHandle()->call(i2cWriteWordDataSrv);
-
-    return i2cWriteWordDataSrv.response.hasSucceeded;
-}
-
-bool Imu::writeDataBlock(uint8_t registerToWrite, std::vector<uint8_t> data)
-{
-    hal_pigpio::hal_pigpioI2cWriteBlockData i2cWriteBlockDataSrv;
-
-    i2cWriteBlockDataSrv.request.handle = imuHandle;
-    i2cWriteBlockDataSrv.request.deviceRegister = registerToWrite;
-    i2cWriteBlockDataSrv.request.length = data.size();
-
-    for (uint8_t index = 0; index < data.size(); ++index)
-    {
-        i2cWriteBlockDataSrv.request.dataBlock.push_back(data.at(index));
-    }
-
-    imuClients->getWriteBlockDataClientHandle()->call(i2cWriteBlockDataSrv);
-
-    return i2cWriteBlockDataSrv.response.hasSucceeded;
-}
-
-int16_t Imu::readByteFromRegister(uint8_t registerToRead)
-{
-    hal_pigpio::hal_pigpioI2cReadByteData i2cReadByteDataSrv;
-
-    i2cReadByteDataSrv.request.handle = imuHandle;
-    i2cReadByteDataSrv.request.deviceRegister = registerToRead;
-
-    imuClients->getReadByteDataClientHandle()->call(i2cReadByteDataSrv);
-
-    if (i2cReadByteDataSrv.response.hasSucceeded)
-    {
-        return i2cReadByteDataSrv.response.value;
-    }
-    else
-    {
-        ROS_ERROR("Failed to read byte!");
-        return -1;
-    }
-}
-
-int32_t Imu::readWordFromRegister(uint8_t registerToRead)
-{
-    hal_pigpio::hal_pigpioI2cReadWordData i2cReadWordDataSrv;
-
-    i2cReadWordDataSrv.request.handle = imuHandle;
-    i2cReadWordDataSrv.request.deviceRegister = registerToRead;
-
-    imuClients->getReadWordDataClientHandle()->call(i2cReadWordDataSrv);
-
-    if (i2cReadWordDataSrv.response.hasSucceeded)
-    {
-        return i2cReadWordDataSrv.response.value;
-    }
-    else
-    {
-        ROS_ERROR("Failed to read word!");
-        return -1;
-    }
-}
-
-std::vector<uint8_t> Imu::readBlockFromRegister(uint8_t registerToRead, uint8_t bytesToRead)
-{
-    hal_pigpio::hal_pigpioI2cReadBlockData i2cReadBlockDataSrv;
-
-    i2cReadBlockDataSrv.request.handle = imuHandle;
-    i2cReadBlockDataSrv.request.deviceRegister = registerToRead;
-    i2cReadBlockDataSrv.request.length = bytesToRead;
-
-    imuClients->getReadBlockDataClientHandle()->call(i2cReadBlockDataSrv);
-
-    if (i2cReadBlockDataSrv.response.hasSucceeded)
-    {
-        return i2cReadBlockDataSrv.response.dataBlock;
-    }
-    else
-    {
-        ROS_ERROR("Failed to read data block!");
-        return {};
-    }
-}
-
 void Imu::startImuReading()
 {
     hal_pigpio::hal_pigpioI2cImuReading i2cImuReadingSrv;
@@ -607,14 +530,6 @@ void Imu::stopImuReading()
     imuClients->getImuReadingClientHandle()->call(i2cImuReadingSrv);
 }
 
-void Imu::publishMessage(void)
-{
-    hal_imu::hal_imuMsg message;
-
-    message.angleInDeg = angle;
-    imuPublisher->publish(message);
-}
-
 void Imu::starts(void)
 {
     isStarted = true;
@@ -630,11 +545,10 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "hal_imu");
     ros::NodeHandle node;
 
-    ImuPublisherRos imuMessagePublisherRos(&node);
     ImuClientsRos imuServiceClientsRos(&node);
     ImuSubscribersRos imuSubscribersRos(&node);
 
-    Imu imu(&imuMessagePublisherRos, &imuServiceClientsRos, &imuSubscribersRos);
+    Imu imu(&imuServiceClientsRos, &imuSubscribersRos);
 
     ROS_INFO("imu node waiting for I2C communication to be ready...");
     while (ros::ok())
