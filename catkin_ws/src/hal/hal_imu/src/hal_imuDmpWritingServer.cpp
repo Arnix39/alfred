@@ -18,27 +18,15 @@ imuDmpWritingActionServer_t *ImuDmpWritingActionServerRos::getActionServerHandle
 }
 
 /* Services interface implementation */
-ImuDmpWritingClientsRos::ImuDmpWritingClientsRos(ros::NodeHandle *node) : i2cReadByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cReadByteData>("hal_pigpioI2cReadByteData")),
-                                                                          i2cWriteByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteByteData>("hal_pigpioI2cWriteByteData")),
-                                                                          i2cWriteWordDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteWordData>("hal_pigpioI2cWriteWordData")),
+ImuDmpWritingClientsRos::ImuDmpWritingClientsRos(ros::NodeHandle *node) : i2cWriteByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteByteData>("hal_pigpioI2cWriteByteData")),
                                                                           i2cWriteBlockDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteBlockData>("hal_pigpioI2cWriteBlockData")),
                                                                           i2cGetHandleClientRos(node->serviceClient<hal_imu::hal_imuGetHandle>("hal_imuGetHandle"))
 {
 }
 
-ros::ServiceClient *ImuDmpWritingClientsRos::getReadByteDataClientHandle()
-{
-    return &i2cReadByteDataClientRos;
-}
-
 ros::ServiceClient *ImuDmpWritingClientsRos::getWriteByteDataClientHandle()
 {
     return &i2cWriteByteDataClientRos;
-}
-
-ros::ServiceClient *ImuDmpWritingClientsRos::getWriteWordDataClientHandle()
-{
-    return &i2cWriteWordDataClientRos;
 }
 
 ros::ServiceClient *ImuDmpWritingClientsRos::getWriteBlockDataClientHandle()
@@ -191,19 +179,6 @@ bool ImuDmpWritingServer::writeByteInRegister(uint8_t registerToWrite, uint8_t v
     imuDmpClients->getWriteByteDataClientHandle()->call(i2cWriteByteDataSrv);
 
     return i2cWriteByteDataSrv.response.hasSucceeded;
-}
-
-bool ImuDmpWritingServer::writeWordInRegister(uint8_t registerToWrite, uint16_t value)
-{
-    hal_pigpio::hal_pigpioI2cWriteWordData i2cWriteWordDataSrv;
-
-    i2cWriteWordDataSrv.request.handle = imuHandle;
-    i2cWriteWordDataSrv.request.deviceRegister = registerToWrite;
-    i2cWriteWordDataSrv.request.value = value;
-
-    imuDmpClients->getWriteWordDataClientHandle()->call(i2cWriteWordDataSrv);
-
-    return i2cWriteWordDataSrv.response.hasSucceeded;
 }
 
 bool ImuDmpWritingServer::writeDataBlock(uint8_t registerToWrite, std::vector<uint8_t> data)
