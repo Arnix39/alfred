@@ -144,8 +144,6 @@ void PigpioImu::computeAngles()
     float tanPsi = 2 * (quaternions.x * quaternions.y - quaternions.w * quaternions.z);
     float quadrantPsi = 2 * (quaternions.w * quaternions.w + quaternions.x * quaternions.x) - 1;
     angles.psi = std::atan2(tanPsi, quadrantPsi) * 180 / M_PI;
-
-    ROS_INFO("phi: %lf, theta: %lf, psi: %lf.", angles.phi, angles.theta, angles.psi);
 }
 
 void PigpioImu::readQuaternionsAndPublishAngles(const ros::TimerEvent &event)
