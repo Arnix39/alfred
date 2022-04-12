@@ -13,6 +13,7 @@
         "/home/arnix/src/alfred/catkin_ws/src/hal/hal_motorcontrol/include/**",
         "/home/arnix/src/alfred/catkin_ws/src/hal/hal_pigpio/include/**",
         "/home/arnix/src/alfred/catkin_ws/src/hal/hal_proxsens/include/**",
+        "/home/arnix/src/alfred/catkin_ws/src/hal/include/**",
         "/usr/include/**"
       ],
       "name": "ROS",
