@@ -1,6 +1,6 @@
 #include "hal_imu.hpp"
 #include "hal_imuInterfaces.hpp"
-#include "hal_imuMPU6050.hpp"
+#include "hal_mpu6050.hpp"
 
 /* Subscriber interface implementation */
 ImuSubscribersRos::ImuSubscribersRos(ros::NodeHandle *node) : nodeHandle(node)

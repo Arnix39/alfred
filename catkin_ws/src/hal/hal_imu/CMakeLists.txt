@@ -59,6 +59,7 @@ catkin_package(
 
 include_directories(
   include
+  ../include
   include/${PROJECT_NAME}
   include/${PROJECT_NAME}DmpWritingServer
   include/${PROJECT_NAME}I2cInit

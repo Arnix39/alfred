@@ -3,7 +3,7 @@
 
 #include "ros/ros.h"
 
-#include "hal_imuMPU6050.hpp"
+#include "hal_mpu6050.hpp"
 #include "hal_imuI2cInitVirtuals.hpp"
 
 // Services and messages headers (generated)
