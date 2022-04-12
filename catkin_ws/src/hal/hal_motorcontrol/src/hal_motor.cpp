@@ -1,8 +1,8 @@
 #include "hal_motor.hpp"
 
 Motor::Motor(uint8_t gpioPwmChannelA, uint8_t gpioPwmChannelB,\
-             uint8_t gpioEncoderChannelA, uint8_t gpioEncoderChannelB) : encoder{.channelA{.gpio=gpioEncoderChannelA, .channel=chA},\
-                                                                                 .channelB{.gpio=gpioEncoderChannelB, .channel=chB},\
+             uint8_t gpioEncoderChannelA, uint8_t gpioEncoderChannelB) : encoder{.channelA{.gpio=gpioEncoderChannelA},\
+                                                                                 .channelB{.gpio=gpioEncoderChannelB},\
                                                                                  .encoderCounts=0},
                                                                          pwmA{.gpio=gpioPwmChannelA, .dutycycle=0},
                                                                          pwmB{.gpio=gpioPwmChannelB, .dutycycle=0},

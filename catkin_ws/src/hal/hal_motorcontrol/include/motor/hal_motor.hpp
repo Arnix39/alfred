@@ -16,7 +16,6 @@
 struct EncoderChannel
 {
     uint8_t gpio;
-    Channel channel;
 };
 
 struct Encoder
@@ -31,7 +30,6 @@ struct Pwm
     uint8_t gpio;
     uint16_t dutycycle;
 };
-
 
 class Motor
 {
