@@ -15,9 +15,6 @@ void ImuSubscribersRos::subscribe(Imu *imu)
 /* Services clients interface implementation */
 ImuClientsRos::ImuClientsRos(ros::NodeHandle *node) : i2cReadByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cReadByteData>("hal_pigpioI2cReadByteData")),
                                                       i2cWriteByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteByteData>("hal_pigpioI2cWriteByteData")),
-                                                      i2cReadWordDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cReadWordData>("hal_pigpioI2cReadWordData")),
-                                                      i2cWriteWordDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteWordData>("hal_pigpioI2cWriteWordData")),
-                                                      i2cReadBlockDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cReadBlockData>("hal_pigpioI2cReadBlockData")),
                                                       i2cWriteBlockDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteBlockData>("hal_pigpioI2cWriteBlockData")),
                                                       i2cImuReadingClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cImuReading>("hal_pigpioI2cImuReading")),
                                                       i2cGetHandleClientRos(node->serviceClient<hal_imu::hal_imuGetHandle>("hal_imuGetHandle"))
@@ -32,21 +29,6 @@ ros::ServiceClient *ImuClientsRos::getReadByteDataClientHandle()
 ros::ServiceClient *ImuClientsRos::getWriteByteDataClientHandle()
 {
     return &i2cWriteByteDataClientRos;
-}
-
-ros::ServiceClient *ImuClientsRos::getReadWordDataClientHandle()
-{
-    return &i2cReadWordDataClientRos;
-}
-
-ros::ServiceClient *ImuClientsRos::getWriteWordDataClientHandle()
-{
-    return &i2cWriteWordDataClientRos;
-}
-
-ros::ServiceClient *ImuClientsRos::getReadBlockDataClientHandle()
-{
-    return &i2cReadBlockDataClientRos;
 }
 
 ros::ServiceClient *ImuClientsRos::getWriteBlockDataClientHandle()

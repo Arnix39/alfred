@@ -9,9 +9,6 @@
 // Services and messages headers (generated)
 #include "hal_pigpio/hal_pigpioI2cReadByteData.h"
 #include "hal_pigpio/hal_pigpioI2cWriteByteData.h"
-#include "hal_pigpio/hal_pigpioI2cReadWordData.h"
-#include "hal_pigpio/hal_pigpioI2cWriteWordData.h"
-#include "hal_pigpio/hal_pigpioI2cReadBlockData.h"
 #include "hal_pigpio/hal_pigpioI2cWriteBlockData.h"
 #include "hal_pigpio/hal_pigpioI2cImuReading.h"
 #include "hal_imu/hal_imuGetHandle.h"
