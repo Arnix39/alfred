@@ -72,10 +72,10 @@ bool PigpioImu::isFifoOverflowed(void)
     return false;
 }
 
-void PigpioImu::readImuData(void)
+void PigpioImu::readQuaternions(void)
 {
     uint16_t fifoCount = 0;
-    char fifoData[I2C_BUFFER_MAX_BYTES];
+    char fifoData[MPU6050_DMP_FIFO_QUAT_SIZE];
 
     if (isFifoOverflowed())
     {
@@ -90,10 +90,7 @@ void PigpioImu::readImuData(void)
         {
             if (i2c_read_i2c_block_data(pigpioHandle, i2cHandle, MPU6050_FIFO_REGISTER, fifoData, MPU6050_DMP_FIFO_QUAT_SIZE) == MPU6050_DMP_FIFO_QUAT_SIZE)
             {
-                quaternions.push_back((static_cast<int32_t>(fifoData[0]) << 24) | (static_cast<int32_t>(fifoData[1]) << 16) | (static_cast<int32_t>(fifoData[2]) << 8) | fifoData[3]);
-                quaternions.push_back((static_cast<int32_t>(fifoData[4]) << 24) | (static_cast<int32_t>(fifoData[5]) << 16) | (static_cast<int32_t>(fifoData[6]) << 8) | fifoData[7]);
-                quaternions.push_back((static_cast<int32_t>(fifoData[8]) << 24) | (static_cast<int32_t>(fifoData[9]) << 16) | (static_cast<int32_t>(fifoData[10]) << 8) | fifoData[11]);
-                quaternions.push_back((static_cast<int32_t>(fifoData[12]) << 24) | (static_cast<int32_t>(fifoData[13]) << 16) | (static_cast<int32_t>(fifoData[14]) << 8) | fifoData[15]);
+                computeQuaternions(fifoData);
             }
             else
             {
@@ -114,52 +111,49 @@ void PigpioImu::readImuData(void)
     }
 }
 
+void PigpioImu::computeQuaternions(char (&data)[MPU6050_DMP_FIFO_QUAT_SIZE])
+{
+    quaternions.w = static_cast<float>((static_cast<int32_t>(data[0]) << 24) | (static_cast<int32_t>(data[1]) << 16) | (static_cast<int32_t>(data[2]) << 8) | data[3]) / MPU6050_QUATERNION_SCALE;
+    quaternions.x = static_cast<float>((static_cast<int32_t>(data[4]) << 24) | (static_cast<int32_t>(data[5]) << 16) | (static_cast<int32_t>(data[6]) << 8) | data[7]) / MPU6050_QUATERNION_SCALE;
+    quaternions.y = static_cast<float>((static_cast<int32_t>(data[8]) << 24) | (static_cast<int32_t>(data[9]) << 16) | (static_cast<int32_t>(data[10]) << 8) | data[11]) / MPU6050_QUATERNION_SCALE;
+    quaternions.z = static_cast<float>((static_cast<int32_t>(data[12]) << 24) | (static_cast<int32_t>(data[13]) << 16) | (static_cast<int32_t>(data[14]) << 8) | data[15]) / MPU6050_QUATERNION_SCALE;
+}
+
 void PigpioImu::publishAngles(void)
 {
-    /*hal_pigpio::hal_pigpioAnglesMsg message;
+    hal_pigpio::hal_pigpioAnglesMsg message;
+    
+    message.phi = angles.phi;
+    message.theta = angles.theta;
+    message.psi = angles.psi;
+    anglesPublisher.publish(message);
+}
 
-    message.angles = quaternions;
-    anglesPublisher.publish(message);*/
+void PigpioImu::computeAngles()
+{
+    // phi (x-axis rotation)
+    float tanPhi = 2 * (quaternions.y * quaternions.z - quaternions.w * quaternions.x);
+    float quadrantPhi = 2 * (quaternions.w * quaternions.w + quaternions.z * quaternions.z) - 1;
+    angles.phi = std::atan2(tanPhi, quadrantPhi) * 180 / M_PI;
 
-    float phi = 0.0f;
-    float theta = 0.0f;
-    float psi = 0.0f;
+    // theta (y-axis rotation)
+    float sinTheta = 2 * (quaternions.x * quaternions.z + quaternions.w * quaternions.y);
+    angles.theta = -std::asin(sinTheta) * 180 / M_PI;
 
-    std::vector<float> quaternionsFloat;
-    std::vector<float> gravity;
+    // psi (z-axis rotation)
+    float tanPsi = 2 * (quaternions.x * quaternions.y - quaternions.w * quaternions.z);
+    float quadrantPsi = 2 * (quaternions.w * quaternions.w + quaternions.x * quaternions.x) - 1;
+    angles.psi = std::atan2(tanPsi, quadrantPsi) * 180 / M_PI;
 
-    if (quaternions.size() >= 4)
-    {
-        quaternionsFloat.push_back(static_cast<float>(quaternions.at(0)) / 1073741824.0f);
-        quaternionsFloat.push_back(static_cast<float>(quaternions.at(1)) / 1073741824.0f);
-        quaternionsFloat.push_back(static_cast<float>(quaternions.at(2)) / 1073741824.0f);
-        quaternionsFloat.push_back(static_cast<float>(quaternions.at(3)) / 1073741824.0f);
-
-        // phi (x-axis rotation)
-        float tanPhi = 2 * (quaternionsFloat.at(2) * quaternionsFloat.at(3) - quaternionsFloat.at(0) * quaternionsFloat.at(1));
-        float quadrantPhi = 2 * (quaternionsFloat.at(0) * quaternionsFloat.at(0) + quaternionsFloat.at(3) * quaternionsFloat.at(3)) - 1;
-        phi = std::atan2(tanPhi, quadrantPhi) * 180 / M_PI;
-
-        // theta (y-axis rotation)
-        float sinTheta = 2 * (quaternionsFloat.at(1) * quaternionsFloat.at(3) + quaternionsFloat.at(0) * quaternionsFloat.at(2));
-        theta = -std::asin(sinTheta) * 180 / M_PI;
-
-        // psi (z-axis rotation)
-        float tanPsi = 2 * (quaternionsFloat.at(1) * quaternionsFloat.at(2) - quaternionsFloat.at(0) * quaternionsFloat.at(3));
-        float quadrantPsi = 2 * (quaternionsFloat.at(0) * quaternionsFloat.at(0) + quaternionsFloat.at(1) * quaternionsFloat.at(1)) - 1;
-        psi = std::atan2(tanPsi, quadrantPsi) * 180 / M_PI;
-
-        ROS_INFO("phi: %lf, theta: %lf, psi: %lf.", phi, theta, psi);
-
-        quaternions.clear();
-    }
+    ROS_INFO("phi: %lf, theta: %lf, psi: %lf.", angles.phi, angles.theta, angles.psi);
 }
 
 void PigpioImu::readQuaternionsAndPublishAngles(const ros::TimerEvent &event)
 {
     if (isImuReady)
     {
-        readImuData();
+        readQuaternions();
+        computeAngles();
         publishAngles();
     }
 }

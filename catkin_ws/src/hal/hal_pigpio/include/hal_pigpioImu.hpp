@@ -14,8 +14,6 @@
 #include "hal_pigpio/hal_pigpioI2cImuReading.h"
 #include "hal_pigpio/hal_pigpioAnglesMsg.h"
 
-#define I2C_BUFFER_MAX_BYTES 32
-
 #define MPU6050_POWER_MANAGEMENT_1_REGISTER 0x6B
 
 #define MPU6050_USER_CONTROL_REGISTER 0x6A
@@ -28,13 +26,30 @@
 #define MPU6050_MAX_FIFO_SAMPLES 1024
 #define MPU6050_MAX_QUATERNIONS_SAMPLES 160
 #define MPU6050_DMP_FIFO_QUAT_SIZE 16
+#define MPU6050_QUATERNION_SCALE 1073741824.0f
+
+struct Quaternions
+{
+    float w;
+    float x;
+    float y;
+    float z;
+};
+
+struct Angles
+{
+    float phi;
+    float theta;
+    float psi;
+};
 
 class PigpioImu
 {
 private:
     int pigpioHandle;
     int32_t i2cHandle;
-    std::vector<int32_t> quaternions;
+    Quaternions quaternions;
+    Angles angles;
     bool isImuReady;
     ros::ServiceServer imuReadingService;
     ros::Timer readQuaternionsAndPublishAnglesTimer;
@@ -43,8 +58,10 @@ private:
 public:
     PigpioImu(ros::NodeHandle *node, int pigpioHandle);
     ~PigpioImu() = default;
-    void readImuData(void);
+    void readQuaternions(void);
+    void computeQuaternions(char (&data)[MPU6050_DMP_FIFO_QUAT_SIZE]);
     void publishAngles(void);
+    void computeAngles(void);
     void readQuaternionsAndPublishAngles(const ros::TimerEvent &event);
     void resetFifo(void);
     uint16_t readFifoCount(void);
