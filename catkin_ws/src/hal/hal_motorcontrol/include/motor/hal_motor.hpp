@@ -46,6 +46,7 @@ public:
     void setPwmDutyCycle(Channel channel, uint16_t dutycycle);
     void setDirectionForward(void);
     void setDirectionBackward(void);
+    void configureGpios(ros::ServiceClient *setOutputClientHandle, ros::ServiceClient *setInputClientHandle, ros::ServiceClient *SetCallbackClientHandle);
 };
 
 #endif
