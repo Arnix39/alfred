@@ -7,6 +7,7 @@
 #include "hal_motorcontrol/hal_motorcontrolMsg.h"
 
 class MotorControl;
+class Motor;
 
 class MotorControlPublisher
 {
@@ -21,7 +22,7 @@ class MotorControlSubscriber
 public:
     MotorControlSubscriber() {}
     virtual ~MotorControlSubscriber() {}
-    virtual void subscribe(MotorControl *motorControl) = 0;
+    virtual void subscribe(MotorControl *motorControl, Motor *motorLeft, Motor *motorRight) = 0;
 };
 
 class MotorControlClients

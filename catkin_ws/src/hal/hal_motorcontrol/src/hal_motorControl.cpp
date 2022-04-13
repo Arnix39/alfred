@@ -16,11 +16,11 @@ MotorControlSubscriberRos::MotorControlSubscriberRos(ros::NodeHandle *node) : no
 {
 }
 
-void MotorControlSubscriberRos::subscribe(MotorControl *motorControl)
+void MotorControlSubscriberRos::subscribe(MotorControl *motorControl, Motor *motorLeft, Motor *motorRight)
 {
     // TODO: once EC messages from motor classes is implemented, change these calls
-    motorLeftSubRos = nodeHandle->subscribe("gpioEdgeChange", 1000, &MotorControl::edgeChangeCallback, motorControl);
-    motorRightSubRos = nodeHandle->subscribe("gpioEdgeChange", 1000, &MotorControl::edgeChangeCallback, motorControl);
+    motorLeftSubRos = nodeHandle->subscribe("gpioEdgeChange", 1000, &Motor::edgeChangeCallback, motorLeft);
+    motorRightSubRos = nodeHandle->subscribe("gpioEdgeChange", 1000, &Motor::edgeChangeCallback, motorRight);
     motorControlPigpioHBSubRos = nodeHandle->subscribe("hal_pigpioHeartbeat", 1000, &MotorControl::pigpioHeartbeatCallback, motorControl);
 }
 
@@ -69,25 +69,25 @@ MotorControl::MotorControl(MotorControlSubscriber *motorControlSubscriber,
                                                                               motorRight(MOTOR_RIGHT_PWM_A_GPIO, MOTOR_RIGHT_PWM_B_GPIO,
                                                                                          MOTOR_RIGHT_ENCODER_CH_A_GPIO, MOTOR_RIGHT_ENCODER_CH_B_GPIO)
 {
-    motorControlSub->subscribe(this);
+    motorControlSub->subscribe(this, &motorLeft, &motorRight);
 }
 
-void MotorControl::configureMotorGpios(void)
+void MotorControl::configureMotor(void)
 {
-    motorLeft.configureGpios(motorControlClients->getSetOutputClientHandle(), motorControlClients->getSetInputClientHandle(), motorControlClients->getSetCallbackClientHandle());
-    motorRight.configureGpios(motorControlClients->getSetOutputClientHandle(), motorControlClients->getSetInputClientHandle(), motorControlClients->getSetCallbackClientHandle());
-}
-
-void MotorControl::edgeChangeCallback(const hal_pigpio::hal_pigpioEdgeChangeMsg &msg)
-{
+    motorLeft.configure(motorControlClients->getSetOutputClientHandle(), motorControlClients->getSetInputClientHandle(), 
+                        motorControlClients->getSetCallbackClientHandle(), 
+                        motorControlClients->getSetPwmFrequencyClientHandle(), motorControlClients->getSetPwmDutycycleClientHandle());
+    motorRight.configure(motorControlClients->getSetOutputClientHandle(), motorControlClients->getSetInputClientHandle(), 
+                         motorControlClients->getSetCallbackClientHandle(), 
+                         motorControlClients->getSetPwmFrequencyClientHandle(), motorControlClients->getSetPwmDutycycleClientHandle());
 }
 
 void MotorControl::publishMessage(void)
 {
     hal_motorcontrol::hal_motorcontrolMsg message;
 
-    message.motorLeftEncoderCount = 22;
-    message.motorRightEncoderCount = 22;
+    message.motorLeftEncoderCount = motorLeft.getEncoderCount();
+    message.motorRightEncoderCount = motorRight.getEncoderCount();
     motorControlPub->publish(message);
 }
 
@@ -128,7 +128,7 @@ int main(int argc, char **argv)
         if (motorControl.isNotStarted() && motorControl.isPigpioNodeStarted())
         {
             ROS_INFO("motorControl node initialising...");
-            motorControl.configureMotorGpios();
+            motorControl.configureMotor();
             motorControl.starts();
             ROS_INFO("motorControl node initialised.");
         }

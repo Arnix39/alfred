@@ -2,7 +2,6 @@
 #define HAL_MOTOR
 
 #include "ros/ros.h"
-//#include "hal_motorVirtuals.hpp"
 #include "commonDefinitions.hpp"
 
 // Services and messages headers (generated)
@@ -22,7 +21,7 @@ struct Encoder
 {
     EncoderChannel channelA;
     EncoderChannel channelB;
-    uint32_t encoderCounts;
+    uint32_t encoderCount;
 };
 
 struct Pwm
@@ -42,11 +41,17 @@ private:
 public:
     Motor(uint8_t gpioPwmChannelA, uint8_t gpioPwmChannelB, uint8_t gpioEncoderChannelA, uint8_t gpioEncoderChannelB);
     ~Motor() = default;
-    uint32_t getEncoderCounts(void);
+    uint32_t getEncoderCount(void);
     void setPwmDutyCycle(Channel channel, uint16_t dutycycle);
     void setDirectionForward(void);
     void setDirectionBackward(void);
-    void configureGpios(ros::ServiceClient *setOutputClientHandle, ros::ServiceClient *setInputClientHandle, ros::ServiceClient *SetCallbackClientHandle);
+    void configure(ros::ServiceClient *setOutputClientHandle, ros::ServiceClient *setInputClientHandle, 
+                   ros::ServiceClient *SetCallbackClientHandle, 
+                   ros::ServiceClient *SetPwmFrequencyClientHandle, ros::ServiceClient *SetPwmDutycycleClientHandle);
+    void incrementEncoderCount(void);
+    void decrementEncoderCount(void);
+    void resetEncoderCount(void);
+    void edgeChangeCallback(const hal_pigpio::hal_pigpioEdgeChangeMsg &msg);
 };
 
 #endif

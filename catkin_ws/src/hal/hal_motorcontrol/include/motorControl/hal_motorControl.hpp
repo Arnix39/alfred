@@ -30,9 +30,8 @@ private:
 public:
     MotorControl(MotorControlSubscriber *motorControlSubscriber, MotorControlPublisher *motorControlPub, MotorControlClients *motorControlServiceClients);
     ~MotorControl() = default;
-    void configureMotorGpios(void);
+    void configureMotor(void);
     void publishMessage(void);
-    void edgeChangeCallback(const hal_pigpio::hal_pigpioEdgeChangeMsg &msg);
     bool isNotStarted(void);
     void starts(void);
     bool isPigpioNodeStarted(void);

@@ -25,7 +25,7 @@ private:
 public:
     MotorControlSubscriberRos(ros::NodeHandle *node);
     ~MotorControlSubscriberRos() = default;
-    void subscribe(MotorControl *motorControl) override;
+    void subscribe(MotorControl *motorControl, Motor *motorLeft, Motor *motorRight) override;
 };
 
 class MotorControlClientsRos : public MotorControlClients
