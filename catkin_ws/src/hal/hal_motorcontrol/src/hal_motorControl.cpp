@@ -21,6 +21,7 @@ void MotorControlSubscriberRos::subscribe(MotorControl *motorControl)
     // TODO: once EC messages from motor classes is implemented, change these calls
     motorLeftSubRos = nodeHandle->subscribe("gpioEdgeChange", 1000, &MotorControl::edgeChangeCallback, motorControl);
     motorRightSubRos = nodeHandle->subscribe("gpioEdgeChange", 1000, &MotorControl::edgeChangeCallback, motorControl);
+    motorControlPigpioHBSubRos = nodeHandle->subscribe("hal_pigpioHeartbeat", 1000, &MotorControl::pigpioHeartbeatCallback, motorControl);
 }
 
 /* Services interface implementation */
@@ -58,13 +59,23 @@ ros::ServiceClient *MotorControlClientsRos::getSetPwmDutycycleClientHandle()
 }
 
 /* Motor control implementation */
-MotorControl::MotorControl(MotorControlSubscriber *motorControlSubscriber, MotorControlPublisher *motorControlPublisher, MotorControlClients *motorControlServiceClients) : rightEncoderCount(0),
-                                                                                                                                                                            leftEncoderCount(0),
-                                                                                                                                                                            motorControlPub(motorControlPublisher),
-                                                                                                                                                                            motorControlClients(motorControlServiceClients),
-                                                                                                                                                                            motorControlSub(motorControlSubscriber)
+MotorControl::MotorControl(MotorControlSubscriber *motorControlSubscriber,
+                           MotorControlPublisher *motorControlPublisher, 
+                           MotorControlClients *motorControlServiceClients) : motorControlPub(motorControlPublisher),
+                                                                              motorControlClients(motorControlServiceClients),
+                                                                              motorControlSub(motorControlSubscriber),
+                                                                              motorLeft(MOTOR_LEFT_PWM_A_GPIO, MOTOR_LEFT_PWM_B_GPIO,
+                                                                                        MOTOR_LEFT_ENCODER_CH_A_GPIO, MOTOR_LEFT_ENCODER_CH_B_GPIO),
+                                                                              motorRight(MOTOR_RIGHT_PWM_A_GPIO, MOTOR_RIGHT_PWM_B_GPIO,
+                                                                                         MOTOR_RIGHT_ENCODER_CH_A_GPIO, MOTOR_RIGHT_ENCODER_CH_B_GPIO)
 {
     motorControlSub->subscribe(this);
+}
+
+void MotorControl::configureMotorGpios(void)
+{
+    motorLeft.configureGpios(motorControlClients->getSetOutputClientHandle(), motorControlClients->getSetInputClientHandle(), motorControlClients->getSetCallbackClientHandle());
+    motorRight.configureGpios(motorControlClients->getSetOutputClientHandle(), motorControlClients->getSetInputClientHandle(), motorControlClients->getSetCallbackClientHandle());
 }
 
 void MotorControl::edgeChangeCallback(const hal_pigpio::hal_pigpioEdgeChangeMsg &msg)
@@ -80,6 +91,26 @@ void MotorControl::publishMessage(void)
     motorControlPub->publish(message);
 }
 
+void MotorControl::starts(void)
+{
+    isStarted = true;
+}
+
+bool MotorControl::isNotStarted(void)
+{
+    return !isStarted;
+}
+
+void MotorControl::pigpioHeartbeatCallback(const hal_pigpio::hal_pigpioHeartbeatMsg &msg)
+{
+    pigpioNodeStarted = msg.isAlive;
+}
+
+bool MotorControl::isPigpioNodeStarted(void)
+{
+    return pigpioNodeStarted;
+}
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "hal_motorcontrol");
@@ -91,14 +122,18 @@ int main(int argc, char **argv)
 
     MotorControl motorControl(&motorControlSubscriberRos, &motorControlPublisherRos, &motorControlServiceClientsRos);
 
-    ros::Rate loop_rate(100);
-
+    ROS_INFO("motorControl node waiting for pigpio node to start...");
     while (ros::ok())
     {
-        motorControl.publishMessage();
+        if (motorControl.isNotStarted() && motorControl.isPigpioNodeStarted())
+        {
+            ROS_INFO("motorControl node initialising...");
+            motorControl.configureMotorGpios();
+            motorControl.starts();
+            ROS_INFO("motorControl node initialised.");
+        }
 
         ros::spinOnce();
-        loop_rate.sleep();
     }
 
     return 0;

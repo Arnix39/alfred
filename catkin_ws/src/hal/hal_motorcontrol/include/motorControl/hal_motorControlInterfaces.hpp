@@ -19,6 +19,7 @@ class MotorControlSubscriberRos : public MotorControlSubscriber
 private:
     ros::Subscriber motorLeftSubRos;
     ros::Subscriber motorRightSubRos;
+    ros::Subscriber motorControlPigpioHBSubRos;
     ros::NodeHandle *nodeHandle;
 
 public:
