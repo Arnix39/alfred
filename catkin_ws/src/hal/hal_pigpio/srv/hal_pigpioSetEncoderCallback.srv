@@ -1,0 +1,6 @@
+uint16 gpioId
+uint8 edgeChangeType
+uint8 motorId
+---
+uint32 callbackId
+bool hasSucceeded

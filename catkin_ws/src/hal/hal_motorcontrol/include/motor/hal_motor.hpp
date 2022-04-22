@@ -7,7 +7,7 @@
 // Services and messages headers (generated)
 #include "hal_pigpio/hal_pigpioSetInputMode.h"
 #include "hal_pigpio/hal_pigpioSetOutputMode.h"
-#include "hal_pigpio/hal_pigpioSetCallback.h"
+#include "hal_pigpio/hal_pigpioSetEncoderCallback.h"
 #include "hal_pigpio/hal_pigpioSetPwmFrequency.h"
 #include "hal_pigpio/hal_pigpioSetPwmDutycycle.h"
 #include "hal_pigpio/hal_pigpioEdgeChangeMsg.h"
@@ -36,22 +36,20 @@ private:
     Encoder encoder;
     Pwm pwmA;
     Pwm pwmB;
-    bool isDirectionForward;
+    ros::ServiceClient *setPwmDutycycleClientHandle;
+    uint8_t id;
 
 public:
-    Motor(uint8_t gpioPwmChannelA, uint8_t gpioPwmChannelB, uint8_t gpioEncoderChannelA, uint8_t gpioEncoderChannelB);
+    Motor(uint8_t gpioPwmChannelA, uint8_t gpioPwmChannelB, uint8_t gpioEncoderChannelA, uint8_t gpioEncoderChannelB, uint8_t motorId);
     ~Motor() = default;
     uint32_t getEncoderCount(void);
-    void setPwmDutyCycle(Channel channel, uint16_t dutycycle);
-    void setDirectionForward(void);
-    void setDirectionBackward(void);
-    void configure(ros::ServiceClient *setOutputClientHandle, ros::ServiceClient *setInputClientHandle, 
-                   ros::ServiceClient *SetCallbackClientHandle, 
-                   ros::ServiceClient *SetPwmFrequencyClientHandle, ros::ServiceClient *SetPwmDutycycleClientHandle);
-    void incrementEncoderCount(void);
-    void decrementEncoderCount(void);
-    void resetEncoderCount(void);
-    void edgeChangeCallback(const hal_pigpio::hal_pigpioEdgeChangeMsg &msg);
+    void setEncoderCount(uint32_t count);
+    void setPwmDutyCycle(uint16_t dutycycle, bool isDirectionForward);
+    void configureGpios(ros::ServiceClient *setOutputClientHandle, ros::ServiceClient *setInputClientHandle, 
+                        ros::ServiceClient *SetCallbackClientHandle, ros::ServiceClient *SetPwmFrequencyClientHandle,
+                        uint8_t motorId);
+    void configureSetPwmDutycycleClientHandle(ros::ServiceClient *setPwmDutycycleClient);
+    uint8_t getId(void);
 };
 
 #endif

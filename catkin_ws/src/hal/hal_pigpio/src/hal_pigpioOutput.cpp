@@ -13,10 +13,9 @@ PigpioOutput::PigpioOutput(ros::NodeHandle *node, int pigpioHandle) : pigpioHand
 bool PigpioOutput::setPwmDutycycle(hal_pigpio::hal_pigpioSetPwmDutycycle::Request &req,
                                    hal_pigpio::hal_pigpioSetPwmDutycycle::Response &res)
 {
-    if ((req.dutycycle != 0) && (set_PWM_dutycycle(pigpioHandle, req.gpioId, req.dutycycle) == 0))
+    if (set_PWM_dutycycle(pigpioHandle, req.gpioId, req.dutycycle) == 0)
     {
         res.hasSucceeded = true;
-        ROS_INFO("Set PWM duty cycle of %u for GPIO %u.", req.dutycycle, req.gpioId);
     }
     else
     {
@@ -29,7 +28,7 @@ bool PigpioOutput::setPwmDutycycle(hal_pigpio::hal_pigpioSetPwmDutycycle::Reques
 bool PigpioOutput::setPwmFrequency(hal_pigpio::hal_pigpioSetPwmFrequency::Request &req,
                                    hal_pigpio::hal_pigpioSetPwmFrequency::Response &res)
 {
-    int pwmSettingResult = set_PWM_dutycycle(pigpioHandle, req.gpioId, req.frequency);
+    int pwmSettingResult = set_PWM_frequency(pigpioHandle, req.gpioId, req.frequency);
 
     if ((pwmSettingResult != PI_NOT_PERMITTED) && (pwmSettingResult != PI_BAD_USER_GPIO))
     {

@@ -2,8 +2,9 @@
 
 PigpioInput::PigpioInput(ros::NodeHandle *node, int pigpioHandle) : pigpioHandle(pigpioHandle),
                                                                     gpioEdgeChangePub(node->advertise<hal_pigpio::hal_pigpioEdgeChangeMsg>("gpioEdgeChange", 1000)),
+                                                                    gpioEncoderCountPub(node->advertise<hal_pigpio::hal_pigpioEncoderCountMsg>("gpioEncoderCount", 1000)),
                                                                     readGpioService(node->advertiseService("hal_pigpioReadGpio", &PigpioInput::readGpio, this)),
-                                                                    setCallbackRisingEdgeService(node->advertiseService("hal_pigpioSetCallback", &PigpioInput::setCallback, this))
+                                                                    setCallbackService(node->advertiseService("hal_pigpioSetCallback", &PigpioInput::setCallback, this))
 {
 }
 
@@ -63,6 +64,65 @@ bool PigpioInput::setCallback(hal_pigpio::hal_pigpioSetCallback::Request &req,
     {
         res.hasSucceeded = false;
         ROS_ERROR("Failed to configure callback for GPIO %u!", req.gpioId);
+    }
+    return true;
+}
+
+void PigpioInput::publishEncoderCount(const ros::TimerEvent &timerEvent)
+{
+    hal_pigpio::hal_pigpioEncoderCountMsg encoderCountMsg;
+
+    for (Motor motor : motors)
+    {
+        encoderCountMsg.encoderCount[motor.id] = motor.encoderCount;
+    }
+
+    gpioEncoderCountPub.publish(encoderCountMsg);
+}
+
+void PigpioInput::gpioEncoderEdgeChangeCallback(int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us)
+{
+    for (Motor motor : motors)
+    {
+        if (find(motor.gpios.begin(), motor.gpios.end(), gpioId) != motor.gpios.end())
+        {
+            ++motor.encoderCount;
+        }
+    }
+}
+
+// This is to pass the pointer of the callback function gpioEncoderEdgeChangeCallback to the pigpio library API
+void PigpioInput::c_gpioEncoderEdgeChangeCallback(int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us, void *userData)
+{
+    PigpioInput *object = reinterpret_cast<PigpioInput *>(userData);
+    object->gpioEncoderEdgeChangeCallback(handle, gpioId, edgeChangeType, timeSinceBoot_us);
+}
+
+bool PigpioInput::setEncoderCallback(hal_pigpio::hal_pigpioSetEncoderCallback::Request &req,
+                                     hal_pigpio::hal_pigpioSetEncoderCallback::Response &res)
+{
+    res.callbackId = callback_ex(pigpioHandle, req.gpioId, req.edgeChangeType, c_gpioEncoderEdgeChangeCallback, reinterpret_cast<void *>(this));
+    if (res.callbackId >= 0)
+    {
+        auto motorIndex = find_if(motors.begin(), motors.end(), [&req](Motor motor) { return motor.id == req.motorId; });
+        if ( motorIndex != motors.end())
+        {
+            motors.at(motorIndex - motors.begin()).gpios.push_back(req.gpioId);
+        }
+        else
+        {
+            Motor motor = {req.motorId, {req.gpioId}, 0};
+            motors.push_back(motor);
+        }
+
+        res.hasSucceeded = true;
+        callbackList.push_back((uint)res.callbackId);
+        ROS_INFO("Encoder callback for GPIO %u configured.", req.gpioId);
+    }
+    else
+    {
+        res.hasSucceeded = false;
+        ROS_ERROR("Failed to configure encoder callback for GPIO %u!", req.gpioId);
     }
     return true;
 }

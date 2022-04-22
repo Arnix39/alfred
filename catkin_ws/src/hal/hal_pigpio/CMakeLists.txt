@@ -23,6 +23,7 @@ add_message_files(
    hal_pigpioEdgeChangeMsg.msg
    hal_pigpioHeartbeatMsg.msg
    hal_pigpioAnglesMsg.msg
+   hal_pigpioEncoderCountMsg.msg
  )
 
 ## Generate services in the 'srv' folder
@@ -51,6 +52,7 @@ add_service_files(
    hal_pigpioReadGpio.srv
    hal_pigpioSetCallback.srv
    hal_pigpioI2cImuReading.srv
+   hal_pigpioSetEncoderCallback.srv
  )
 
 ## Generate added messages and services with any dependencies listed here
