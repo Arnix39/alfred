@@ -60,6 +60,11 @@ void Motor::configureSetPwmDutycycleClientHandle(ros::ServiceClient *setPwmDutyc
     setPwmDutycycleClientHandle = setPwmDutycycleClient;
 }
 
+void Motor::configureSetMotorDirectionPublisherHandle(ros::Publisher *setMotorDirectionPublisher)
+{
+    setMotorDirectionPublisherHandle = setMotorDirectionPublisher;
+}
+
 uint32_t Motor::getEncoderCount(void)
 {
     return encoder.encoderCount;
@@ -70,9 +75,14 @@ void Motor::setEncoderCount(uint32_t count)
     encoder.encoderCount = count;
 }
 
-void Motor::setPwmDutyCycle(uint16_t dutycycle, bool isDirectionForward)
+void Motor::setPwmDutyCycleAndDirection(uint16_t dutycycle, bool isDirectionForward)
 {
     hal_pigpio::hal_pigpioSetPwmDutycycle setPwmDutycycleSrv;
+    hal_pigpio::hal_pigpioMotorDirectionMsg motorDirectionMsg;
+
+    motorDirectionMsg.isDirectionForward = isDirectionForward;
+    motorDirectionMsg.motorId = id;
+    setMotorDirectionPublisherHandle->publish(motorDirectionMsg);
 
     pwmB.dutycycle = dutycycle;
     pwmA.dutycycle = dutycycle;

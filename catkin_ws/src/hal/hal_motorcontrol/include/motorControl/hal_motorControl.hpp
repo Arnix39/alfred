@@ -14,20 +14,21 @@
 #include "hal_pigpio/hal_pigpioSetPwmDutycycle.h"
 #include "hal_pigpio/hal_pigpioHeartbeatMsg.h"
 #include "hal_motorcontrol/hal_motorcontrolMsg.h"
+#include "hal_pigpio/hal_pigpioMotorDirectionMsg.h"
 
 class MotorControl
 {
 private:
-    MotorControlPublisher *motorControlPub;
+    MotorControlPublishers *motorControlPubs;
     MotorControlClients *motorControlClients;
-    MotorControlSubscriber *motorControlSub;
+    MotorControlSubscribers *motorControlSubs;
     Motor motorLeft;
     Motor motorRight;
     bool pigpioNodeStarted;
     bool isStarted;
 
 public:
-    MotorControl(MotorControlSubscriber *motorControlSubscriber, MotorControlPublisher *motorControlPub, MotorControlClients *motorControlServiceClients);
+    MotorControl(MotorControlSubscribers *motorControlSubscribers, MotorControlPublishers *motorControlPublishers, MotorControlClients *motorControlServiceClients);
     ~MotorControl() = default;
     void configureMotor(void);
     void publishMessage(void);

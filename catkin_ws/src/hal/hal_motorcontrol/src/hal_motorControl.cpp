@@ -1,22 +1,28 @@
 #include "hal_motorControl.hpp"
 #include "hal_motorControlInterfaces.hpp"
 
-/* Publisher interface implementation */
-MotorControlPublisherRos::MotorControlPublisherRos(ros::NodeHandle *node) : motorControlPubRos(node->advertise<hal_motorcontrol::hal_motorcontrolMsg>("motorsEncoderCountValue", 1000))
+/* Publishers interface implementation */
+MotorControlPublishersRos::MotorControlPublishersRos(ros::NodeHandle *node) : motorControlPubRos(node->advertise<hal_motorcontrol::hal_motorcontrolMsg>("motorsEncoderCountValue", 1000)),
+                                                                              motorDirectionPubRos(node->advertise<hal_pigpio::hal_pigpioMotorDirectionMsg>("motorDirection", 1000))
 {
 }
 
-void MotorControlPublisherRos::publish(hal_motorcontrol::hal_motorcontrolMsg message)
+void MotorControlPublishersRos::publishMsg(hal_motorcontrol::hal_motorcontrolMsg message)
 {
     motorControlPubRos.publish(message);
 }
 
+ros::Publisher *MotorControlPublishersRos::getMotorDirectionPublisherHandle()
+{
+    return &motorDirectionPubRos;
+}
+
 /* Subscriber interface implementation */
-MotorControlSubscriberRos::MotorControlSubscriberRos(ros::NodeHandle *node) : nodeHandle(node)
+MotorControlSubscribersRos::MotorControlSubscribersRos(ros::NodeHandle *node) : nodeHandle(node)
 {
 }
 
-void MotorControlSubscriberRos::subscribe(MotorControl *motorControl)
+void MotorControlSubscribersRos::subscribe(MotorControl *motorControl)
 {
     motorControlPigpioHBSubRos = nodeHandle->subscribe("hal_pigpioHeartbeat", 1000, &MotorControl::pigpioHeartbeatCallback, motorControl);
 }
@@ -56,11 +62,11 @@ ros::ServiceClient *MotorControlClientsRos::getSetPwmDutycycleClientHandle()
 }
 
 /* Motor control implementation */
-MotorControl::MotorControl(MotorControlSubscriber *motorControlSubscriber,
-                           MotorControlPublisher *motorControlPublisher, 
-                           MotorControlClients *motorControlServiceClients) : motorControlPub(motorControlPublisher),
+MotorControl::MotorControl(MotorControlSubscribers *motorControlSubscribers,
+                           MotorControlPublishers *motorControlPublishers, 
+                           MotorControlClients *motorControlServiceClients) : motorControlPubs(motorControlPublishers),
                                                                               motorControlClients(motorControlServiceClients),
-                                                                              motorControlSub(motorControlSubscriber),
+                                                                              motorControlSubs(motorControlSubscribers),
                                                                               motorLeft(MOTOR_LEFT_PWM_A_GPIO, MOTOR_LEFT_PWM_B_GPIO,
                                                                                         MOTOR_LEFT_ENCODER_CH_A_GPIO, MOTOR_LEFT_ENCODER_CH_B_GPIO,
                                                                                         MOTOR_LEFT),
@@ -68,7 +74,7 @@ MotorControl::MotorControl(MotorControlSubscriber *motorControlSubscriber,
                                                                                          MOTOR_RIGHT_ENCODER_CH_A_GPIO, MOTOR_RIGHT_ENCODER_CH_B_GPIO,
                                                                                          MOTOR_RIGHT)
 {
-    motorControlSub->subscribe(this);
+    motorControlSubs->subscribe(this);
 }
 
 void MotorControl::configureMotor(void)
@@ -77,11 +83,13 @@ void MotorControl::configureMotor(void)
                              motorControlClients->getSetEncoderCallbackClientHandle(), motorControlClients->getSetPwmFrequencyClientHandle(),
                              motorLeft.getId());
     motorLeft.configureSetPwmDutycycleClientHandle(motorControlClients->getSetPwmDutycycleClientHandle());
+    motorLeft.configureSetMotorDirectionPublisherHandle(motorControlPubs->getMotorDirectionPublisherHandle());
 
     motorRight.configureGpios(motorControlClients->getSetOutputClientHandle(), motorControlClients->getSetInputClientHandle(), 
                               motorControlClients->getSetEncoderCallbackClientHandle(), motorControlClients->getSetPwmFrequencyClientHandle(),
                               motorRight.getId());
     motorRight.configureSetPwmDutycycleClientHandle(motorControlClients->getSetPwmDutycycleClientHandle());
+    motorRight.configureSetMotorDirectionPublisherHandle(motorControlPubs->getMotorDirectionPublisherHandle());
 }
 
 void MotorControl::publishMessage(void)
@@ -90,7 +98,7 @@ void MotorControl::publishMessage(void)
 
     message.motorLeftEncoderCount = motorLeft.getEncoderCount();
     message.motorRightEncoderCount = motorRight.getEncoderCount();
-    motorControlPub->publish(message);
+    motorControlPubs->publishMsg(message);
 }
 
 void MotorControl::starts(void)
@@ -115,12 +123,12 @@ bool MotorControl::isPigpioNodeStarted(void)
 
 void MotorControl::setPwmLeft(uint16_t dutycycle, bool direction)
 {
-    motorLeft.setPwmDutyCycle(dutycycle, direction);
+    motorLeft.setPwmDutyCycleAndDirection(dutycycle, direction);
 }
 
 void MotorControl::setPwmRight(uint16_t dutycycle, bool direction)
 {
-    motorRight.setPwmDutyCycle(dutycycle, direction);
+    motorRight.setPwmDutyCycleAndDirection(dutycycle, direction);
 }
 
 int main(int argc, char **argv)
@@ -128,11 +136,11 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "hal_motorcontrol");
     ros::NodeHandle node;
 
-    MotorControlPublisherRos motorControlPublisherRos(&node);
-    MotorControlSubscriberRos motorControlSubscriberRos(&node);
+    MotorControlPublishersRos motorControlPublishersRos(&node);
+    MotorControlSubscribersRos motorControlSubscribersRos(&node);
     MotorControlClientsRos motorControlServiceClientsRos(&node);
 
-    MotorControl motorControl(&motorControlSubscriberRos, &motorControlPublisherRos, &motorControlServiceClientsRos);
+    MotorControl motorControl(&motorControlSubscribersRos, &motorControlPublishersRos, &motorControlServiceClientsRos);
 
     ros::Rate rate(1);
 

@@ -5,22 +5,24 @@
 
 // Services and messages headers (generated)
 #include "hal_motorcontrol/hal_motorcontrolMsg.h"
+#include "hal_pigpio/hal_pigpioMotorDirectionMsg.h"
 
 class MotorControl;
 
-class MotorControlPublisher
+class MotorControlPublishers
 {
 public:
-    MotorControlPublisher() {}
-    virtual ~MotorControlPublisher() {}
-    virtual void publish(hal_motorcontrol::hal_motorcontrolMsg message) = 0;
+    MotorControlPublishers() {}
+    virtual ~MotorControlPublishers() {}
+    virtual void publishMsg(hal_motorcontrol::hal_motorcontrolMsg message) = 0;
+    virtual ros::Publisher *getMotorDirectionPublisherHandle() = 0;
 };
 
-class MotorControlSubscriber
+class MotorControlSubscribers
 {
 public:
-    MotorControlSubscriber() {}
-    virtual ~MotorControlSubscriber() {}
+    MotorControlSubscribers() {}
+    virtual ~MotorControlSubscribers() {}
     virtual void subscribe(MotorControl *motorControl) = 0;
 };
 

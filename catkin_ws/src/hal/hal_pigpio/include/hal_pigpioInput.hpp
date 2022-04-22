@@ -12,12 +12,14 @@
 #include "hal_pigpio/hal_pigpioSetEncoderCallback.h"
 #include "hal_pigpio/hal_pigpioEdgeChangeMsg.h"
 #include "hal_pigpio/hal_pigpioEncoderCountMsg.h"
+#include "hal_pigpio/hal_pigpioMotorDirectionMsg.h"
 
 struct Motor
 {
     uint8_t id;
     std::vector<unsigned> gpios;
-    uint32_t encoderCount;
+    int32_t encoderCount;
+    bool isDirectionForward;
 };
 
 class PigpioInput
@@ -25,6 +27,7 @@ class PigpioInput
 private:
     ros::Publisher gpioEdgeChangePub;
     ros::Publisher gpioEncoderCountPub;
+    ros::Subscriber setMotorDirectionSub;
     ros::ServiceServer readGpioService;
     ros::ServiceServer setCallbackService;
     ros::ServiceServer setEncoderCallbackService;
@@ -46,6 +49,7 @@ public:
     bool setEncoderCallback(hal_pigpio::hal_pigpioSetEncoderCallback::Request &req,
                             hal_pigpio::hal_pigpioSetEncoderCallback::Response &res);
     void publishEncoderCount(const ros::TimerEvent &timerEvent);
+    void setMotorInForwardDirection(const hal_pigpio::hal_pigpioMotorDirectionMsg &msg);
 };
 
 #endif

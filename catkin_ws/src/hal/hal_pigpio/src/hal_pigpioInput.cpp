@@ -4,7 +4,8 @@ PigpioInput::PigpioInput(ros::NodeHandle *node, int pigpioHandle) : pigpioHandle
                                                                     gpioEdgeChangePub(node->advertise<hal_pigpio::hal_pigpioEdgeChangeMsg>("gpioEdgeChange", 1000)),
                                                                     gpioEncoderCountPub(node->advertise<hal_pigpio::hal_pigpioEncoderCountMsg>("gpioEncoderCount", 1000)),
                                                                     readGpioService(node->advertiseService("hal_pigpioReadGpio", &PigpioInput::readGpio, this)),
-                                                                    setCallbackService(node->advertiseService("hal_pigpioSetCallback", &PigpioInput::setCallback, this))
+                                                                    setCallbackService(node->advertiseService("hal_pigpioSetCallback", &PigpioInput::setCallback, this)),
+                                                                    setMotorDirectionSub(node->subscribe("motorDirection", 1000, &PigpioInput::setMotorInForwardDirection, this))
 {
 }
 
@@ -77,6 +78,8 @@ void PigpioInput::publishEncoderCount(const ros::TimerEvent &timerEvent)
         encoderCountMsg.encoderCount[motor.id] = motor.encoderCount;
     }
 
+    ROS_INFO("Encoder count motor left: %d", encoderCountMsg.encoderCount[0]);
+
     gpioEncoderCountPub.publish(encoderCountMsg);
 }
 
@@ -86,7 +89,14 @@ void PigpioInput::gpioEncoderEdgeChangeCallback(int handle, unsigned gpioId, uns
     {
         if (find(motor.gpios.begin(), motor.gpios.end(), gpioId) != motor.gpios.end())
         {
-            ++motor.encoderCount;
+            if(motor.isDirectionForward)
+            {
+                ++motor.encoderCount;
+            }
+            else
+            {
+                --motor.encoderCount;
+            }
         }
     }
 }
@@ -125,4 +135,17 @@ bool PigpioInput::setEncoderCallback(hal_pigpio::hal_pigpioSetEncoderCallback::R
         ROS_ERROR("Failed to configure encoder callback for GPIO %u!", req.gpioId);
     }
     return true;
+}
+
+void PigpioInput::setMotorInForwardDirection(const hal_pigpio::hal_pigpioMotorDirectionMsg &msg)
+{
+    auto motorIndex = find_if(motors.begin(), motors.end(), [msg](Motor motor) { return motor.id == msg.motorId; });
+    if ( motorIndex != motors.end())
+    {
+        motors.at(motorIndex - motors.begin()).isDirectionForward = msg.isDirectionForward;
+    }
+    else
+    {
+        ROS_ERROR("Failed to set motor direction for motor %u!", msg.motorId);
+    }
 }

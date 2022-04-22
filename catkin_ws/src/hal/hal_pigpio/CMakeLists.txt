@@ -24,6 +24,7 @@ add_message_files(
    hal_pigpioHeartbeatMsg.msg
    hal_pigpioAnglesMsg.msg
    hal_pigpioEncoderCountMsg.msg
+   hal_pigpioMotorDirectionMsg.msg
  )
 
 ## Generate services in the 'srv' folder

@@ -1,2 +1,2 @@
 uint8 gpioId
-uint32[] encoderCount
+int32[] encoderCount

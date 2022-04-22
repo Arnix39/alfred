@@ -3,26 +3,28 @@
 
 #include "hal_motorControlVirtuals.hpp"
 
-class MotorControlPublisherRos : public MotorControlPublisher
+class MotorControlPublishersRos : public MotorControlPublishers
 {
 private:
     ros::Publisher motorControlPubRos;
+    ros::Publisher motorDirectionPubRos;
 
 public:
-    MotorControlPublisherRos(ros::NodeHandle *node);
-    ~MotorControlPublisherRos() = default;
-    void publish(hal_motorcontrol::hal_motorcontrolMsg message) override;
+    MotorControlPublishersRos(ros::NodeHandle *node);
+    ~MotorControlPublishersRos() = default;
+    void publishMsg(hal_motorcontrol::hal_motorcontrolMsg message) override;
+    ros::Publisher *getMotorDirectionPublisherHandle() override;
 };
 
-class MotorControlSubscriberRos : public MotorControlSubscriber
+class MotorControlSubscribersRos : public MotorControlSubscribers
 {
 private:
     ros::Subscriber motorControlPigpioHBSubRos;
     ros::NodeHandle *nodeHandle;
 
 public:
-    MotorControlSubscriberRos(ros::NodeHandle *node);
-    ~MotorControlSubscriberRos() = default;
+    MotorControlSubscribersRos(ros::NodeHandle *node);
+    ~MotorControlSubscribersRos() = default;
     void subscribe(MotorControl *motorControl) override;
 };
 

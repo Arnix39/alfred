@@ -11,6 +11,7 @@
 #include "hal_pigpio/hal_pigpioSetPwmFrequency.h"
 #include "hal_pigpio/hal_pigpioSetPwmDutycycle.h"
 #include "hal_pigpio/hal_pigpioEdgeChangeMsg.h"
+#include "hal_pigpio/hal_pigpioMotorDirectionMsg.h"
 
 struct EncoderChannel
 {
@@ -37,6 +38,7 @@ private:
     Pwm pwmA;
     Pwm pwmB;
     ros::ServiceClient *setPwmDutycycleClientHandle;
+    ros::Publisher *setMotorDirectionPublisherHandle;
     uint8_t id;
 
 public:
@@ -44,11 +46,12 @@ public:
     ~Motor() = default;
     uint32_t getEncoderCount(void);
     void setEncoderCount(uint32_t count);
-    void setPwmDutyCycle(uint16_t dutycycle, bool isDirectionForward);
+    void setPwmDutyCycleAndDirection(uint16_t dutycycle, bool isDirectionForward);
     void configureGpios(ros::ServiceClient *setOutputClientHandle, ros::ServiceClient *setInputClientHandle, 
                         ros::ServiceClient *SetCallbackClientHandle, ros::ServiceClient *SetPwmFrequencyClientHandle,
                         uint8_t motorId);
     void configureSetPwmDutycycleClientHandle(ros::ServiceClient *setPwmDutycycleClient);
+    void configureSetMotorDirectionPublisherHandle(ros::Publisher *setMotorDirectionPublisher);
     uint8_t getId(void);
 };
 
