@@ -19,6 +19,7 @@ MotorControlSubscribersRos::MotorControlSubscribersRos(ros::NodeHandle *node) : 
 void MotorControlSubscribersRos::subscribe(MotorControl *motorControl)
 {
     motorControlPigpioHBSubRos = nodeHandle->subscribe("hal_pigpioHeartbeat", 1000, &MotorControl::pigpioHeartbeatCallback, motorControl);
+    motorControlPigpioECSubRos = nodeHandle->subscribe("hal_pigpioEncoderCount", 1000, &MotorControl::pigpioEncoderCountCallback, motorControl);
 }
 
 /* Services interface implementation */
@@ -90,7 +91,24 @@ void MotorControl::configureMotor(void)
     motorRight.configureSetMotorDirectionClientHandle(motorControlClients->getSetMotorDirectionClientHandle());
 }
 
-void MotorControl::publishMessage(void)
+void MotorControl::pigpioEncoderCountCallback(const hal_pigpio::hal_pigpioEncoderCountMsg &msg)
+{
+    if (msg.motorId == MOTOR_LEFT)
+    {
+        motorLeft.setEncoderCount(msg.encoderCount);
+    }
+    else if (msg.motorId == MOTOR_RIGHT)
+    {
+        motorRight.setEncoderCount(msg.encoderCount);
+    }
+    else
+    {
+        ROS_ERROR("Encoder count message received for unknown motor!");
+    }
+    
+}
+
+void MotorControl::publishMessage(const ros::TimerEvent &timerEvent)
 {
     hal_motorcontrol::hal_motorControlMsg message;
 
@@ -139,6 +157,8 @@ int main(int argc, char **argv)
     MotorControlClientsRos motorControlServiceClientsRos(&node);
 
     MotorControl motorControl(&motorControlSubscribersRos, &motorControlPublishersRos, &motorControlServiceClientsRos);
+
+    ros::Timer motorControlECTimer(node.createTimer(ros::Duration(0.05), &MotorControl::publishMessage, &motorControl));
 
     ros::Rate rate(1);
 

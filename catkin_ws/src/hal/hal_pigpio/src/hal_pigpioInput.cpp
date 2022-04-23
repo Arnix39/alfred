@@ -2,7 +2,7 @@
 
 PigpioInput::PigpioInput(ros::NodeHandle *node, int pigpioHandle) : pigpioHandle(pigpioHandle),
                                                                     gpioEdgeChangePub(node->advertise<hal_pigpio::hal_pigpioEdgeChangeMsg>("gpioEdgeChange", 1000)),
-                                                                    gpioEncoderCountPub(node->advertise<hal_pigpio::hal_pigpioEncoderCountMsg>("gpioEncoderCount", 1000)),
+                                                                    gpioEncoderCountPub(node->advertise<hal_pigpio::hal_pigpioEncoderCountMsg>("hal_pigpioEncoderCount", 1000)),
                                                                     readGpioService(node->advertiseService("hal_pigpioReadGpio", &PigpioInput::readGpio, this)),
                                                                     setCallbackService(node->advertiseService("hal_pigpioSetCallback", &PigpioInput::setCallback, this)),
                                                                     setEncoderCallbackService(node->advertiseService("hal_pigpioSetEncoderCallback", &PigpioInput::setEncoderCallback, this)),

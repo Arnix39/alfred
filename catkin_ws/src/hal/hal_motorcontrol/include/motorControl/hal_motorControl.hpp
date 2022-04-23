@@ -14,6 +14,7 @@
 #include "hal_pigpio/hal_pigpioSetPwmDutycycle.h"
 #include "hal_pigpio/hal_pigpioSetMotorDirection.h"
 #include "hal_pigpio/hal_pigpioHeartbeatMsg.h"
+#include "hal_pigpio/hal_pigpioEncoderCountMsg.h"
 #include "hal_motorcontrol/hal_motorControlMsg.h"
 
 class MotorControl
@@ -31,11 +32,12 @@ public:
     MotorControl(MotorControlSubscribers *motorControlSubscribers, MotorControlPublishers *motorControlPublishers, MotorControlClients *motorControlServiceClients);
     ~MotorControl() = default;
     void configureMotor(void);
-    void publishMessage(void);
+    void publishMessage(const ros::TimerEvent &timerEvent);
     bool isNotStarted(void);
     void starts(void);
     bool isPigpioNodeStarted(void);
     void pigpioHeartbeatCallback(const hal_pigpio::hal_pigpioHeartbeatMsg &msg);
+    void pigpioEncoderCountCallback(const hal_pigpio::hal_pigpioEncoderCountMsg &msg);
 
     void setPwmLeft(uint16_t dutycycle, bool direction);
     void setPwmRight(uint16_t dutycycle, bool direction);
