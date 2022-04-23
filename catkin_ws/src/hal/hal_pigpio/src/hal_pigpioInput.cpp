@@ -83,8 +83,6 @@ void PigpioInput::publishEncoderCount(const ros::TimerEvent &timerEvent)
             encoderCountMsg.motorId = motor.id;
             encoderCountMsg.encoderCount = motor.encoderCount;
 
-            ROS_INFO("Encoder count for motor %d: %d", encoderCountMsg.motorId, encoderCountMsg.encoderCount);
-
             gpioEncoderCountPub.publish(encoderCountMsg);
         }
     }
