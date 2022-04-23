@@ -12,8 +12,7 @@ Motor::Motor(uint8_t gpioPwmChannelA, uint8_t gpioPwmChannelB,
 };
 
 void Motor::configureGpios(ros::ServiceClient *setOutputClientHandle, ros::ServiceClient *setInputClientHandle, 
-                           ros::ServiceClient *setCallbackClientHandle, ros::ServiceClient *setPwmFrequencyClientHandle,
-                           uint8_t motorId)
+                           ros::ServiceClient *setEncoderCallbackClientHandle, ros::ServiceClient *setPwmFrequencyClientHandle)
 {
     hal_pigpio::hal_pigpioSetInputMode setInputModeSrv;
     hal_pigpio::hal_pigpioSetEncoderCallback setEncoderCallbackSrv;
@@ -27,7 +26,7 @@ void Motor::configureGpios(ros::ServiceClient *setOutputClientHandle, ros::Servi
     setEncoderCallbackSrv.request.gpioId = encoder.channelA.gpio;
     setEncoderCallbackSrv.request.edgeChangeType = AS_EITHER_EDGE;
     setEncoderCallbackSrv.request.motorId = id;
-    setCallbackClientHandle->call(setEncoderCallbackSrv);
+    setEncoderCallbackClientHandle->call(setEncoderCallbackSrv);
 
     /* Encoder channel B */
     setInputModeSrv.request.gpioId = encoder.channelB.gpio;
@@ -36,7 +35,7 @@ void Motor::configureGpios(ros::ServiceClient *setOutputClientHandle, ros::Servi
     setEncoderCallbackSrv.request.gpioId = encoder.channelB.gpio;
     setEncoderCallbackSrv.request.edgeChangeType = AS_EITHER_EDGE;
     setEncoderCallbackSrv.request.motorId = id;
-    setCallbackClientHandle->call(setEncoderCallbackSrv);
+    setEncoderCallbackClientHandle->call(setEncoderCallbackSrv);
 
     /* PWM channel A */
     setOutputModeSrv.request.gpioId = pwmA.gpio;
@@ -60,9 +59,9 @@ void Motor::configureSetPwmDutycycleClientHandle(ros::ServiceClient *setPwmDutyc
     setPwmDutycycleClientHandle = setPwmDutycycleClient;
 }
 
-void Motor::configureSetMotorDirectionPublisherHandle(ros::Publisher *setMotorDirectionPublisher)
+void Motor::configureSetMotorDirectionClientHandle(ros::ServiceClient *setMotorDirectionClient)
 {
-    setMotorDirectionPublisherHandle = setMotorDirectionPublisher;
+    setMotorDirectionClientHandle = setMotorDirectionClient;
 }
 
 uint32_t Motor::getEncoderCount(void)
@@ -78,11 +77,11 @@ void Motor::setEncoderCount(uint32_t count)
 void Motor::setPwmDutyCycleAndDirection(uint16_t dutycycle, bool isDirectionForward)
 {
     hal_pigpio::hal_pigpioSetPwmDutycycle setPwmDutycycleSrv;
-    hal_pigpio::hal_pigpioMotorDirectionMsg motorDirectionMsg;
+    hal_pigpio::hal_pigpioSetMotorDirection motorDirectionSrv;
 
-    motorDirectionMsg.isDirectionForward = isDirectionForward;
-    motorDirectionMsg.motorId = id;
-    setMotorDirectionPublisherHandle->publish(motorDirectionMsg);
+    motorDirectionSrv.request.isDirectionForward = isDirectionForward;
+    motorDirectionSrv.request.motorId = id;
+    setMotorDirectionClientHandle->call(motorDirectionSrv);
 
     pwmB.dutycycle = dutycycle;
     pwmA.dutycycle = dutycycle;

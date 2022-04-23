@@ -5,7 +5,10 @@ PigpioInput::PigpioInput(ros::NodeHandle *node, int pigpioHandle) : pigpioHandle
                                                                     gpioEncoderCountPub(node->advertise<hal_pigpio::hal_pigpioEncoderCountMsg>("gpioEncoderCount", 1000)),
                                                                     readGpioService(node->advertiseService("hal_pigpioReadGpio", &PigpioInput::readGpio, this)),
                                                                     setCallbackService(node->advertiseService("hal_pigpioSetCallback", &PigpioInput::setCallback, this)),
-                                                                    setMotorDirectionSub(node->subscribe("motorDirection", 1000, &PigpioInput::setMotorInForwardDirection, this))
+                                                                    setEncoderCallbackService(node->advertiseService("hal_pigpioSetEncoderCallback", &PigpioInput::setEncoderCallback, this)),
+                                                                    setMotorDirectionService(node->advertiseService("hal_pigpioSetMotorDirection", &PigpioInput::setMotorDirection, this)),
+                                                                    callbackList({}),
+                                                                    motors({})
 {
 }
 
@@ -73,19 +76,23 @@ void PigpioInput::publishEncoderCount(const ros::TimerEvent &timerEvent)
 {
     hal_pigpio::hal_pigpioEncoderCountMsg encoderCountMsg;
 
-    for (Motor motor : motors)
+    if (motors.size() != 0)
     {
-        encoderCountMsg.encoderCount[motor.id] = motor.encoderCount;
+        for (Motor &motor : motors)
+        {
+            encoderCountMsg.motorId = motor.id;
+            encoderCountMsg.encoderCount = motor.encoderCount;
+
+            ROS_INFO("Encoder count for motor %d: %d", encoderCountMsg.motorId, encoderCountMsg.encoderCount);
+
+            gpioEncoderCountPub.publish(encoderCountMsg);
+        }
     }
-
-    ROS_INFO("Encoder count motor left: %d", encoderCountMsg.encoderCount[0]);
-
-    gpioEncoderCountPub.publish(encoderCountMsg);
 }
 
 void PigpioInput::gpioEncoderEdgeChangeCallback(int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us)
 {
-    for (Motor motor : motors)
+    for (Motor &motor : motors)
     {
         if (find(motor.gpios.begin(), motor.gpios.end(), gpioId) != motor.gpios.end())
         {
@@ -137,15 +144,17 @@ bool PigpioInput::setEncoderCallback(hal_pigpio::hal_pigpioSetEncoderCallback::R
     return true;
 }
 
-void PigpioInput::setMotorInForwardDirection(const hal_pigpio::hal_pigpioMotorDirectionMsg &msg)
+bool PigpioInput::setMotorDirection(hal_pigpio::hal_pigpioSetMotorDirection::Request &req,
+                                    hal_pigpio::hal_pigpioSetMotorDirection::Response &res)
 {
-    auto motorIndex = find_if(motors.begin(), motors.end(), [msg](Motor motor) { return motor.id == msg.motorId; });
+    auto motorIndex = find_if(motors.begin(), motors.end(), [&req](Motor motor) { return motor.id == req.motorId; });
     if ( motorIndex != motors.end())
     {
-        motors.at(motorIndex - motors.begin()).isDirectionForward = msg.isDirectionForward;
+        motors.at(motorIndex - motors.begin()).isDirectionForward = req.isDirectionForward;
     }
     else
     {
-        ROS_ERROR("Failed to set motor direction for motor %u!", msg.motorId);
+        ROS_ERROR("Failed to set motor direction for motor %u!", req.motorId);
     }
+    return true;
 }

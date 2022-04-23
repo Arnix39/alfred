@@ -7,13 +7,11 @@ class MotorControlPublishersRos : public MotorControlPublishers
 {
 private:
     ros::Publisher motorControlPubRos;
-    ros::Publisher motorDirectionPubRos;
 
 public:
     MotorControlPublishersRos(ros::NodeHandle *node);
     ~MotorControlPublishersRos() = default;
     void publishMsg(hal_motorcontrol::hal_motorcontrolMsg message) override;
-    ros::Publisher *getMotorDirectionPublisherHandle() override;
 };
 
 class MotorControlSubscribersRos : public MotorControlSubscribers
@@ -36,6 +34,7 @@ private:
     ros::ServiceClient gpioSetOutputClientRos;
     ros::ServiceClient gpioSetPwmFrequencyClientRos;
     ros::ServiceClient gpioSetPwmDutycycleClientRos;
+    ros::ServiceClient gpioSetMotorDirectionClientRos;
 
 public:
     MotorControlClientsRos(ros::NodeHandle *node);
@@ -45,6 +44,7 @@ public:
     ros::ServiceClient *getSetOutputClientHandle() override;
     ros::ServiceClient *getSetPwmFrequencyClientHandle() override;
     ros::ServiceClient *getSetPwmDutycycleClientHandle() override;
+    ros::ServiceClient *getSetMotorDirectionClientHandle() override;
 };
 
 #endif

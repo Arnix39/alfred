@@ -1,0 +1,4 @@
+bool isDirectionForward
+uint8 motorId
+---
+bool hasSucceeded

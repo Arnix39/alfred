@@ -25,7 +25,7 @@ int main(int argc, char **argv)
     PigpioImu pigpioImu(&node, pigpioHandle);
 
     ros::Timer heartbeatTimer(node.createTimer(ros::Duration(0.1), &PigpioInit::publishHeartbeat, &pigpioInit));
-    ros::Timer encoderCountTimer(node.createTimer(ros::Duration(0.005), &PigpioInput::publishEncoderCount, &pigpioInput));
+    ros::Timer encoderCountTimer(node.createTimer(ros::Duration(0.5), &PigpioInput::publishEncoderCount, &pigpioInput));
 
     ros::spin();
 

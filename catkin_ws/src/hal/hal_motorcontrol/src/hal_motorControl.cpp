@@ -2,19 +2,13 @@
 #include "hal_motorControlInterfaces.hpp"
 
 /* Publishers interface implementation */
-MotorControlPublishersRos::MotorControlPublishersRos(ros::NodeHandle *node) : motorControlPubRos(node->advertise<hal_motorcontrol::hal_motorcontrolMsg>("motorsEncoderCountValue", 1000)),
-                                                                              motorDirectionPubRos(node->advertise<hal_pigpio::hal_pigpioMotorDirectionMsg>("motorDirection", 1000))
+MotorControlPublishersRos::MotorControlPublishersRos(ros::NodeHandle *node) : motorControlPubRos(node->advertise<hal_motorcontrol::hal_motorcontrolMsg>("motorsEncoderCountValue", 1000))
 {
 }
 
 void MotorControlPublishersRos::publishMsg(hal_motorcontrol::hal_motorcontrolMsg message)
 {
     motorControlPubRos.publish(message);
-}
-
-ros::Publisher *MotorControlPublishersRos::getMotorDirectionPublisherHandle()
-{
-    return &motorDirectionPubRos;
 }
 
 /* Subscriber interface implementation */
@@ -32,7 +26,8 @@ MotorControlClientsRos::MotorControlClientsRos(ros::NodeHandle *node) : gpioSetI
                                                                         gpioSetOutputClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetOutputMode>("hal_pigpioSetOutputMode")),
                                                                         gpioSetEncoderCallbackClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetEncoderCallback>("hal_pigpioSetEncoderCallback")),
                                                                         gpioSetPwmFrequencyClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetPwmFrequency>("hal_pigpioSetPwmFrequency")),
-                                                                        gpioSetPwmDutycycleClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetPwmDutycycle>("hal_pigpioSetPwmDutycycle"))
+                                                                        gpioSetPwmDutycycleClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetPwmDutycycle>("hal_pigpioSetPwmDutycycle")),
+                                                                        gpioSetMotorDirectionClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetMotorDirection>("hal_pigpioSetMotorDirection"))
 {
 }
 
@@ -61,6 +56,11 @@ ros::ServiceClient *MotorControlClientsRos::getSetPwmDutycycleClientHandle()
     return &gpioSetPwmDutycycleClientRos;
 }
 
+ros::ServiceClient *MotorControlClientsRos::getSetMotorDirectionClientHandle()
+{
+    return &gpioSetMotorDirectionClientRos;
+}
+
 /* Motor control implementation */
 MotorControl::MotorControl(MotorControlSubscribers *motorControlSubscribers,
                            MotorControlPublishers *motorControlPublishers, 
@@ -80,16 +80,14 @@ MotorControl::MotorControl(MotorControlSubscribers *motorControlSubscribers,
 void MotorControl::configureMotor(void)
 {
     motorLeft.configureGpios(motorControlClients->getSetOutputClientHandle(), motorControlClients->getSetInputClientHandle(), 
-                             motorControlClients->getSetEncoderCallbackClientHandle(), motorControlClients->getSetPwmFrequencyClientHandle(),
-                             motorLeft.getId());
+                             motorControlClients->getSetEncoderCallbackClientHandle(), motorControlClients->getSetPwmFrequencyClientHandle());
     motorLeft.configureSetPwmDutycycleClientHandle(motorControlClients->getSetPwmDutycycleClientHandle());
-    motorLeft.configureSetMotorDirectionPublisherHandle(motorControlPubs->getMotorDirectionPublisherHandle());
+    motorLeft.configureSetMotorDirectionClientHandle(motorControlClients->getSetMotorDirectionClientHandle());
 
     motorRight.configureGpios(motorControlClients->getSetOutputClientHandle(), motorControlClients->getSetInputClientHandle(), 
-                              motorControlClients->getSetEncoderCallbackClientHandle(), motorControlClients->getSetPwmFrequencyClientHandle(),
-                              motorRight.getId());
+                              motorControlClients->getSetEncoderCallbackClientHandle(), motorControlClients->getSetPwmFrequencyClientHandle());
     motorRight.configureSetPwmDutycycleClientHandle(motorControlClients->getSetPwmDutycycleClientHandle());
-    motorRight.configureSetMotorDirectionPublisherHandle(motorControlPubs->getMotorDirectionPublisherHandle());
+    motorRight.configureSetMotorDirectionClientHandle(motorControlClients->getSetMotorDirectionClientHandle());
 }
 
 void MotorControl::publishMessage(void)
@@ -136,8 +134,8 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "hal_motorcontrol");
     ros::NodeHandle node;
 
-    MotorControlPublishersRos motorControlPublishersRos(&node);
     MotorControlSubscribersRos motorControlSubscribersRos(&node);
+    MotorControlPublishersRos motorControlPublishersRos(&node);
     MotorControlClientsRos motorControlServiceClientsRos(&node);
 
     MotorControl motorControl(&motorControlSubscribersRos, &motorControlPublishersRos, &motorControlServiceClientsRos);

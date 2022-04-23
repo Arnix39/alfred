@@ -1,2 +1,2 @@
-uint8 gpioId
-int32[] encoderCount
+uint8 motorId
+int32 encoderCount

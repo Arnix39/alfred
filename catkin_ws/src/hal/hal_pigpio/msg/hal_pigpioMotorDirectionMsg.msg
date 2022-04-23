@@ -1,2 +1,0 @@
-bool isDirectionForward
-uint8 motorId

@@ -5,7 +5,6 @@
 
 // Services and messages headers (generated)
 #include "hal_motorcontrol/hal_motorcontrolMsg.h"
-#include "hal_pigpio/hal_pigpioMotorDirectionMsg.h"
 
 class MotorControl;
 
@@ -15,7 +14,6 @@ public:
     MotorControlPublishers() {}
     virtual ~MotorControlPublishers() {}
     virtual void publishMsg(hal_motorcontrol::hal_motorcontrolMsg message) = 0;
-    virtual ros::Publisher *getMotorDirectionPublisherHandle() = 0;
 };
 
 class MotorControlSubscribers
@@ -36,6 +34,7 @@ public:
     virtual ros::ServiceClient *getSetOutputClientHandle() = 0;
     virtual ros::ServiceClient *getSetPwmFrequencyClientHandle() = 0;
     virtual ros::ServiceClient *getSetPwmDutycycleClientHandle() = 0;
+    virtual ros::ServiceClient *getSetMotorDirectionClientHandle() = 0;
 };
 
 #endif

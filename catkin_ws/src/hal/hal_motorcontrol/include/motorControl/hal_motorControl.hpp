@@ -12,9 +12,8 @@
 #include "hal_pigpio/hal_pigpioSetEncoderCallback.h"
 #include "hal_pigpio/hal_pigpioSetPwmFrequency.h"
 #include "hal_pigpio/hal_pigpioSetPwmDutycycle.h"
+#include "hal_pigpio/hal_pigpioSetMotorDirection.h"
 #include "hal_pigpio/hal_pigpioHeartbeatMsg.h"
-#include "hal_motorcontrol/hal_motorcontrolMsg.h"
-#include "hal_pigpio/hal_pigpioMotorDirectionMsg.h"
 
 class MotorControl
 {
