@@ -1,0 +1,10 @@
+<launch>
+	<machine name="Alfred" address="192.168.1.221" env-loader="/home/arnix/Alfred/env.sh" default="true" user="arnix"/>
+	<node machine="Alfred" pkg="hal_pigpio" name="hal_pigpio_node" type="hal_pigpio_node" output="screen"/>
+	<node machine="Alfred" pkg="hal_proxsens" name="hal_proxsens_node" type="hal_proxsens_node" output="screen"/>
+	<node machine="Alfred" pkg="hal_imu" name="hal_imuI2cInit_node" type="hal_imuI2cInit_node" output="screen"/>
+	<node machine="Alfred" pkg="hal_imu" name="hal_imuDmpWritingServer_node" type="hal_imuDmpWritingServer_node" output="screen"/>
+	<node machine="Alfred" pkg="hal_imu" name="hal_imu_node" type="hal_imu_node" output="screen"/>
+	<node machine="Alfred" pkg="hal_motorcontrol" name="hal_motorcontrol_node" type="hal_motorcontrol_node" output="screen"/>
+</launch>
+
