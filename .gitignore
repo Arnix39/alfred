@@ -7,3 +7,5 @@ catkin_ws/install_aarch64/
 catkin_ws/log/
 .vscode
 copy_to_pi.sh
+alfred.launch
+env.sh
