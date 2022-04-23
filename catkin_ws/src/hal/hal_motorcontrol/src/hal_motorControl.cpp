@@ -2,11 +2,11 @@
 #include "hal_motorControlInterfaces.hpp"
 
 /* Publishers interface implementation */
-MotorControlPublishersRos::MotorControlPublishersRos(ros::NodeHandle *node) : motorControlPubRos(node->advertise<hal_motorcontrol::hal_motorcontrolMsg>("motorsEncoderCountValue", 1000))
+MotorControlPublishersRos::MotorControlPublishersRos(ros::NodeHandle *node) : motorControlPubRos(node->advertise<hal_motorcontrol::hal_motorControlMsg>("motorsEncoderCountValue", 1000))
 {
 }
 
-void MotorControlPublishersRos::publishMsg(hal_motorcontrol::hal_motorcontrolMsg message)
+void MotorControlPublishersRos::publishEncoderCounts(hal_motorcontrol::hal_motorControlMsg message)
 {
     motorControlPubRos.publish(message);
 }
@@ -92,11 +92,11 @@ void MotorControl::configureMotor(void)
 
 void MotorControl::publishMessage(void)
 {
-    hal_motorcontrol::hal_motorcontrolMsg message;
+    hal_motorcontrol::hal_motorControlMsg message;
 
     message.motorLeftEncoderCount = motorLeft.getEncoderCount();
     message.motorRightEncoderCount = motorRight.getEncoderCount();
-    motorControlPubs->publishMsg(message);
+    motorControlPubs->publishEncoderCounts(message);
 }
 
 void MotorControl::starts(void)

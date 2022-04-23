@@ -4,7 +4,7 @@
 #include "ros/ros.h"
 
 // Services and messages headers (generated)
-#include "hal_motorcontrol/hal_motorcontrolMsg.h"
+#include "hal_motorcontrol/hal_motorControlMsg.h"
 
 class MotorControl;
 
@@ -13,7 +13,7 @@ class MotorControlPublishers
 public:
     MotorControlPublishers() {}
     virtual ~MotorControlPublishers() {}
-    virtual void publishMsg(hal_motorcontrol::hal_motorcontrolMsg message) = 0;
+    virtual void publishEncoderCounts(hal_motorcontrol::hal_motorControlMsg message) = 0;
 };
 
 class MotorControlSubscribers

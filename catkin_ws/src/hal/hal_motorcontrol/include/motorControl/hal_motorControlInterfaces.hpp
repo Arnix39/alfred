@@ -11,7 +11,7 @@ private:
 public:
     MotorControlPublishersRos(ros::NodeHandle *node);
     ~MotorControlPublishersRos() = default;
-    void publishMsg(hal_motorcontrol::hal_motorcontrolMsg message) override;
+    void publishEncoderCounts(hal_motorcontrol::hal_motorControlMsg message) override;
 };
 
 class MotorControlSubscribersRos : public MotorControlSubscribers

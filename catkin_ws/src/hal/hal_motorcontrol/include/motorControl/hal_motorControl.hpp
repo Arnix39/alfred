@@ -14,6 +14,7 @@
 #include "hal_pigpio/hal_pigpioSetPwmDutycycle.h"
 #include "hal_pigpio/hal_pigpioSetMotorDirection.h"
 #include "hal_pigpio/hal_pigpioHeartbeatMsg.h"
+#include "hal_motorcontrol/hal_motorControlMsg.h"
 
 class MotorControl
 {
