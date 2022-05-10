@@ -9,8 +9,13 @@
   <author email="arnaud.hote@gmail.com">Arnix</author>
   <license>BSD</license>
 
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+
   <!-- Dependencies -->
   <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
 
   <build_depend>roscpp</build_depend>
   <build_depend>hal_pigpio</build_depend>
@@ -19,5 +24,6 @@
   <exec_depend>roscpp</exec_depend>
   <exec_depend>hal_pigpio</exec_depend>
   <exec_depend>message_runtime</exec_depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
 
 </package>

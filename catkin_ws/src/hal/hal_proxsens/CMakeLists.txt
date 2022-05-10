@@ -2,14 +2,15 @@ cmake_minimum_required(VERSION 3.0.2)
 set(PROJECT_NAME hal_proxsens)
 project(${PROJECT_NAME})
 
-add_compile_options(-std=c++11)
+set(CMAKE_CXX_STANDARD 14)
+#add_compile_options(-std=c++11)
 
-## Find catkin macros and libraries
-find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  message_generation
-  hal_pigpio
-)
+## Find ament macros and libraries
+find_package(ament_cmake REQUIRED)
+find_package(roscpp REQUIRED)
+find_package(message_generation REQUIRED)
+find_package(hal_pigpio REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
 
 ################################################
 ## Declare ROS messages, services and actions ##
