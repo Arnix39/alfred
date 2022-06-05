@@ -5,5 +5,5 @@
     "python.analysis.extraPaths": [
         "/opt/ros/humble/lib/python3.8/site-packages/"
     ],
-    "ros.distro": "humble"
+    "cmake.configureOnOpen": true
 }

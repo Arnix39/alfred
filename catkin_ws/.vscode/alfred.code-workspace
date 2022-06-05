@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		}
+	],
+	"settings": {
+		"python.autoComplete.extraPaths": [
+			"/opt/ros/humble/lib/python3/dist-packages"
+		],
+		"python.analysis.extraPaths": [
+			"/opt/ros/humble/lib/python3/dist-packages"
+		],
+		"ros.distro": "humble"
+	}
+}
