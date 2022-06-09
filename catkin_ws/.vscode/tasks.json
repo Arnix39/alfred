@@ -21,5 +21,19 @@
                 "isDefault": true
             }
         },
+        {
+            "label": "ROS2: Clean",
+            "detail": "Run the clean target",
+            "type": "shell",
+            "command": "colcon build --cmake-target clean",
+            "problemMatcher": "$gcc"
+        },
+        {
+            "label": "ROS2: Purge",
+            "detail": "Purge workspace by deleting all generated files.",
+            "type": "shell",
+            "command": "rm -fr build install log; py3clean .",
+            "problemMatcher": []
+        }
     ]
 }
