@@ -1,1 +1,1 @@
-This directory contains the ROS `catkin` workspace.
+This directory contains the ROS2 workspace for Alfred.
