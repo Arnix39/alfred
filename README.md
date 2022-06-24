@@ -3,7 +3,7 @@ Alfred is a self balanced two-wheels robot based around a Raspberry Pi. It will 
 
 ## Aim of the project
 This project's main goal is for me to learn (or consolidate) and apply new skills:
-- ROS, OpenCV and Google Test
+- ROS/ROS2, OpenCV and Google Test
 - C++, Rust and UML
 
 ## Hardware
@@ -21,7 +21,7 @@ Alfred is composed of the following components:
 The remote used to control Alfred is a [STM32F3 Discovery board](https://gitlab.com/arnixroboticslab/alfred/-/blob/master/Datasheets/STM32F3_Disc_manual.pdf) to which a [HC05](https://gitlab.com/arnixroboticslab/alfred/-/blob/master/Datasheets/HC05_DS.pdf) bluetooth module is connected.
 
 ## Software
-The software powering Alfred is using [ROS Noetic](http://wiki.ros.org/noetic) running on [Ubuntu server 20.04 LTS](https://ubuntu.com/download/raspberry-pi) for Raspberry Pi.
+The software powering Alfred is using [ROS2 Humble](https://docs.ros.org/en/humble/index.html) running on [Ubuntu server 22.04 LTS](https://ubuntu.com/download/raspberry-pi) for Raspberry Pi.
 The Pi's code is using some librairies:
 - [pigpio](http://abyz.me.uk/rpi/pigpio/index.html): a library used to control the GPIOs of the Rapsberry Pi
 
