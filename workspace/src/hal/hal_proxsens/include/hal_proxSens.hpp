@@ -3,18 +3,18 @@
 
 #include "stdint.h"
 
-#include "ros/ros.h"
+#include "rclcpp/rclcpp.hpp"
 #include "hal_proxSensVirtuals.hpp"
 
 // Services and messages headers (generated)
-#include "hal_pigpio/hal_pigpioSetInputMode.h"
-#include "hal_pigpio/hal_pigpioSetOutputMode.h"
-#include "hal_pigpio/hal_pigpioSetGpioHigh.h"
-#include "hal_pigpio/hal_pigpioSendTriggerPulse.h"
-#include "hal_pigpio/hal_pigpioSetCallback.h"
-#include "hal_pigpio/hal_pigpioEdgeChangeMsg.h"
-#include "hal_pigpio/hal_pigpioHeartbeatMsg.h"
-#include "hal_proxsens/hal_proxsensMsg.h"
+// #include "hal_pigpio/hal_pigpioSetInputMode.h"
+// #include "hal_pigpio/hal_pigpioSetOutputMode.h"
+// #include "hal_pigpio/hal_pigpioSetGpioHigh.h"
+// #include "hal_pigpio/hal_pigpioSendTriggerPulse.h"
+// #include "hal_pigpio/hal_pigpioSetCallback.h"
+// #include "hal_pigpio/hal_pigpioEdgeChangeMsg.h"
+// #include "hal_pigpio/hal_pigpioHeartbeatMsg.h"
+#include "hal_proxsens/msg/hal_proxsens.hpp"
 
 #define PROXSENS_TRIGGER_GPIO 5
 #define PROXSENS_ECHO_GPIO 6
@@ -52,7 +52,7 @@ public:
     void edgeChangeCallback(const hal_pigpio::hal_pigpioEdgeChangeMsg &msg);
     void pigpioHeartbeatCallback(const hal_pigpio::hal_pigpioHeartbeatMsg &msg);
     bool isPigpioNodeStarted(void);
-    void publishAndGetDistance(const ros::TimerEvent &timerEvent);
+    void publishAndGetDistance(const rclcpp::TimerEvent &timerEvent);
     bool isNotStarted(void);
     void starts(void);
 };

@@ -6,10 +6,10 @@
 class ProxSensPublisherRos : public ProxSensPublisher
 {
 private:
-    ros::Publisher proxSensPubRos;
+    rclcpp::Publisher proxSensPubRos;
 
 public:
-    ProxSensPublisherRos(ros::NodeHandle *node);
+    ProxSensPublisherRos(rclcpp::NodeHandle *node);
     ~ProxSensPublisherRos() = default;
     void publish(hal_proxsens::hal_proxsensMsg message) override;
 };
@@ -17,12 +17,12 @@ public:
 class ProxSensSubscriberRos : public ProxSensSubscriber
 {
 private:
-    ros::Subscriber proxSensSubRos;
-    ros::Subscriber proxSensPigpioHBSubRos;
-    ros::NodeHandle *nodeHandle;
+    rclcpp::Subscriber proxSensSubRos;
+    rclcpp::Subscriber proxSensPigpioHBSubRos;
+    rclcpp::NodeHandle *nodeHandle;
 
 public:
-    ProxSensSubscriberRos(ros::NodeHandle *node);
+    ProxSensSubscriberRos(rclcpp::NodeHandle *node);
     ~ProxSensSubscriberRos() = default;
     void subscribe(ProxSens *proxSens) override;
 };
@@ -30,20 +30,20 @@ public:
 class ProxSensClientsRos : public ProxSensClients
 {
 private:
-    ros::ServiceClient gpioSetInputClientRos;
-    ros::ServiceClient gpioSetCallbackClientRos;
-    ros::ServiceClient gpioSetOutputClientRos;
-    ros::ServiceClient gpioSendTriggerPulseClientRos;
-    ros::ServiceClient gpioSetGpioHighClientRos;
+    rclcpp::ServiceClient gpioSetInputClientRos;
+    rclcpp::ServiceClient gpioSetCallbackClientRos;
+    rclcpp::ServiceClient gpioSetOutputClientRos;
+    rclcpp::ServiceClient gpioSendTriggerPulseClientRos;
+    rclcpp::ServiceClient gpioSetGpioHighClientRos;
 
 public:
-    ProxSensClientsRos(ros::NodeHandle *node);
+    ProxSensClientsRos(rclcpp::NodeHandle *node);
     ~ProxSensClientsRos() = default;
-    ros::ServiceClient *getSetInputClientHandle() override;
-    ros::ServiceClient *getSetCallbackClientHandle() override;
-    ros::ServiceClient *getSetOutputClientHandle() override;
-    ros::ServiceClient *getSendTriggerPulseClientHandle() override;
-    ros::ServiceClient *getSetGpioHighClientHandle() override;
+    rclcpp::ServiceClient *getSetInputClientHandle() override;
+    rclcpp::ServiceClient *getSetCallbackClientHandle() override;
+    rclcpp::ServiceClient *getSetOutputClientHandle() override;
+    rclcpp::ServiceClient *getSendTriggerPulseClientHandle() override;
+    rclcpp::ServiceClient *getSetGpioHighClientHandle() override;
 };
 
 #endif

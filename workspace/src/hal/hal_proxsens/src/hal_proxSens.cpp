@@ -2,7 +2,7 @@
 #include "hal_proxSensInterfaces.hpp"
 
 /* Publisher interface implementation */
-ProxSensPublisherRos::ProxSensPublisherRos(ros::NodeHandle *node) : proxSensPubRos(node->advertise<hal_proxsens::hal_proxsensMsg>("proxSensorValue", 1000))
+ProxSensPublisherRos::ProxSensPublisherRos(rclcpp::NodeHandle *node) : proxSensPubRos(node->advertise<hal_proxsens::hal_proxsensMsg>("proxSensorValue", 1000))
 {
 }
 
@@ -23,7 +23,7 @@ void ProxSensSubscriberRos::subscribe(ProxSens *proxSens)
 }
 
 /* Services interface implementation */
-ProxSensClientsRos::ProxSensClientsRos(ros::NodeHandle *node) : gpioSetInputClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetInputMode>("hal_pigpioSetInputMode")),
+ProxSensClientsRos::ProxSensClientsRos(rclcpp::NodeHandle *node) : gpioSetInputClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetInputMode>("hal_pigpioSetInputMode")),
                                                                 gpioSetOutputClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetOutputMode>("hal_pigpioSetOutputMode")),
                                                                 gpioSetCallbackClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetCallback>("hal_pigpioSetCallback")),
                                                                 gpioSendTriggerPulseClientRos(node->serviceClient<hal_pigpio::hal_pigpioSendTriggerPulse>("hal_pigpioSendTriggerPulse")),
@@ -164,7 +164,7 @@ void ProxSens::enableOutputLevelShifter(void)
     proxSensClients->getSetGpioHighClientHandle()->call(setGpioHighSrv);
 }
 
-void ProxSens::publishAndGetDistance(const ros::TimerEvent &timerEvent)
+void ProxSens::publishAndGetDistance(const rclcpp::TimerEvent &timerEvent)
 {
     publishMessage();
     trigger();
@@ -182,9 +182,9 @@ bool ProxSens::isNotStarted(void)
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "hal_proxsens");
-    ros::NodeHandle node;
-    ros::Timer proxSensTimer;
+    rclcpp::init(argc, argv, "hal_proxsens");
+    auto node = std::make_shared<rclcpp::Node>("hal_proxsens_node");
+    rclcpp::Timer proxSensTimer;
 
     ProxSensPublisherRos proxSensPublisherRos(&node);
     ProxSensSubscriberRos proxSensSubscriberRos(&node);
@@ -192,21 +192,22 @@ int main(int argc, char **argv)
 
     ProxSens proxSens(&proxSensSubscriberRos, &proxSensPublisherRos, &proxSensServiceClientsRos);
 
-    ROS_INFO("proxSens node waiting for pigpio node to start...");
-    while (ros::ok())
+    RCLCPP_INFO(node->get_logger(),"proxSens node waiting for pigpio node to start...");
+    while (rclcpp::ok())
     {
         if (proxSens.isNotStarted() && proxSens.isPigpioNodeStarted())
         {
-            ROS_INFO("proxSens node initialising...");
+            RCLCPP_INFO(node->get_logger(),"proxSens node initialising...");
             proxSens.configureGpios();
             proxSens.enableOutputLevelShifter();
             proxSens.starts();
-            proxSensTimer = node.createTimer(ros::Duration(0.1), &ProxSens::publishAndGetDistance, &proxSens);
-            ROS_INFO("proxSens node initialised.");
+            proxSensTimer = node.createTimer(rclcpp::Duration(0.1), &ProxSens::publishAndGetDistance, &proxSens);
+            RCLCPP_INFO(node->get_logger(),"proxSens node initialised.");
         }
 
-        ros::spinOnce();
+        rclcpp::spin_some(node);
     }
 
+    rclcpp::shutdown();
     return 0;
 }

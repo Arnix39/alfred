@@ -1,10 +1,10 @@
 #ifndef HAL_PROXSENS_VIRTUALS
 #define HAL_PROXSENS_VIRTUALS
 
-#include "ros/ros.h"
+#include "rclcpp/rclcpp.hpp"
 
 // Services and messages headers (generated)
-#include "hal_proxsens/hal_proxsensMsg.h"
+#include "hal_proxsens/msg/hal_proxsens.hpp"
 
 class ProxSens;
 
@@ -13,7 +13,7 @@ class ProxSensPublisher
 public:
     ProxSensPublisher() {}
     virtual ~ProxSensPublisher() {}
-    virtual void publish(hal_proxsens::hal_proxsensMsg message) = 0;
+    virtual void publish(hal_proxsens::msg::HalProxsens message) = 0;
 };
 
 class ProxSensSubscriber
@@ -29,11 +29,11 @@ class ProxSensClients
 public:
     ProxSensClients() {}
     virtual ~ProxSensClients() {}
-    virtual ros::ServiceClient *getSetInputClientHandle() = 0;
-    virtual ros::ServiceClient *getSetCallbackClientHandle() = 0;
-    virtual ros::ServiceClient *getSetOutputClientHandle() = 0;
-    virtual ros::ServiceClient *getSendTriggerPulseClientHandle() = 0;
-    virtual ros::ServiceClient *getSetGpioHighClientHandle() = 0;
+    virtual rclcpp::ServiceClient *getSetInputClientHandle() = 0;
+    virtual rclcpp::ServiceClient *getSetCallbackClientHandle() = 0;
+    virtual rclcpp::ServiceClient *getSetOutputClientHandle() = 0;
+    virtual rclcpp::ServiceClient *getSendTriggerPulseClientHandle() = 0;
+    virtual rclcpp::ServiceClient *getSetGpioHighClientHandle() = 0;
 };
 
 #endif
