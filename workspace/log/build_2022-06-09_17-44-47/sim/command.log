@@ -1,1 +1,0 @@
-Invoking command in '/home/arnix/src/alfred/catkin_ws/build/sim': /usr/bin/cmake /home/arnix/src/alfred/catkin_ws/src/sim -DCATKIN_INSTALL_INTO_PREFIX_ROOT=0 -DCMAKE_INSTALL_PREFIX=/home/arnix/src/alfred/catkin_ws/install/sim

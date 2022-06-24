@@ -1,2 +1,0 @@
-Invoking command in '/home/arnix/src/alfred/catkin_ws/build/hal': /usr/bin/cmake /home/arnix/src/alfred/catkin_ws/src/hal -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_INSTALL_PREFIX=/home/arnix/src/alfred/catkin_ws/install/hal
-Invoked command in '/home/arnix/src/alfred/catkin_ws/build/hal' returned '1': /usr/bin/cmake /home/arnix/src/alfred/catkin_ws/src/hal -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_INSTALL_PREFIX=/home/arnix/src/alfred/catkin_ws/install/hal
