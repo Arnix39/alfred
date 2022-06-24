@@ -1,0 +1,34 @@
+[0.009s] Invoking command in '/home/arnix/src/alfred/catkin_ws/build/hal': /usr/bin/cmake /home/arnix/src/alfred/catkin_ws/src/hal -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_INSTALL_PREFIX=/home/arnix/src/alfred/catkin_ws/install/hal
+[0.012s] [33mCMake Warning (dev) in CMakeLists.txt:
+[0.012s]   No project() command is present.  The top-level CMakeLists.txt file must
+[0.012s]   contain a literal, direct call to the project() command.  Add a line of
+[0.012s]   code such as
+[0.012s] 
+[0.012s]     project(ProjectName)
+[0.012s] 
+[0.012s]   near the top of the file, but after cmake_minimum_required().
+[0.012s] 
+[0.012s]   CMake is pretending there is a "project(Project)" command on the first
+[0.012s]   line.
+[0.012s] This warning is for project developers.  Use -Wno-dev to suppress it.
+[0.012s] [0m
+[0.027s] [31mCMake Error at hal_pigpio/CMakeLists.txt:8 (find_package):
+[0.027s]   By not providing "Findcatkin.cmake" in CMAKE_MODULE_PATH this project has
+[0.027s]   asked CMake to find a package configuration file provided by "catkin", but
+[0.027s]   CMake did not find one.
+[0.027s] 
+[0.027s]   Could not find a package configuration file provided by "catkin" with any
+[0.027s]   of the following names:
+[0.027s] 
+[0.027s]     catkinConfig.cmake
+[0.027s]     catkin-config.cmake
+[0.027s] 
+[0.027s]   Add the installation prefix of "catkin" to CMAKE_PREFIX_PATH or set
+[0.027s]   "catkin_DIR" to a directory containing one of the above files.  If "catkin"
+[0.027s]   provides a separate development package or SDK, be sure it has been
+[0.028s]   installed.
+[0.028s] 
+[0.028s] [0m
+[0.028s] -- Configuring incomplete, errors occurred!
+[0.028s] See also "/home/arnix/src/alfred/catkin_ws/build/hal/CMakeFiles/CMakeOutput.log".
+[0.029s] Invoked command in '/home/arnix/src/alfred/catkin_ws/build/hal' returned '1': /usr/bin/cmake /home/arnix/src/alfred/catkin_ws/src/hal -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_INSTALL_PREFIX=/home/arnix/src/alfred/catkin_ws/install/hal

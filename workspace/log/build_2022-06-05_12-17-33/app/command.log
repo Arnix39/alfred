@@ -1,0 +1,1 @@
+Invoking command in '/home/arnix/src/alfred/catkin_ws/build/app': /usr/bin/cmake /home/arnix/src/alfred/catkin_ws/src/app -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCATKIN_INSTALL_INTO_PREFIX_ROOT=0 -DCATKIN_SYMLINK_INSTALL=ON -DCMAKE_INSTALL_PREFIX=/home/arnix/src/alfred/catkin_ws/install/app

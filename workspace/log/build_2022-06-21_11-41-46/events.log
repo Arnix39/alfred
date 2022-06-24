@@ -1,0 +1,5 @@
+[0.000000] (-) TimerEvent: {}
+[0.001108] (-) JobUnselected: {'identifier': 'app'}
+[0.001210] (-) JobUnselected: {'identifier': 'hal'}
+[0.001711] (-) JobUnselected: {'identifier': 'sim'}
+[0.001801] (-) EventReactorShutdown: {}

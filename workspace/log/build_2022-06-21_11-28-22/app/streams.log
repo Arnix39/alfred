@@ -1,0 +1,21 @@
+[0.035s] Invoking command in '/home/arnix/src/alfred/catkin_ws/build/app': /usr/bin/cmake /home/arnix/src/alfred/catkin_ws/src/app -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCATKIN_INSTALL_INTO_PREFIX_ROOT=0 -DCATKIN_SYMLINK_INSTALL=ON -DCMAKE_INSTALL_PREFIX=/home/arnix/src/alfred/catkin_ws/install/app
+[0.107s] [31mCMake Error at CMakeLists.txt:8 (find_package):
+[0.107s]   By not providing "Findcatkin.cmake" in CMAKE_MODULE_PATH this project has
+[0.107s]   asked CMake to find a package configuration file provided by "catkin", but
+[0.107s]   CMake did not find one.
+[0.108s] 
+[0.108s]   Could not find a package configuration file provided by "catkin" with any
+[0.108s]   of the following names:
+[0.108s] 
+[0.108s]     catkinConfig.cmake
+[0.108s]     catkin-config.cmake
+[0.109s] 
+[0.109s]   Add the installation prefix of "catkin" to CMAKE_PREFIX_PATH or set
+[0.109s]   "catkin_DIR" to a directory containing one of the above files.  If "catkin"
+[0.109s]   provides a separate development package or SDK, be sure it has been
+[0.109s]   installed.
+[0.109s] 
+[0.109s] [0m
+[0.118s] -- Configuring incomplete, errors occurred!
+[0.118s] See also "/home/arnix/src/alfred/catkin_ws/build/app/CMakeFiles/CMakeOutput.log".
+[0.121s] Invoked command in '/home/arnix/src/alfred/catkin_ws/build/app' returned '1': /usr/bin/cmake /home/arnix/src/alfred/catkin_ws/src/app -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCATKIN_INSTALL_INTO_PREFIX_ROOT=0 -DCATKIN_SYMLINK_INSTALL=ON -DCMAKE_INSTALL_PREFIX=/home/arnix/src/alfred/catkin_ws/install/app

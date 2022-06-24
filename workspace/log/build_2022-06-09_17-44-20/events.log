@@ -1,0 +1,88 @@
+[0.000000] (-) TimerEvent: {}
+[0.000467] (app) JobQueued: {'identifier': 'app', 'dependencies': OrderedDict()}
+[0.000646] (hal) JobQueued: {'identifier': 'hal', 'dependencies': OrderedDict()}
+[0.000674] (sim) JobQueued: {'identifier': 'sim', 'dependencies': OrderedDict()}
+[0.000694] (app) JobStarted: {'identifier': 'app'}
+[0.004959] (hal) JobStarted: {'identifier': 'hal'}
+[0.006308] (sim) JobStarted: {'identifier': 'sim'}
+[0.009007] (app) JobProgress: {'identifier': 'app', 'progress': 'cmake'}
+[0.009523] (app) Command: {'cmd': ['/usr/bin/cmake', '/home/arnix/src/alfred/catkin_ws/src/app', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON', '-DCATKIN_INSTALL_INTO_PREFIX_ROOT=0', '-DCATKIN_SYMLINK_INSTALL=ON', '-DCMAKE_INSTALL_PREFIX=/home/arnix/src/alfred/catkin_ws/install/app'], 'cwd': '/home/arnix/src/alfred/catkin_ws/build/app', 'env': OrderedDict([('GJS_DEBUG_TOPICS', 'JS ERROR;JS LOG'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('LANGUAGE', 'en_GB'), ('USER', 'arnix'), ('LC_TIME', 'en_US.UTF-8'), ('XDG_SESSION_TYPE', 'wayland'), ('GIT_ASKPASS', '/usr/share/code/resources/app/extensions/git/dist/askpass.sh'), ('SHLVL', '0'), ('HOME', '/home/arnix'), ('CHROME_DESKTOP', 'code-url-handler.desktop'), ('TERM_PROGRAM_VERSION', '1.67.2'), ('DESKTOP_SESSION', 'ubuntu'), ('GIO_LAUNCHED_DESKTOP_FILE', '/usr/share/applications/code.desktop'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('VSCODE_GIT_ASKPASS_MAIN', '/usr/share/code/resources/app/extensions/git/dist/askpass-main.js'), ('LC_MONETARY', 'en_US.UTF-8'), ('VSCODE_GIT_ASKPASS_NODE', '/usr/share/code/code'), ('MANAGERPID', '2287'), ('SYSTEMD_EXEC_PID', '2517'), ('IM_CONFIG_CHECK_ENV', '1'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '8427'), ('IM_CONFIG_PHASE', '1'), ('WAYLAND_DISPLAY', 'wayland-0'), ('LOGNAME', 'arnix'), ('_', '/usr/bin/colcon'), ('JOURNAL_STREAM', '8:36188'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'arnix'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('PATH', '/home/arnix/.local/bin:/home/arnix/.cargo/bin:/home/arnix/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin'), ('SESSION_MANAGER', 'local/Faye:@/tmp/.ICE-unix/2481,unix/Faye:/tmp/.ICE-unix/2481'), ('INVOCATION_ID', 'e1f83de422ae4cda94c17dede9b81139'), ('PAPERSIZE', 'letter'), ('XDG_MENU_PREFIX', 'gnome-'), ('LC_ADDRESS', 'en_US.UTF-8'), ('GNOME_SETUP_DISPLAY', ':1'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('GDK_BACKEND', 'x11'), ('DISPLAY', ':0'), ('LANG', 'en_GB.UTF-8'), ('XDG_CURRENT_DESKTOP', 'Unity'), ('LC_TELEPHONE', 'en_US.UTF-8'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/.mutter-Xwaylandauth.LODKN1'), ('VSCODE_GIT_IPC_HANDLE', '/run/user/1000/vscode-git-7cffd7f28b.sock'), ('TERM_PROGRAM', 'vscode'), ('SSH_AGENT_LAUNCHER', 'gnome-keyring'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('ORIGINAL_XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('SHELL', '/bin/bash'), ('LC_NAME', 'en_US.UTF-8'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('LC_MEASUREMENT', 'en_US.UTF-8'), ('GJS_DEBUG_OUTPUT', 'stderr'), ('LC_IDENTIFICATION', 'en_US.UTF-8'), ('VSCODE_GIT_ASKPASS_EXTRA_ARGS', '--ms-enable-electron-run-as-node'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/arnix/src/alfred/catkin_ws/build/app'), ('LC_ALL', 'en_US.UTF-8'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('LC_NUMERIC', 'en_US.UTF-8'), ('LC_PAPER', 'en_US.UTF-8'), ('COLCON', '1')]), 'shell': False}
+[0.011831] (hal) JobProgress: {'identifier': 'hal', 'progress': 'cmake'}
+[0.012365] (hal) Command: {'cmd': ['/usr/bin/cmake', '/home/arnix/src/alfred/catkin_ws/src/hal', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON', '-DCMAKE_INSTALL_PREFIX=/home/arnix/src/alfred/catkin_ws/install/hal'], 'cwd': '/home/arnix/src/alfred/catkin_ws/build/hal', 'env': OrderedDict([('GJS_DEBUG_TOPICS', 'JS ERROR;JS LOG'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('LANGUAGE', 'en_GB'), ('USER', 'arnix'), ('LC_TIME', 'en_US.UTF-8'), ('XDG_SESSION_TYPE', 'wayland'), ('GIT_ASKPASS', '/usr/share/code/resources/app/extensions/git/dist/askpass.sh'), ('SHLVL', '0'), ('HOME', '/home/arnix'), ('CHROME_DESKTOP', 'code-url-handler.desktop'), ('TERM_PROGRAM_VERSION', '1.67.2'), ('DESKTOP_SESSION', 'ubuntu'), ('GIO_LAUNCHED_DESKTOP_FILE', '/usr/share/applications/code.desktop'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('VSCODE_GIT_ASKPASS_MAIN', '/usr/share/code/resources/app/extensions/git/dist/askpass-main.js'), ('LC_MONETARY', 'en_US.UTF-8'), ('VSCODE_GIT_ASKPASS_NODE', '/usr/share/code/code'), ('MANAGERPID', '2287'), ('SYSTEMD_EXEC_PID', '2517'), ('IM_CONFIG_CHECK_ENV', '1'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '8427'), ('IM_CONFIG_PHASE', '1'), ('WAYLAND_DISPLAY', 'wayland-0'), ('LOGNAME', 'arnix'), ('_', '/usr/bin/colcon'), ('JOURNAL_STREAM', '8:36188'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'arnix'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('PATH', '/home/arnix/.local/bin:/home/arnix/.cargo/bin:/home/arnix/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin'), ('SESSION_MANAGER', 'local/Faye:@/tmp/.ICE-unix/2481,unix/Faye:/tmp/.ICE-unix/2481'), ('INVOCATION_ID', 'e1f83de422ae4cda94c17dede9b81139'), ('PAPERSIZE', 'letter'), ('XDG_MENU_PREFIX', 'gnome-'), ('LC_ADDRESS', 'en_US.UTF-8'), ('GNOME_SETUP_DISPLAY', ':1'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('GDK_BACKEND', 'x11'), ('DISPLAY', ':0'), ('LANG', 'en_GB.UTF-8'), ('XDG_CURRENT_DESKTOP', 'Unity'), ('LC_TELEPHONE', 'en_US.UTF-8'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/.mutter-Xwaylandauth.LODKN1'), ('VSCODE_GIT_IPC_HANDLE', '/run/user/1000/vscode-git-7cffd7f28b.sock'), ('TERM_PROGRAM', 'vscode'), ('SSH_AGENT_LAUNCHER', 'gnome-keyring'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('ORIGINAL_XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('SHELL', '/bin/bash'), ('LC_NAME', 'en_US.UTF-8'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('LC_MEASUREMENT', 'en_US.UTF-8'), ('GJS_DEBUG_OUTPUT', 'stderr'), ('LC_IDENTIFICATION', 'en_US.UTF-8'), ('VSCODE_GIT_ASKPASS_EXTRA_ARGS', '--ms-enable-electron-run-as-node'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/arnix/src/alfred/catkin_ws/build/hal'), ('LC_ALL', 'en_US.UTF-8'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('LC_NUMERIC', 'en_US.UTF-8'), ('LC_PAPER', 'en_US.UTF-8'), ('COLCON', '1')]), 'shell': False}
+[0.014663] (sim) JobProgress: {'identifier': 'sim', 'progress': 'cmake'}
+[0.014841] (sim) Command: {'cmd': ['/usr/bin/cmake', '/home/arnix/src/alfred/catkin_ws/src/sim', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON', '-DCATKIN_INSTALL_INTO_PREFIX_ROOT=0', '-DCATKIN_SYMLINK_INSTALL=ON', '-DCMAKE_INSTALL_PREFIX=/home/arnix/src/alfred/catkin_ws/install/sim'], 'cwd': '/home/arnix/src/alfred/catkin_ws/build/sim', 'env': OrderedDict([('GJS_DEBUG_TOPICS', 'JS ERROR;JS LOG'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('LANGUAGE', 'en_GB'), ('USER', 'arnix'), ('LC_TIME', 'en_US.UTF-8'), ('XDG_SESSION_TYPE', 'wayland'), ('GIT_ASKPASS', '/usr/share/code/resources/app/extensions/git/dist/askpass.sh'), ('SHLVL', '0'), ('HOME', '/home/arnix'), ('CHROME_DESKTOP', 'code-url-handler.desktop'), ('TERM_PROGRAM_VERSION', '1.67.2'), ('DESKTOP_SESSION', 'ubuntu'), ('GIO_LAUNCHED_DESKTOP_FILE', '/usr/share/applications/code.desktop'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('VSCODE_GIT_ASKPASS_MAIN', '/usr/share/code/resources/app/extensions/git/dist/askpass-main.js'), ('LC_MONETARY', 'en_US.UTF-8'), ('VSCODE_GIT_ASKPASS_NODE', '/usr/share/code/code'), ('MANAGERPID', '2287'), ('SYSTEMD_EXEC_PID', '2517'), ('IM_CONFIG_CHECK_ENV', '1'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '8427'), ('IM_CONFIG_PHASE', '1'), ('WAYLAND_DISPLAY', 'wayland-0'), ('LOGNAME', 'arnix'), ('_', '/usr/bin/colcon'), ('JOURNAL_STREAM', '8:36188'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'arnix'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('PATH', '/home/arnix/.local/bin:/home/arnix/.cargo/bin:/home/arnix/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin'), ('SESSION_MANAGER', 'local/Faye:@/tmp/.ICE-unix/2481,unix/Faye:/tmp/.ICE-unix/2481'), ('INVOCATION_ID', 'e1f83de422ae4cda94c17dede9b81139'), ('PAPERSIZE', 'letter'), ('XDG_MENU_PREFIX', 'gnome-'), ('LC_ADDRESS', 'en_US.UTF-8'), ('GNOME_SETUP_DISPLAY', ':1'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('GDK_BACKEND', 'x11'), ('DISPLAY', ':0'), ('LANG', 'en_GB.UTF-8'), ('XDG_CURRENT_DESKTOP', 'Unity'), ('LC_TELEPHONE', 'en_US.UTF-8'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/.mutter-Xwaylandauth.LODKN1'), ('VSCODE_GIT_IPC_HANDLE', '/run/user/1000/vscode-git-7cffd7f28b.sock'), ('TERM_PROGRAM', 'vscode'), ('SSH_AGENT_LAUNCHER', 'gnome-keyring'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('ORIGINAL_XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('SHELL', '/bin/bash'), ('LC_NAME', 'en_US.UTF-8'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('LC_MEASUREMENT', 'en_US.UTF-8'), ('GJS_DEBUG_OUTPUT', 'stderr'), ('LC_IDENTIFICATION', 'en_US.UTF-8'), ('VSCODE_GIT_ASKPASS_EXTRA_ARGS', '--ms-enable-electron-run-as-node'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/arnix/src/alfred/catkin_ws/build/sim'), ('LC_ALL', 'en_US.UTF-8'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('LC_NUMERIC', 'en_US.UTF-8'), ('LC_PAPER', 'en_US.UTF-8'), ('COLCON', '1')]), 'shell': False}
+[0.017085] (hal) StderrLine: {'line': b'\x1b[33mCMake Warning (dev) in CMakeLists.txt:\n'}
+[0.017173] (hal) StderrLine: {'line': b'  No project() command is present.  The top-level CMakeLists.txt file must\n'}
+[0.017237] (hal) StderrLine: {'line': b'  contain a literal, direct call to the project() command.  Add a line of\n'}
+[0.017290] (hal) StderrLine: {'line': b'  code such as\n'}
+[0.017334] (hal) StderrLine: {'line': b'\n'}
+[0.017382] (hal) StderrLine: {'line': b'    project(ProjectName)\n'}
+[0.017424] (hal) StderrLine: {'line': b'\n'}
+[0.017463] (hal) StderrLine: {'line': b'  near the top of the file, but after cmake_minimum_required().\n'}
+[0.017500] (hal) StderrLine: {'line': b'\n'}
+[0.017538] (hal) StderrLine: {'line': b'  CMake is pretending there is a "project(Project)" command on the first\n'}
+[0.017577] (hal) StderrLine: {'line': b'  line.\n'}
+[0.017617] (hal) StderrLine: {'line': b'This warning is for project developers.  Use -Wno-dev to suppress it.\n'}
+[0.017656] (hal) StderrLine: {'line': b'\x1b[0m\n'}
+[0.032211] (hal) StderrLine: {'line': b'\x1b[31mCMake Error at hal_pigpio/CMakeLists.txt:8 (find_package):\n'}
+[0.032355] (hal) StderrLine: {'line': b'  By not providing "Findcatkin.cmake" in CMAKE_MODULE_PATH this project has\n'}
+[0.032402] (hal) StderrLine: {'line': b'  asked CMake to find a package configuration file provided by "catkin", but\n'}
+[0.032444] (hal) StderrLine: {'line': b'  CMake did not find one.\n'}
+[0.032484] (hal) StderrLine: {'line': b'\n'}
+[0.032530] (hal) StderrLine: {'line': b'  Could not find a package configuration file provided by "catkin" with any\n'}
+[0.032567] (hal) StderrLine: {'line': b'  of the following names:\n'}
+[0.032606] (hal) StderrLine: {'line': b'\n'}
+[0.032644] (hal) StderrLine: {'line': b'    catkinConfig.cmake\n'}
+[0.032682] (hal) StderrLine: {'line': b'    catkin-config.cmake\n'}
+[0.032719] (hal) StderrLine: {'line': b'\n'}
+[0.032757] (hal) StderrLine: {'line': b'  Add the installation prefix of "catkin" to CMAKE_PREFIX_PATH or set\n'}
+[0.032812] (hal) StderrLine: {'line': b'  "catkin_DIR" to a directory containing one of the above files.  If "catkin"\n'}
+[0.032860] (hal) StderrLine: {'line': b'  provides a separate development package or SDK, be sure it has been\n'}
+[0.032906] (hal) StderrLine: {'line': b'  installed.\n'}
+[0.032954] (hal) StderrLine: {'line': b'\n'}
+[0.033000] (hal) StderrLine: {'line': b'\x1b[0m\n'}
+[0.033048] (hal) StdoutLine: {'line': b'-- Configuring incomplete, errors occurred!\n'}
+[0.033105] (hal) StdoutLine: {'line': b'See also "/home/arnix/src/alfred/catkin_ws/build/hal/CMakeFiles/CMakeOutput.log".\n'}
+[0.033930] (hal) CommandEnded: {'returncode': 1}
+[0.034485] (hal) JobEnded: {'identifier': 'hal', 'rc': 1}
+[0.035384] (sim) StderrLine: {'line': b'\x1b[31mCMake Error at CMakeLists.txt:8 (find_package):\n'}
+[0.035592] (sim) StderrLine: {'line': b'  By not providing "Findcatkin.cmake" in CMAKE_MODULE_PATH this project has\n'}
+[0.035645] (sim) StderrLine: {'line': b'  asked CMake to find a package configuration file provided by "catkin", but\n'}
+[0.035698] (sim) StderrLine: {'line': b'  CMake did not find one.\n'}
+[0.035742] (sim) StderrLine: {'line': b'\n'}
+[0.035785] (sim) StderrLine: {'line': b'  Could not find a package configuration file provided by "catkin" with any\n'}
+[0.035827] (sim) StderrLine: {'line': b'  of the following names:\n'}
+[0.035868] (sim) StderrLine: {'line': b'\n'}
+[0.035910] (sim) StderrLine: {'line': b'    catkinConfig.cmake\n'}
+[0.035957] (sim) StderrLine: {'line': b'    catkin-config.cmake\n'}
+[0.036018] (sim) StderrLine: {'line': b'\n'}
+[0.036066] (sim) StderrLine: {'line': b'  Add the installation prefix of "catkin" to CMAKE_PREFIX_PATH or set\n'}
+[0.036115] (sim) StderrLine: {'line': b'  "catkin_DIR" to a directory containing one of the above files.  If "catkin"\n'}
+[0.036175] (sim) StderrLine: {'line': b'  provides a separate development package or SDK, be sure it has been\n'}
+[0.036225] (sim) StderrLine: {'line': b'  installed.\n'}
+[0.036272] (sim) StderrLine: {'line': b'\n'}
+[0.036312] (sim) StderrLine: {'line': b'\x1b[0m\n'}
+[0.036355] (app) StderrLine: {'line': b'\x1b[31mCMake Error at CMakeLists.txt:8 (find_package):\n'}
+[0.036405] (app) StderrLine: {'line': b'  By not providing "Findcatkin.cmake" in CMAKE_MODULE_PATH this project has\n'}
+[0.036446] (app) StderrLine: {'line': b'  asked CMake to find a package configuration file provided by "catkin", but\n'}
+[0.036486] (app) StderrLine: {'line': b'  CMake did not find one.\n'}
+[0.036527] (app) StderrLine: {'line': b'\n'}
+[0.036567] (app) StderrLine: {'line': b'  Could not find a package configuration file provided by "catkin" with any\n'}
+[0.036606] (app) StderrLine: {'line': b'  of the following names:\n'}
+[0.036667] (app) StderrLine: {'line': b'\n'}
+[0.036895] (app) StderrLine: {'line': b'    catkinConfig.cmake\n'}
+[0.037294] (app) StderrLine: {'line': b'    catkin-config.cmake\n'}
+[0.037345] (app) StderrLine: {'line': b'\n'}
+[0.037387] (app) StderrLine: {'line': b'  Add the installation prefix of "catkin" to CMAKE_PREFIX_PATH or set\n'}
+[0.037432] (app) StderrLine: {'line': b'  "catkin_DIR" to a directory containing one of the above files.  If "catkin"\n'}
+[0.037488] (app) StderrLine: {'line': b'  provides a separate development package or SDK, be sure it has been\n'}
+[0.037530] (app) StderrLine: {'line': b'  installed.\n'}
+[0.037587] (app) StderrLine: {'line': b'\n'}
+[0.037637] (sim) StdoutLine: {'line': b'-- Configuring incomplete, errors occurred!\n'}
+[0.037709] (sim) StdoutLine: {'line': b'See also "/home/arnix/src/alfred/catkin_ws/build/sim/CMakeFiles/CMakeOutput.log".\n'}
+[0.037761] (app) StdoutLine: {'line': b'-- Configuring incomplete, errors occurred!\n'}
+[0.037811] (app) StdoutLine: {'line': b'See also "/home/arnix/src/alfred/catkin_ws/build/app/CMakeFiles/CMakeOutput.log".\n'}
+[0.037861] (app) StderrLine: {'line': b'\x1b[0m\n'}
+[0.037910] (sim) JobEnded: {'identifier': 'sim', 'rc': 'SIGINT'}
+[0.038164] (app) JobEnded: {'identifier': 'app', 'rc': 'SIGINT'}
+[0.047855] (-) EventReactorShutdown: {}
