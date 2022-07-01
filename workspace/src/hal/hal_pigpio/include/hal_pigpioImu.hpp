@@ -1,11 +1,11 @@
 #ifndef HAL_PIGPIO_IMU
 #define HAL_PIGPIO_IMU
 
-#include "ros/ros.h"
 #include <vector>
-
 #define _USE_MATH_DEFINES
 #include <cmath>
+
+#include "rclcpp/rclcpp.hpp"
 
 #include "hal_mpu6050.hpp"
 
@@ -13,8 +13,8 @@
 #include <pigpiod_if2.h>
 
 // Services and messages headers (generated)
-#include "hal_pigpio/hal_pigpioI2cImuReading.h"
-#include "hal_pigpio/hal_pigpioAnglesMsg.h"
+#include "hal_pigpio/srv/hal_pigpio_i2c_imu_reading.hpp"
+#include "hal_pigpio/msg/hal_pigpio_angles.hpp"
 
 struct Quaternions
 {

@@ -1,20 +1,20 @@
 #ifndef HAL_PIGPIO_INIT
 #define HAL_PIGPIO_INIT
 
-#include "ros/ros.h"
+#include "rclcpp/rclcpp.hpp"
 
 // Pigpio library
 #include <pigpiod_if2.h>
 
 // Services and messages headers (generated)
-#include "hal_pigpio/hal_pigpioGetHandle.h"
-#include "hal_pigpio/hal_pigpioGetMode.h"
-#include "hal_pigpio/hal_pigpioSetInputMode.h"
-#include "hal_pigpio/hal_pigpioSetOutputMode.h"
-#include "hal_pigpio/hal_pigpioSetPullUp.h"
-#include "hal_pigpio/hal_pigpioSetPullDown.h"
-#include "hal_pigpio/hal_pigpioClearResistor.h"
-#include "hal_pigpio/hal_pigpioHeartbeatMsg.h"
+#include "hal_pigpio/srv/hal_pigpio_get_handle.hpp"
+#include "hal_pigpio/srv/hal_pigpio_get_mode.hpp"
+#include "hal_pigpio/srv/hal_pigpio_set_input_mode.hpp"
+#include "hal_pigpio/srv/hal_pigpio_set_output_mode.hpp"
+#include "hal_pigpio/srv/hal_pigpio_set_pull_up.hpp"
+#include "hal_pigpio/srv/hal_pigpio_set_pull_down.hpp"
+#include "hal_pigpio/srv/hal_pigpio_clear_resistor.hpp"
+#include "hal_pigpio/msg/hal_pigpio_heartbeat.hpp"
 
 class PigpioInit
 {

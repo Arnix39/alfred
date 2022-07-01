@@ -1,7 +1,7 @@
 #ifndef HAL_PIGPIO_OUTPUT
 #define HAL_PIGPIO_OUTPUT
 
-#include "ros/ros.h"
+#include "rclcpp/rclcpp.hpp"
 
 // Pigpio library
 #include <pigpiod_if2.h>

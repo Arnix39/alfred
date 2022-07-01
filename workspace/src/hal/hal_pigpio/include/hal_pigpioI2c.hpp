@@ -1,20 +1,20 @@
 #ifndef HAL_PIGPIO_I2C
 #define HAL_PIGPIO_I2C
 
-#include "ros/ros.h"
+#include "rclcpp/rclcpp.hpp"
 
 // Pigpio library
 #include <pigpiod_if2.h>
 
 // Services and messages headers (generated)
-#include "hal_pigpio/hal_pigpioI2cOpen.h"
-#include "hal_pigpio/hal_pigpioI2cClose.h"
-#include "hal_pigpio/hal_pigpioI2cReadByteData.h"
-#include "hal_pigpio/hal_pigpioI2cReadWordData.h"
-#include "hal_pigpio/hal_pigpioI2cReadBlockData.h"
-#include "hal_pigpio/hal_pigpioI2cWriteByteData.h"
-#include "hal_pigpio/hal_pigpioI2cWriteWordData.h"
-#include "hal_pigpio/hal_pigpioI2cWriteBlockData.h"
+#include "hal_pigpio/srv/hal_pigpio_i2c_open.hpp"
+#include "hal_pigpio/srv/hal_pigpio_i2c_close.hpp"
+#include "hal_pigpio/srv/hal_pigpio_i2c_read_byte_data.hpp"
+#include "hal_pigpio/srv/hal_pigpio_i2c_read_word_data.hpp"
+#include "hal_pigpio/srv/hal_pigpio_i2c_read_block_data.hpp"
+#include "hal_pigpio/srv/hal_pigpio_i2c_write_byte_data.hpp"
+#include "hal_pigpio/srv/hal_pigpio_i2c_write_word_data.hpp"
+#include "hal_pigpio/srv/hal_pigpio_i2c_write_block_data.hpp"
 
 #define I2C_BUFFER_MAX_BYTES 32
 

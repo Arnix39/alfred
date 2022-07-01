@@ -20,12 +20,14 @@ find_package(pigpio MODULE REQUIRED)
 ################################################
 ## Declare ROS messages, services and actions ##
 ################################################
-
-rosidl_generate_interfaces(${PROJECT_NAME}
+set(msg_files
   msg/HalPigpioEdgeChange.msg
   msg/HalPigpioHeartbeat.msg
   msg/HalPigpioAngles.msg
   msg/HalPigpioEncoderCount.msg
+)
+
+set(srv_files
   srv/HalPigpioGetHandle.srv
   srv/HalPigpioGetMode.srv
   srv/HalPigpioSetInputMode.srv
@@ -51,6 +53,14 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   srv/HalPigpioI2cImuReading.srv
   srv/HalPigpioSetEncoderCallback.srv
   srv/HalPigpioSetMotorDirection.srv
+)
+
+#################################################
+## Generate ROS messages, services and actions ##
+#################################################
+rosidl_generate_interfaces(${PROJECT_NAME}
+  ${msg_files}
+  ${srv_files}
  )
 
 ###########
