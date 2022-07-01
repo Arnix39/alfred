@@ -4,6 +4,8 @@
 #include "hal_pigpioI2c.hpp"
 #include "hal_pigpioImu.hpp"
 
+using namespace std::chrono_literals;
+
 int main(int argc, char **argv)
 {
     rclcpp::init(argc, argv);
@@ -24,8 +26,8 @@ int main(int argc, char **argv)
     PigpioI2c pigpioI2c(node, pigpioHandle);
     PigpioImu pigpioImu(node, pigpioHandle);
 
-    rclcpp::Timer heartbeatTimer(node.createTimer(rclcpp::Duration(0.1), &PigpioInit::publishHeartbeat, &pigpioInit));
-    rclcpp::Timer encoderCountTimer(node.createTimer(rclcpp::Duration(0.005), &PigpioInput::publishEncoderCount, &pigpioInput));
+    rclcpp::TimerBase::SharedPtr heartbeatTimer(node->create_wall_timer(100ms, std::bind(&PigpioInit::publishHeartbeat, &pigpioInit)));
+    rclcpp::TimerBase::SharedPtr encoderCountTimer(node->create_wall_timer(5ms, std::bind(&PigpioInput::publishEncoderCount, &pigpioInput)));
 
     rclcpp::spin(node);
 

@@ -1,6 +1,7 @@
 #ifndef HAL_PIGPIO_IMU
 #define HAL_PIGPIO_IMU
 
+#include <chrono>
 #include <vector>
 #define _USE_MATH_DEFINES
 #include <cmath>
@@ -40,9 +41,9 @@ private:
     Quaternions quaternions;
     Angles angles;
     bool isImuReady;
-    rclcpp::ServiceServer imuReadingService;
-    rclcpp::Timer readQuaternionsAndPublishAnglesTimer;
-    rclcpp::Publisher anglesPublisher;
+    rclcpp::TimerBase::SharedPtr readQuaternionsAndPublishAnglesTimer;
+    rclcpp::Service<hal_pigpio::srv::HalPigpioI2cImuReading>::SharedPtr imuReadingService;
+    rclcpp::Publisher<hal_pigpio::msg::HalPigpioAngles>::SharedPtr anglesPublisher;
 
 public:
     PigpioImu(std::shared_ptr<rclcpp::Node> node, int pigpioHandle);
@@ -51,12 +52,12 @@ public:
     void computeQuaternions(char (&data)[MPU6050_DMP_FIFO_QUAT_SIZE]);
     void publishAngles(void);
     void computeAngles(void);
-    void readQuaternionsAndPublishAngles(const rclcpp::TimerEvent &event);
+    void readQuaternionsAndPublishAngles(void);
     void resetFifo(void);
     uint16_t readFifoCount(void);
     bool isFifoOverflowed(void);
-    bool i2cImuReading(std::shared_ptr<hal_pigpio::srv::HalPigpioI2cImuReading::Request request,
-                       std::shared_ptr<hal_pigpio::srv::HalPigpioI2cImuReading::Response response);
+    void i2cImuReading(const std::shared_ptr<hal_pigpio::srv::HalPigpioI2cImuReading::Request> request,
+                       std::shared_ptr<hal_pigpio::srv::HalPigpioI2cImuReading::Response> response);
 };
 
 #endif

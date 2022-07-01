@@ -1,13 +1,17 @@
 #include "hal_pigpioImu.hpp"
 
+using namespace std::chrono_literals;
+using namespace std::placeholders;
+
 PigpioImu::PigpioImu(std::shared_ptr<rclcpp::Node> node, int pigpioHandle) :    pigpioHandle(pigpioHandle),
                                                                                 halPigpioNode(node),
                                                                                 i2cHandle(-1),
                                                                                 quaternions({0, 0, 0, 0}),
-                                                                                readQuaternionsAndPublishAnglesTimer(node->createTimer(rclcpp::Duration(0.005), &PigpioImu::readQuaternionsAndPublishAngles, this)),
+                                                                                angles({0.0, 0.0, 0.0}),
                                                                                 isImuReady(false),
-                                                                                imuReadingService(node->advertiseService("hal_pigpioI2cImuReading", &PigpioImu::i2cImuReading, this)),
-                                                                                anglesPublisher(node->advertise<hal_pigpio::hal_pigpioAnglesMsg>("hal_pigpioAngles", 1000))
+                                                                                readQuaternionsAndPublishAnglesTimer(node->create_wall_timer(5ms, std::bind(&PigpioImu::readQuaternionsAndPublishAngles, this))),
+                                                                                imuReadingService(node->create_service<hal_pigpio::srv::HalPigpioI2cImuReading>("hal_pigpioI2cImuReading", std::bind(&PigpioImu::i2cImuReading, this, _1, _2))),
+                                                                                anglesPublisher(node->create_publisher<hal_pigpio::msg::HalPigpioAngles>("hal_pigpioAngles", 1000))
 {
 }
 
@@ -122,12 +126,12 @@ void PigpioImu::computeQuaternions(char (&data)[MPU6050_DMP_FIFO_QUAT_SIZE])
 
 void PigpioImu::publishAngles(void)
 {
-    hal_pigpio::hal_pigpioAnglesMsg message;
+    auto message = hal_pigpio::msg::HalPigpioAngles();
     
     message.phi = angles.phi;
     message.theta = angles.theta;
     message.psi = angles.psi;
-    anglesPublisher.publish(message);
+    anglesPublisher->publish(message);
 }
 
 void PigpioImu::computeAngles()
@@ -147,7 +151,7 @@ void PigpioImu::computeAngles()
     angles.psi = std::atan2(tanPsi, quadrantPsi) * 180 / M_PI;
 }
 
-void PigpioImu::readQuaternionsAndPublishAngles(const rclcpp::TimerEvent &event)
+void PigpioImu::readQuaternionsAndPublishAngles()
 {
     if (isImuReady)
     {
@@ -157,16 +161,16 @@ void PigpioImu::readQuaternionsAndPublishAngles(const rclcpp::TimerEvent &event)
     }
 }
 
-void PigpioImu::i2cImuReading(std::shared_ptr<hal_pigpio::srv::HalPigpioI2cImuReading::Request request,
-                              std::shared_ptr<hal_pigpio::srv::HalPigpioI2cImuReading::Response response)
+void PigpioImu::i2cImuReading(const std::shared_ptr<hal_pigpio::srv::HalPigpioI2cImuReading::Request> request,
+                              std::shared_ptr<hal_pigpio::srv::HalPigpioI2cImuReading::Response> response)
 {
-    isImuReady = request->isImuReady;
-    i2cHandle = request->imuHandle;
+    (void)response;
+    
+    isImuReady = request->is_imu_ready;
+    i2cHandle = request->imu_handle;
     
     if (isImuReady)
     {
         resetFifo();
     }
-
-    return true;
 }

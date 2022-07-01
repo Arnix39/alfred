@@ -1,15 +1,17 @@
 #include "hal_pigpioI2c.hpp"
 
+using namespace std::placeholders;
+
 PigpioI2c::PigpioI2c(std::shared_ptr<rclcpp::Node> node, int pigpioHandle) :    pigpioHandle(pigpioHandle),
                                                                                 halPigpioNode(node),
-                                                                                i2cOpenService(node->create_service<hal_pigpio::srv::HalPigpioI2cOpen>("hal_pigpioI2cOpen", std::bind(&PigpioI2c::i2cOpen, this, std::placeholders::_1, std::placeholders::_2))),
-                                                                                i2cCloseService(node->create_service<hal_pigpio::srv::HalPigpioI2cClose>("hal_pigpioI2cClose", std::bind(&PigpioI2c::i2cClose, this, std::placeholders::_1, std::placeholders::_2))),
-                                                                                i2cReadByteDataService(node->create_service<hal_pigpio::srv::HalPigpioI2cReadByteData>("hal_pigpioI2cReadByteData", std::bind(&PigpioI2c::i2cReadByteData, this, std::placeholders::_1, std::placeholders::_2))),
-                                                                                i2cReadWordDataService(node->create_service<hal_pigpio::srv::HalPigpioI2cReadWordData>("hal_pigpioI2cReadWordData", std::bind(&PigpioI2c::i2cReadWordData, this, std::placeholders::_1, std::placeholders::_2))),
-                                                                                i2cReadBlockDataService(node->create_service<hal_pigpio::srv::HalPigpioI2cReadBlockData>("hal_pigpioI2cReadBlockData", std::bind(&PigpioI2c::i2cReadBlockData, this, std::placeholders::_1, std::placeholders::_2))),
-                                                                                i2cWriteByteDataService(node->create_service<hal_pigpio::srv::HalPigpioI2cWriteByteData>("hal_pigpioI2cWriteByteData", std::bind(&PigpioI2c::i2cWriteByteData, this, std::placeholders::_1, std::placeholders::_2))),
-                                                                                i2cWriteWordDataService(node->create_service<hal_pigpio::srv::HalPigpioI2cWriteWordData>("hal_pigpioI2cWriteWordData", std::bind(&PigpioI2c::i2cWriteWordData, this, std::placeholders::_1, std::placeholders::_2))),
-                                                                                i2cWriteBlockDataService(node->create_service<hal_pigpio::srv::HalPigpioI2cWriteBlockData>("hal_pigpioI2cWriteBlockData", std::bind(&PigpioI2c::i2cWriteBlockData, this, std::placeholders::_1, std::placeholders::_2)))
+                                                                                i2cOpenService(node->create_service<hal_pigpio::srv::HalPigpioI2cOpen>("hal_pigpioI2cOpen", std::bind(&PigpioI2c::i2cOpen, this, _1, _2))),
+                                                                                i2cCloseService(node->create_service<hal_pigpio::srv::HalPigpioI2cClose>("hal_pigpioI2cClose", std::bind(&PigpioI2c::i2cClose, this, _1, _2))),
+                                                                                i2cReadByteDataService(node->create_service<hal_pigpio::srv::HalPigpioI2cReadByteData>("hal_pigpioI2cReadByteData", std::bind(&PigpioI2c::i2cReadByteData, this, _1, _2))),
+                                                                                i2cReadWordDataService(node->create_service<hal_pigpio::srv::HalPigpioI2cReadWordData>("hal_pigpioI2cReadWordData", std::bind(&PigpioI2c::i2cReadWordData, this, _1, _2))),
+                                                                                i2cReadBlockDataService(node->create_service<hal_pigpio::srv::HalPigpioI2cReadBlockData>("hal_pigpioI2cReadBlockData", std::bind(&PigpioI2c::i2cReadBlockData, this, _1, _2))),
+                                                                                i2cWriteByteDataService(node->create_service<hal_pigpio::srv::HalPigpioI2cWriteByteData>("hal_pigpioI2cWriteByteData", std::bind(&PigpioI2c::i2cWriteByteData, this, _1, _2))),
+                                                                                i2cWriteWordDataService(node->create_service<hal_pigpio::srv::HalPigpioI2cWriteWordData>("hal_pigpioI2cWriteWordData", std::bind(&PigpioI2c::i2cWriteWordData, this, _1, _2))),
+                                                                                i2cWriteBlockDataService(node->create_service<hal_pigpio::srv::HalPigpioI2cWriteBlockData>("hal_pigpioI2cWriteBlockData", std::bind(&PigpioI2c::i2cWriteBlockData, this, _1, _2)))
 {
 }
 
