@@ -23,34 +23,34 @@ class PigpioI2c
 private:
     int pigpioHandle;
     std::shared_ptr<rclcpp::Node> halPigpioNode;
-    rclcpp::ServiceServer i2cOpenService;
-    rclcpp::ServiceServer i2cCloseService;
-    rclcpp::ServiceServer i2cWriteByteDataService;
-    rclcpp::ServiceServer i2cWriteWordDataService;
-    rclcpp::ServiceServer i2cWriteBlockDataService;
-    rclcpp::ServiceServer i2cReadByteDataService;
-    rclcpp::ServiceServer i2cReadWordDataService;
-    rclcpp::ServiceServer i2cReadBlockDataService;
+    rclcpp::Service<hal_pigpio::srv::HalPigpioI2cOpen>::SharedPtr i2cOpenService;
+    rclcpp::Service<hal_pigpio::srv::HalPigpioI2cClose>::SharedPtr i2cCloseService;
+    rclcpp::Service<hal_pigpio::srv::HalPigpioI2cReadByteData>::SharedPtr i2cReadByteDataService;
+    rclcpp::Service<hal_pigpio::srv::HalPigpioI2cReadWordData>::SharedPtr i2cReadWordDataService;
+    rclcpp::Service<hal_pigpio::srv::HalPigpioI2cReadBlockData>::SharedPtr i2cReadBlockDataService;
+    rclcpp::Service<hal_pigpio::srv::HalPigpioI2cWriteByteData>::SharedPtr i2cWriteByteDataService;
+    rclcpp::Service<hal_pigpio::srv::HalPigpioI2cWriteWordData>::SharedPtr i2cWriteWordDataService;
+    rclcpp::Service<hal_pigpio::srv::HalPigpioI2cWriteBlockData>::SharedPtr i2cWriteBlockDataService;
 
 public:
     PigpioI2c(std::shared_ptr<rclcpp::Node> node, int pigpioHandle);
     ~PigpioI2c() = default;
-    bool i2cOpen(hal_pigpio::hal_pigpioI2cOpen::Request &req,
-                 hal_pigpio::hal_pigpioI2cOpen::Response &res);
-    bool i2cClose(hal_pigpio::hal_pigpioI2cClose::Request &req,
-                  hal_pigpio::hal_pigpioI2cClose::Response &res);
-    bool i2cReadByteData(hal_pigpio::hal_pigpioI2cReadByteData::Request &req,
-                         hal_pigpio::hal_pigpioI2cReadByteData::Response &res);
-    bool i2cReadWordData(hal_pigpio::hal_pigpioI2cReadWordData::Request &req,
-                         hal_pigpio::hal_pigpioI2cReadWordData::Response &res);
-    bool i2cReadBlockData(hal_pigpio::hal_pigpioI2cReadBlockData::Request &req,
-                          hal_pigpio::hal_pigpioI2cReadBlockData::Response &res);
-    bool i2cWriteByteData(hal_pigpio::hal_pigpioI2cWriteByteData::Request &req,
-                          hal_pigpio::hal_pigpioI2cWriteByteData::Response &res);
-    bool i2cWriteWordData(hal_pigpio::hal_pigpioI2cWriteWordData::Request &req,
-                          hal_pigpio::hal_pigpioI2cWriteWordData::Response &res);
-    bool i2cWriteBlockData(hal_pigpio::hal_pigpioI2cWriteBlockData::Request &req,
-                           hal_pigpio::hal_pigpioI2cWriteBlockData::Response &res);
+    void i2cOpen(const std::shared_ptr<hal_pigpio::srv::HalPigpioI2cOpen::Request> request,
+                 std::shared_ptr<hal_pigpio::srv::HalPigpioI2cOpen::Response> response);
+    void i2cClose(const std::shared_ptr<hal_pigpio::srv::HalPigpioI2cClose::Request> request,
+                  std::shared_ptr<hal_pigpio::srv::HalPigpioI2cClose::Response> response);
+    void i2cReadByteData(const std::shared_ptr<hal_pigpio::srv::HalPigpioI2cReadByteData::Request> request,
+                         std::shared_ptr<hal_pigpio::srv::HalPigpioI2cReadByteData::Response> response);
+    void i2cReadWordData(const std::shared_ptr<hal_pigpio::srv::HalPigpioI2cReadWordData::Request> request,
+                         std::shared_ptr<hal_pigpio::srv::HalPigpioI2cReadWordData::Response> response);
+    void i2cReadBlockData(const std::shared_ptr<hal_pigpio::srv::HalPigpioI2cReadBlockData::Request> request,
+                          std::shared_ptr<hal_pigpio::srv::HalPigpioI2cReadBlockData::Response> response);
+    void i2cWriteByteData(const std::shared_ptr<hal_pigpio::srv::HalPigpioI2cWriteByteData::Request> request,
+                          std::shared_ptr<hal_pigpio::srv::HalPigpioI2cWriteByteData::Response> response);
+    void i2cWriteWordData(const std::shared_ptr<hal_pigpio::srv::HalPigpioI2cWriteWordData::Request> request,
+                          std::shared_ptr<hal_pigpio::srv::HalPigpioI2cWriteWordData::Response> response);
+    void i2cWriteBlockData(const std::shared_ptr<hal_pigpio::srv::HalPigpioI2cWriteBlockData::Request> request,
+                           std::shared_ptr<hal_pigpio::srv::HalPigpioI2cWriteBlockData::Response> response);
 };
 
 #endif

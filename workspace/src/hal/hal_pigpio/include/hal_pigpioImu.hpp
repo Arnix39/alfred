@@ -55,8 +55,8 @@ public:
     void resetFifo(void);
     uint16_t readFifoCount(void);
     bool isFifoOverflowed(void);
-    bool i2cImuReading(hal_pigpio::hal_pigpioI2cImuReading::Request &req,
-                       hal_pigpio::hal_pigpioI2cImuReading::Response &res);
+    bool i2cImuReading(std::shared_ptr<hal_pigpio::srv::HalPigpioI2cImuReading::Request request,
+                       std::shared_ptr<hal_pigpio::srv::HalPigpioI2cImuReading::Response response);
 };
 
 #endif

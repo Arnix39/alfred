@@ -33,20 +33,20 @@ private:
 public:
     PigpioInit(std::shared_ptr<rclcpp::Node> node, int pigpioHandle);
     ~PigpioInit();
-    bool getHandle(hal_pigpio::hal_pigpioGetHandle::Request &req,
-                   hal_pigpio::hal_pigpioGetHandle::Response &res);
-    bool getMode(hal_pigpio::hal_pigpioGetMode::Request &req,
-                 hal_pigpio::hal_pigpioGetMode::Response &res);
-    bool setInputMode(hal_pigpio::hal_pigpioSetInputMode::Request &req,
-                      hal_pigpio::hal_pigpioSetInputMode::Response &res);
-    bool setOutputMode(hal_pigpio::hal_pigpioSetOutputMode::Request &req,
-                       hal_pigpio::hal_pigpioSetOutputMode::Response &res);
-    bool setPullUp(hal_pigpio::hal_pigpioSetPullUp::Request &req,
-                   hal_pigpio::hal_pigpioSetPullUp::Response &res);
-    bool setPullDown(hal_pigpio::hal_pigpioSetPullDown::Request &req,
-                     hal_pigpio::hal_pigpioSetPullDown::Response &res);
-    bool clearResistor(hal_pigpio::hal_pigpioClearResistor::Request &req,
-                       hal_pigpio::hal_pigpioClearResistor::Response &res);
+    bool getHandle(hal_pigpio::hal_pigpioGetHandle::Request request,
+                   hal_pigpio::hal_pigpioGetHandle::Response response);
+    bool getMode(hal_pigpio::hal_pigpioGetMode::Request request,
+                 hal_pigpio::hal_pigpioGetMode::Response response);
+    bool setInputMode(hal_pigpio::hal_pigpioSetInputMode::Request request,
+                      hal_pigpio::hal_pigpioSetInputMode::Response response);
+    bool setOutputMode(hal_pigpio::hal_pigpioSetOutputMode::Request request,
+                       hal_pigpio::hal_pigpioSetOutputMode::Response response);
+    bool setPullUp(hal_pigpio::hal_pigpioSetPullUp::Request request,
+                   hal_pigpio::hal_pigpioSetPullUp::Response response);
+    bool setPullDown(hal_pigpio::hal_pigpioSetPullDown::Request request,
+                     hal_pigpio::hal_pigpioSetPullDown::Response response);
+    bool clearResistor(hal_pigpio::hal_pigpioClearResistor::Request request,
+                       hal_pigpio::hal_pigpioClearResistor::Response response);
     void publishHeartbeat(const rclcpp::TimerEvent &timerEvent);
 };
 

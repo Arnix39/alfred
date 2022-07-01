@@ -21,18 +21,18 @@ PigpioInput::~PigpioInput()
     }
 }
 
-bool PigpioInput::readGpio(hal_pigpio::hal_pigpioReadGpio::Request &req,
-                           hal_pigpio::hal_pigpioReadGpio::Response &res)
+void PigpioInput::readGpio(hal_pigpio::hal_pigpioReadGpio::Request request,
+                           hal_pigpio::hal_pigpioReadGpio::Response response)
 {
-    res.level = gpio_read(pigpioHandle, req.gpioId);
-    if (res.level != PI_BAD_GPIO)
+    response->level = gpio_read(pigpioHandle, request->gpioId);
+    if (response->level != PI_BAD_GPIO)
     {
-        res.hasSucceeded = true;
+        response->has_succeeded = true;
     }
     else
     {
-        res.hasSucceeded = false;
-        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to read GPIO %u!", req.gpioId);
+        response->has_succeeded = false;
+        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to read GPIO %u!", request->gpioId);
     }
     return true;
 }
@@ -55,20 +55,20 @@ void PigpioInput::c_gpioEdgeChangeCallback(int handle, unsigned gpioId, unsigned
     object->gpioEdgeChangeCallback(handle, gpioId, edgeChangeType, timeSinceBoot_us);
 }
 
-bool PigpioInput::setCallback(hal_pigpio::hal_pigpioSetCallback::Request &req,
-                              hal_pigpio::hal_pigpioSetCallback::Response &res)
+void PigpioInput::setCallback(hal_pigpio::hal_pigpioSetCallback::Request request,
+                              hal_pigpio::hal_pigpioSetCallback::Response response)
 {
-    res.callbackId = callback_ex(pigpioHandle, req.gpioId, req.edgeChangeType, c_gpioEdgeChangeCallback, reinterpret_cast<void *>(this));
-    if (res.callbackId >= 0)
+    response->callbackId = callback_ex(pigpioHandle, request->gpioId, request->edgeChangeType, c_gpioEdgeChangeCallback, reinterpret_cast<void *>(this));
+    if (response->callbackId >= 0)
     {
-        res.hasSucceeded = true;
-        callbackList.push_back((uint)res.callbackId);
-        RCLCPP_INFO(halPigpioNode->get_logger(),"Callback for GPIO %u configured.", req.gpioId);
+        response->has_succeeded = true;
+        callbackList.push_back((uint)response->callbackId);
+        RCLCPP_INFO(halPigpioNode->get_logger(),"Callback for GPIO %u configured.", request->gpioId);
     }
     else
     {
-        res.hasSucceeded = false;
-        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to configure callback for GPIO %u!", req.gpioId);
+        response->has_succeeded = false;
+        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to configure callback for GPIO %u!", request->gpioId);
     }
     return true;
 }
@@ -114,46 +114,46 @@ void PigpioInput::c_gpioEncoderEdgeChangeCallback(int handle, unsigned gpioId, u
     object->gpioEncoderEdgeChangeCallback(handle, gpioId, edgeChangeType, timeSinceBoot_us);
 }
 
-bool PigpioInput::setEncoderCallback(hal_pigpio::hal_pigpioSetEncoderCallback::Request &req,
-                                     hal_pigpio::hal_pigpioSetEncoderCallback::Response &res)
+void PigpioInput::setEncoderCallback(hal_pigpio::hal_pigpioSetEncoderCallback::Request request,
+                                     hal_pigpio::hal_pigpioSetEncoderCallback::Response response)
 {
-    res.callbackId = callback_ex(pigpioHandle, req.gpioId, req.edgeChangeType, c_gpioEncoderEdgeChangeCallback, reinterpret_cast<void *>(this));
-    if (res.callbackId >= 0)
+    response->callbackId = callback_ex(pigpioHandle, request->gpioId, request->edgeChangeType, c_gpioEncoderEdgeChangeCallback, reinterpret_cast<void *>(this));
+    if (response->callbackId >= 0)
     {
-        auto motorIndex = find_if(motors.begin(), motors.end(), [&req](Motor motor) { return motor.id == req.motorId; });
+        auto motorIndex = find_if(motors.begin(), motors.end(), [request](Motor motor) { return motor.id == request->motorId; });
         if ( motorIndex != motors.end())
         {
-            motors.at(motorIndex - motors.begin()).gpios.push_back(req.gpioId);
+            motors.at(motorIndex - motors.begin()).gpios.push_back(request->gpioId);
         }
         else
         {
-            Motor motor = {req.motorId, {req.gpioId}, 0};
+            Motor motor = {request->motorId, {request->gpioId}, 0};
             motors.push_back(motor);
         }
 
-        res.hasSucceeded = true;
-        callbackList.push_back((uint)res.callbackId);
-        RCLCPP_INFO(halPigpioNode->get_logger(),"Encoder callback for GPIO %u configured.", req.gpioId);
+        response->has_succeeded = true;
+        callbackList.push_back((uint)response->callbackId);
+        RCLCPP_INFO(halPigpioNode->get_logger(),"Encoder callback for GPIO %u configured.", request->gpioId);
     }
     else
     {
-        res.hasSucceeded = false;
-        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to configure encoder callback for GPIO %u!", req.gpioId);
+        response->has_succeeded = false;
+        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to configure encoder callback for GPIO %u!", request->gpioId);
     }
     return true;
 }
 
-bool PigpioInput::setMotorDirection(hal_pigpio::hal_pigpioSetMotorDirection::Request &req,
-                                    hal_pigpio::hal_pigpioSetMotorDirection::Response &res)
+void PigpioInput::setMotorDirection(hal_pigpio::hal_pigpioSetMotorDirection::Request request,
+                                    hal_pigpio::hal_pigpioSetMotorDirection::Response response)
 {
-    auto motorIndex = find_if(motors.begin(), motors.end(), [&req](Motor motor) { return motor.id == req.motorId; });
+    auto motorIndex = find_if(motors.begin(), motors.end(), [request](Motor motor) { return motor.id == request->motorId; });
     if ( motorIndex != motors.end())
     {
-        motors.at(motorIndex - motors.begin()).isDirectionForward = req.isDirectionForward;
+        motors.at(motorIndex - motors.begin()).isDirectionForward = request->isDirectionForward;
     }
     else
     {
-        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to set motor direction for motor %u!", req.motorId);
+        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to set motor direction for motor %u!", request->motorId);
     }
     return true;
 }

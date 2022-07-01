@@ -29,16 +29,16 @@ private:
 public:
     PigpioOutput(std::shared_ptr<rclcpp::Node> node, int pigpioHandle);
     ~PigpioOutput() = default;
-    bool setPwmDutycycle(hal_pigpio::hal_pigpioSetPwmDutycycle::Request &req,
-                         hal_pigpio::hal_pigpioSetPwmDutycycle::Response &res);
-    bool setPwmFrequency(hal_pigpio::hal_pigpioSetPwmFrequency::Request &req,
-                         hal_pigpio::hal_pigpioSetPwmFrequency::Response &res);
-    bool setGpioHigh(hal_pigpio::hal_pigpioSetGpioHigh::Request &req,
-                     hal_pigpio::hal_pigpioSetGpioHigh::Response &res);
-    bool setGpioLow(hal_pigpio::hal_pigpioSetGpioLow::Request &req,
-                    hal_pigpio::hal_pigpioSetGpioLow::Response &res);
-    bool sendTriggerPulse(hal_pigpio::hal_pigpioSendTriggerPulse::Request &req,
-                          hal_pigpio::hal_pigpioSendTriggerPulse::Response &res);
+    bool setPwmDutycycle(hal_pigpio::hal_pigpioSetPwmDutycycle::Request request,
+                         hal_pigpio::hal_pigpioSetPwmDutycycle::Response response);
+    bool setPwmFrequency(hal_pigpio::hal_pigpioSetPwmFrequency::Request request,
+                         hal_pigpio::hal_pigpioSetPwmFrequency::Response response);
+    bool setGpioHigh(hal_pigpio::hal_pigpioSetGpioHigh::Request request,
+                     hal_pigpio::hal_pigpioSetGpioHigh::Response response);
+    bool setGpioLow(hal_pigpio::hal_pigpioSetGpioLow::Request request,
+                    hal_pigpio::hal_pigpioSetGpioLow::Response response);
+    bool sendTriggerPulse(hal_pigpio::hal_pigpioSendTriggerPulse::Request request,
+                          hal_pigpio::hal_pigpioSendTriggerPulse::Response response);
 };
 
 #endif

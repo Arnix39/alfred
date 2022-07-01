@@ -157,11 +157,11 @@ void PigpioImu::readQuaternionsAndPublishAngles(const rclcpp::TimerEvent &event)
     }
 }
 
-bool PigpioImu::i2cImuReading(hal_pigpio::hal_pigpioI2cImuReading::Request &req,
-                              hal_pigpio::hal_pigpioI2cImuReading::Response &res)
+void PigpioImu::i2cImuReading(std::shared_ptr<hal_pigpio::srv::HalPigpioI2cImuReading::Request request,
+                              std::shared_ptr<hal_pigpio::srv::HalPigpioI2cImuReading::Response response)
 {
-    isImuReady = req.isImuReady;
-    i2cHandle = req.imuHandle;
+    isImuReady = request->isImuReady;
+    i2cHandle = request->imuHandle;
     
     if (isImuReady)
     {

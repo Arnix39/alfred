@@ -11,80 +11,80 @@ PigpioOutput::PigpioOutput(std::shared_ptr<rclcpp::Node> node, int pigpioHandle)
 {
 }
 
-bool PigpioOutput::setPwmDutycycle(hal_pigpio::hal_pigpioSetPwmDutycycle::Request &req,
-                                   hal_pigpio::hal_pigpioSetPwmDutycycle::Response &res)
+void PigpioOutput::setPwmDutycycle(hal_pigpio::hal_pigpioSetPwmDutycycle::Request request,
+                                   hal_pigpio::hal_pigpioSetPwmDutycycle::Response response)
 {
-    if (set_PWM_dutycycle(pigpioHandle, req.gpioId, req.dutycycle) == 0)
+    if (set_PWM_dutycycle(pigpioHandle, request->gpioId, request->dutycycle) == 0)
     {
-        res.hasSucceeded = true;
+        response->has_succeeded = true;
     }
     else
     {
-        res.hasSucceeded = false;
-        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to set PWM duty cycle for GPIO %u!", req.gpioId);
+        response->has_succeeded = false;
+        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to set PWM duty cycle for GPIO %u!", request->gpioId);
     }
     return true;
 }
 
-bool PigpioOutput::setPwmFrequency(hal_pigpio::hal_pigpioSetPwmFrequency::Request &req,
-                                   hal_pigpio::hal_pigpioSetPwmFrequency::Response &res)
+void PigpioOutput::setPwmFrequency(hal_pigpio::hal_pigpioSetPwmFrequency::Request request,
+                                   hal_pigpio::hal_pigpioSetPwmFrequency::Response response)
 {
-    int pwmSettingResult = set_PWM_frequency(pigpioHandle, req.gpioId, req.frequency);
+    int pwmSettingResult = set_PWM_frequency(pigpioHandle, request->gpioId, request->frequency);
 
     if ((pwmSettingResult != PI_NOT_PERMITTED) && (pwmSettingResult != PI_BAD_USER_GPIO))
     {
-        res.hasSucceeded = true;
-        RCLCPP_INFO(halPigpioNode->get_logger(),"Set PWM frequency of %u for GPIO %u.", req.frequency, req.gpioId);
+        response->has_succeeded = true;
+        RCLCPP_INFO(halPigpioNode->get_logger(),"Set PWM frequency of %u for GPIO %u.", request->frequency, request->gpioId);
     }
     else
     {
-        res.hasSucceeded = false;
-        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to set PWM frequency for GPIO %u!", req.gpioId);
+        response->has_succeeded = false;
+        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to set PWM frequency for GPIO %u!", request->gpioId);
     }
     return true;
 }
 
-bool PigpioOutput::setGpioHigh(hal_pigpio::hal_pigpioSetGpioHigh::Request &req,
-                               hal_pigpio::hal_pigpioSetGpioHigh::Response &res)
+void PigpioOutput::setGpioHigh(hal_pigpio::hal_pigpioSetGpioHigh::Request request,
+                               hal_pigpio::hal_pigpioSetGpioHigh::Response response)
 {
-    if (gpio_write(pigpioHandle, req.gpioId, PI_HIGH) == 0)
+    if (gpio_write(pigpioHandle, request->gpioId, PI_HIGH) == 0)
     {
-        res.hasSucceeded = true;
+        response->has_succeeded = true;
     }
     else
     {
-        res.hasSucceeded = false;
-        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to set GPIO %u to high level!", req.gpioId);
+        response->has_succeeded = false;
+        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to set GPIO %u to high level!", request->gpioId);
     }
     return true;
 }
 
-bool PigpioOutput::setGpioLow(hal_pigpio::hal_pigpioSetGpioLow::Request &req,
-                              hal_pigpio::hal_pigpioSetGpioLow::Response &res)
+void PigpioOutput::setGpioLow(hal_pigpio::hal_pigpioSetGpioLow::Request request,
+                              hal_pigpio::hal_pigpioSetGpioLow::Response response)
 {
-    if (gpio_write(pigpioHandle, req.gpioId, PI_LOW) == 0)
+    if (gpio_write(pigpioHandle, request->gpioId, PI_LOW) == 0)
     {
-        res.hasSucceeded = true;
+        response->has_succeeded = true;
     }
     else
     {
-        res.hasSucceeded = false;
-        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to set GPIO %u to low level!", req.gpioId);
+        response->has_succeeded = false;
+        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to set GPIO %u to low level!", request->gpioId);
     }
     return true;
 }
 
-bool PigpioOutput::sendTriggerPulse(hal_pigpio::hal_pigpioSendTriggerPulse::Request &req,
-                                    hal_pigpio::hal_pigpioSendTriggerPulse::Response &res)
+void PigpioOutput::sendTriggerPulse(hal_pigpio::hal_pigpioSendTriggerPulse::Request request,
+                                    hal_pigpio::hal_pigpioSendTriggerPulse::Response response)
 {
-    if (gpio_trigger(pigpioHandle, req.gpioId, req.pulseLengthInUs, PI_HIGH) == 0)
+    if (gpio_trigger(pigpioHandle, request->gpioId, request->pulseLengthInUs, PI_HIGH) == 0)
     {
-        res.hasSucceeded = true;
+        response->has_succeeded = true;
     }
     else
     {
-        res.hasSucceeded = false;
-        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to send trigger pulse for GPIO %u!", req.gpioId);
+        response->has_succeeded = false;
+        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to send trigger pulse for GPIO %u!", request->gpioId);
     }
     return true;
 }

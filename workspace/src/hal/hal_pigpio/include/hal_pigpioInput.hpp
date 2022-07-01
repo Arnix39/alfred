@@ -44,14 +44,14 @@ private:
 public:
     PigpioInput(std::shared_ptr<rclcpp::Node> node, int pigpioHandle);
     ~PigpioInput();
-    bool readGpio(hal_pigpio::hal_pigpioReadGpio::Request &req,
-                  hal_pigpio::hal_pigpioReadGpio::Response &res);
-    bool setCallback(hal_pigpio::hal_pigpioSetCallback::Request &req,
-                     hal_pigpio::hal_pigpioSetCallback::Response &res);
-    bool setEncoderCallback(hal_pigpio::hal_pigpioSetEncoderCallback::Request &req,
-                            hal_pigpio::hal_pigpioSetEncoderCallback::Response &res);
-    bool setMotorDirection(hal_pigpio::hal_pigpioSetMotorDirection::Request &req,
-                           hal_pigpio::hal_pigpioSetMotorDirection::Response &res);
+    bool readGpio(hal_pigpio::hal_pigpioReadGpio::Request request,
+                  hal_pigpio::hal_pigpioReadGpio::Response response);
+    bool setCallback(hal_pigpio::hal_pigpioSetCallback::Request request,
+                     hal_pigpio::hal_pigpioSetCallback::Response response);
+    bool setEncoderCallback(hal_pigpio::hal_pigpioSetEncoderCallback::Request request,
+                            hal_pigpio::hal_pigpioSetEncoderCallback::Response response);
+    bool setMotorDirection(hal_pigpio::hal_pigpioSetMotorDirection::Request request,
+                           hal_pigpio::hal_pigpioSetMotorDirection::Response response);
     void publishEncoderCount(const rclcpp::TimerEvent &timerEvent);
 };
 

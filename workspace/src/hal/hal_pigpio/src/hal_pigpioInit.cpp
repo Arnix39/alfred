@@ -19,108 +19,108 @@ PigpioInit::~PigpioInit()
     pigpio_stop(pigpioHandle);
 }
 
-bool PigpioInit::getHandle(hal_pigpio::hal_pigpioGetHandle::Request &req,
-                           hal_pigpio::hal_pigpioGetHandle::Response &res)
+void PigpioInit::getHandle(hal_pigpio::hal_pigpioGetHandle::Request request,
+                           hal_pigpio::hal_pigpioGetHandle::Response response)
 {
-    res.handle = pigpioHandle;
+    response->handle = pigpioHandle;
     return true;
 }
 
-bool PigpioInit::getMode(hal_pigpio::hal_pigpioGetMode::Request &req,
-                         hal_pigpio::hal_pigpioGetMode::Response &res)
+void PigpioInit::getMode(hal_pigpio::hal_pigpioGetMode::Request request,
+                         hal_pigpio::hal_pigpioGetMode::Response response)
 {
-    res.mode = get_mode(pigpioHandle, req.gpioId);
-    if (res.mode >= 0)
+    response->mode = get_mode(pigpioHandle, request->gpioId);
+    if (response->mode >= 0)
     {
-        res.hasSucceeded = true;
+        response->has_succeeded = true;
     }
     else
     {
-        res.hasSucceeded = false;
-        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to retrieve mode for GPIO %u!", req.gpioId);
-    }
-    return true;
-}
-
-bool PigpioInit::setInputMode(hal_pigpio::hal_pigpioSetInputMode::Request &req,
-                              hal_pigpio::hal_pigpioSetInputMode::Response &res)
-{
-    if (set_mode(pigpioHandle, req.gpioId, PI_INPUT) == 0)
-    {
-        res.hasSucceeded = true;
-        RCLCPP_INFO(halPigpioNode->get_logger(),"GPIO %u configured as input.", req.gpioId);
-    }
-    else
-    {
-        res.hasSucceeded = false;
-        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to configure GPIO %u as input!", req.gpioId);
-    }
-
-    return true;
-}
-
-bool PigpioInit::setOutputMode(hal_pigpio::hal_pigpioSetOutputMode::Request &req,
-                               hal_pigpio::hal_pigpioSetOutputMode::Response &res)
-{
-    if (set_mode(pigpioHandle, req.gpioId, PI_OUTPUT) == 0)
-    {
-        res.hasSucceeded = true;
-        RCLCPP_INFO(halPigpioNode->get_logger(),"GPIO %u configured as output.", req.gpioId);
-    }
-    else
-    {
-        res.hasSucceeded = false;
-        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to configure GPIO %u as output!", req.gpioId);
+        response->has_succeeded = false;
+        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to retrieve mode for GPIO %u!", request->gpioId);
     }
     return true;
 }
 
-bool PigpioInit::setPullUp(hal_pigpio::hal_pigpioSetPullUp::Request &req,
-                           hal_pigpio::hal_pigpioSetPullUp::Response &res)
+void PigpioInit::setInputMode(hal_pigpio::hal_pigpioSetInputMode::Request request,
+                              hal_pigpio::hal_pigpioSetInputMode::Response response)
 {
-    if (set_pull_up_down(pigpioHandle, req.gpioId, PI_PUD_UP) == 0)
+    if (set_mode(pigpioHandle, request->gpioId, PI_INPUT) == 0)
     {
-        res.hasSucceeded = true;
-        RCLCPP_INFO(halPigpioNode->get_logger(),"Sucessfully set pull-up resistor for GPIO %u.", req.gpioId);
+        response->has_succeeded = true;
+        RCLCPP_INFO(halPigpioNode->get_logger(),"GPIO %u configured as input.", request->gpioId);
     }
     else
     {
-        res.hasSucceeded = true;
-        RCLCPP_INFO(halPigpioNode->get_logger(),"Failed to set pull-up resistor for GPIO %u!", req.gpioId);
+        response->has_succeeded = false;
+        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to configure GPIO %u as input!", request->gpioId);
     }
 
     return true;
 }
 
-bool PigpioInit::setPullDown(hal_pigpio::hal_pigpioSetPullDown::Request &req,
-                             hal_pigpio::hal_pigpioSetPullDown::Response &res)
+void PigpioInit::setOutputMode(hal_pigpio::hal_pigpioSetOutputMode::Request request,
+                               hal_pigpio::hal_pigpioSetOutputMode::Response response)
 {
-    if (set_pull_up_down(pigpioHandle, req.gpioId, PI_PUD_DOWN) == 0)
+    if (set_mode(pigpioHandle, request->gpioId, PI_OUTPUT) == 0)
     {
-        res.hasSucceeded = true;
-        RCLCPP_INFO(halPigpioNode->get_logger(),"Sucessfully set pull-down resistor for GPIO %u.", req.gpioId);
+        response->has_succeeded = true;
+        RCLCPP_INFO(halPigpioNode->get_logger(),"GPIO %u configured as output.", request->gpioId);
     }
     else
     {
-        res.hasSucceeded = true;
-        RCLCPP_INFO(halPigpioNode->get_logger(),"Failed to set pull-down resistor for GPIO %u!", req.gpioId);
+        response->has_succeeded = false;
+        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to configure GPIO %u as output!", request->gpioId);
+    }
+    return true;
+}
+
+void PigpioInit::setPullUp(hal_pigpio::hal_pigpioSetPullUp::Request request,
+                           hal_pigpio::hal_pigpioSetPullUp::Response response)
+{
+    if (set_pull_up_down(pigpioHandle, request->gpioId, PI_PUD_UP) == 0)
+    {
+        response->has_succeeded = true;
+        RCLCPP_INFO(halPigpioNode->get_logger(),"Sucessfully set pull-up resistor for GPIO %u.", request->gpioId);
+    }
+    else
+    {
+        response->has_succeeded = true;
+        RCLCPP_INFO(halPigpioNode->get_logger(),"Failed to set pull-up resistor for GPIO %u!", request->gpioId);
     }
 
     return true;
 }
 
-bool PigpioInit::clearResistor(hal_pigpio::hal_pigpioClearResistor::Request &req,
-                               hal_pigpio::hal_pigpioClearResistor::Response &res)
+void PigpioInit::setPullDown(hal_pigpio::hal_pigpioSetPullDown::Request request,
+                             hal_pigpio::hal_pigpioSetPullDown::Response response)
 {
-    if (set_pull_up_down(pigpioHandle, req.gpioId, PI_PUD_OFF) == 0)
+    if (set_pull_up_down(pigpioHandle, request->gpioId, PI_PUD_DOWN) == 0)
     {
-        res.hasSucceeded = true;
-        RCLCPP_INFO(halPigpioNode->get_logger(),"Sucessfully clear resistor for GPIO %u.", req.gpioId);
+        response->has_succeeded = true;
+        RCLCPP_INFO(halPigpioNode->get_logger(),"Sucessfully set pull-down resistor for GPIO %u.", request->gpioId);
     }
     else
     {
-        res.hasSucceeded = true;
-        RCLCPP_INFO(halPigpioNode->get_logger(),"Failed to clear resistor for GPIO %u!", req.gpioId);
+        response->has_succeeded = true;
+        RCLCPP_INFO(halPigpioNode->get_logger(),"Failed to set pull-down resistor for GPIO %u!", request->gpioId);
+    }
+
+    return true;
+}
+
+void PigpioInit::clearResistor(hal_pigpio::hal_pigpioClearResistor::Request request,
+                               hal_pigpio::hal_pigpioClearResistor::Response response)
+{
+    if (set_pull_up_down(pigpioHandle, request->gpioId, PI_PUD_OFF) == 0)
+    {
+        response->has_succeeded = true;
+        RCLCPP_INFO(halPigpioNode->get_logger(),"Sucessfully clear resistor for GPIO %u.", request->gpioId);
+    }
+    else
+    {
+        response->has_succeeded = true;
+        RCLCPP_INFO(halPigpioNode->get_logger(),"Failed to clear resistor for GPIO %u!", request->gpioId);
     }
 
     return true;
