@@ -1,5 +1,0 @@
-uint16 gpioId
-uint8 edgeChangeType
----
-uint32 callbackId
-bool hasSucceeded

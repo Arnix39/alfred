@@ -1,0 +1,6 @@
+int32 handle
+uint8 device_register
+uint8[] data_block
+uint8 length
+---
+bool has_succeeded

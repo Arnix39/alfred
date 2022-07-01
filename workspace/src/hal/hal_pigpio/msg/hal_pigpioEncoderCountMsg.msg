@@ -1,2 +1,0 @@
-uint8 motorId
-int32 encoderCount

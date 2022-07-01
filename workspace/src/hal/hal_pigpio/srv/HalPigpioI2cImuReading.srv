@@ -1,0 +1,3 @@
+int32 imu_handle
+bool is_imu_ready
+---

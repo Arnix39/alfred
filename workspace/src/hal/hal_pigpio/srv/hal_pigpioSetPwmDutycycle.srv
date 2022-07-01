@@ -1,4 +1,0 @@
-uint16 gpioId
-uint8 dutycycle
----
-bool hasSucceeded

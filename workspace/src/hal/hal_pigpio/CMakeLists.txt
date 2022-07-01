@@ -2,13 +2,17 @@ cmake_minimum_required(VERSION 3.8)
 set(PROJECT_NAME hal_pigpio)
 project(${PROJECT_NAME})
 
-add_compile_options(-std=c++17)
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
 
-## Find catkin macros and libraries
-find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  message_generation
-)
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} )
 find_package(pigpio MODULE REQUIRED)
@@ -17,56 +21,37 @@ find_package(pigpio MODULE REQUIRED)
 ## Declare ROS messages, services and actions ##
 ################################################
 
-## Generate messages in the 'msg' folder
-add_message_files(
-   FILES
-   hal_pigpioEdgeChangeMsg.msg
-   hal_pigpioHeartbeatMsg.msg
-   hal_pigpioAnglesMsg.msg
-   hal_pigpioEncoderCountMsg.msg
+rosidl_generate_interfaces(${PROJECT_NAME}
+  msg/HalPigpioEdgeChange.msg
+  msg/HalPigpioHeartbeat.msg
+  msg/HalPigpioAngles.msg
+  msg/HalPigpioEncoderCount.msg
+  srv/HalPigpioGetHandle.srv
+  srv/HalPigpioGetMode.srv
+  srv/HalPigpioSetInputMode.srv
+  srv/HalPigpioSetOutputMode.srv
+  srv/HalPigpioSetPullUp.srv
+  srv/HalPigpioSetPullDown.srv
+  srv/HalPigpioClearResistor.srv
+  srv/HalPigpioSetGpioHigh.srv
+  srv/HalPigpioSetGpioLow.srv
+  srv/HalPigpioSetPwmDutycycle.srv
+  srv/HalPigpioSetPwmFrequency.srv
+  srv/HalPigpioSendTriggerPulse.srv
+  srv/HalPigpioI2cOpen.srv
+  srv/HalPigpioI2cClose.srv
+  srv/HalPigpioI2cReadByteData.srv
+  srv/HalPigpioI2cReadWordData.srv
+  srv/HalPigpioI2cReadBlockData.srv
+  srv/HalPigpioI2cWriteByteData.srv
+  srv/HalPigpioI2cWriteWordData.srv
+  srv/HalPigpioI2cWriteBlockData.srv
+  srv/HalPigpioReadGpio.srv
+  srv/HalPigpioSetCallback.srv
+  srv/HalPigpioI2cImuReading.srv
+  srv/HalPigpioSetEncoderCallback.srv
+  srv/HalPigpioSetMotorDirection.srv
  )
-
-## Generate services in the 'srv' folder
-add_service_files(
-   FILES
-   hal_pigpioGetHandle.srv
-   hal_pigpioGetMode.srv
-   hal_pigpioSetInputMode.srv
-   hal_pigpioSetOutputMode.srv
-   hal_pigpioSetPullUp.srv
-   hal_pigpioSetPullDown.srv
-   hal_pigpioClearResistor.srv
-   hal_pigpioSetGpioHigh.srv
-   hal_pigpioSetGpioLow.srv
-   hal_pigpioSetPwmDutycycle.srv
-   hal_pigpioSetPwmFrequency.srv
-   hal_pigpioSendTriggerPulse.srv
-   hal_pigpioI2cOpen.srv
-   hal_pigpioI2cClose.srv
-   hal_pigpioI2cReadByteData.srv
-   hal_pigpioI2cReadWordData.srv
-   hal_pigpioI2cReadBlockData.srv
-   hal_pigpioI2cWriteByteData.srv
-   hal_pigpioI2cWriteWordData.srv
-   hal_pigpioI2cWriteBlockData.srv
-   hal_pigpioReadGpio.srv
-   hal_pigpioSetCallback.srv
-   hal_pigpioI2cImuReading.srv
-   hal_pigpioSetEncoderCallback.srv
-   hal_pigpioSetMotorDirection.srv
- )
-
-## Generate added messages and services with any dependencies listed here
-  generate_messages(
-   DEPENDENCIES 
- )
-
-###################################
-## catkin specific configuration ##
-###################################
-catkin_package(
-  CATKIN_DEPENDS roscpp 
-)
 
 ###########
 ## Build ##
@@ -79,19 +64,10 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME}_init_lib OBJECT src/hal_pigpioInit.cpp)
-add_dependencies(${PROJECT_NAME}_init_lib ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
-
 add_library(${PROJECT_NAME}_output_lib OBJECT src/hal_pigpioOutput.cpp)
-add_dependencies(${PROJECT_NAME}_output_lib ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
-
 add_library(${PROJECT_NAME}_input_lib OBJECT src/hal_pigpioInput.cpp)
-add_dependencies(${PROJECT_NAME}_input_lib ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
-
 add_library(${PROJECT_NAME}_i2c_lib OBJECT src/hal_pigpioI2c.cpp)
-add_dependencies(${PROJECT_NAME}_i2c_lib ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
-
 add_library(${PROJECT_NAME}_imu_lib OBJECT src/hal_pigpioImu.cpp)
-add_dependencies(${PROJECT_NAME}_imu_lib ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
 add_executable(${PROJECT_NAME}_node 
   src/hal_pigpio.cpp 
@@ -101,9 +77,10 @@ add_executable(${PROJECT_NAME}_node
   $<TARGET_OBJECTS:${PROJECT_NAME}_i2c_lib>
   $<TARGET_OBJECTS:${PROJECT_NAME}_imu_lib> 
 )
-add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+ament_target_dependencies(${PROJECT_NAME}_node rclcpp)
+rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME} "rosidl_typesupport_cpp")
 target_link_libraries(${PROJECT_NAME}_node
-  ${catkin_LIBRARIES}
+  "${cpp_typesupport_target}"
   ${pigpio_LIBRAIRIES}
 )
 
@@ -112,5 +89,7 @@ target_link_libraries(${PROJECT_NAME}_node
 #############
 install(TARGETS
   ${PROJECT_NAME}_node
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  DESTINATION lib/${PROJECT_NAME}
 )
+
+ament_package()
