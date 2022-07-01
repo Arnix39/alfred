@@ -21,32 +21,32 @@ class PigpioInit
 private:
     int pigpioHandle;
     std::shared_ptr<rclcpp::Node> halPigpioNode;
-    rclcpp::ServiceServer getHandleService;
-    rclcpp::ServiceServer getModeService;
-    rclcpp::ServiceServer setInputModeService;
-    rclcpp::ServiceServer setOutputModeService;
-    rclcpp::ServiceServer setPullUpService;
-    rclcpp::ServiceServer setPullDownService;
-    rclcpp::ServiceServer clearResistorService;
-    rclcpp::Publisher heartbeatPublisher;
+    rclcpp::Service<hal_pigpio::srv::HalPigpioGetHandle>::SharedPtr getHandleService;
+    rclcpp::Service<hal_pigpio::srv::HalPigpioGetMode>::SharedPtr getModeService;
+    rclcpp::Service<hal_pigpio::srv::HalPigpioSetInputMode>::SharedPtr setInputModeService;
+    rclcpp::Service<hal_pigpio::srv::HalPigpioSetOutputMode>::SharedPtr setOutputModeService;
+    rclcpp::Service<hal_pigpio::srv::HalPigpioSetPullUp>::SharedPtr setPullUpService;
+    rclcpp::Service<hal_pigpio::srv::HalPigpioSetPullDown>::SharedPtr setPullDownService;
+    rclcpp::Service<hal_pigpio::srv::HalPigpioClearResistor>::SharedPtr clearResistorService;
+    rclcpp::Publisher<hal_pigpio::msg::HalPigpioHeartbeat>::SharedPtr heartbeatPublisher;
 
 public:
     PigpioInit(std::shared_ptr<rclcpp::Node> node, int pigpioHandle);
     ~PigpioInit();
-    bool getHandle(hal_pigpio::hal_pigpioGetHandle::Request request,
-                   hal_pigpio::hal_pigpioGetHandle::Response response);
-    bool getMode(hal_pigpio::hal_pigpioGetMode::Request request,
-                 hal_pigpio::hal_pigpioGetMode::Response response);
-    bool setInputMode(hal_pigpio::hal_pigpioSetInputMode::Request request,
-                      hal_pigpio::hal_pigpioSetInputMode::Response response);
-    bool setOutputMode(hal_pigpio::hal_pigpioSetOutputMode::Request request,
-                       hal_pigpio::hal_pigpioSetOutputMode::Response response);
-    bool setPullUp(hal_pigpio::hal_pigpioSetPullUp::Request request,
-                   hal_pigpio::hal_pigpioSetPullUp::Response response);
-    bool setPullDown(hal_pigpio::hal_pigpioSetPullDown::Request request,
-                     hal_pigpio::hal_pigpioSetPullDown::Response response);
-    bool clearResistor(hal_pigpio::hal_pigpioClearResistor::Request request,
-                       hal_pigpio::hal_pigpioClearResistor::Response response);
+    void getHandle(const std::shared_ptr<hal_pigpio::srv::HalPigpioGetHandle::Request> request,
+                   std::shared_ptr<hal_pigpio::srv::HalPigpioGetHandle::Response> response);
+    void getMode(const std::shared_ptr<hal_pigpio::srv::HalPigpioGetMode::Request> request,
+                 std::shared_ptr<hal_pigpio::srv::HalPigpioGetMode::Response> response);
+    void setInputMode(const std::shared_ptr<hal_pigpio::srv::HalPigpioSetInputMode::Request> request,
+                      std::shared_ptr<hal_pigpio::srv::HalPigpioSetInputMode::Response> response);
+    void setOutputMode(const std::shared_ptr<hal_pigpio::srv::HalPigpioSetOutputMode::Request> request,
+                       std::shared_ptr<hal_pigpio::srv::HalPigpioSetOutputMode::Response> response);
+    void setPullUp(const std::shared_ptr<hal_pigpio::srv::HalPigpioSetPullUp::Request> request,
+                   std::shared_ptr<hal_pigpio::srv::HalPigpioSetPullUp::Response> response);
+    void setPullDown(const std::shared_ptr<hal_pigpio::srv::HalPigpioSetPullDown::Request> request,
+                     std::shared_ptr<hal_pigpio::srv::HalPigpioSetPullDown::Response> response);
+    void clearResistor(const std::shared_ptr<hal_pigpio::srv::HalPigpioClearResistor::Request> request,
+                       std::shared_ptr<hal_pigpio::srv::HalPigpioClearResistor::Response> response);
     void publishHeartbeat(void);
 };
 
