@@ -39,18 +39,18 @@ private:
     Quaternions quaternions;
     Angles angles;
     bool isImuReady;
-    ros::ServiceServer imuReadingService;
-    ros::Timer readQuaternionsAndPublishAnglesTimer;
-    ros::Publisher anglesPublisher;
+    rclcpp::ServiceServer imuReadingService;
+    rclcpp::Timer readQuaternionsAndPublishAnglesTimer;
+    rclcpp::Publisher anglesPublisher;
 
 public:
-    PigpioImu(ros::NodeHandle *node, int pigpioHandle);
+    PigpioImu(rclcpp::NodeHandle *node, int pigpioHandle);
     ~PigpioImu() = default;
     void readQuaternions(void);
     void computeQuaternions(char (&data)[MPU6050_DMP_FIFO_QUAT_SIZE]);
     void publishAngles(void);
     void computeAngles(void);
-    void readQuaternionsAndPublishAngles(const ros::TimerEvent &event);
+    void readQuaternionsAndPublishAngles(const rclcpp::TimerEvent &event);
     void resetFifo(void);
     uint16_t readFifoCount(void);
     bool isFifoOverflowed(void);

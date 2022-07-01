@@ -73,11 +73,27 @@ include_directories(
   ${pigpio_INCLUDE_DIRS}
 )
 
+rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME} "rosidl_typesupport_cpp")
+
 add_library(${PROJECT_NAME}_init_lib OBJECT src/hal_pigpioInit.cpp)
+ament_target_dependencies(${PROJECT_NAME}_init_lib rclcpp)
+target_link_libraries(${PROJECT_NAME}_init_lib "${cpp_typesupport_target}") 
+
 add_library(${PROJECT_NAME}_output_lib OBJECT src/hal_pigpioOutput.cpp)
+ament_target_dependencies(${PROJECT_NAME}_output_lib rclcpp)
+target_link_libraries(${PROJECT_NAME}_output_lib "${cpp_typesupport_target}") 
+
 add_library(${PROJECT_NAME}_input_lib OBJECT src/hal_pigpioInput.cpp)
+ament_target_dependencies(${PROJECT_NAME}_input_lib rclcpp)
+target_link_libraries(${PROJECT_NAME}_input_lib "${cpp_typesupport_target}") 
+
 add_library(${PROJECT_NAME}_i2c_lib OBJECT src/hal_pigpioI2c.cpp)
+ament_target_dependencies(${PROJECT_NAME}_i2c_lib rclcpp)
+target_link_libraries(${PROJECT_NAME}_i2c_lib "${cpp_typesupport_target}") 
+
 add_library(${PROJECT_NAME}_imu_lib OBJECT src/hal_pigpioImu.cpp)
+ament_target_dependencies(${PROJECT_NAME}_imu_lib rclcpp)
+target_link_libraries(${PROJECT_NAME}_imu_lib "${cpp_typesupport_target}") 
 
 add_executable(${PROJECT_NAME}_node 
   src/hal_pigpio.cpp 
@@ -88,10 +104,10 @@ add_executable(${PROJECT_NAME}_node
   $<TARGET_OBJECTS:${PROJECT_NAME}_imu_lib> 
 )
 ament_target_dependencies(${PROJECT_NAME}_node rclcpp)
-rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME} "rosidl_typesupport_cpp")
 target_link_libraries(${PROJECT_NAME}_node
   "${cpp_typesupport_target}"
   ${pigpio_LIBRAIRIES}
+  ${rclcpp_LIBRARIES}
 )
 
 #############

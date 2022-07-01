@@ -19,18 +19,18 @@
 class PigpioInit
 {
 private:
-    ros::ServiceServer getHandleService;
-    ros::ServiceServer getModeService;
-    ros::ServiceServer setInputModeService;
-    ros::ServiceServer setOutputModeService;
-    ros::ServiceServer setPullUpService;
-    ros::ServiceServer setPullDownService;
-    ros::ServiceServer clearResistorService;
-    ros::Publisher heartbeatPublisher;
+    rclcpp::ServiceServer getHandleService;
+    rclcpp::ServiceServer getModeService;
+    rclcpp::ServiceServer setInputModeService;
+    rclcpp::ServiceServer setOutputModeService;
+    rclcpp::ServiceServer setPullUpService;
+    rclcpp::ServiceServer setPullDownService;
+    rclcpp::ServiceServer clearResistorService;
+    rclcpp::Publisher heartbeatPublisher;
     int pigpioHandle;
 
 public:
-    PigpioInit(ros::NodeHandle *node, int pigpioHandle);
+    PigpioInit(rclcpp::NodeHandle *node, int pigpioHandle);
     ~PigpioInit();
     bool getHandle(hal_pigpio::hal_pigpioGetHandle::Request &req,
                    hal_pigpio::hal_pigpioGetHandle::Response &res);
@@ -46,7 +46,7 @@ public:
                      hal_pigpio::hal_pigpioSetPullDown::Response &res);
     bool clearResistor(hal_pigpio::hal_pigpioClearResistor::Request &req,
                        hal_pigpio::hal_pigpioClearResistor::Response &res);
-    void publishHeartbeat(const ros::TimerEvent &timerEvent);
+    void publishHeartbeat(const rclcpp::TimerEvent &timerEvent);
 };
 
 #endif

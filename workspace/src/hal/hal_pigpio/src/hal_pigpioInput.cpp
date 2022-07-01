@@ -1,6 +1,6 @@
 #include "hal_pigpioInput.hpp"
 
-PigpioInput::PigpioInput(ros::NodeHandle *node, int pigpioHandle) : pigpioHandle(pigpioHandle),
+PigpioInput::PigpioInput(rclcpp::NodeHandle *node, int pigpioHandle) : pigpioHandle(pigpioHandle),
                                                                     gpioEdgeChangePub(node->advertise<hal_pigpio::hal_pigpioEdgeChangeMsg>("gpioEdgeChange", 1000)),
                                                                     gpioEncoderCountPub(node->advertise<hal_pigpio::hal_pigpioEncoderCountMsg>("hal_pigpioEncoderCount", 1000)),
                                                                     readGpioService(node->advertiseService("hal_pigpioReadGpio", &PigpioInput::readGpio, this)),
@@ -31,7 +31,7 @@ bool PigpioInput::readGpio(hal_pigpio::hal_pigpioReadGpio::Request &req,
     else
     {
         res.hasSucceeded = false;
-        ROS_ERROR("Failed to read GPIO %u!", req.gpioId);
+        RCLCPP_ERROR("Failed to read GPIO %u!", req.gpioId);
     }
     return true;
 }
@@ -62,17 +62,17 @@ bool PigpioInput::setCallback(hal_pigpio::hal_pigpioSetCallback::Request &req,
     {
         res.hasSucceeded = true;
         callbackList.push_back((uint)res.callbackId);
-        ROS_INFO("Callback for GPIO %u configured.", req.gpioId);
+        RCLCPP_INFO("Callback for GPIO %u configured.", req.gpioId);
     }
     else
     {
         res.hasSucceeded = false;
-        ROS_ERROR("Failed to configure callback for GPIO %u!", req.gpioId);
+        RCLCPP_ERROR("Failed to configure callback for GPIO %u!", req.gpioId);
     }
     return true;
 }
 
-void PigpioInput::publishEncoderCount(const ros::TimerEvent &timerEvent)
+void PigpioInput::publishEncoderCount(const rclcpp::TimerEvent &timerEvent)
 {
     hal_pigpio::hal_pigpioEncoderCountMsg encoderCountMsg;
 
@@ -132,12 +132,12 @@ bool PigpioInput::setEncoderCallback(hal_pigpio::hal_pigpioSetEncoderCallback::R
 
         res.hasSucceeded = true;
         callbackList.push_back((uint)res.callbackId);
-        ROS_INFO("Encoder callback for GPIO %u configured.", req.gpioId);
+        RCLCPP_INFO("Encoder callback for GPIO %u configured.", req.gpioId);
     }
     else
     {
         res.hasSucceeded = false;
-        ROS_ERROR("Failed to configure encoder callback for GPIO %u!", req.gpioId);
+        RCLCPP_ERROR("Failed to configure encoder callback for GPIO %u!", req.gpioId);
     }
     return true;
 }
@@ -152,7 +152,7 @@ bool PigpioInput::setMotorDirection(hal_pigpio::hal_pigpioSetMotorDirection::Req
     }
     else
     {
-        ROS_ERROR("Failed to set motor direction for motor %u!", req.motorId);
+        RCLCPP_ERROR("Failed to set motor direction for motor %u!", req.motorId);
     }
     return true;
 }

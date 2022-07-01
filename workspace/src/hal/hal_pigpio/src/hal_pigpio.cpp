@@ -6,17 +6,17 @@
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "hal_pigpio");
-    ros::NodeHandle node;
+    rclcpp::init(argc, argv, "hal_pigpio");
+    rclcpp::NodeHandle node;
     int pigpioHandle;
 
     pigpioHandle = pigpio_start(NULL, NULL);
     if (pigpioHandle < 0)
     {
-        ROS_ERROR("Pigpio daemon not running!");
+        RCLCPP_ERROR("Pigpio daemon not running!");
         return -1;
     }
-    ROS_INFO("Pigpio handle: %d.", pigpioHandle);
+    RCLCPP_INFO("Pigpio handle: %d.", pigpioHandle);
 
     PigpioInit pigpioInit(&node, pigpioHandle);
     PigpioOutput pigpioOutput(&node, pigpioHandle);
@@ -24,10 +24,10 @@ int main(int argc, char **argv)
     PigpioI2c pigpioI2c(&node, pigpioHandle);
     PigpioImu pigpioImu(&node, pigpioHandle);
 
-    ros::Timer heartbeatTimer(node.createTimer(ros::Duration(0.1), &PigpioInit::publishHeartbeat, &pigpioInit));
-    ros::Timer encoderCountTimer(node.createTimer(ros::Duration(0.005), &PigpioInput::publishEncoderCount, &pigpioInput));
+    rclcpp::Timer heartbeatTimer(node.createTimer(rclcpp::Duration(0.1), &PigpioInit::publishHeartbeat, &pigpioInit));
+    rclcpp::Timer encoderCountTimer(node.createTimer(rclcpp::Duration(0.005), &PigpioInput::publishEncoderCount, &pigpioInput));
 
-    ros::spin();
+    rclcpp::spin();
 
     return 0;
 }

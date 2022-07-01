@@ -21,18 +21,18 @@
 class PigpioI2c
 {
 private:
-    ros::ServiceServer i2cOpenService;
-    ros::ServiceServer i2cCloseService;
-    ros::ServiceServer i2cWriteByteDataService;
-    ros::ServiceServer i2cWriteWordDataService;
-    ros::ServiceServer i2cWriteBlockDataService;
-    ros::ServiceServer i2cReadByteDataService;
-    ros::ServiceServer i2cReadWordDataService;
-    ros::ServiceServer i2cReadBlockDataService;
+    rclcpp::ServiceServer i2cOpenService;
+    rclcpp::ServiceServer i2cCloseService;
+    rclcpp::ServiceServer i2cWriteByteDataService;
+    rclcpp::ServiceServer i2cWriteWordDataService;
+    rclcpp::ServiceServer i2cWriteBlockDataService;
+    rclcpp::ServiceServer i2cReadByteDataService;
+    rclcpp::ServiceServer i2cReadWordDataService;
+    rclcpp::ServiceServer i2cReadBlockDataService;
     int pigpioHandle;
 
 public:
-    PigpioI2c(ros::NodeHandle *node, int pigpioHandle);
+    PigpioI2c(rclcpp::NodeHandle *node, int pigpioHandle);
     ~PigpioI2c() = default;
     bool i2cOpen(hal_pigpio::hal_pigpioI2cOpen::Request &req,
                  hal_pigpio::hal_pigpioI2cOpen::Response &res);

@@ -1,9 +1,9 @@
 #include "hal_pigpioImu.hpp"
 
-PigpioImu::PigpioImu(ros::NodeHandle *node, int pigpioHandle) : pigpioHandle(pigpioHandle),
+PigpioImu::PigpioImu(rclcpp::NodeHandle *node, int pigpioHandle) : pigpioHandle(pigpioHandle),
                                                                 i2cHandle(-1),
                                                                 quaternions({0, 0, 0, 0}),
-                                                                readQuaternionsAndPublishAnglesTimer(node->createTimer(ros::Duration(0.005), &PigpioImu::readQuaternionsAndPublishAngles, this)),
+                                                                readQuaternionsAndPublishAnglesTimer(node->createTimer(rclcpp::Duration(0.005), &PigpioImu::readQuaternionsAndPublishAngles, this)),
                                                                 isImuReady(false),
                                                                 imuReadingService(node->advertiseService("hal_pigpioI2cImuReading", &PigpioImu::i2cImuReading, this)),
                                                                 anglesPublisher(node->advertise<hal_pigpio::hal_pigpioAnglesMsg>("hal_pigpioAngles", 1000))
@@ -17,11 +17,11 @@ void PigpioImu::resetFifo()
     valueRead = i2c_read_byte_data(pigpioHandle, i2cHandle, MPU6050_USER_CONTROL_REGISTER);
     if (valueRead < 0)
     {
-        ROS_ERROR("Failed to reset FIFO!");
+        RCLCPP_ERROR("Failed to reset FIFO!");
     }
     else if (i2c_write_byte_data(pigpioHandle, i2cHandle, MPU6050_USER_CONTROL_REGISTER, (static_cast<uint8_t>(valueRead) | (1 << MPU6050_FIFO_RESET_BIT))) != 0)
     {
-        ROS_ERROR("Failed to reset FIFO!");
+        RCLCPP_ERROR("Failed to reset FIFO!");
     }
 }
 
@@ -33,7 +33,7 @@ uint16_t PigpioImu::readFifoCount()
     valueRead = i2c_read_byte_data(pigpioHandle, i2cHandle, MPU6050_FIFO_COUNT_H_REGISTER);
     if (valueRead < 0)
     {
-        ROS_ERROR("Failed to read the number of bytes in the FIFO!");
+        RCLCPP_ERROR("Failed to read the number of bytes in the FIFO!");
         return 0;
     }
     else
@@ -44,7 +44,7 @@ uint16_t PigpioImu::readFifoCount()
     valueRead = i2c_read_byte_data(pigpioHandle, i2cHandle, MPU6050_FIFO_COUNT_L_REGISTER);
     if (valueRead < 0)
     {
-        ROS_ERROR("Failed to read the number of bytes in the FIFO!");
+        RCLCPP_ERROR("Failed to read the number of bytes in the FIFO!");
         return 0;
     }
     else
@@ -62,7 +62,7 @@ bool PigpioImu::isFifoOverflowed(void)
     interruptStatus = i2c_read_byte_data(pigpioHandle, i2cHandle, MPU6050_INTERRUPT_STATUS_REGISTER);
     if (interruptStatus < 0)
     {
-        ROS_ERROR("Failed to read interrupt status!");
+        RCLCPP_ERROR("Failed to read interrupt status!");
     }
     else if (static_cast<uint8_t>(interruptStatus) & MPU6050_FIFO_OVERFLOW)
     {
@@ -79,7 +79,7 @@ void PigpioImu::readQuaternions(void)
 
     if (isFifoOverflowed())
     {
-        ROS_ERROR("FIFO has overflowed!");
+        RCLCPP_ERROR("FIFO has overflowed!");
         resetFifo();
     }
     else
@@ -94,7 +94,7 @@ void PigpioImu::readQuaternions(void)
             }
             else
             {
-                ROS_ERROR("Failed to read FIFO!");
+                RCLCPP_ERROR("Failed to read FIFO!");
                 resetFifo();
                 return;
             }
@@ -106,7 +106,7 @@ void PigpioImu::readQuaternions(void)
         }
         else
         {
-            ROS_INFO("Not enough samples in FIFO.");
+            RCLCPP_INFO("Not enough samples in FIFO.");
         }
     }
 }
@@ -146,7 +146,7 @@ void PigpioImu::computeAngles()
     angles.psi = std::atan2(tanPsi, quadrantPsi) * 180 / M_PI;
 }
 
-void PigpioImu::readQuaternionsAndPublishAngles(const ros::TimerEvent &event)
+void PigpioImu::readQuaternionsAndPublishAngles(const rclcpp::TimerEvent &event)
 {
     if (isImuReady)
     {

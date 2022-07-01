@@ -7,27 +7,26 @@
 #include <pigpiod_if2.h>
 
 // Services and messages headers (generated)
-#include "hal_pigpio/hal_pigpioGetHandle.h"
-#include "hal_pigpio/hal_pigpioSetPwmDutycycle.h"
-#include "hal_pigpio/hal_pigpioSetPwmFrequency.h"
-#include "hal_pigpio/hal_pigpioSetGpioHigh.h"
-#include "hal_pigpio/hal_pigpioSetGpioLow.h"
-#include "hal_pigpio/hal_pigpioSendTriggerPulse.h"
-#include "hal_pigpio/hal_pigpioGetMode.h"
+#include "hal_pigpio/srv/hal_pigpio_set_pwm_dutycycle.hpp"
+#include "hal_pigpio/srv/hal_pigpio_set_pwm_frequency.hpp"
+#include "hal_pigpio/srv/hal_pigpio_set_gpio_high.hpp"
+#include "hal_pigpio/srv/hal_pigpio_set_gpio_low.hpp"
+#include "hal_pigpio/srv/hal_pigpio_send_trigger_pulse.hpp"
+#include "hal_pigpio/srv/hal_pigpio_get_mode.hpp"
 
 class PigpioOutput
 {
 private:
-    ros::ServiceServer setPwmDutycycleService;
-    ros::ServiceServer setPwmFrequencyService;
-    ros::ServiceServer setGpioHighService;
-    ros::ServiceServer setGpioLowService;
-    ros::ServiceServer sendTriggerPulseService;
-    ros::ServiceClient getModeClient;
+    rclcpp::ServiceServer setPwmDutycycleService;
+    rclcpp::ServiceServer setPwmFrequencyService;
+    rclcpp::ServiceServer setGpioHighService;
+    rclcpp::ServiceServer setGpioLowService;
+    rclcpp::ServiceServer sendTriggerPulseService;
+    rclcpp::ServiceClient getModeClient;
     int pigpioHandle;
 
 public:
-    PigpioOutput(ros::NodeHandle *node, int pigpioHandle);
+    PigpioOutput(rclcpp::NodeHandle *node, int pigpioHandle);
     ~PigpioOutput() = default;
     bool setPwmDutycycle(hal_pigpio::hal_pigpioSetPwmDutycycle::Request &req,
                          hal_pigpio::hal_pigpioSetPwmDutycycle::Response &res);
