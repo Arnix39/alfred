@@ -21,6 +21,8 @@
 class PigpioI2c
 {
 private:
+    int pigpioHandle;
+    std::shared_ptr<rclcpp::Node> halPigpioNode;
     rclcpp::ServiceServer i2cOpenService;
     rclcpp::ServiceServer i2cCloseService;
     rclcpp::ServiceServer i2cWriteByteDataService;
@@ -29,8 +31,6 @@ private:
     rclcpp::ServiceServer i2cReadByteDataService;
     rclcpp::ServiceServer i2cReadWordDataService;
     rclcpp::ServiceServer i2cReadBlockDataService;
-    int pigpioHandle;
-    std::shared_ptr<rclcpp::Node> halPigpioNode;
 
 public:
     PigpioI2c(std::shared_ptr<rclcpp::Node> node, int pigpioHandle);

@@ -19,6 +19,8 @@
 class PigpioInit
 {
 private:
+    int pigpioHandle;
+    std::shared_ptr<rclcpp::Node> halPigpioNode;
     rclcpp::ServiceServer getHandleService;
     rclcpp::ServiceServer getModeService;
     rclcpp::ServiceServer setInputModeService;
@@ -27,8 +29,6 @@ private:
     rclcpp::ServiceServer setPullDownService;
     rclcpp::ServiceServer clearResistorService;
     rclcpp::Publisher heartbeatPublisher;
-    int pigpioHandle;
-    std::shared_ptr<rclcpp::Node> halPigpioNode;
 
 public:
     PigpioInit(std::shared_ptr<rclcpp::Node> node, int pigpioHandle);

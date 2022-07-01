@@ -17,14 +17,14 @@
 class PigpioOutput
 {
 private:
+    int pigpioHandle;
+    std::shared_ptr<rclcpp::Node> halPigpioNode;
     rclcpp::ServiceServer setPwmDutycycleService;
     rclcpp::ServiceServer setPwmFrequencyService;
     rclcpp::ServiceServer setGpioHighService;
     rclcpp::ServiceServer setGpioLowService;
     rclcpp::ServiceServer sendTriggerPulseService;
     rclcpp::ServiceClient getModeClient;
-    int pigpioHandle;
-    std::shared_ptr<rclcpp::Node> halPigpioNode;
 
 public:
     PigpioOutput(std::shared_ptr<rclcpp::Node> node, int pigpioHandle);
