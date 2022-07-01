@@ -52,7 +52,7 @@ public:
                             hal_pigpio::hal_pigpioSetEncoderCallback::Response response);
     bool setMotorDirection(hal_pigpio::hal_pigpioSetMotorDirection::Request request,
                            hal_pigpio::hal_pigpioSetMotorDirection::Response response);
-    void publishEncoderCount(const rclcpp::TimerEvent &timerEvent);
+    void publishEncoderCount(void);
 };
 
 #endif

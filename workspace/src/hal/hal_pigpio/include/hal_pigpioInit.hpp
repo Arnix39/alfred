@@ -47,7 +47,7 @@ public:
                      hal_pigpio::hal_pigpioSetPullDown::Response response);
     bool clearResistor(hal_pigpio::hal_pigpioClearResistor::Request request,
                        hal_pigpio::hal_pigpioClearResistor::Response response);
-    void publishHeartbeat(const rclcpp::TimerEvent &timerEvent);
+    void publishHeartbeat(void);
 };
 
 #endif

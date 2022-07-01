@@ -126,7 +126,7 @@ void PigpioInit::clearResistor(hal_pigpio::hal_pigpioClearResistor::Request requ
     return true;
 }
 
-void PigpioInit::publishHeartbeat()
+void PigpioInit::publishHeartbeat(void)
 {
     hal_pigpio::hal_pigpioHeartbeatMsg heartbeat;
     heartbeat.isAlive = true;

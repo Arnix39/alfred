@@ -30,6 +30,7 @@ int main(int argc, char **argv)
     rclcpp::TimerBase::SharedPtr encoderCountTimer(node->create_wall_timer(5ms, std::bind(&PigpioInput::publishEncoderCount, &pigpioInput)));
 
     rclcpp::spin(node);
-
+    
+    rclcpp::shutdown();
     return 0;
 }

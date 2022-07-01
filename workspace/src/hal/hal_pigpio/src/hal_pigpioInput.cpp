@@ -73,7 +73,7 @@ void PigpioInput::setCallback(hal_pigpio::hal_pigpioSetCallback::Request request
     return true;
 }
 
-void PigpioInput::publishEncoderCount(const rclcpp::TimerEvent &timerEvent)
+void PigpioInput::publishEncoderCount(void)
 {
     hal_pigpio::hal_pigpioEncoderCountMsg encoderCountMsg;
 
