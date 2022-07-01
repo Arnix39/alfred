@@ -30,9 +30,10 @@ private:
     rclcpp::ServiceServer i2cReadWordDataService;
     rclcpp::ServiceServer i2cReadBlockDataService;
     int pigpioHandle;
+    std::shared_ptr<rclcpp::Node> halPigpioNode;
 
 public:
-    PigpioI2c(rclcpp::NodeHandle *node, int pigpioHandle);
+    PigpioI2c(std::shared_ptr<rclcpp::Node> node, int pigpioHandle);
     ~PigpioI2c() = default;
     bool i2cOpen(hal_pigpio::hal_pigpioI2cOpen::Request &req,
                  hal_pigpio::hal_pigpioI2cOpen::Response &res);

@@ -35,6 +35,7 @@ class PigpioImu
 {
 private:
     int pigpioHandle;
+    std::shared_ptr<rclcpp::Node> halPigpioNode;
     int32_t i2cHandle;
     Quaternions quaternions;
     Angles angles;
@@ -44,7 +45,7 @@ private:
     rclcpp::Publisher anglesPublisher;
 
 public:
-    PigpioImu(rclcpp::NodeHandle *node, int pigpioHandle);
+    PigpioImu(std::shared_ptr<rclcpp::Node> node, int pigpioHandle);
     ~PigpioImu() = default;
     void readQuaternions(void);
     void computeQuaternions(char (&data)[MPU6050_DMP_FIFO_QUAT_SIZE]);

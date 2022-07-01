@@ -26,13 +26,14 @@ struct Motor
 class PigpioInput
 {
 private:
+    int pigpioHandle;
+    std::shared_ptr<rclcpp::Node> halPigpioNode;
     rclcpp::Publisher gpioEdgeChangePub;
     rclcpp::Publisher gpioEncoderCountPub;
     rclcpp::ServiceServer readGpioService;
     rclcpp::ServiceServer setCallbackService;
     rclcpp::ServiceServer setEncoderCallbackService;
     rclcpp::ServiceServer setMotorDirectionService;
-    int pigpioHandle;
     std::vector<uint> callbackList;
     std::vector<Motor> motors;
     inline void gpioEdgeChangeCallback(int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us);
@@ -41,7 +42,7 @@ private:
     static void c_gpioEncoderEdgeChangeCallback(int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us, void *userData);
 
 public:
-    PigpioInput(rclcpp::NodeHandle *node, int pigpioHandle);
+    PigpioInput(std::shared_ptr<rclcpp::Node> node, int pigpioHandle);
     ~PigpioInput();
     bool readGpio(hal_pigpio::hal_pigpioReadGpio::Request &req,
                   hal_pigpio::hal_pigpioReadGpio::Response &res);

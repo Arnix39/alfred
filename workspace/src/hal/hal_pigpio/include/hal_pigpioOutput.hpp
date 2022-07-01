@@ -24,9 +24,10 @@ private:
     rclcpp::ServiceServer sendTriggerPulseService;
     rclcpp::ServiceClient getModeClient;
     int pigpioHandle;
+    std::shared_ptr<rclcpp::Node> halPigpioNode;
 
 public:
-    PigpioOutput(rclcpp::NodeHandle *node, int pigpioHandle);
+    PigpioOutput(std::shared_ptr<rclcpp::Node> node, int pigpioHandle);
     ~PigpioOutput() = default;
     bool setPwmDutycycle(hal_pigpio::hal_pigpioSetPwmDutycycle::Request &req,
                          hal_pigpio::hal_pigpioSetPwmDutycycle::Response &res);

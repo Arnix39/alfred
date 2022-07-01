@@ -1,14 +1,15 @@
 #include "hal_pigpioI2c.hpp"
 
-PigpioI2c::PigpioI2c(rclcpp::NodeHandle *node, int pigpioHandle) : pigpioHandle(pigpioHandle),
-                                                                i2cOpenService(node->advertiseService("hal_pigpioI2cOpen", &PigpioI2c::i2cOpen, this)),
-                                                                i2cCloseService(node->advertiseService("hal_pigpioI2cClose", &PigpioI2c::i2cClose, this)),
-                                                                i2cReadByteDataService(node->advertiseService("hal_pigpioI2cReadByteData", &PigpioI2c::i2cReadByteData, this)),
-                                                                i2cReadWordDataService(node->advertiseService("hal_pigpioI2cReadWordData", &PigpioI2c::i2cReadWordData, this)),
-                                                                i2cReadBlockDataService(node->advertiseService("hal_pigpioI2cReadBlockData", &PigpioI2c::i2cReadBlockData, this)),
-                                                                i2cWriteByteDataService(node->advertiseService("hal_pigpioI2cWriteByteData", &PigpioI2c::i2cWriteByteData, this)),
-                                                                i2cWriteWordDataService(node->advertiseService("hal_pigpioI2cWriteWordData", &PigpioI2c::i2cWriteWordData, this)),
-                                                                i2cWriteBlockDataService(node->advertiseService("hal_pigpioI2cWriteBlockData", &PigpioI2c::i2cWriteBlockData, this))
+PigpioI2c::PigpioI2c(std::shared_ptr<rclcpp::Node> node, int pigpioHandle) :    pigpioHandle(pigpioHandle),
+                                                                                halPigpioNode(node),
+                                                                                i2cOpenService(node->advertiseService("hal_pigpioI2cOpen", &PigpioI2c::i2cOpen, this)),
+                                                                                i2cCloseService(node->advertiseService("hal_pigpioI2cClose", &PigpioI2c::i2cClose, this)),
+                                                                                i2cReadByteDataService(node->advertiseService("hal_pigpioI2cReadByteData", &PigpioI2c::i2cReadByteData, this)),
+                                                                                i2cReadWordDataService(node->advertiseService("hal_pigpioI2cReadWordData", &PigpioI2c::i2cReadWordData, this)),
+                                                                                i2cReadBlockDataService(node->advertiseService("hal_pigpioI2cReadBlockData", &PigpioI2c::i2cReadBlockData, this)),
+                                                                                i2cWriteByteDataService(node->advertiseService("hal_pigpioI2cWriteByteData", &PigpioI2c::i2cWriteByteData, this)),
+                                                                                i2cWriteWordDataService(node->advertiseService("hal_pigpioI2cWriteWordData", &PigpioI2c::i2cWriteWordData, this)),
+                                                                                i2cWriteBlockDataService(node->advertiseService("hal_pigpioI2cWriteBlockData", &PigpioI2c::i2cWriteBlockData, this))
 {
 }
 
@@ -19,12 +20,12 @@ bool PigpioI2c::i2cOpen(hal_pigpio::hal_pigpioI2cOpen::Request &req,
     if (res.handle >= 0)
     {
         res.hasSucceeded = true;
-        RCLCPP_INFO("I2C bus %u open for device %u with handle %u.", req.bus, req.address, res.handle);
+        RCLCPP_INFO(halPigpioNode->get_logger(),"I2C bus %u open for device %u with handle %u.", req.bus, req.address, res.handle);
     }
     else
     {
         res.hasSucceeded = false;
-        RCLCPP_ERROR("Failed to open I2C bus %u for device %u.", req.bus, req.address);
+        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to open I2C bus %u for device %u.", req.bus, req.address);
     }
     return true;
 }
@@ -35,12 +36,12 @@ bool PigpioI2c::i2cClose(hal_pigpio::hal_pigpioI2cClose::Request &req,
     if (i2c_close(pigpioHandle, req.handle) == 0)
     {
         res.hasSucceeded = true;
-        RCLCPP_INFO("I2C device with handle %u closed.", req.handle);
+        RCLCPP_INFO(halPigpioNode->get_logger(),"I2C device with handle %u closed.", req.handle);
     }
     else
     {
         res.hasSucceeded = false;
-        RCLCPP_ERROR("Failed to close I2C device with handle %u.", req.handle);
+        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to close I2C device with handle %u.", req.handle);
     }
     return true;
 }
@@ -58,7 +59,7 @@ bool PigpioI2c::i2cReadByteData(hal_pigpio::hal_pigpioI2cReadByteData::Request &
     {
         res.value = 0;
         res.hasSucceeded = false;
-        RCLCPP_ERROR("Failed to read register %u on device with handle %u.", req.deviceRegister, req.handle);
+        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to read register %u on device with handle %u.", req.deviceRegister, req.handle);
     }
     return true;
 }
@@ -76,7 +77,7 @@ bool PigpioI2c::i2cReadWordData(hal_pigpio::hal_pigpioI2cReadWordData::Request &
     {
         res.value = 0;
         res.hasSucceeded = false;
-        RCLCPP_ERROR("Failed to read register %u on device with handle %u.", req.deviceRegister, req.handle);
+        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to read register %u on device with handle %u.", req.deviceRegister, req.handle);
     }
     return true;
 }
@@ -95,12 +96,12 @@ bool PigpioI2c::i2cReadBlockData(hal_pigpio::hal_pigpioI2cReadBlockData::Request
             res.dataBlock.push_back(buffer[index]);
         }
 
-        RCLCPP_INFO("Successfuly read data block from register %u on device with handle %u.", req.deviceRegister, req.handle);
+        RCLCPP_INFO(halPigpioNode->get_logger(),"Successfuly read data block from register %u on device with handle %u.", req.deviceRegister, req.handle);
     }
     else
     {
         res.hasSucceeded = false;
-        RCLCPP_ERROR("Failed to read register %u on device with handle %u.", req.deviceRegister, req.handle);
+        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to read register %u on device with handle %u.", req.deviceRegister, req.handle);
     }
     return true;
 }
@@ -115,7 +116,7 @@ bool PigpioI2c::i2cWriteByteData(hal_pigpio::hal_pigpioI2cWriteByteData::Request
     else
     {
         res.hasSucceeded = false;
-        RCLCPP_ERROR("Failed to write register %u on device with handle %u.", req.deviceRegister, req.handle);
+        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to write register %u on device with handle %u.", req.deviceRegister, req.handle);
     }
     return true;
 }
@@ -130,7 +131,7 @@ bool PigpioI2c::i2cWriteWordData(hal_pigpio::hal_pigpioI2cWriteWordData::Request
     else
     {
         res.hasSucceeded = false;
-        RCLCPP_ERROR("Failed to write register %u on device with handle %u.", req.deviceRegister, req.handle);
+        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to write register %u on device with handle %u.", req.deviceRegister, req.handle);
     }
     return true;
 }
@@ -152,7 +153,7 @@ bool PigpioI2c::i2cWriteBlockData(hal_pigpio::hal_pigpioI2cWriteBlockData::Reque
     else
     {
         res.hasSucceeded = false;
-        RCLCPP_ERROR("Failed to write data block in register %u on device with handle %u.", req.deviceRegister, req.handle);
+        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to write data block in register %u on device with handle %u.", req.deviceRegister, req.handle);
     }
     return true;
 }

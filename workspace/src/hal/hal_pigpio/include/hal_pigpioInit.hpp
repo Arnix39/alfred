@@ -28,9 +28,10 @@ private:
     rclcpp::ServiceServer clearResistorService;
     rclcpp::Publisher heartbeatPublisher;
     int pigpioHandle;
+    std::shared_ptr<rclcpp::Node> halPigpioNode;
 
 public:
-    PigpioInit(rclcpp::NodeHandle *node, int pigpioHandle);
+    PigpioInit(std::shared_ptr<rclcpp::Node> node, int pigpioHandle);
     ~PigpioInit();
     bool getHandle(hal_pigpio::hal_pigpioGetHandle::Request &req,
                    hal_pigpio::hal_pigpioGetHandle::Response &res);
