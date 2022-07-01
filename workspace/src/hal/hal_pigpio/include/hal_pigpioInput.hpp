@@ -28,12 +28,12 @@ class PigpioInput
 private:
     int pigpioHandle;
     std::shared_ptr<rclcpp::Node> halPigpioNode;
-    rclcpp::Publisher gpioEdgeChangePub;
-    rclcpp::Publisher gpioEncoderCountPub;
-    rclcpp::ServiceServer readGpioService;
-    rclcpp::ServiceServer setCallbackService;
-    rclcpp::ServiceServer setEncoderCallbackService;
-    rclcpp::ServiceServer setMotorDirectionService;
+    rclcpp::Publisher<hal_pigpio::msg::HalPigpioEdgeChange>::SharedPtr gpioEdgeChangePub;
+    rclcpp::Publisher<hal_pigpio::msg::HalPigpioEncoderCount>::SharedPtr gpioEncoderCountPub;
+    rclcpp::Service<hal_pigpio::srv::HalPigpioReadGpio>::SharedPtr readGpioService;
+    rclcpp::Service<hal_pigpio::srv::HalPigpioSetCallback>::SharedPtr setCallbackService;
+    rclcpp::Service<hal_pigpio::srv::HalPigpioSetEncoderCallback>::SharedPtr setEncoderCallbackService;
+    rclcpp::Service<hal_pigpio::srv::HalPigpioSetMotorDirection>::SharedPtr setMotorDirectionService;
     std::vector<uint> callbackList;
     std::vector<Motor> motors;
     inline void gpioEdgeChangeCallback(int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us);
@@ -44,14 +44,14 @@ private:
 public:
     PigpioInput(std::shared_ptr<rclcpp::Node> node, int pigpioHandle);
     ~PigpioInput();
-    bool readGpio(hal_pigpio::hal_pigpioReadGpio::Request request,
-                  hal_pigpio::hal_pigpioReadGpio::Response response);
-    bool setCallback(hal_pigpio::hal_pigpioSetCallback::Request request,
-                     hal_pigpio::hal_pigpioSetCallback::Response response);
-    bool setEncoderCallback(hal_pigpio::hal_pigpioSetEncoderCallback::Request request,
-                            hal_pigpio::hal_pigpioSetEncoderCallback::Response response);
-    bool setMotorDirection(hal_pigpio::hal_pigpioSetMotorDirection::Request request,
-                           hal_pigpio::hal_pigpioSetMotorDirection::Response response);
+    void readGpio(const std::shared_ptr<hal_pigpio::srv::HalPigpioReadGpio::Request> request,
+                  std::shared_ptr<hal_pigpio::srv::HalPigpioReadGpio::Response> response);
+    void setCallback(const std::shared_ptr<hal_pigpio::srv::HalPigpioSetCallback::Request> request,
+                     std::shared_ptr<hal_pigpio::srv::HalPigpioSetCallback::Response> response);
+    void setEncoderCallback(const std::shared_ptr<hal_pigpio::srv::HalPigpioSetEncoderCallback::Request> request,
+                            std::shared_ptr<hal_pigpio::srv::HalPigpioSetEncoderCallback::Response> response);
+    void setMotorDirection(const std::shared_ptr<hal_pigpio::srv::HalPigpioSetMotorDirection::Request> request,
+                           std::shared_ptr<hal_pigpio::srv::HalPigpioSetMotorDirection::Response> response);
     void publishEncoderCount(void);
 };
 
