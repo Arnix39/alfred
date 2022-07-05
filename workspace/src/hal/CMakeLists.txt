@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
 add_subdirectory(hal_pigpio)
 #add_subdirectory(hal_imu)
-#add_subdirectory(hal_proxsens)
+add_subdirectory(hal_proxsens)
 #add_subdirectory(hal_motorcontrol)
