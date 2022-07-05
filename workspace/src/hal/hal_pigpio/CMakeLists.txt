@@ -63,6 +63,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   ${srv_files}
  )
 
+ament_export_dependencies(rosidl_default_runtime)
+
 ###########
 ## Build ##
 ###########
