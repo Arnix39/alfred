@@ -1,4 +1,0 @@
-uint16 gpio_id
-uint16 pulse_length_in_us
----
-bool has_succeeded

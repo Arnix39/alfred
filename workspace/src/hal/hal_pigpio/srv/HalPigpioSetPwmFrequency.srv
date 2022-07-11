@@ -1,4 +1,0 @@
-uint16 gpio_id
-uint16 frequency
----
-bool has_succeeded

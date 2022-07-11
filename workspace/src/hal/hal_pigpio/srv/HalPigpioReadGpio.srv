@@ -1,4 +1,0 @@
-uint16 gpio_id
----
-int8 level
-bool has_succeeded

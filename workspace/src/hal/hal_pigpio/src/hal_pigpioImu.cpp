@@ -10,8 +10,8 @@ PigpioImu::PigpioImu(std::shared_ptr<rclcpp::Node> node, int pigpioHandle) :    
                                                                                 angles({0.0, 0.0, 0.0}),
                                                                                 isImuReady(false),
                                                                                 readQuaternionsAndPublishAnglesTimer(node->create_wall_timer(5ms, std::bind(&PigpioImu::readQuaternionsAndPublishAngles, this))),
-                                                                                imuReadingService(node->create_service<hal_pigpio::srv::HalPigpioI2cImuReading>("hal_pigpioI2cImuReading", std::bind(&PigpioImu::i2cImuReading, this, _1, _2))),
-                                                                                anglesPublisher(node->create_publisher<hal_pigpio::msg::HalPigpioAngles>("hal_pigpioAngles", 1000))
+                                                                                imuReadingService(node->create_service<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading>("hal_pigpioI2cImuReading", std::bind(&PigpioImu::i2cImuReading, this, _1, _2))),
+                                                                                anglesPublisher(node->create_publisher<hal_pigpio_interfaces::msg::HalPigpioAngles>("hal_pigpioAngles", 1000))
 {
 }
 
@@ -126,7 +126,7 @@ void PigpioImu::computeQuaternions(char (&data)[MPU6050_DMP_FIFO_QUAT_SIZE])
 
 void PigpioImu::publishAngles(void)
 {
-    auto message = hal_pigpio::msg::HalPigpioAngles();
+    auto message = hal_pigpio_interfaces::msg::HalPigpioAngles();
     
     message.phi = angles.phi;
     message.theta = angles.theta;
@@ -161,8 +161,8 @@ void PigpioImu::readQuaternionsAndPublishAngles()
     }
 }
 
-void PigpioImu::i2cImuReading(const std::shared_ptr<hal_pigpio::srv::HalPigpioI2cImuReading::Request> request,
-                              std::shared_ptr<hal_pigpio::srv::HalPigpioI2cImuReading::Response> response)
+void PigpioImu::i2cImuReading(const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading::Request> request,
+                              std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading::Response> response)
 {
     (void)response;
     

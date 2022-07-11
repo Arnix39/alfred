@@ -10,18 +10,18 @@ Proxsens::Proxsens(std::shared_ptr<rclcpp::Node> node) : halProxsensNode(node),
                                                          distanceInCm(UINT16_MAX),
                                                          pigpioNodeStarted(false),
                                                          isStarted(false),
-                                                         gpioSetInputClient(node->create_client<hal_pigpio::srv::HalPigpioSetInputMode>("hal_pigpioSetInputMode")),
-                                                         gpioSetOutputClient(node->create_client<hal_pigpio::srv::HalPigpioSetOutputMode>("hal_pigpioSetOutputMode")),
-                                                         gpioSetCallbackClient(node->create_client<hal_pigpio::srv::HalPigpioSetCallback>("hal_pigpioSetCallback")),
-                                                         gpioSendTriggerPulseClient(node->create_client<hal_pigpio::srv::HalPigpioSendTriggerPulse>("hal_pigpioSendTriggerPulse")),
-                                                         gpioSetGpioHighClient(node->create_client<hal_pigpio::srv::HalPigpioSetGpioHigh>("hal_pigpioSetGpioHigh")),
-                                                         proxsensDistancePub(node->create_publisher<hal_proxsens::msg::HalProxsens>("proxSensorValue", 1000)),
-                                                         proxsensEdgeChangeSub(node->create_subscription<hal_pigpio::msg::HalPigpioEdgeChange>("gpioEdgeChange", 1000, std::bind(&Proxsens::edgeChangeCallback, this, _1))),
-                                                         proxsensPigpioHBSub(node->create_subscription<hal_pigpio::msg::HalPigpioHeartbeat>("hal_pigpioHeartbeat", 1000, std::bind(&Proxsens::pigpioHeartbeatCallback, this, _1)))
+                                                         gpioSetInputClient(node->create_client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>("hal_pigpioSetInputMode")),
+                                                         gpioSetOutputClient(node->create_client<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>("hal_pigpioSetOutputMode")),
+                                                         gpioSetCallbackClient(node->create_client<hal_pigpio_interfaces::srv::HalPigpioSetCallback>("hal_pigpioSetCallback")),
+                                                         gpioSendTriggerPulseClient(node->create_client<hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse>("hal_pigpioSendTriggerPulse")),
+                                                         gpioSetGpioHighClient(node->create_client<hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh>("hal_pigpioSetGpioHigh")),
+                                                         proxsensDistancePub(node->create_publisher<hal_proxsens_interfaces::msg::HalProxsens>("proxSensorValue", 1000)),
+                                                         proxsensEdgeChangeSub(node->create_subscription<hal_pigpio_interfaces::msg::HalPigpioEdgeChange>("gpioEdgeChange", 1000, std::bind(&Proxsens::edgeChangeCallback, this, _1))),
+                                                         proxsensPigpioHBSub(node->create_subscription<hal_pigpio_interfaces::msg::HalPigpioHeartbeat>("hal_pigpioHeartbeat", 1000, std::bind(&Proxsens::pigpioHeartbeatCallback, this, _1)))
 {
 }
 
-void Proxsens::edgeChangeCallback(const hal_pigpio::msg::HalPigpioEdgeChange &msg)
+void Proxsens::edgeChangeCallback(const hal_pigpio_interfaces::msg::HalPigpioEdgeChange &msg)
 {
     static uint8_t lastEdgeChangeType = NO_CHANGE;
     static uint32_t lastTimestamp = 0;
@@ -54,7 +54,7 @@ void Proxsens::edgeChangeCallback(const hal_pigpio::msg::HalPigpioEdgeChange &ms
     }
 }
 
-void Proxsens::pigpioHeartbeatCallback(const hal_pigpio::msg::HalPigpioHeartbeat &msg)
+void Proxsens::pigpioHeartbeatCallback(const hal_pigpio_interfaces::msg::HalPigpioHeartbeat &msg)
 {
     pigpioNodeStarted = msg.is_alive;
 }
@@ -66,7 +66,7 @@ bool Proxsens::isPigpioNodeStarted(void)
 
 void Proxsens::publishDistance(void)
 {
-    auto distance = hal_proxsens::msg::HalProxsens();
+    auto distance = hal_proxsens_interfaces::msg::HalProxsens();
 
     distance.distance_in_cm = distanceInCm;
     proxsensDistancePub->publish(distance);
@@ -74,10 +74,10 @@ void Proxsens::publishDistance(void)
 
 void Proxsens::configureGpios(void)
 {
-    auto setInputModeRequest = std::make_shared<hal_pigpio::srv::HalPigpioSetInputMode::Request>();
-    auto setOutputModeForTriggerRequest = std::make_shared<hal_pigpio::srv::HalPigpioSetOutputMode::Request>();
-    auto setOutputModeForShifterRequest = std::make_shared<hal_pigpio::srv::HalPigpioSetOutputMode::Request>();
-    auto setCallbackRequest = std::make_shared<hal_pigpio::srv::HalPigpioSetCallback::Request>();
+    auto setInputModeRequest = std::make_shared<hal_pigpio_interfaces::srv::HalPigpioSetInputMode::Request>();
+    auto setOutputModeForTriggerRequest = std::make_shared<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode::Request>();
+    auto setOutputModeForShifterRequest = std::make_shared<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode::Request>();
+    auto setCallbackRequest = std::make_shared<hal_pigpio_interfaces::srv::HalPigpioSetCallback::Request>();
 
     setInputModeRequest->gpio_id = PROXSENS_ECHO_GPIO;
     auto setInputModeResult = gpioSetInputClient->async_send_request(setInputModeRequest);
@@ -119,7 +119,7 @@ void Proxsens::configureGpios(void)
 
 void Proxsens::trigger(void)
 {
-    auto sendTriggerPulseRequest = std::make_shared<hal_pigpio::srv::HalPigpioSendTriggerPulse::Request>();
+    auto sendTriggerPulseRequest = std::make_shared<hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse::Request>();
 
     sendTriggerPulseRequest->gpio_id = PROXSENS_TRIGGER_GPIO;
     sendTriggerPulseRequest->pulse_length_in_us = PROXSENS_TRIGGER_LENGTH_US;
@@ -129,7 +129,7 @@ void Proxsens::trigger(void)
 
 void Proxsens::enableOutputLevelShifter(void)
 {
-    auto setGpioHighRequest = std::make_shared<hal_pigpio::srv::HalPigpioSetGpioHigh::Request>();
+    auto setGpioHighRequest = std::make_shared<hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh::Request>();
 
     setGpioHighRequest->gpio_id = PROXSENS_LEVEL_SHIFTER_OE_GPIO;
     auto setGpioHighResult = gpioSetGpioHighClient->async_send_request(setGpioHighRequest);

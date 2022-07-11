@@ -1,5 +1,0 @@
-int32 handle
-uint8 device_register
-uint8 value
----
-bool has_succeeded

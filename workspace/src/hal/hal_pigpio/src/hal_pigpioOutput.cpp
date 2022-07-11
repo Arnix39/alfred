@@ -4,17 +4,17 @@ using namespace std::placeholders;
 
 PigpioOutput::PigpioOutput(std::shared_ptr<rclcpp::Node> node, int pigpioHandle) :  pigpioHandle(pigpioHandle),
                                                                                     halPigpioNode(node),
-                                                                                    getModeClient(node->create_client<hal_pigpio::srv::HalPigpioGetMode>("hal_pigpioGetMode")),
-                                                                                    setPwmDutycycleService(node->create_service<hal_pigpio::srv::HalPigpioSetPwmDutycycle>("hal_pigpioSetPwmDutycycle", std::bind(&PigpioOutput::setPwmDutycycle, this, _1, _2))),
-                                                                                    setPwmFrequencyService(node->create_service<hal_pigpio::srv::HalPigpioSetPwmFrequency>("hal_pigpioSetPwmFrequency", std::bind(&PigpioOutput::setPwmFrequency, this, _1, _2))),
-                                                                                    setGpioHighService(node->create_service<hal_pigpio::srv::HalPigpioSetGpioHigh>("hal_pigpioSetGpioHigh", std::bind(&PigpioOutput::setGpioHigh, this, _1, _2))),
-                                                                                    setGpioLowService(node->create_service<hal_pigpio::srv::HalPigpioSetGpioLow>("hal_pigpioSetGpioLow", std::bind(&PigpioOutput::setGpioLow, this, _1, _2))),
-                                                                                    sendTriggerPulseService(node->create_service<hal_pigpio::srv::HalPigpioSendTriggerPulse>("hal_pigpioSendTriggerPulse", std::bind(&PigpioOutput::sendTriggerPulse, this, _1, _2)))
+                                                                                    getModeClient(node->create_client<hal_pigpio_interfaces::srv::HalPigpioGetMode>("hal_pigpioGetMode")),
+                                                                                    setPwmDutycycleService(node->create_service<hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle>("hal_pigpioSetPwmDutycycle", std::bind(&PigpioOutput::setPwmDutycycle, this, _1, _2))),
+                                                                                    setPwmFrequencyService(node->create_service<hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency>("hal_pigpioSetPwmFrequency", std::bind(&PigpioOutput::setPwmFrequency, this, _1, _2))),
+                                                                                    setGpioHighService(node->create_service<hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh>("hal_pigpioSetGpioHigh", std::bind(&PigpioOutput::setGpioHigh, this, _1, _2))),
+                                                                                    setGpioLowService(node->create_service<hal_pigpio_interfaces::srv::HalPigpioSetGpioLow>("hal_pigpioSetGpioLow", std::bind(&PigpioOutput::setGpioLow, this, _1, _2))),
+                                                                                    sendTriggerPulseService(node->create_service<hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse>("hal_pigpioSendTriggerPulse", std::bind(&PigpioOutput::sendTriggerPulse, this, _1, _2)))
 {
 }
 
-void PigpioOutput::setPwmDutycycle(const std::shared_ptr<hal_pigpio::srv::HalPigpioSetPwmDutycycle::Request> request,
-                     std::shared_ptr<hal_pigpio::srv::HalPigpioSetPwmDutycycle::Response> response)
+void PigpioOutput::setPwmDutycycle(const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle::Request> request,
+                     std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle::Response> response)
 {
     if (set_PWM_dutycycle(pigpioHandle, request->gpio_id, request->dutycycle) == 0)
     {
@@ -27,8 +27,8 @@ void PigpioOutput::setPwmDutycycle(const std::shared_ptr<hal_pigpio::srv::HalPig
     }
 }
 
-void PigpioOutput::setPwmFrequency(const std::shared_ptr<hal_pigpio::srv::HalPigpioSetPwmFrequency::Request> request,
-                                   std::shared_ptr<hal_pigpio::srv::HalPigpioSetPwmFrequency::Response> response)
+void PigpioOutput::setPwmFrequency(const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency::Request> request,
+                                   std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency::Response> response)
 {
     int pwmSettingResult = set_PWM_frequency(pigpioHandle, request->gpio_id, request->frequency);
 
@@ -44,8 +44,8 @@ void PigpioOutput::setPwmFrequency(const std::shared_ptr<hal_pigpio::srv::HalPig
     }
 }
 
-void PigpioOutput::setGpioHigh(const std::shared_ptr<hal_pigpio::srv::HalPigpioSetGpioHigh::Request> request,
-                               std::shared_ptr<hal_pigpio::srv::HalPigpioSetGpioHigh::Response> response)
+void PigpioOutput::setGpioHigh(const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh::Request> request,
+                               std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh::Response> response)
 {
     if (gpio_write(pigpioHandle, request->gpio_id, PI_HIGH) == 0)
     {
@@ -58,8 +58,8 @@ void PigpioOutput::setGpioHigh(const std::shared_ptr<hal_pigpio::srv::HalPigpioS
     }
 }
 
-void PigpioOutput::setGpioLow(const std::shared_ptr<hal_pigpio::srv::HalPigpioSetGpioLow::Request> request,
-                              std::shared_ptr<hal_pigpio::srv::HalPigpioSetGpioLow::Response> response)
+void PigpioOutput::setGpioLow(const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetGpioLow::Request> request,
+                              std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetGpioLow::Response> response)
 {
     if (gpio_write(pigpioHandle, request->gpio_id, PI_LOW) == 0)
     {
@@ -72,8 +72,8 @@ void PigpioOutput::setGpioLow(const std::shared_ptr<hal_pigpio::srv::HalPigpioSe
     }
 }
 
-void PigpioOutput::sendTriggerPulse(const std::shared_ptr<hal_pigpio::srv::HalPigpioSendTriggerPulse::Request> request,
-                                    std::shared_ptr<hal_pigpio::srv::HalPigpioSendTriggerPulse::Response> response)
+void PigpioOutput::sendTriggerPulse(const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse::Request> request,
+                                    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse::Response> response)
 {
     if (gpio_trigger(pigpioHandle, request->gpio_id, request->pulse_length_in_us, PI_HIGH) == 0)
     {

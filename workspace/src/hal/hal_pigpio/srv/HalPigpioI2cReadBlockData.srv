@@ -1,6 +1,0 @@
-int32 handle
-uint8 device_register
-uint8 length
----
-uint8[] data_block
-bool has_succeeded

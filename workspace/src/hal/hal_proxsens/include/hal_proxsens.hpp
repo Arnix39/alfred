@@ -6,14 +6,14 @@
 #include "rclcpp/rclcpp.hpp"
 
 // Services and messages headers (generated)
-#include "hal_pigpio/srv/hal_pigpio_set_input_mode.hpp"
-#include "hal_pigpio/srv/hal_pigpio_set_output_mode.hpp"
-#include "hal_pigpio/srv/hal_pigpio_set_gpio_high.hpp"
-#include "hal_pigpio/srv/hal_pigpio_send_trigger_pulse.hpp"
-#include "hal_pigpio/srv/hal_pigpio_set_callback.hpp"
-#include "hal_pigpio/msg/hal_pigpio_edge_change.hpp"
-#include "hal_pigpio/msg/hal_pigpio_heartbeat.hpp"
-#include "hal_proxsens/msg/hal_proxsens.hpp"
+#include "hal_pigpio_interfaces/srv/hal_pigpio_set_input_mode.hpp"
+#include "hal_pigpio_interfaces/srv/hal_pigpio_set_output_mode.hpp"
+#include "hal_pigpio_interfaces/srv/hal_pigpio_set_gpio_high.hpp"
+#include "hal_pigpio_interfaces/srv/hal_pigpio_send_trigger_pulse.hpp"
+#include "hal_pigpio_interfaces/srv/hal_pigpio_set_callback.hpp"
+#include "hal_pigpio_interfaces/msg/hal_pigpio_edge_change.hpp"
+#include "hal_pigpio_interfaces/msg/hal_pigpio_heartbeat.hpp"
+#include "hal_proxsens_interfaces/msg/hal_proxsens.hpp"
 
 #define PROXSENS_TRIGGER_GPIO 5
 #define PROXSENS_ECHO_GPIO 6
@@ -38,14 +38,14 @@ private:
     uint16_t distanceInCm;
     bool pigpioNodeStarted;
     bool isStarted;
-    rclcpp::Client<hal_pigpio::srv::HalPigpioSetInputMode>::SharedPtr gpioSetInputClient;
-    rclcpp::Client<hal_pigpio::srv::HalPigpioSetOutputMode>::SharedPtr gpioSetOutputClient;
-    rclcpp::Client<hal_pigpio::srv::HalPigpioSetCallback>::SharedPtr gpioSetCallbackClient;
-    rclcpp::Client<hal_pigpio::srv::HalPigpioSendTriggerPulse>::SharedPtr gpioSendTriggerPulseClient;
-    rclcpp::Client<hal_pigpio::srv::HalPigpioSetGpioHigh>::SharedPtr gpioSetGpioHighClient;
-    rclcpp::Publisher<hal_proxsens::msg::HalProxsens>::SharedPtr proxsensDistancePub;
-    rclcpp::Subscription<hal_pigpio::msg::HalPigpioEdgeChange>::SharedPtr proxsensEdgeChangeSub;
-    rclcpp::Subscription<hal_pigpio::msg::HalPigpioHeartbeat>::SharedPtr proxsensPigpioHBSub;
+    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>::SharedPtr gpioSetInputClient;
+    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>::SharedPtr gpioSetOutputClient;
+    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetCallback>::SharedPtr gpioSetCallbackClient;
+    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse>::SharedPtr gpioSendTriggerPulseClient;
+    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh>::SharedPtr gpioSetGpioHighClient;
+    rclcpp::Publisher<hal_proxsens_interfaces::msg::HalProxsens>::SharedPtr proxsensDistancePub;
+    rclcpp::Subscription<hal_pigpio_interfaces::msg::HalPigpioEdgeChange>::SharedPtr proxsensEdgeChangeSub;
+    rclcpp::Subscription<hal_pigpio_interfaces::msg::HalPigpioHeartbeat>::SharedPtr proxsensPigpioHBSub;
 
 public:
     Proxsens(std::shared_ptr<rclcpp::Node> node);
@@ -54,8 +54,8 @@ public:
     void configureGpios(void);
     void trigger(void);
     void enableOutputLevelShifter(void);
-    void edgeChangeCallback(const hal_pigpio::msg::HalPigpioEdgeChange &msg);
-    void pigpioHeartbeatCallback(const hal_pigpio::msg::HalPigpioHeartbeat &msg);
+    void edgeChangeCallback(const hal_pigpio_interfaces::msg::HalPigpioEdgeChange &msg);
+    void pigpioHeartbeatCallback(const hal_pigpio_interfaces::msg::HalPigpioHeartbeat &msg);
     bool isPigpioNodeStarted(void);
     void publishAndGetDistance(void);
     bool isNotStarted(void);
