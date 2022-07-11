@@ -1,0 +1,5 @@
+uint16 bus
+uint16 address
+---
+bool has_succeeded
+int32 handle

@@ -1,0 +1,4 @@
+uint16 gpio_id
+uint8 dutycycle
+---
+bool has_succeeded
