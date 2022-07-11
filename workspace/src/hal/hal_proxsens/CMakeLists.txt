@@ -12,8 +12,15 @@ find_package(hal_proxsens_interfaces REQUIRED)
 include_directories(
   include
 )
+
+set(dependencies
+rclcpp
+hal_pigpio_interfaces
+hal_proxsens_interfaces
+)
+
 add_executable(${PROJECT_NAME}_node src/hal_proxsens.cpp)
-ament_target_dependencies(${PROJECT_NAME}_node rclcpp hal_proxsens_interfaces hal_pigpio_interfaces)
+ament_target_dependencies(${PROJECT_NAME}_node ${dependencies})
 
 #############
 ## Testing ##
@@ -24,7 +31,7 @@ ament_target_dependencies(${PROJECT_NAME}_node rclcpp hal_proxsens_interfaces ha
 #  ament_lint_auto_find_test_dependencies()
   
 #  ament_add_gtest(${PROJECT_NAME}_test test/test_hal_proxSens.cpp)
-#  ament_target_dependencies(${PROJECT_NAME}_test rclcpp hal_proxsens_interfaces hal_pigpio_interfaces)
+#  ament_target_dependencies(${PROJECT_NAME}_test ${dependencies})
 #endif()
 
 #############
