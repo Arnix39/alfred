@@ -38,7 +38,7 @@ add_library(${PROJECT_NAME}_imu OBJECT src/hal_pigpioImu.cpp)
 ament_target_dependencies(${PROJECT_NAME}_imu ${dependencies})
 
 add_executable(${PROJECT_NAME}_node 
-  src/hal_pigpio.cpp 
+  src/hal_pigpio_node.cpp 
   $<TARGET_OBJECTS:${PROJECT_NAME}_init> 
   $<TARGET_OBJECTS:${PROJECT_NAME}_output> 
   $<TARGET_OBJECTS:${PROJECT_NAME}_input>

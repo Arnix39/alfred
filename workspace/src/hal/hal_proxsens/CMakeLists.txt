@@ -19,7 +19,13 @@ hal_pigpio_interfaces
 hal_proxsens_interfaces
 )
 
-add_executable(${PROJECT_NAME}_node src/hal_proxsens.cpp)
+add_library(${PROJECT_NAME} OBJECT src/hal_proxsens.cpp)
+ament_target_dependencies(${PROJECT_NAME} ${dependencies})
+
+add_executable(${PROJECT_NAME}_node 
+  src/hal_proxsens_node.cpp
+  $<TARGET_OBJECTS:${PROJECT_NAME}> 
+)
 ament_target_dependencies(${PROJECT_NAME}_node ${dependencies})
 
 #############
