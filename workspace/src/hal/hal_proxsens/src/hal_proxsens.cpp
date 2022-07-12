@@ -51,6 +51,11 @@ void Proxsens::edgeChangeCallback(const hal_pigpio_interfaces::msg::HalPigpioEdg
             lastEdgeChangeType = edgeChangeType;
             lastTimestamp = timestamp;
         }
+        else
+        {
+            lastEdgeChangeType = FALLING_EDGE;
+            lastTimestamp = timestamp;
+        }
     }
 }
 

@@ -4,10 +4,23 @@
 #include "hal_proxsens.hpp"
 
 #define PROX_SENS_DISTANCE_10CM 10
+#define PROX_SENS_DISTANCE_100CM 100
 #define PROX_SENS_DISTANCE_DEFAULT_VALUE UINT16_MAX
 
 using namespace std::placeholders;
 using namespace std::chrono_literals;
+
+const hal_pigpio_interfaces::msg::HalPigpioEdgeChange & edgeChangeMessage(uint8_t gpioId, uint8_t edgeChangeType, uint32_t timeSinceBoot_us)
+{
+    auto message = hal_pigpio_interfaces::msg::HalPigpioEdgeChange();
+
+    message.gpio_id = gpioId;
+    message.edge_change_type = edgeChangeType;
+    message.time_since_boot_us = timeSinceBoot_us;
+    const hal_pigpio_interfaces::msg::HalPigpioEdgeChange  &messageToSend = message;
+
+    return messageToSend;
+}
 
 class ProxsensCheckerNode : public rclcpp::Node
 {
@@ -27,7 +40,7 @@ private :
     rclcpp::Subscription<hal_proxsens_interfaces::msg::HalProxsens>::SharedPtr proxsensSub;
 };
 
-/* Test fixtures */
+/* Test fixture */
 class ProxsensTest : public testing::Test
 {
 protected:
@@ -52,8 +65,6 @@ protected:
         proxsens.reset();
         proxsensChecker.reset();
     }
-
-private:
 };
 
 /* Test cases */
@@ -67,44 +78,85 @@ TEST_F(ProxsensTest, sensorDistanceDefaultValue)
     ASSERT_EQ(future.get(), PROX_SENS_DISTANCE_DEFAULT_VALUE);
 }
 
-/*TEST_F(ProxsensTest, sensorDistanceFallingEdgeFirst)
-{
-    uint32_t timestampFallingEdge = 10000;
-    uint32_t timestampRisingEdge = 10590;
-
-    proxSens.edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, FALLING_EDGE, timestampFallingEdge));
-    proxSens.edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, RISING_EDGE, timestampRisingEdge));
-
-    proxSens.publishMessage();
-
-    ASSERT_EQ(proxSensPublisherMock.distanceInCm, PROX_SENS_DISTANCE_DEFAULT_VALUE);
-}
-
 TEST_F(ProxsensTest, sensorDistance10cm)
 {
     uint32_t timestampRisingEdge = 10000;
-    uint32_t timestampFallingEdge = 10590;
+    uint32_t timestampFallingEdge = 10580;
+    auto future = std::shared_future<uint16_t>(proxsensChecker->distanceInCm.get_future());
 
-    proxSens.edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, RISING_EDGE, timestampRisingEdge));
-    proxSens.edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, FALLING_EDGE, timestampFallingEdge));
+    proxsens->edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, RISING_EDGE, timestampRisingEdge));
+    proxsens->edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, FALLING_EDGE, timestampFallingEdge));
+    proxsens->publishDistance();
+    ASSERT_EQ(executor.spin_until_future_complete(future, 1s), rclcpp::FutureReturnCode::SUCCESS);
 
-    proxSens.publishMessage();
+    ASSERT_EQ(future.get(), PROX_SENS_DISTANCE_10CM);
+}
 
-    ASSERT_EQ(proxSensPublisherMock.distanceInCm, PROX_SENS_DISTANCE_10CM);
+TEST_F(ProxsensTest, sensorDistanceTwoFallingEdges)
+{
+    uint32_t timestampRisingEdge = 10000;
+    uint32_t timestampFallingEdge = 15800;
+    uint32_t timestampFirstFallingEdge = 20000;
+    uint32_t timestampSecondFallingEdge = 20580;
+    auto future = std::shared_future<uint16_t>(proxsensChecker->distanceInCm.get_future());
+
+    proxsens->edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, RISING_EDGE, timestampRisingEdge));
+    proxsens->edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, FALLING_EDGE, timestampFallingEdge));
+    proxsens->publishDistance();
+    ASSERT_EQ(executor.spin_until_future_complete(future, 1s), rclcpp::FutureReturnCode::SUCCESS);
+    ASSERT_EQ(future.get(), PROX_SENS_DISTANCE_100CM);
+
+    proxsens->edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, FALLING_EDGE, timestampFirstFallingEdge));
+    proxsens->edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, FALLING_EDGE, timestampSecondFallingEdge));
+    proxsens->publishDistance();
+    ASSERT_EQ(executor.spin_until_future_complete(future, 1s), rclcpp::FutureReturnCode::SUCCESS);
+    ASSERT_EQ(future.get(), PROX_SENS_DISTANCE_100CM);
 }
 
 TEST_F(ProxsensTest, sensorDistance10cmWithTimestampRollout)
 {
-    uint32_t timestampRisingEdge = UINT32_MAX - 295;
-    uint32_t timestampFallingEdge = 295;
+    uint32_t timestampRisingEdge = UINT32_MAX - 290;
+    uint32_t timestampFallingEdge = 290;
+    auto future = std::shared_future<uint16_t>(proxsensChecker->distanceInCm.get_future());
 
-    proxSens.edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, RISING_EDGE, timestampRisingEdge));
-    proxSens.edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, FALLING_EDGE, timestampFallingEdge));
+    proxsens->edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, RISING_EDGE, timestampRisingEdge));
+    proxsens->edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, FALLING_EDGE, timestampFallingEdge));
+    proxsens->publishDistance();
+    ASSERT_EQ(executor.spin_until_future_complete(future, 1s), rclcpp::FutureReturnCode::SUCCESS);
 
-    proxSens.publishMessage();
+    ASSERT_EQ(future.get(), PROX_SENS_DISTANCE_10CM);
+}
 
-    ASSERT_EQ(proxSensPublisherMock.distanceInCm, PROX_SENS_DISTANCE_10CM);
-}*/
+TEST_F(ProxsensTest, sensorDistanceFallingEdgeFirstWithRisingEdge)
+{
+    uint32_t timestampFirstFallingEdge = 9000;
+    uint32_t timestampRisingEdge = 10000;
+    uint32_t timestampSecondFallingEdge = 15800;
+    auto future = std::shared_future<uint16_t>(proxsensChecker->distanceInCm.get_future());
+
+    proxsens->edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, FALLING_EDGE, timestampFirstFallingEdge));
+    proxsens->edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, RISING_EDGE, timestampRisingEdge));
+    proxsens->edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, FALLING_EDGE, timestampSecondFallingEdge));
+    proxsens->publishDistance();
+    ASSERT_EQ(executor.spin_until_future_complete(future, 1s), rclcpp::FutureReturnCode::SUCCESS);
+
+    ASSERT_EQ(future.get(), PROX_SENS_DISTANCE_100CM);
+}
+
+TEST_F(ProxsensTest, sensorDistanceTwoRisingEdges)
+{
+    uint32_t timestampFirstRisingEdge = 10000;
+    uint32_t timestampSecondRisingEdge = 10580;
+    uint32_t timestampFallingEdge = 11160;
+    auto future = std::shared_future<uint16_t>(proxsensChecker->distanceInCm.get_future());
+
+    proxsens->edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, RISING_EDGE, timestampFirstRisingEdge));
+    proxsens->edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, RISING_EDGE, timestampSecondRisingEdge));
+    proxsens->edgeChangeCallback(edgeChangeMessage(PROXSENS_ECHO_GPIO, FALLING_EDGE, timestampFallingEdge));
+    proxsens->publishDistance();
+    ASSERT_EQ(executor.spin_until_future_complete(future, 1s), rclcpp::FutureReturnCode::SUCCESS);
+    ASSERT_EQ(future.get(), PROX_SENS_DISTANCE_10CM);
+}
 
 int main(int argc, char **argv)
 {
