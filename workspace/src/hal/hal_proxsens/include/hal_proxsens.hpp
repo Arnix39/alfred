@@ -28,10 +28,9 @@
 #define RISING_EDGE 1
 #define NO_CHANGE 2
 
-class Proxsens
+class Proxsens : public rclcpp::Node
 {
 private:
-    std::shared_ptr<rclcpp::Node> halProxsensNode;
     uint8_t edgeChangeType;
     uint32_t timestamp;
     uint32_t echoCallbackId;
@@ -48,7 +47,7 @@ private:
     rclcpp::Subscription<hal_pigpio_interfaces::msg::HalPigpioHeartbeat>::SharedPtr proxsensPigpioHBSub;
 
 public:
-    Proxsens(std::shared_ptr<rclcpp::Node> node);
+    Proxsens();
     ~Proxsens() = default;
     void publishDistance(void);
     void configureGpios(void);

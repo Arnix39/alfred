@@ -3,21 +3,21 @@
 using namespace std::placeholders;
 using namespace std::chrono_literals;
 
-Proxsens::Proxsens(std::shared_ptr<rclcpp::Node> node) : halProxsensNode(node),
-                                                         edgeChangeType(NO_CHANGE),
-                                                         timestamp(0),
-                                                         echoCallbackId(0),
-                                                         distanceInCm(UINT16_MAX),
-                                                         pigpioNodeStarted(false),
-                                                         isStarted(false),
-                                                         gpioSetInputClient(node->create_client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>("hal_pigpioSetInputMode")),
-                                                         gpioSetOutputClient(node->create_client<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>("hal_pigpioSetOutputMode")),
-                                                         gpioSetCallbackClient(node->create_client<hal_pigpio_interfaces::srv::HalPigpioSetCallback>("hal_pigpioSetCallback")),
-                                                         gpioSendTriggerPulseClient(node->create_client<hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse>("hal_pigpioSendTriggerPulse")),
-                                                         gpioSetGpioHighClient(node->create_client<hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh>("hal_pigpioSetGpioHigh")),
-                                                         proxsensDistancePub(node->create_publisher<hal_proxsens_interfaces::msg::HalProxsens>("proxSensorValue", 1000)),
-                                                         proxsensEdgeChangeSub(node->create_subscription<hal_pigpio_interfaces::msg::HalPigpioEdgeChange>("gpioEdgeChange", 1000, std::bind(&Proxsens::edgeChangeCallback, this, _1))),
-                                                         proxsensPigpioHBSub(node->create_subscription<hal_pigpio_interfaces::msg::HalPigpioHeartbeat>("hal_pigpioHeartbeat", 1000, std::bind(&Proxsens::pigpioHeartbeatCallback, this, _1)))
+Proxsens::Proxsens() : rclcpp::Node("hal_proxsens_node"),
+                       edgeChangeType(NO_CHANGE),
+                       timestamp(0),
+                       echoCallbackId(0),
+                       distanceInCm(UINT16_MAX),
+                       pigpioNodeStarted(false),
+                       isStarted(false),
+                       gpioSetInputClient(this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>("hal_pigpioSetInputMode")),
+                       gpioSetOutputClient(this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>("hal_pigpioSetOutputMode")),
+                       gpioSetCallbackClient(this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetCallback>("hal_pigpioSetCallback")),
+                       gpioSendTriggerPulseClient(this->create_client<hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse>("hal_pigpioSendTriggerPulse")),
+                       gpioSetGpioHighClient(this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh>("hal_pigpioSetGpioHigh")),
+                       proxsensDistancePub(this->create_publisher<hal_proxsens_interfaces::msg::HalProxsens>("proxSensorValue", 1000)),
+                       proxsensEdgeChangeSub(this->create_subscription<hal_pigpio_interfaces::msg::HalPigpioEdgeChange>("gpioEdgeChange", 1000, std::bind(&Proxsens::edgeChangeCallback, this, _1))),
+                       proxsensPigpioHBSub(this->create_subscription<hal_pigpio_interfaces::msg::HalPigpioHeartbeat>("hal_pigpioHeartbeat", 1000, std::bind(&Proxsens::pigpioHeartbeatCallback, this, _1)))
 {
 }
 
@@ -81,16 +81,16 @@ void Proxsens::configureGpios(void)
 
     setInputModeRequest->gpio_id = PROXSENS_ECHO_GPIO;
     auto setInputModeResult = gpioSetInputClient->async_send_request(setInputModeRequest);
-    if (rclcpp::spin_until_future_complete(halProxsensNode, setInputModeResult) != rclcpp::FutureReturnCode::SUCCESS)
+    if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), setInputModeResult) != rclcpp::FutureReturnCode::SUCCESS)
     {
-        RCLCPP_ERROR(halProxsensNode->get_logger(), "Failed to call service setInputMode");
+        RCLCPP_ERROR(this->get_logger(), "Failed to call service setInputMode");
     }
 
     setCallbackRequest->gpio_id = PROXSENS_ECHO_GPIO;
     setCallbackRequest->edge_change_type = AS_EITHER_EDGE;
 
     auto setCallbackResult = gpioSetCallbackClient->async_send_request(setCallbackRequest);
-    if (rclcpp::spin_until_future_complete(halProxsensNode, setCallbackResult) == rclcpp::FutureReturnCode::SUCCESS)
+    if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), setCallbackResult) == rclcpp::FutureReturnCode::SUCCESS)
     {
         if (setCallbackResult.get()->has_succeeded)
         {
@@ -99,21 +99,21 @@ void Proxsens::configureGpios(void)
     }
     else
     {
-        RCLCPP_ERROR(halProxsensNode->get_logger(), "Failed to call service setCallback");
+        RCLCPP_ERROR(this->get_logger(), "Failed to call service setCallback");
     }
 
     setOutputModeForTriggerRequest->gpio_id = PROXSENS_TRIGGER_GPIO;
     auto setOutputModeForTriggerResult = gpioSetOutputClient->async_send_request(setOutputModeForTriggerRequest);
-    if (rclcpp::spin_until_future_complete(halProxsensNode, setOutputModeForTriggerResult) != rclcpp::FutureReturnCode::SUCCESS)
+    if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), setOutputModeForTriggerResult) != rclcpp::FutureReturnCode::SUCCESS)
     {
-        RCLCPP_ERROR(halProxsensNode->get_logger(), "Failed to call service setOutputMode for trigger");
+        RCLCPP_ERROR(this->get_logger(), "Failed to call service setOutputMode for trigger");
     }
 
     setOutputModeForShifterRequest->gpio_id = PROXSENS_LEVEL_SHIFTER_OE_GPIO;
     auto setOutputModeForShifterResult = gpioSetOutputClient->async_send_request(setOutputModeForShifterRequest);
-    if (rclcpp::spin_until_future_complete(halProxsensNode, setOutputModeForShifterResult) != rclcpp::FutureReturnCode::SUCCESS)
+    if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), setOutputModeForShifterResult) != rclcpp::FutureReturnCode::SUCCESS)
     {
-        RCLCPP_ERROR(halProxsensNode->get_logger(), "Failed to call service setOutputMode for shifter");
+        RCLCPP_ERROR(this->get_logger(), "Failed to call service setOutputMode for shifter");
     }
 }
 
@@ -144,6 +144,7 @@ void Proxsens::publishAndGetDistance(void)
 void Proxsens::starts(void)
 {
     isStarted = true;
+    auto timer = this->create_wall_timer(100ms, std::bind(&Proxsens::publishAndGetDistance, this));
 }
 
 bool Proxsens::isNotStarted(void)

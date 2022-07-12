@@ -5,20 +5,17 @@ using namespace std::chrono_literals;
 int main(int argc, char **argv)
 {
     rclcpp::init(argc, argv);
-    auto node = std::make_shared<rclcpp::Node>("hal_proxsens_node");
-
-    Proxsens proxSens(node);
+    auto node = std::make_shared<Proxsens>();
 
     RCLCPP_INFO(node->get_logger(),"proxSens node waiting for pigpio node to start...");
     while (rclcpp::ok())
     {
-        if (proxSens.isNotStarted() && proxSens.isPigpioNodeStarted())
+        if (node->isNotStarted() && node->isPigpioNodeStarted())
         {
             RCLCPP_INFO(node->get_logger(),"proxSens node initialising...");
-            proxSens.configureGpios();
-            proxSens.enableOutputLevelShifter();
-            proxSens.starts();
-            rclcpp::TimerBase::SharedPtr proxsensTimer(node->create_wall_timer(100ms, std::bind(&Proxsens::publishAndGetDistance, &proxSens)));
+            node->configureGpios();
+            node->enableOutputLevelShifter();
+            node->starts();
             RCLCPP_INFO(node->get_logger(),"proxSens node initialised.");
         }
 

@@ -32,9 +32,9 @@ ament_target_dependencies(${PROJECT_NAME}_node ${dependencies})
 ## Testing ##
 #############
 if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
+  #find_package(ament_lint_auto REQUIRED)
   find_package(ament_cmake_gtest REQUIRED)
-  ament_lint_auto_find_test_dependencies()
+  #ament_lint_auto_find_test_dependencies()
   
   ament_add_gtest(${PROJECT_NAME}_test test/test_hal_proxsens.cpp)
   ament_target_dependencies(${PROJECT_NAME}_test ${dependencies})
