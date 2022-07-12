@@ -14,9 +14,9 @@ include_directories(
 )
 
 set(dependencies
-rclcpp
-hal_pigpio_interfaces
-hal_proxsens_interfaces
+  rclcpp
+  hal_pigpio_interfaces
+  hal_proxsens_interfaces
 )
 
 add_library(${PROJECT_NAME} OBJECT src/hal_proxsens.cpp)

@@ -7,20 +7,21 @@
 #define PROX_SENS_DISTANCE_DEFAULT_VALUE UINT16_MAX
 
 using namespace std::placeholders;
+using namespace std::chrono_literals;
 
 class ProxsensCheckerNode : public rclcpp::Node
 {
 public : 
     ProxsensCheckerNode() : rclcpp::Node("hal_proxsens_checker_node"),
-                            proxsensSub(this->create_subscription<hal_proxsens_interfaces::msg::HalProxsens>("proxsensDistance", 1000, std::bind(&ProxsensCheckerNode::getProxsensDistance, this, _1)))
+                            proxsensSub(this->create_subscription<hal_proxsens_interfaces::msg::HalProxsens>("proxSensorValue", 1000, std::bind(&ProxsensCheckerNode::getProxsensDistance, this, _1)))
     {
     }
     ~ProxsensCheckerNode() = default;
     void getProxsensDistance(const hal_proxsens_interfaces::msg::HalProxsens &msg)
     {
-        distanceInCm = msg.distance_in_cm;
+        distanceInCm.set_value(msg.distance_in_cm);
     }
-    uint16_t distanceInCm;
+    std::promise<uint16_t> distanceInCm;
 
 private :
     rclcpp::Subscription<hal_proxsens_interfaces::msg::HalProxsens>::SharedPtr proxsensSub;
@@ -32,15 +33,22 @@ class ProxsensTest : public testing::Test
 protected:
     std::shared_ptr<Proxsens> proxsens;
     std::shared_ptr<ProxsensCheckerNode> proxsensChecker;
+    rclcpp::executors::SingleThreadedExecutor executor;
 
     void SetUp()
     {
         proxsensChecker = std::make_shared<ProxsensCheckerNode>();
         proxsens = std::make_shared<Proxsens>();
+
+        executor.add_node(proxsens);
+        executor.add_node(proxsensChecker);
     }
 
     void TearDown()
     {
+        executor.cancel();
+        executor.remove_node(proxsens);
+        executor.remove_node(proxsensChecker);
         proxsens.reset();
         proxsensChecker.reset();
     }
@@ -51,10 +59,12 @@ private:
 /* Test cases */
 TEST_F(ProxsensTest, sensorDistanceDefaultValue)
 {
-    proxsens->publishDistance();
+    auto future = std::shared_future<uint16_t>(proxsensChecker->distanceInCm.get_future());
 
-    ASSERT_EQ(proxsensChecker->distanceInCm, PROX_SENS_DISTANCE_DEFAULT_VALUE);
-    //ASSERT_EQ(proxsensChecker->distanceInCm, 0);
+    proxsens->publishDistance();
+    ASSERT_EQ(executor.spin_until_future_complete(future, 1s), rclcpp::FutureReturnCode::SUCCESS);
+
+    ASSERT_EQ(future.get(), PROX_SENS_DISTANCE_DEFAULT_VALUE);
 }
 
 /*TEST_F(ProxsensTest, sensorDistanceFallingEdgeFirst)
