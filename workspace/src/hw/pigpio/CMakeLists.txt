@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
-project(pigpio_mock)
+project(pigpio)
 
 find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
 
 ###########
 ## Build ##
@@ -12,11 +11,19 @@ include_directories(
 )
 
 set(dependencies
-  rclcpp
 )
 
-add_library(${PROJECT_NAME} SHARED src/pigpio_mock.cpp)
-ament_target_dependencies(${PROJECT_NAME} ${dependencies})
+if(BUILD_TESTING)
+  add_library(${PROJECT_NAME} SHARED src/pigpio_mock.cpp)
+  ament_target_dependencies(${PROJECT_NAME} ${dependencies})
+else()
+  add_library(${PROJECT_NAME}_command SHARED src/command.c)
+  ament_target_dependencies(${PROJECT_NAME}_command ${dependencies})
+
+  add_library(${PROJECT_NAME} SHARED src/pigpiod_if2.c)
+  ament_target_dependencies(${PROJECT_NAME} ${dependencies})
+  target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_command)
+endif()
 
 #############
 ## Install ##

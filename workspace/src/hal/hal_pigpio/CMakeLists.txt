@@ -4,12 +4,7 @@ project(hal_pigpio)
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(hal_pigpio_interfaces REQUIRED)
-if(BUILD_TESTING)
-  find_package(pigpio_mock REQUIRED)
-else()
-  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR})
-  find_package(pigpio MODULE REQUIRED)
-endif()
+find_package(pigpio REQUIRED)
 
 ###########
 ## Build ##
@@ -19,17 +14,10 @@ include_directories(
   ../include
 )
 
-if(BUILD_TESTING)
-  set(dependencies
-    rclcpp
-    hal_pigpio_interfaces
-    pigpio_mock)
-else()
-  set(dependencies
-    rclcpp
-    hal_pigpio_interfaces
-    pigpio)
-endif()
+set(dependencies
+  rclcpp
+  hal_pigpio_interfaces
+  pigpio)
 
 add_library(${PROJECT_NAME}_init OBJECT src/hal_pigpioInit.cpp)
 ament_target_dependencies(${PROJECT_NAME}_init ${dependencies})
@@ -54,9 +42,6 @@ add_executable(${PROJECT_NAME}_node
   $<TARGET_OBJECTS:${PROJECT_NAME}_i2c>
   $<TARGET_OBJECTS:${PROJECT_NAME}_imu>)
 ament_target_dependencies(${PROJECT_NAME}_node ${dependencies})
-if(!BUILD_TESTING)
-  target_link_libraries(${PROJECT_NAME}_node ${pigpio_LIBRAIRIES})
-endif()
 
 #############
 ## Testing ##
