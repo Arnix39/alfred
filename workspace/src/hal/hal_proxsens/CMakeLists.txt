@@ -44,8 +44,8 @@ endif()
 #############
 ## Install ##
 #############
-install(TARGETS
-  ${PROJECT_NAME}_node
+install(
+  TARGETS ${PROJECT_NAME}_node
   DESTINATION lib/${PROJECT_NAME}
 )
 

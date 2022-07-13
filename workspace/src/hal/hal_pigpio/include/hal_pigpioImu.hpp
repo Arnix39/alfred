@@ -11,7 +11,7 @@
 #include "hal_mpu6050.hpp"
 
 // Pigpio library
-#include <pigpiod_if2.h>
+#include "pigpiod_if2.h"
 
 // Services and messages headers (generated)
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_imu_reading.hpp"

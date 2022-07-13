@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>hal_pigpio_mock</name>
+  <name>pigpio_mock</name>
   <version>0.0.1</version>
-  <description>Mock HAL PiGpio package for Alfred</description>
+  <description>Mock package for pigpio library for Alfred</description>
 
   <!-- Maintainer, author and license information -->
   <maintainer email="arnaud.hote@gmail.com">Arnix</maintainer>
@@ -12,7 +12,6 @@
   <!-- Dependencies -->
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>hal_pigpio_interfaces</depend>
   <depend>rclcpp</depend>
 
   <test_depend>ament_lint_auto</test_depend>
