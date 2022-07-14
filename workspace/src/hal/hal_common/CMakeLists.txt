@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(pigpio)
+project(hal_common)
 
 find_package(ament_cmake REQUIRED)
 
@@ -10,20 +10,7 @@ include_directories(
   include
 )
 
-if(BUILD_TESTING)
-  add_library(${PROJECT_NAME}_pi_mock OBJECT src/mock/raspberrypi_mock.cpp)
-
-  add_library(${PROJECT_NAME} SHARED 
-    src/mock/pigpio_mock.cpp
-    $<TARGET_OBJECTS:${PROJECT_NAME}_pi_mock>)
-else()
-  add_library(${PROJECT_NAME}_command OBJECT src/command.c)
-  target_compile_options(${PROJECT_NAME}_command PRIVATE -O3 -pthread -fpic)
-
-  add_library(${PROJECT_NAME} SHARED 
-    src/pigpiod_if2.c 
-    $<TARGET_OBJECTS:${PROJECT_NAME}_command>)
-endif()
+add_library(${PROJECT_NAME} INTERFACE)
 
 #############
 ## Install ##

@@ -4,6 +4,7 @@ project(hal_pigpio)
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(hal_pigpio_interfaces REQUIRED)
+find_package(hal_common REQUIRED)
 find_package(pigpio REQUIRED)
 
 ###########
@@ -11,12 +12,12 @@ find_package(pigpio REQUIRED)
 ###########
 include_directories(
   include
-  ../include
 )
 
 set(dependencies
   rclcpp
   hal_pigpio_interfaces
+  hal_common
   pigpio)
 
 add_library(${PROJECT_NAME}_init OBJECT src/hal_pigpioInit.cpp)
