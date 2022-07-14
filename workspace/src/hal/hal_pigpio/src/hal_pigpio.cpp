@@ -3,7 +3,13 @@
 using namespace std::chrono_literals;
 
 Pigpio::Pigpio() : rclcpp_lifecycle::LifecycleNode("hal_pigpio_node"),
-                   pigpioHandle(-1)
+                   pigpioHandle(-1),
+                   i2cHandle(-1),
+                   quaternions({0.0, 0.0, 0.0, 0.0}),
+                   angles({0.0, 0.0, 0.0}),
+                   isImuReady(false),
+                   callbackList({}),
+                   motors({})
 {
 }
 
@@ -13,6 +19,9 @@ Pigpio::~Pigpio()
     {
         callback_cancel(callbackId);
     }
+
+    RCLCPP_INFO(get_logger(),"Stopping pigpio daemon.");
+    pigpio_stop(pigpioHandle);
 }
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio::on_configure(const rclcpp_lifecycle::State &)
