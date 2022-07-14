@@ -9,7 +9,6 @@ find_package(rosidl_default_generators REQUIRED)
 ################################################
 set(msg_files
   msg/HalPigpioEdgeChange.msg
-  msg/HalPigpioHeartbeat.msg
   msg/HalPigpioAngles.msg
   msg/HalPigpioEncoderCount.msg
 )
