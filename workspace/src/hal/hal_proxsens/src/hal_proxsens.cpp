@@ -3,22 +3,60 @@
 using namespace std::placeholders;
 using namespace std::chrono_literals;
 
-Proxsens::Proxsens() : rclcpp::Node("hal_proxsens_node"),
+Proxsens::Proxsens() : rclcpp_lifecycle::LifecycleNode("hal_proxsens_node"),
                        edgeChangeType(NO_CHANGE),
                        timestamp(0),
                        echoCallbackId(0),
-                       distanceInCm(UINT16_MAX),
-                       pigpioNodeStarted(false),
-                       isStarted(false),
-                       gpioSetInputClient(this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>("hal_pigpioSetInputMode")),
-                       gpioSetOutputClient(this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>("hal_pigpioSetOutputMode")),
-                       gpioSetCallbackClient(this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetCallback>("hal_pigpioSetCallback")),
-                       gpioSendTriggerPulseClient(this->create_client<hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse>("hal_pigpioSendTriggerPulse")),
-                       gpioSetGpioHighClient(this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh>("hal_pigpioSetGpioHigh")),
-                       proxsensDistancePub(this->create_publisher<hal_proxsens_interfaces::msg::HalProxsens>("proxSensorValue", 1000)),
-                       proxsensEdgeChangeSub(this->create_subscription<hal_pigpio_interfaces::msg::HalPigpioEdgeChange>("gpioEdgeChange", 1000, std::bind(&Proxsens::edgeChangeCallback, this, _1))),
-                       proxsensPigpioHBSub(this->create_subscription<hal_pigpio_interfaces::msg::HalPigpioHeartbeat>("hal_pigpioHeartbeat", 1000, std::bind(&Proxsens::pigpioHeartbeatCallback, this, _1)))
+                       distanceInCm(UINT16_MAX)
 {
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Proxsens::on_configure(const rclcpp_lifecycle::State &)
+{
+    gpioSetInputClient = this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>("hal_pigpioSetInputMode");
+    gpioSetOutputClient = this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>("hal_pigpioSetOutputMode");
+    gpioSetCallbackClient = this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetCallback>("hal_pigpioSetCallback");
+    gpioSendTriggerPulseClient = this->create_client<hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse>("hal_pigpioSendTriggerPulse");
+    gpioSetGpioHighClient = this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh>("hal_pigpioSetGpioHigh");
+
+    proxsensDistancePub = this->create_publisher<hal_proxsens_interfaces::msg::HalProxsens>("proxSensorValue", 1000);
+
+    proxsensEdgeChangeSub = this->create_subscription<hal_pigpio_interfaces::msg::HalPigpioEdgeChange>("gpioEdgeChange", 1000, std::bind(&Proxsens::edgeChangeCallback, this, _1));
+    RCLCPP_INFO(get_logger(),"proxsens node configured!");
+
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Proxsens::on_activate(const rclcpp_lifecycle::State &)
+{
+    proxsensDistancePub->on_activate();
+
+    configureGpios();
+    enableOutputLevelShifter();
+    RCLCPP_INFO(get_logger(),"proxsens node activated!");
+
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Proxsens::on_deactivate(const rclcpp_lifecycle::State &)
+{
+    proxsensDistancePub->on_deactivate();
+
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Proxsens::on_cleanup(const rclcpp_lifecycle::State &)
+{
+    proxsensDistancePub.reset();
+
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Proxsens::on_shutdown(const rclcpp_lifecycle::State & state)
+{
+    proxsensDistancePub.reset();
+
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
 void Proxsens::edgeChangeCallback(const hal_pigpio_interfaces::msg::HalPigpioEdgeChange &msg)
@@ -57,16 +95,6 @@ void Proxsens::edgeChangeCallback(const hal_pigpio_interfaces::msg::HalPigpioEdg
             lastTimestamp = timestamp;
         }
     }
-}
-
-void Proxsens::pigpioHeartbeatCallback(const hal_pigpio_interfaces::msg::HalPigpioHeartbeat &msg)
-{
-    pigpioNodeStarted = msg.is_alive;
-}
-
-bool Proxsens::isPigpioNodeStarted(void)
-{
-    return pigpioNodeStarted;
 }
 
 void Proxsens::publishDistance(void)
@@ -144,15 +172,4 @@ void Proxsens::publishAndGetDistance(void)
 {
     publishDistance();
     trigger();
-}
-
-void Proxsens::starts(void)
-{
-    isStarted = true;
-    auto timer = this->create_wall_timer(100ms, std::bind(&Proxsens::publishAndGetDistance, this));
-}
-
-bool Proxsens::isNotStarted(void)
-{
-    return !isStarted;
 }

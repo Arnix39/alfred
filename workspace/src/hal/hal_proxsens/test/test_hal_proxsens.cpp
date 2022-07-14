@@ -53,14 +53,14 @@ protected:
         proxsensChecker = std::make_shared<ProxsensCheckerNode>();
         proxsens = std::make_shared<Proxsens>();
 
-        executor.add_node(proxsens);
+        executor.add_node(proxsens->get_node_base_interface());
         executor.add_node(proxsensChecker);
     }
 
     void TearDown()
     {
         executor.cancel();
-        executor.remove_node(proxsens);
+        executor.remove_node(proxsens->get_node_base_interface());
         executor.remove_node(proxsensChecker);
         proxsens.reset();
         proxsensChecker.reset();
