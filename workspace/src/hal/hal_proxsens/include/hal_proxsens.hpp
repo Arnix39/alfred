@@ -13,7 +13,6 @@
 #include "hal_pigpio_interfaces/srv/hal_pigpio_send_trigger_pulse.hpp"
 #include "hal_pigpio_interfaces/srv/hal_pigpio_set_callback.hpp"
 #include "hal_pigpio_interfaces/msg/hal_pigpio_edge_change.hpp"
-#include "hal_pigpio_interfaces/msg/hal_pigpio_heartbeat.hpp"
 #include "hal_proxsens_interfaces/msg/hal_proxsens.hpp"
 
 #define PROXSENS_TRIGGER_GPIO 5
@@ -43,7 +42,6 @@ private:
     rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh>::SharedPtr gpioSetGpioHighClient;
     rclcpp_lifecycle::LifecyclePublisher<hal_proxsens_interfaces::msg::HalProxsens>::SharedPtr proxsensDistancePub;
     rclcpp::Subscription<hal_pigpio_interfaces::msg::HalPigpioEdgeChange>::SharedPtr proxsensEdgeChangeSub;
-    rclcpp::Subscription<hal_pigpio_interfaces::msg::HalPigpioHeartbeat>::SharedPtr proxsensPigpioHBSub;
 
 public:
     Proxsens();
@@ -52,7 +50,7 @@ public:
     rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_activate(const rclcpp_lifecycle::State &);
     rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_deactivate(const rclcpp_lifecycle::State &);
     rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_cleanup(const rclcpp_lifecycle::State &);
-    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_shutdown(const rclcpp_lifecycle::State & state);
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_shutdown(const rclcpp_lifecycle::State &);
     void publishDistance(void);
     void configureGpios(void);
     void trigger(void);
