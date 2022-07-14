@@ -1,36 +1,21 @@
-#include "hal_pigpioImu.hpp"
+#include "hal_pigpio.hpp"
 
-using namespace std::chrono_literals;
-using namespace std::placeholders;
-
-PigpioImu::PigpioImu(std::shared_ptr<rclcpp::Node> node, int pigpioHandle) :    pigpioHandle(pigpioHandle),
-                                                                                halPigpioNode(node),
-                                                                                i2cHandle(-1),
-                                                                                quaternions({0, 0, 0, 0}),
-                                                                                angles({0.0, 0.0, 0.0}),
-                                                                                isImuReady(false),
-                                                                                readQuaternionsAndPublishAnglesTimer(node->create_wall_timer(5ms, std::bind(&PigpioImu::readQuaternionsAndPublishAngles, this))),
-                                                                                imuReadingService(node->create_service<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading>("hal_pigpioI2cImuReading", std::bind(&PigpioImu::i2cImuReading, this, _1, _2))),
-                                                                                anglesPublisher(node->create_publisher<hal_pigpio_interfaces::msg::HalPigpioAngles>("hal_pigpioAngles", 1000))
-{
-}
-
-void PigpioImu::resetFifo()
+void Pigpio::resetFifo()
 {
     int16_t valueRead;
 
     valueRead = i2c_read_byte_data(pigpioHandle, i2cHandle, MPU6050_USER_CONTROL_REGISTER);
     if (valueRead < 0)
     {
-        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to reset FIFO!");
+        RCLCPP_ERROR(get_logger(),"Failed to reset FIFO!");
     }
     else if (i2c_write_byte_data(pigpioHandle, i2cHandle, MPU6050_USER_CONTROL_REGISTER, (static_cast<uint8_t>(valueRead) | (1 << MPU6050_FIFO_RESET_BIT))) != 0)
     {
-        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to reset FIFO!");
+        RCLCPP_ERROR(get_logger(),"Failed to reset FIFO!");
     }
 }
 
-uint16_t PigpioImu::readFifoCount()
+uint16_t Pigpio::readFifoCount()
 {
     int16_t valueRead;
     uint16_t fifoCount;
@@ -38,7 +23,7 @@ uint16_t PigpioImu::readFifoCount()
     valueRead = i2c_read_byte_data(pigpioHandle, i2cHandle, MPU6050_FIFO_COUNT_H_REGISTER);
     if (valueRead < 0)
     {
-        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to read the number of bytes in the FIFO!");
+        RCLCPP_ERROR(get_logger(),"Failed to read the number of bytes in the FIFO!");
         return 0;
     }
     else
@@ -49,7 +34,7 @@ uint16_t PigpioImu::readFifoCount()
     valueRead = i2c_read_byte_data(pigpioHandle, i2cHandle, MPU6050_FIFO_COUNT_L_REGISTER);
     if (valueRead < 0)
     {
-        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to read the number of bytes in the FIFO!");
+        RCLCPP_ERROR(get_logger(),"Failed to read the number of bytes in the FIFO!");
         return 0;
     }
     else
@@ -60,14 +45,14 @@ uint16_t PigpioImu::readFifoCount()
     return fifoCount;
 }
 
-bool PigpioImu::isFifoOverflowed(void)
+bool Pigpio::isFifoOverflowed(void)
 {
     int16_t interruptStatus;
 
     interruptStatus = i2c_read_byte_data(pigpioHandle, i2cHandle, MPU6050_INTERRUPT_STATUS_REGISTER);
     if (interruptStatus < 0)
     {
-        RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to read interrupt status!");
+        RCLCPP_ERROR(get_logger(),"Failed to read interrupt status!");
     }
     else if (static_cast<uint8_t>(interruptStatus) & MPU6050_FIFO_OVERFLOW)
     {
@@ -77,14 +62,14 @@ bool PigpioImu::isFifoOverflowed(void)
     return false;
 }
 
-void PigpioImu::readQuaternions(void)
+void Pigpio::readQuaternions(void)
 {
     uint16_t fifoCount = 0;
     char fifoData[MPU6050_DMP_FIFO_QUAT_SIZE];
 
     if (isFifoOverflowed())
     {
-        RCLCPP_ERROR(halPigpioNode->get_logger(),"FIFO has overflowed!");
+        RCLCPP_ERROR(get_logger(),"FIFO has overflowed!");
         resetFifo();
     }
     else
@@ -99,7 +84,7 @@ void PigpioImu::readQuaternions(void)
             }
             else
             {
-                RCLCPP_ERROR(halPigpioNode->get_logger(),"Failed to read FIFO!");
+                RCLCPP_ERROR(get_logger(),"Failed to read FIFO!");
                 resetFifo();
                 return;
             }
@@ -111,12 +96,12 @@ void PigpioImu::readQuaternions(void)
         }
         else
         {
-            RCLCPP_INFO(halPigpioNode->get_logger(),"Not enough samples in FIFO.");
+            RCLCPP_INFO(get_logger(),"Not enough samples in FIFO.");
         }
     }
 }
 
-void PigpioImu::computeQuaternions(char (&data)[MPU6050_DMP_FIFO_QUAT_SIZE])
+void Pigpio::computeQuaternions(char (&data)[MPU6050_DMP_FIFO_QUAT_SIZE])
 {
     quaternions.w = static_cast<float>((static_cast<int32_t>(data[0]) << 24) | (static_cast<int32_t>(data[1]) << 16) | (static_cast<int32_t>(data[2]) << 8) | data[3]) / MPU6050_QUATERNION_SCALE;
     quaternions.x = static_cast<float>((static_cast<int32_t>(data[4]) << 24) | (static_cast<int32_t>(data[5]) << 16) | (static_cast<int32_t>(data[6]) << 8) | data[7]) / MPU6050_QUATERNION_SCALE;
@@ -124,7 +109,7 @@ void PigpioImu::computeQuaternions(char (&data)[MPU6050_DMP_FIFO_QUAT_SIZE])
     quaternions.z = static_cast<float>((static_cast<int32_t>(data[12]) << 24) | (static_cast<int32_t>(data[13]) << 16) | (static_cast<int32_t>(data[14]) << 8) | data[15]) / MPU6050_QUATERNION_SCALE;
 }
 
-void PigpioImu::publishAngles(void)
+void Pigpio::publishAngles(void)
 {
     auto message = hal_pigpio_interfaces::msg::HalPigpioAngles();
     
@@ -134,7 +119,7 @@ void PigpioImu::publishAngles(void)
     anglesPublisher->publish(message);
 }
 
-void PigpioImu::computeAngles()
+void Pigpio::computeAngles()
 {
     // phi (x-axis rotation)
     float tanPhi = 2 * (quaternions.y * quaternions.z - quaternions.w * quaternions.x);
@@ -151,7 +136,7 @@ void PigpioImu::computeAngles()
     angles.psi = std::atan2(tanPsi, quadrantPsi) * 180 / M_PI;
 }
 
-void PigpioImu::readQuaternionsAndPublishAngles()
+void Pigpio::readQuaternionsAndPublishAngles()
 {
     if (isImuReady)
     {
@@ -161,7 +146,7 @@ void PigpioImu::readQuaternionsAndPublishAngles()
     }
 }
 
-void PigpioImu::i2cImuReading(const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading::Request> request,
+void Pigpio::i2cImuReading(const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading::Request> request,
                               std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading::Response> response)
 {
     (void)response;
