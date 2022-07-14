@@ -10,19 +10,19 @@ include_directories(
   include
 )
 
-set(dependencies
-)
-
 if(BUILD_TESTING)
-  add_library(${PROJECT_NAME} SHARED src/pigpio_mock.cpp)
-  ament_target_dependencies(${PROJECT_NAME} ${dependencies})
-else()
-  add_library(${PROJECT_NAME}_command SHARED src/command.c)
-  ament_target_dependencies(${PROJECT_NAME}_command ${dependencies})
+  add_library(${PROJECT_NAME}_pi_mock OBJECT src/mock/raspberrypi_mock.cpp)
 
-  add_library(${PROJECT_NAME} SHARED src/pigpiod_if2.c)
-  ament_target_dependencies(${PROJECT_NAME} ${dependencies})
-  target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_command)
+  add_library(${PROJECT_NAME} SHARED 
+    src/mock/pigpio_mock.cpp
+    $<TARGET_OBJECTS:${PROJECT_NAME}_pi_mock>)
+else()
+  add_library(${PROJECT_NAME}_command OBJECT src/command.c)
+  target_compile_options(${PROJECT_NAME}_command PRIVATE -O3 -pthread -fpic)
+
+  add_library(${PROJECT_NAME} SHARED 
+    src/pigpiod_if2.c 
+    $<TARGET_OBJECTS:${PROJECT_NAME}_command>)
 endif()
 
 #############
