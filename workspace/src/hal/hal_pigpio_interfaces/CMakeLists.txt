@@ -14,7 +14,6 @@ set(msg_files
 )
 
 set(srv_files
-  srv/HalPigpioGetHandle.srv
   srv/HalPigpioGetMode.srv
   srv/HalPigpioSetInputMode.srv
   srv/HalPigpioSetOutputMode.srv
