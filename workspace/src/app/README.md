@@ -1,1 +1,1 @@
-This directory contains the application layer (`app`) components.
+This directory contains the application layer (`app`) packages.

@@ -1,1 +1,1 @@
-This package APIs to access Raspberry Pi GPIOs.
+This package contains the library (pigpio) to access Raspberry Pi GPIOs.

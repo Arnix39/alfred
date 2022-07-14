@@ -1,1 +1,1 @@
-This directory contains the hardware abstraction layer (`hal`) components.
+This directory contains the hardware abstraction layer (`hal`) packages.
