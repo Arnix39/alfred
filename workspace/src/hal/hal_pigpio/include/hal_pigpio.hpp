@@ -49,9 +49,9 @@ private:
     rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioSetGpioLow>::SharedPtr setGpioLowService;
     rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse>::SharedPtr sendTriggerPulseService;
 
-    rclcpp::Publisher<hal_pigpio_interfaces::msg::HalPigpioEdgeChange>::SharedPtr gpioEdgeChangePub;
-    rclcpp::Publisher<hal_pigpio_interfaces::msg::HalPigpioEncoderCount>::SharedPtr gpioEncoderCountPub;
-    rclcpp::Publisher<hal_pigpio_interfaces::msg::HalPigpioAngles>::SharedPtr anglesPublisher;
+    rclcpp_lifecycle::LifecyclePublisher<hal_pigpio_interfaces::msg::HalPigpioEdgeChange>::SharedPtr gpioEdgeChangePub;
+    rclcpp_lifecycle::LifecyclePublisher<hal_pigpio_interfaces::msg::HalPigpioEncoderCount>::SharedPtr gpioEncoderCountPub;
+    rclcpp_lifecycle::LifecyclePublisher<hal_pigpio_interfaces::msg::HalPigpioAngles>::SharedPtr anglesPublisher;
 
     rclcpp::TimerBase::SharedPtr readQuaternionsAndPublishAnglesTimer;
     rclcpp::TimerBase::SharedPtr encoderCountTimer;
@@ -63,7 +63,7 @@ private:
 
 public:
     Pigpio();
-    ~Pigpio();
+    ~Pigpio() = default;
 
     rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_configure(const rclcpp_lifecycle::State &);
     rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_activate(const rclcpp_lifecycle::State &);

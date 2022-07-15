@@ -147,7 +147,7 @@ void Pigpio::readQuaternionsAndPublishAngles()
 }
 
 void Pigpio::i2cImuReading(const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading::Request> request,
-                              std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading::Response> response)
+                           std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading::Response> response)
 {
     (void)response;
     
