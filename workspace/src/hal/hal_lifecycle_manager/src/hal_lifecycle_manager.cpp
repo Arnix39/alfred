@@ -1,9 +1,5 @@
 #include "hal_lifecycle_manager.hpp"
 
-int main(int argc, char **argv)
+HalLifecycleManager::HalLifecycleManager() :  rclcpp::Node("hal_lifecycle_manager_node")
 {
-    rclcpp::init(argc, argv);
-
-    rclcpp::shutdown();
-    return 0;
 }
