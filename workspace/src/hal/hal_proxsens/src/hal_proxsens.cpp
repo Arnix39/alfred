@@ -42,6 +42,11 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Proxse
 {
     proxsensDistancePub->on_deactivate();
 
+    edgeChangeType = NO_CHANGE;
+    timestamp = 0;
+    echoCallbackId = 0;
+    distanceInCm = UINT16_MAX;
+
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
