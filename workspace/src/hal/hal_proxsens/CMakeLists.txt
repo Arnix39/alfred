@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.8)
 project(hal_proxsens)
 
 find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(hal_pigpio_interfaces REQUIRED)
 find_package(hal_proxsens_interfaces REQUIRED)
@@ -15,7 +14,6 @@ include_directories(
 )
 
 set(dependencies
-  rclcpp
   rclcpp_lifecycle
   hal_pigpio_interfaces
   hal_proxsens_interfaces

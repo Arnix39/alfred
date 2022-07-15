@@ -14,13 +14,13 @@ Pigpio::Pigpio() : rclcpp_lifecycle::LifecycleNode("hal_pigpio_node"),
 {
 }
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio::on_configure(const rclcpp_lifecycle::State &)
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio::on_configure(const rclcpp_lifecycle::State & previous_state)
 {
     pigpioHandle = pigpio_start(NULL, NULL);
     if (pigpioHandle < 0)
     {
         RCLCPP_ERROR(get_logger(),"Pigpio daemon not running!");
-        return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::FAILURE;
+        return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::ERROR;
     }
 
     RCLCPP_INFO(get_logger(),"Pigpio handle: %d.", pigpioHandle);
@@ -62,7 +62,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio::on_activate(const rclcpp_lifecycle::State &)
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio::on_activate(const rclcpp_lifecycle::State & previous_state)
 {
     gpioEdgeChangePub->on_activate();
     gpioEncoderCountPub->on_activate();
@@ -73,7 +73,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio::on_deactivate(const rclcpp_lifecycle::State &)
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio::on_deactivate(const rclcpp_lifecycle::State & previous_state)
 {
     gpioEdgeChangePub->on_deactivate();
     gpioEncoderCountPub->on_deactivate();
@@ -90,7 +90,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio::on_cleanup(const rclcpp_lifecycle::State &)
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio::on_cleanup(const rclcpp_lifecycle::State & previous_state)
 {
     for (uint callbackId : callbackList)
     {
@@ -119,7 +119,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio::on_shutdown(const rclcpp_lifecycle::State &)
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio::on_shutdown(const rclcpp_lifecycle::State & previous_state)
 {
     for (uint callbackId : callbackList)
     {
@@ -146,4 +146,9 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio
     RCLCPP_INFO(get_logger(),"hal_pigpio node shutdown!");
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio::on_error(const rclcpp_lifecycle::State & previous_state)
+{    
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::FAILURE;
 }
