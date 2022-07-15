@@ -129,7 +129,7 @@ void Proxsens::configureGpios(void)
     auto setInputModeResult = gpioSetInputClient->async_send_request(setInputModeRequest);
     if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), setInputModeResult) != rclcpp::FutureReturnCode::SUCCESS)
     {
-        RCLCPP_ERROR(this->get_logger(), "Failed to call service setInputMode");
+        RCLCPP_ERROR(get_logger(), "Failed to call service setInputMode");
     }
 
     setCallbackRequest->gpio_id = PROXSENS_ECHO_GPIO;
@@ -145,21 +145,21 @@ void Proxsens::configureGpios(void)
     }
     else
     {
-        RCLCPP_ERROR(this->get_logger(), "Failed to call service setCallback");
+        RCLCPP_ERROR(get_logger(), "Failed to call service setCallback");
     }
 
     setOutputModeForTriggerRequest->gpio_id = PROXSENS_TRIGGER_GPIO;
     auto setOutputModeForTriggerResult = gpioSetOutputClient->async_send_request(setOutputModeForTriggerRequest);
     if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), setOutputModeForTriggerResult) != rclcpp::FutureReturnCode::SUCCESS)
     {
-        RCLCPP_ERROR(this->get_logger(), "Failed to call service setOutputMode for trigger");
+        RCLCPP_ERROR(get_logger(), "Failed to call service setOutputMode for trigger");
     }
 
     setOutputModeForShifterRequest->gpio_id = PROXSENS_LEVEL_SHIFTER_OE_GPIO;
     auto setOutputModeForShifterResult = gpioSetOutputClient->async_send_request(setOutputModeForShifterRequest);
     if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), setOutputModeForShifterResult) != rclcpp::FutureReturnCode::SUCCESS)
     {
-        RCLCPP_ERROR(this->get_logger(), "Failed to call service setOutputMode for shifter");
+        RCLCPP_ERROR(get_logger(), "Failed to call service setOutputMode for shifter");
     }
 }
 
