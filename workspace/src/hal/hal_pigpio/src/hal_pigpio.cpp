@@ -57,6 +57,8 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio
     readQuaternionsAndPublishAnglesTimer = create_wall_timer(5ms, std::bind(&Pigpio::readQuaternionsAndPublishAngles, this));
     encoderCountTimer = create_wall_timer(5ms, std::bind(&Pigpio::publishEncoderCount, this));
 
+    RCLCPP_INFO(get_logger(),"hal_pigpio node configured!");
+
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
@@ -65,6 +67,8 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio
     gpioEdgeChangePub->on_activate();
     gpioEncoderCountPub->on_activate();
     anglesPublisher->on_activate();
+
+    RCLCPP_INFO(get_logger(),"hal_pigpio node activated!");
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -80,6 +84,8 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio
     angles = {0.0, 0.0, 0.0};
 
     i2cHandle = PI_NO_HANDLE;
+
+    RCLCPP_INFO(get_logger(),"hal_pigpio node deactivated!");
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -108,6 +114,8 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio
         pigpioHandle = PI_NO_HANDLE;
     }
 
+    RCLCPP_INFO(get_logger(),"hal_pigpio node unconfigured!");
+
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
@@ -134,6 +142,8 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio
         pigpio_stop(pigpioHandle);
         pigpioHandle = PI_NO_HANDLE;
     }
+
+    RCLCPP_INFO(get_logger(),"hal_pigpio node shutdown!");
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
