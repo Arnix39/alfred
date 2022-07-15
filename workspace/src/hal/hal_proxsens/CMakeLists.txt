@@ -10,22 +10,19 @@ find_package(hal_proxsens_interfaces REQUIRED)
 ## Build ##
 ###########
 include_directories(
-  include
-)
+  include)
 
 set(dependencies
   rclcpp_lifecycle
   hal_pigpio_interfaces
-  hal_proxsens_interfaces
-)
+  hal_proxsens_interfaces)
 
 add_library(${PROJECT_NAME} OBJECT src/hal_proxsens.cpp)
 ament_target_dependencies(${PROJECT_NAME} ${dependencies})
 
 add_executable(${PROJECT_NAME}_node 
   src/hal_proxsens_node.cpp
-  $<TARGET_OBJECTS:${PROJECT_NAME}> 
-)
+  $<TARGET_OBJECTS:${PROJECT_NAME}>)
 ament_target_dependencies(${PROJECT_NAME}_node ${dependencies})
 
 #############
@@ -46,7 +43,6 @@ endif()
 #############
 install(
   TARGETS ${PROJECT_NAME}_node
-  DESTINATION lib/${PROJECT_NAME}
-)
+  DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
