@@ -4,8 +4,8 @@ using namespace std::chrono_literals;
 using namespace std::placeholders;
 
 Pigpio::Pigpio() : rclcpp_lifecycle::LifecycleNode("hal_pigpio_node"),
-                   pigpioHandle(-1),
-                   i2cHandle(-1),
+                   pigpioHandle(PI_NO_HANDLE),
+                   i2cHandle(PI_NO_HANDLE),
                    quaternions({0.0, 0.0, 0.0, 0.0}),
                    angles({0.0, 0.0, 0.0}),
                    isImuReady(false),
@@ -75,6 +75,12 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio
     gpioEncoderCountPub->on_deactivate();
     anglesPublisher->on_deactivate();
 
+    isImuReady = false;
+    quaternions = {0.0, 0.0, 0.0, 0.0};
+    angles = {0.0, 0.0, 0.0};
+
+    i2cHandle = PI_NO_HANDLE;
+
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
@@ -84,6 +90,9 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio
     {
         callback_cancel(callbackId);
     }
+    callbackList.clear();
+
+    motors.clear();
 
     gpioEdgeChangePub.reset();
     gpioEncoderCountPub.reset();
@@ -91,12 +100,27 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio
 
     readQuaternionsAndPublishAnglesTimer.reset();
     encoderCountTimer.reset();
+
+    if (pigpioHandle >= 0)
+    {
+        RCLCPP_INFO(get_logger(),"Releasing pigpio daemon.");
+        pigpio_stop(pigpioHandle);
+        pigpioHandle = PI_NO_HANDLE;
+    }
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio::on_shutdown(const rclcpp_lifecycle::State &)
 {
+    for (uint callbackId : callbackList)
+    {
+        callback_cancel(callbackId);
+    }
+    callbackList.clear();
+
+    motors.clear();
+
     gpioEdgeChangePub.reset();
     gpioEncoderCountPub.reset();
     anglesPublisher.reset();
@@ -104,8 +128,12 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio
     readQuaternionsAndPublishAnglesTimer.reset();
     encoderCountTimer.reset();
 
-    RCLCPP_INFO(get_logger(),"Releasing pigpio daemon.");
-    pigpio_stop(pigpioHandle);
+    if (pigpioHandle >= 0)
+    {
+        RCLCPP_INFO(get_logger(),"Releasing pigpio daemon.");
+        pigpio_stop(pigpioHandle);
+        pigpioHandle = PI_NO_HANDLE;
+    }
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
