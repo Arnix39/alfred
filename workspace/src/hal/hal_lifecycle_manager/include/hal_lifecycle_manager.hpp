@@ -11,6 +11,10 @@
 class HalLifecycleManager : public rclcpp::Node
 {
 private:
+    std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::GetState>> hal_pigpio_node_get_state;
+    std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::GetState>> hal_proxsens_node_get_state;
+    std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::ChangeState>> hal_pigpio_node_change_state;
+    std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::ChangeState>> hal_proxsens_node_change_state;
 
 public:
     HalLifecycleManager();
