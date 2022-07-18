@@ -1,6 +1,8 @@
 #ifndef HAL_LIFECYCLE_MANAGER
 #define HAL_LIFECYCLE_MANAGER
 
+#include <chrono>
+
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_lifecycle/lifecycle_node.hpp"
 #include "lifecycle_msgs/msg/state.hpp"
@@ -18,6 +20,9 @@ private:
 
 public:
     HalLifecycleManager();
+    void ActivateNodes(void);
+    void DeactivateNodes(void);
+    void ShutdownNodes(void);
 };
 
 #endif
