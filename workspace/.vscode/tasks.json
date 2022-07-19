@@ -12,6 +12,16 @@
             "problemMatcher": "$gcc"
         },
         {
+            "label": "ROS2: Build workspace for Raspberry Pi 3B+",
+            "type": "shell",
+            "command": "../cross_compile.sh",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": "$gcc"
+        },
+        {
             "label": "ROS2: Run tests",
             "detail": "Run all unit tests and show results.",
             "type": "shell",

@@ -6,3 +6,4 @@ workspace/cc_internals/
 workspace/install_aarch64/
 workspace/log/
 workspace/install
+cross_compile/sysroot

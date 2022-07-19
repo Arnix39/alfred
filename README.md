@@ -28,5 +28,4 @@ The Pi's code is using some librairies:
 I am planning to use [Hubris](https://oxidecomputer.github.io/hubris/) (a small OS written in `Rust`) to run on the remote.
 
 ## Tooling
-[`ros_cross_compile`](https://github.com/ros-tooling/cross_compile) is used to compile the project (that is written in `C++`) for the Raspberry Pi on a desktop machine. The ROS packages are then deployed manually to the Raspberry Pi.
 `Cargo` is used to compile the remote's code (written in `Rust`).
