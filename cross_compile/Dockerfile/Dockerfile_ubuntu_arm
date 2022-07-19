@@ -21,7 +21,8 @@ RUN apt update && apt install -y \
     libpcre3-dev \
     bash-completion \
     dirmngr \
-    gnupg2
+    gnupg2 \
+    python3.10
 
 # ROS2 dependencies
 RUN apt install -y --no-install-recommends \

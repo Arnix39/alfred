@@ -1,9 +1,11 @@
 #!/bin/sh
 
-mkdir cross_compile/qemu-user-static
-mkdir cross_compile/workspace
-
 cd cross_compile
+
+if [ -d "sysroot" ]; then rm -Rf sysroot; fi
+
+mkdir qemu-user-static
+mkdir workspace
 
 cp /usr/bin/qemu-*-static qemu-user-static
 cp -r ../workspace/src workspace
@@ -12,7 +14,7 @@ docker build -t arm_ros2:latest -f ./Dockerfile/Dockerfile_ubuntu_arm .
 docker run --name arm_sysroot arm_ros2:latest
 
 docker container export -o sysroot.tar arm_sysroot
-mkdir -p sysroot
+mkdir sysroot
 tar -C sysroot -xf sysroot.tar lib usr opt etc
 docker rm arm_sysroot
 

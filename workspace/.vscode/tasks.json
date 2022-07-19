@@ -16,8 +16,7 @@
             "type": "shell",
             "command": "../cross_compile.sh",
             "group": {
-                "kind": "build",
-                "isDefault": true
+                "kind": "build"
             },
             "problemMatcher": "$gcc"
         },
