@@ -29,11 +29,11 @@
 #define RISING_EDGE 1
 #define NO_CHANGE 2
 
-typedef rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>::SharedFuture SetInputModeFuture_t;
-typedef rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetCallback>::SharedFuture SetCallbackFuture_t;
-typedef rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>::SharedFuture SetOutputModeFuture_t;
-typedef rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse>::SharedFuture SendTriggerPulseFuture_t;
-typedef rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh>::SharedFuture SetGpioHighFuture_t;
+using SetInputModeFuture_t = rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>::SharedFuture;
+using SetCallbackFuture_t = rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetCallback>::SharedFuture;
+using SetOutputModeFuture_t = rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>::SharedFuture;
+using SendTriggerPulseFuture_t = rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse>::SharedFuture;
+using SetGpioHighFuture_t = rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh>::SharedFuture;
 
 class Proxsens : public rclcpp_lifecycle::LifecycleNode
 {
