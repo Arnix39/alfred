@@ -131,41 +131,54 @@ void Proxsens::configureGpios(void)
     auto setCallbackRequest = std::make_shared<hal_pigpio_interfaces::srv::HalPigpioSetCallback::Request>();
 
     setInputModeRequest->gpio_id = PROXSENS_ECHO_GPIO;
-    auto setInputModeResult = gpioSetInputClient->async_send_request(setInputModeRequest);
-    if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), setInputModeResult) != rclcpp::FutureReturnCode::SUCCESS)
+    auto setInputModecallback = [this](SetInputModeFuture_t future) 
     {
-        RCLCPP_ERROR(get_logger(), "Failed to call service setInputMode");
-    }
+        auto hasSucceeded = future.get()->has_succeeded;
+        if(!hasSucceeded)
+        {
+            RCLCPP_ERROR(get_logger(), "Failed to call service setInputMode");
+        }   
+    };
+    auto setInputModeFuture = gpioSetInputClient->async_send_request(setInputModeRequest, setInputModecallback);
 
     setCallbackRequest->gpio_id = PROXSENS_ECHO_GPIO;
     setCallbackRequest->edge_change_type = AS_EITHER_EDGE;
-
-    auto setCallbackResult = gpioSetCallbackClient->async_send_request(setCallbackRequest);
-    if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), setCallbackResult) == rclcpp::FutureReturnCode::SUCCESS)
+    auto setCallbackCallback = [this](SetCallbackFuture_t future) 
     {
-        if (setCallbackResult.get()->has_succeeded)
+        auto hasSucceeded = future.get()->has_succeeded;
+        if(hasSucceeded)
         {
-            echoCallbackId = setCallbackResult.get()->callback_id;
+            echoCallbackId = future.get()->callback_id;
         }
-    }
-    else
-    {
-        RCLCPP_ERROR(get_logger(), "Failed to call service setCallback");
-    }
+        else
+        {
+            RCLCPP_ERROR(get_logger(), "Failed to call service setCallback");
+        }
+            
+    };
+    auto setCallbackResult = gpioSetCallbackClient->async_send_request(setCallbackRequest, setCallbackCallback);
 
     setOutputModeForTriggerRequest->gpio_id = PROXSENS_TRIGGER_GPIO;
-    auto setOutputModeForTriggerResult = gpioSetOutputClient->async_send_request(setOutputModeForTriggerRequest);
-    if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), setOutputModeForTriggerResult) != rclcpp::FutureReturnCode::SUCCESS)
+    auto setOutputModeForTriggerCallback = [this](SetOutputModeFuture_t future) 
     {
-        RCLCPP_ERROR(get_logger(), "Failed to call service setOutputMode for trigger");
-    }
+        auto hasSucceeded = future.get()->has_succeeded;
+        if(!hasSucceeded)
+        {
+            RCLCPP_ERROR(get_logger(), "Failed to call service setOutputMode for trigger");
+        }   
+    };
+    auto setOutputModeForTriggerResult = gpioSetOutputClient->async_send_request(setOutputModeForTriggerRequest, setOutputModeForTriggerCallback);
 
     setOutputModeForShifterRequest->gpio_id = PROXSENS_LEVEL_SHIFTER_OE_GPIO;
-    auto setOutputModeForShifterResult = gpioSetOutputClient->async_send_request(setOutputModeForShifterRequest);
-    if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), setOutputModeForShifterResult) != rclcpp::FutureReturnCode::SUCCESS)
+    auto setOutputModeForShifterCallback = [this](SetOutputModeFuture_t future) 
     {
-        RCLCPP_ERROR(get_logger(), "Failed to call service setOutputMode for shifter");
-    }
+        auto hasSucceeded = future.get()->has_succeeded;
+        if(!hasSucceeded)
+        {
+            RCLCPP_ERROR(get_logger(), "Failed to call service setOutputMode for shifter");
+        }   
+    };
+    auto setOutputModeForShifterResult = gpioSetOutputClient->async_send_request(setOutputModeForShifterRequest, setOutputModeForShifterCallback);
 }
 
 void Proxsens::trigger(void)
@@ -174,8 +187,15 @@ void Proxsens::trigger(void)
 
     sendTriggerPulseRequest->gpio_id = PROXSENS_TRIGGER_GPIO;
     sendTriggerPulseRequest->pulse_length_in_us = PROXSENS_TRIGGER_LENGTH_US;
-
-    auto sendTriggerPulseResult = gpioSendTriggerPulseClient->async_send_request(sendTriggerPulseRequest);
+    auto sendTriggerPulseCallback = [this](SendTriggerPulseFuture_t future) 
+    {
+        auto hasSucceeded = future.get()->has_succeeded;
+        if(!hasSucceeded)
+        {
+            RCLCPP_ERROR(get_logger(), "Failed to call service sendTriggerPulse");
+        }   
+    };
+    auto sendTriggerPulseResult = gpioSendTriggerPulseClient->async_send_request(sendTriggerPulseRequest, sendTriggerPulseCallback);
 }
 
 void Proxsens::enableOutputLevelShifter(void)
@@ -183,7 +203,15 @@ void Proxsens::enableOutputLevelShifter(void)
     auto setGpioHighRequest = std::make_shared<hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh::Request>();
 
     setGpioHighRequest->gpio_id = PROXSENS_LEVEL_SHIFTER_OE_GPIO;
-    auto setGpioHighResult = gpioSetGpioHighClient->async_send_request(setGpioHighRequest);
+    auto setGpioHighCallback = [this](SetGpioHighFuture_t future) 
+    {
+        auto hasSucceeded = future.get()->has_succeeded;
+        if(!hasSucceeded)
+        {
+            RCLCPP_ERROR(get_logger(), "Failed to call service sendTriggerPulse");
+        }   
+    };
+    auto setGpioHighResult = gpioSetGpioHighClient->async_send_request(setGpioHighRequest,setGpioHighCallback);
 }
 
 void Proxsens::publishAndGetDistance(void)
