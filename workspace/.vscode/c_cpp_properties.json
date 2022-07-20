@@ -3,7 +3,7 @@
       {
           "name": "ROS2",
           "includePath": [
-              "${workspaceFolder}/**",
+              "${workspaceFolder}/**"
           ],
           "defines": [],
           "compilerPath": "/usr/bin/g++",
