@@ -11,12 +11,9 @@
 
   <!-- Dependencies -->
   <buildtool_depend>ament_cmake</buildtool_depend>
-  
-  <build_depend>rclcpp_lifecycle</build_depend>
-  <build_depend>lifecycle_msgs</build_depend>
 
-  <exec_depend>rclcpp_lifecycle</exec_depend>
-  <exec_depend>lifecycle_msgs</exec_depend>
+  <exec_depend>hal_pigpio</exec_depend>
+  <exec_depend>hal_proxsens</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
