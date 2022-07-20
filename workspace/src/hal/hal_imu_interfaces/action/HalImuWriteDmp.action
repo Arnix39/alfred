@@ -1,0 +1,8 @@
+#goal
+bool write
+---
+#result
+bool success
+---
+#feedback
+uint8 bank
