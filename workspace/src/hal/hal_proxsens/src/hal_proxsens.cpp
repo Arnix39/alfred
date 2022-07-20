@@ -23,7 +23,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Proxse
 
     proxsensEdgeChangeSub = this->create_subscription<hal_pigpio_interfaces::msg::HalPigpioEdgeChange>("gpioEdgeChange", 1000, std::bind(&Proxsens::edgeChangeCallback, this, _1));
     
-    RCLCPP_INFO(get_logger(),"proxsens node configured!");
+    RCLCPP_INFO(get_logger(),"hal_proxsens node configured!");
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -35,7 +35,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Proxse
     configureGpios();
     enableOutputLevelShifter();
     
-    RCLCPP_INFO(get_logger(),"proxsens node activated!");
+    RCLCPP_INFO(get_logger(),"hal_proxsens node activated!");
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -49,7 +49,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Proxse
     echoCallbackId = 0;
     distanceInCm = UINT16_MAX;
 
-    RCLCPP_INFO(get_logger(),"proxsens node deactivated!");
+    RCLCPP_INFO(get_logger(),"hal_proxsens node deactivated!");
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -58,7 +58,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Proxse
 {
     proxsensDistancePub.reset();
 
-    RCLCPP_INFO(get_logger(),"proxsens node unconfigured!");
+    RCLCPP_INFO(get_logger(),"hal_proxsens node unconfigured!");
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -67,7 +67,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Proxse
 {
     proxsensDistancePub.reset();
 
-    RCLCPP_INFO(get_logger(),"proxsens node shutdown!");
+    RCLCPP_INFO(get_logger(),"hal_proxsens node shutdown!");
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
