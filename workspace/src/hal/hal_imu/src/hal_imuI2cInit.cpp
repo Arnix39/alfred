@@ -131,7 +131,7 @@ bool ImuI2cInit::isNotStarted(void)
     return !isStarted;
 }
 
-int main(int argc, char **argv)
+/*int main(int argc, char **argv)
 {
     ros::init(argc, argv, "hal_imuI2cInit");
     ros::NodeHandle node;
@@ -160,4 +160,4 @@ int main(int argc, char **argv)
     }
 
     return 0;
-}
+}*/

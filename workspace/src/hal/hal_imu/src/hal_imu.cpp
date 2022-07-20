@@ -522,7 +522,7 @@ bool Imu::isNotStarted(void)
     return !isStarted;
 }
 
-int main(int argc, char **argv)
+/*int main(int argc, char **argv)
 {
     ros::init(argc, argv, "hal_imu");
     ros::NodeHandle node;
@@ -549,4 +549,4 @@ int main(int argc, char **argv)
     }
 
     return 0;
-}
+}*/

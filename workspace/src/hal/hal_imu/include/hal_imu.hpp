@@ -1,20 +1,19 @@
 #ifndef HAL_IMU
 #define HAL_IMU
 
-#include "ros/ros.h"
-#include <actionlib/client/simple_action_client.h>
-
-#include "hal_imuVirtuals.hpp"
+#include "rclcpp/rclcpp.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
+#include "lifecycle_msgs/msg/transition.hpp"
+#include "rclcpp_action/rclcpp_action.hpp"
 
 // Services and messages headers (generated)
-#include "hal_pigpio/hal_pigpioI2cReadByteData.h"
-#include "hal_pigpio/hal_pigpioI2cWriteByteData.h"
-#include "hal_pigpio/hal_pigpioI2cWriteBlockData.h"
-#include "hal_pigpio/hal_pigpioI2cImuReading.h"
-#include "hal_imu/hal_imuGetHandle.h"
-#include "hal_imu/hal_imuWriteDmpAction.h"
-#include "hal_imu/hal_imuMsg.h"
-#include "hal_imu/hal_imuI2cHeartbeatMsg.h"
+#include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_read_byte_data.hpp"
+#include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_write_byte_data.hpp"
+#include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_write_block_data.hpp"
+#include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_imu_reading.hpp"
+#include "hal_imu_interfaces/srv/hal_imu_get_handle.hpp"
+#include "hal_imu_interfaces/msg/hal_imu.hpp"
+#include "hal_imu_interfaces/action/hal_imu_write_dmp.hpp"
 
 #define IMU_GYROSCOPE_X_OFFSET 0
 #define IMU_GYROSCOPE_Y_OFFSET -34
@@ -34,20 +33,15 @@ struct SensorBias
     const uint8_t lsbRegister;
 };
 
-class Imu
+class Imu : public rclcpp_lifecycle::LifecycleNode
 {
 private:
-    ImuClients *imuClients;
-    ImuSubscribers *imuSubs;
     int32_t imuHandle;
     bool i2cInitialised;
-    bool isStarted;
 
 public:
-    Imu(ImuClients *imuServiceClients, ImuSubscribers *imuSubscribers);
+    Imu();
     ~Imu() = default;
-    void imuI2cInitHeartbeatCallback(const hal_imu::hal_imuI2cHeartbeatMsg &msg);
-    bool isI2cInitialised(void);
     void getI2cHandle(void);
     void init(void);
     void writeDmp(void);
@@ -61,8 +55,6 @@ public:
     bool writeDataToDmp(uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data);
     void startImuReading(void);
     void stopImuReading(void);
-    bool isNotStarted(void);
-    void starts(void);
     void setConfiguration(void);
     void setGyroscopeSensitivity(void);
     void setAccelerometerSensitivity(void);

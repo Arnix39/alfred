@@ -1,94 +1,59 @@
 cmake_minimum_required(VERSION 3.8)
-set(PROJECT_NAME hal_imu)
-project(${PROJECT_NAME})
+project(hal_imu)
 
-add_compile_options(-std=c++11)
-
-## Find catkin macros and libraries
-find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  std_msgs
-  actionlib
-  message_generation
-  hal_pigpio
-)
-
-################################################
-## Declare ROS messages, services and actions ##
-################################################
-
-## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-  hal_imuMsg.msg
-  hal_imuI2cHeartbeatMsg.msg
-)
-
-## Generate services in the 'srv' folder
-add_service_files(
-  FILES
-  hal_imuGetHandle.srv
-)
-
-## Generate action servers in the 'action' folder
-add_action_files(
-  FILES
-  hal_imuWriteDmp.action
-)
-
-## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES 
-  std_msgs
-  actionlib_msgs
-)
-
-###################################
-## catkin specific configuration ##
-###################################
-catkin_package(
-  CATKIN_DEPENDS 
-  roscpp 
-  std_msgs 
-  actionlib_msgs
-)
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclcpp_action REQUIRED)
+find_package(rclcpp_lifecycle REQUIRED)
+find_package(hal_pigpio_interfaces REQUIRED)
+find_package(hal_imu_interfaces REQUIRED)
 
 ###########
 ## Build ##
 ###########
-
 include_directories(
-  include
-  ../include
-  include/${PROJECT_NAME}
-  include/${PROJECT_NAME}DmpWritingServer
-  include/${PROJECT_NAME}I2cInit
-  ${catkin_INCLUDE_DIRS}
-)
+  include)
 
-add_library(${PROJECT_NAME}_lib src/hal_imuDmpWritingServer.cpp)
-add_dependencies(${PROJECT_NAME}_lib
-  ${catkin_EXPORTED_TARGETS}
-  ${${PROJECT_NAME}_EXPORTED_TARGETS}
-)
+set(dependencies
+  rclcpp
+  rclcpp_action
+  rclcpp_lifecycle
+  hal_pigpio_interfaces
+  hal_imu_interfaces)
 
-add_executable(${PROJECT_NAME}_node src/hal_imu.cpp)
-add_dependencies(${PROJECT_NAME}_node	${${PROJECT_NAME}_EXPORTED_TARGETS}	${catkin_EXPORTED_TARGETS})
-target_link_libraries(${PROJECT_NAME}_node
-  ${catkin_LIBRARIES}
-)
+add_library(${PROJECT_NAME} OBJECT src/hal_imu.cpp)
+ament_target_dependencies(${PROJECT_NAME} ${dependencies})
 
-add_executable(${PROJECT_NAME}I2cInit_node src/hal_imuI2cInit.cpp)
-add_dependencies(${PROJECT_NAME}I2cInit_node	${${PROJECT_NAME}_EXPORTED_TARGETS}	${catkin_EXPORTED_TARGETS})
-target_link_libraries(${PROJECT_NAME}I2cInit_node
-  ${catkin_LIBRARIES}
-)
+add_library(${PROJECT_NAME}I2cInit OBJECT src/hal_imuI2cInit.cpp)
+ament_target_dependencies(${PROJECT_NAME}I2cInit ${dependencies})
 
-add_executable(${PROJECT_NAME}DmpWritingServer_node src/hal_imuDmpWritingServer.cpp)
-add_dependencies(${PROJECT_NAME}DmpWritingServer_node	${${PROJECT_NAME}_EXPORTED_TARGETS}	${catkin_EXPORTED_TARGETS})
-target_link_libraries(${PROJECT_NAME}DmpWritingServer_node
-  ${catkin_LIBRARIES}
-)
+add_library(${PROJECT_NAME}DmpWritingServer OBJECT src/hal_imuDmpWritingServer.cpp)
+ament_target_dependencies(${PROJECT_NAME}DmpWritingServer ${dependencies})
+
+add_executable(${PROJECT_NAME}_node 
+  src/hal_imu_node.cpp
+  $<TARGET_OBJECTS:${PROJECT_NAME}>)
+ament_target_dependencies(${PROJECT_NAME}_node ${dependencies})
+
+add_executable(${PROJECT_NAME}I2cInit_node 
+  src/hal_imuI2cInit_node.cpp
+  $<TARGET_OBJECTS:${PROJECT_NAME}I2cInit>)
+ament_target_dependencies(${PROJECT_NAME}I2cInit_node ${dependencies})
+
+add_executable(${PROJECT_NAME}DmpWritingServer_node 
+  src/hal_imuDmpWritingServer_node.cpp
+  $<TARGET_OBJECTS:${PROJECT_NAME}DmpWritingServer>)
+ament_target_dependencies(${PROJECT_NAME}DmpWritingServer_node ${dependencies})
+
+#############
+## Testing ##
+#############
+if(BUILD_TESTING)
+  #find_package(ament_lint_auto REQUIRED)
+  find_package(ament_cmake_gtest REQUIRED)
+  #ament_lint_auto_find_test_dependencies()
+  
+endif()
 
 #############
 ## Install ##
@@ -97,13 +62,7 @@ install(TARGETS
   ${PROJECT_NAME}_node
   ${PROJECT_NAME}DmpWritingServer_node
   ${PROJECT_NAME}I2cInit_node
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  DESTINATION lib/${PROJECT_NAME}
 )
 
-#############
-## Testing ##
-#############
-catkin_add_gmock(${PROJECT_NAME}-test test/test_hal_imuDmpWritingServer.cpp)
-if(TARGET ${PROJECT_NAME}-test)
-  target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME}_lib ${catkin_LIBRARIES})
-endif()
+ament_package()
