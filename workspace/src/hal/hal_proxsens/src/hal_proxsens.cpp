@@ -131,7 +131,7 @@ void Proxsens::configureGpios(void)
     auto setCallbackRequest = std::make_shared<hal_pigpio_interfaces::srv::HalPigpioSetCallback::Request>();
 
     setInputModeRequest->gpio_id = PROXSENS_ECHO_GPIO;
-    auto setInputModecallback = [this](SetInputModeFuture_t future) 
+    auto setInputModeCallback = [this](SetInputModeFuture_t future) 
     {
         auto hasSucceeded = future.get()->has_succeeded;
         if(!hasSucceeded)
@@ -139,7 +139,7 @@ void Proxsens::configureGpios(void)
             RCLCPP_ERROR(get_logger(), "Failed to call service setInputMode");
         }   
     };
-    auto setInputModeFuture = gpioSetInputClient->async_send_request(setInputModeRequest, setInputModecallback);
+    auto setInputModeFuture = gpioSetInputClient->async_send_request(setInputModeRequest, setInputModeCallback);
 
     setCallbackRequest->gpio_id = PROXSENS_ECHO_GPIO;
     setCallbackRequest->edge_change_type = AS_EITHER_EDGE;
