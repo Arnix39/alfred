@@ -96,7 +96,7 @@ void Pigpio::readQuaternions(void)
         }
         else
         {
-            RCLCPP_INFO(get_logger(),"Not enough samples in FIFO.");
+            RCLCPP_INFO(get_logger(), "Not enough samples in FIFO.");
         }
     }
 }

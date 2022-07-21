@@ -72,7 +72,7 @@ void ImuDmpWritingServer::getI2cHandle(void)
 void ImuDmpWritingServer::startServer(void)
 {
     imuDmpWritingServer->getActionServerHandle()->start();
-    ROS_INFO("Action server started.");
+    RCLCPP_INFO(get_logger(), "Action server started.");
 }
 
 bool ImuDmpWritingServer::isI2cInitialised(void)
@@ -103,7 +103,7 @@ void ImuDmpWritingServer::writeDmp(void)
 
     result.success = true;
 
-    ROS_INFO("Started writing DMP code.");
+    RCLCPP_INFO(get_logger(), "Started writing DMP code.");
 
     for (uint16_t byte = 0; byte < DMP_CODE_SIZE; ++byte)
     {
@@ -120,7 +120,7 @@ void ImuDmpWritingServer::writeDmp(void)
             
             if (!writeData(bank, chunkAddressInBank, data))
             {
-                ROS_ERROR("Failed to write DMP code: chunk at address %u of bank %u not written!", chunkAddressInBank, bank);
+                RCLCPP_ERROR(get_logger(), "Failed to write DMP code: chunk at address %u of bank %u not written!", chunkAddressInBank, bank);
                 result.success = false;
                 imuDmpWritingServer->getActionServerHandle()->setAborted(result);
                 return;
@@ -134,13 +134,13 @@ void ImuDmpWritingServer::writeDmp(void)
     writeSuccess &= writeByteInRegister(MPU6050_DMP_START_ADDRESS_L_REGISTER, startAddressLsb);
     if (!writeSuccess)
     {
-        ROS_ERROR("Failed to write DMP code: start address not written!");
+        RCLCPP_ERROR(get_logger(), "Failed to write DMP code: start address not written!");
         result.success = false;
         imuDmpWritingServer->getActionServerHandle()->setAborted(result);
         return;
     }
 
-    ROS_INFO("Successfully wrote DMP code.");
+    RCLCPP_INFO(get_logger(), "Successfully wrote DMP code.");
     imuDmpWritingServer->getActionServerHandle()->setSucceeded(result);
 }
 
@@ -220,13 +220,13 @@ bool ImuDmpWritingServer::isNotStarted(void)
 
     ImuDmpWritingServer imuDmpWritingServer(&imuWriteDmpServer, &imuServiceClients, &imuDmpWritingServerSubscribers);
 
-    ROS_INFO("imuDmpWritingServer node waiting for I2C communication to be ready...");
+    RCLCPP_INFO(get_logger(), "imuDmpWritingServer node waiting for I2C communication to be ready...");
     while (ros::ok())
     {
         if (imuDmpWritingServer.isNotStarted() && imuDmpWritingServer.isI2cInitialised())
         {
             imuDmpWritingServer.getI2cHandle();
-            ROS_INFO("imuDmpWritingServer I2C communication ready.");
+            RCLCPP_INFO(get_logger(), "imuDmpWritingServer I2C communication ready.");
             imuDmpWritingServer.startServer();
             imuDmpWritingServer.starts();
         }

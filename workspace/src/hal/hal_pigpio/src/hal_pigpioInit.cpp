@@ -21,7 +21,7 @@ void Pigpio::setInputMode(const std::shared_ptr<hal_pigpio_interfaces::srv::HalP
     if (set_mode(pigpioHandle, request->gpio_id, PI_INPUT) == 0)
     {
         response->has_succeeded = true;
-        RCLCPP_INFO(get_logger(),"GPIO %u configured as input.", request->gpio_id);
+        RCLCPP_INFO(get_logger(), "GPIO %u configured as input.", request->gpio_id);
     }
     else
     {
@@ -36,7 +36,7 @@ void Pigpio::setOutputMode(const std::shared_ptr<hal_pigpio_interfaces::srv::Hal
     if (set_mode(pigpioHandle, request->gpio_id, PI_OUTPUT) == 0)
     {
         response->has_succeeded = true;
-        RCLCPP_INFO(get_logger(),"GPIO %u configured as output.", request->gpio_id);
+        RCLCPP_INFO(get_logger(), "GPIO %u configured as output.", request->gpio_id);
     }
     else
     {
@@ -51,12 +51,12 @@ void Pigpio::setPullUp(const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigp
     if (set_pull_up_down(pigpioHandle, request->gpio_id, PI_PUD_UP) == 0)
     {
         response->has_succeeded = true;
-        RCLCPP_INFO(get_logger(),"Sucessfully set pull-up resistor for GPIO %u.", request->gpio_id);
+        RCLCPP_INFO(get_logger(), "Sucessfully set pull-up resistor for GPIO %u.", request->gpio_id);
     }
     else
     {
         response->has_succeeded = true;
-        RCLCPP_INFO(get_logger(),"Failed to set pull-up resistor for GPIO %u!", request->gpio_id);
+        RCLCPP_INFO(get_logger(), "Failed to set pull-up resistor for GPIO %u!", request->gpio_id);
     }
 }
 
@@ -66,12 +66,12 @@ void Pigpio::setPullDown(const std::shared_ptr<hal_pigpio_interfaces::srv::HalPi
     if (set_pull_up_down(pigpioHandle, request->gpio_id, PI_PUD_DOWN) == 0)
     {
         response->has_succeeded = true;
-        RCLCPP_INFO(get_logger(),"Sucessfully set pull-down resistor for GPIO %u.", request->gpio_id);
+        RCLCPP_INFO(get_logger(), "Sucessfully set pull-down resistor for GPIO %u.", request->gpio_id);
     }
     else
     {
         response->has_succeeded = true;
-        RCLCPP_INFO(get_logger(),"Failed to set pull-down resistor for GPIO %u!", request->gpio_id);
+        RCLCPP_INFO(get_logger(), "Failed to set pull-down resistor for GPIO %u!", request->gpio_id);
     }
 }
 
@@ -81,11 +81,11 @@ void Pigpio::clearResistor(const std::shared_ptr<hal_pigpio_interfaces::srv::Hal
     if (set_pull_up_down(pigpioHandle, request->gpio_id, PI_PUD_OFF) == 0)
     {
         response->has_succeeded = true;
-        RCLCPP_INFO(get_logger(),"Sucessfully clear resistor for GPIO %u.", request->gpio_id);
+        RCLCPP_INFO(get_logger(), "Sucessfully clear resistor for GPIO %u.", request->gpio_id);
     }
     else
     {
         response->has_succeeded = true;
-        RCLCPP_INFO(get_logger(),"Failed to clear resistor for GPIO %u!", request->gpio_id);
+        RCLCPP_INFO(get_logger(), "Failed to clear resistor for GPIO %u!", request->gpio_id);
     }
 }

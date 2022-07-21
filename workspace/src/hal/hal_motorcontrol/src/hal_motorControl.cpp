@@ -103,7 +103,7 @@ void MotorControl::pigpioEncoderCountCallback(const hal_pigpio::hal_pigpioEncode
     }
     else
     {
-        ROS_ERROR("Encoder count message received for unknown motor!");
+        RCLCPP_ERROR(get_logger(), "Encoder count message received for unknown motor!");
     }
     
 }
@@ -162,15 +162,15 @@ int main(int argc, char **argv)
 
     ros::Rate rate(1);
 
-    ROS_INFO("motorControl node waiting for pigpio node to start...");
+    RCLCPP_INFO(get_logger(), "motorControl node waiting for pigpio node to start...");
     while (ros::ok())
     {
         if (motorControl.isNotStarted() && motorControl.isPigpioNodeStarted())
         {
-            ROS_INFO("motorControl node initialising...");
+            RCLCPP_INFO(get_logger(), "motorControl node initialising...");
             motorControl.configureMotor();
             motorControl.starts();
-            ROS_INFO("motorControl node initialised.");
+            RCLCPP_INFO(get_logger(), "motorControl node initialised.");
         }
         else if(!motorControl.isNotStarted())
         {
@@ -183,7 +183,7 @@ int main(int argc, char **argv)
                 dutycycle = 0;
             }
 
-            ROS_INFO("Dutycycle: %d.", dutycycle);
+            RCLCPP_INFO(get_logger(), "Dutycycle: %d.", dutycycle);
 
             motorControl.setPwmLeft(dutycycle, direction);
             motorControl.setPwmRight(dutycycle, direction);

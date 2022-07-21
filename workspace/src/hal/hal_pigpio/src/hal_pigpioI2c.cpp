@@ -7,7 +7,7 @@ void Pigpio::i2cOpen(const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpio
     if (response->handle >= 0)
     {
         response->has_succeeded = true;
-        RCLCPP_INFO(get_logger(),"I2C bus %u open for device %u with handle %u.", request->bus, request->address, response->handle);
+        RCLCPP_INFO(get_logger(), "I2C bus %u open for device %u with handle %u.", request->bus, request->address, response->handle);
     }
     else
     {
@@ -22,7 +22,7 @@ void Pigpio::i2cClose(const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpi
     if (i2c_close(pigpioHandle, request->handle) == 0)
     {
         response->has_succeeded = true;
-        RCLCPP_INFO(get_logger(),"I2C device with handle %u closed.", request->handle);
+        RCLCPP_INFO(get_logger(), "I2C device with handle %u closed.", request->handle);
     }
     else
     {
@@ -79,7 +79,7 @@ void Pigpio::i2cReadBlockData(const std::shared_ptr<hal_pigpio_interfaces::srv::
             response->data_block.push_back(buffer[index]);
         }
 
-        RCLCPP_INFO(get_logger(),"Successfuly read data block from register %u on device with handle %u.", request->device_register, request->handle);
+        RCLCPP_INFO(get_logger(), "Successfuly read data block from register %u on device with handle %u.", request->device_register, request->handle);
     }
     else
     {

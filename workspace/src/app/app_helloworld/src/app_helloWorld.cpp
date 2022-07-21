@@ -3,7 +3,7 @@
 
 void callback(const std_msgs::String::ConstPtr &message)
 {
-    ROS_INFO("I heard: %s", message->data.c_str());
+    RCLCPP_INFO(get_logger(), "I heard: %s", message->data.c_str());
 }
 
 int main(int argc, char **argv)

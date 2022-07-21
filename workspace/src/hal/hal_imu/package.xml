@@ -14,6 +14,7 @@
   
   <depend>hal_pigpio_interfaces</depend>
   <depend>hal_imu_interfaces</depend>
+  <depend>hal_common</depend>
 
   <build_depend>rclcpp_lifecycle</build_depend>
   <exec_depend>rclcpp_lifecycle</exec_depend>

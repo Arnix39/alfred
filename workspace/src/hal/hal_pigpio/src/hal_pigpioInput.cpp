@@ -43,7 +43,7 @@ void Pigpio::setCallback(const std::shared_ptr<hal_pigpio_interfaces::srv::HalPi
     {
         response->has_succeeded = true;
         callbackList.push_back((uint)response->callback_id);
-        RCLCPP_INFO(get_logger(),"Callback for GPIO %u configured.", request->gpio_id);
+        RCLCPP_INFO(get_logger(), "Callback for GPIO %u configured.", request->gpio_id);
     }
     else
     {
@@ -116,7 +116,7 @@ void Pigpio::setEncoderCallback(const std::shared_ptr<hal_pigpio_interfaces::srv
 
         response->has_succeeded = true;
         callbackList.push_back((uint)response->callback_id);
-        RCLCPP_INFO(get_logger(),"Encoder callback for GPIO %u configured.", request->gpio_id);
+        RCLCPP_INFO(get_logger(), "Encoder callback for GPIO %u configured.", request->gpio_id);
     }
     else
     {

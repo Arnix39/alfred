@@ -1,5 +1,4 @@
 #include "hal_imu.hpp"
-#include "hal_imuInterfaces.hpp"
 #include "hal_mpu6050.hpp"
 
 /* Subscriber interface implementation */
@@ -90,12 +89,12 @@ void Imu::init(void)
 
 void Imu::resetImu(void)
 {
-    ROS_INFO("IMU resetting...");
+    RCLCPP_INFO(get_logger(), "IMU resetting...");
 
     /* Reset MPU6050 */
     if (!writeByteInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, MPU6050_RESET))
     {
-        ROS_ERROR("Failed to reset IMU because chip couldn't be resetted.");
+        RCLCPP_ERROR(get_logger(), "Failed to reset IMU because chip couldn't be resetted.");
         return;
     }
 
@@ -104,7 +103,7 @@ void Imu::resetImu(void)
     /* Reset signal paths */
     if (!writeByteInRegister(MPU6050_SIGNAL_PATH_RESET_REGISTER, MPU6050_SIGNAL_PATH_RESET))
     {
-        ROS_ERROR("Failed to reset IMU because signal paths couldn't be resetted.");
+        RCLCPP_ERROR(get_logger(), "Failed to reset IMU because signal paths couldn't be resetted.");
         return;
     }
 
@@ -113,22 +112,22 @@ void Imu::resetImu(void)
     /* Disable sleep mode */
     if (!writeByteInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, 0x00))
     {
-        ROS_ERROR("Failed to reset IMU because sleep mode couldn't be disabled.");
+        RCLCPP_ERROR(get_logger(), "Failed to reset IMU because sleep mode couldn't be disabled.");
         return;
     }
 
-    ROS_INFO("Successfully resetted IMU.");
+    RCLCPP_INFO(get_logger(), "Successfully resetted IMU.");
 }
 
 void Imu::setClockSource(void)
 {
     if (!writeByteInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, MPU6050_CLOCK_SOURCE_PLL_X))
     {
-        ROS_ERROR("Failed to enable PLL_X clock source.");
+        RCLCPP_ERROR(get_logger(), "Failed to enable PLL_X clock source.");
     }
     else
     {
-        ROS_INFO("Successfully enabled PLL_X clock source.");
+        RCLCPP_INFO(get_logger(), "Successfully enabled PLL_X clock source.");
     }
 }
 
@@ -149,11 +148,11 @@ void Imu::setMpuRate(uint16_t rate)
 
     if (!writeByteInRegister(MPU6050_SAMPLE_RATE_REGISTER, div))
     {
-        ROS_ERROR("Failed to set MPU sample rate.");
+        RCLCPP_ERROR(get_logger(), "Failed to set MPU sample rate.");
     }
     else
     {
-        ROS_INFO("Successfully set MPU sample rate.");
+        RCLCPP_INFO(get_logger(), "Successfully set MPU sample rate.");
     }
 }
 
@@ -161,11 +160,11 @@ void Imu::setConfiguration(void)
 {
     if (!writeByteInRegister(MPU6050_CONFIGURATION_REGISTER, MPU6050_DLPF_BANDWITH_188))
     {
-        ROS_ERROR("Failed to write configuration of MPU.");
+        RCLCPP_ERROR(get_logger(), "Failed to write configuration of MPU.");
     }
     else
     {
-        ROS_INFO("Successfully wrote configuration of MPU.");
+        RCLCPP_INFO(get_logger(), "Successfully wrote configuration of MPU.");
     }
 }
 
@@ -173,11 +172,11 @@ void Imu::setAccelerometerSensitivity(void)
 {
     if (!writeByteInRegister(MPU6050_ACCELEROMETER_CONFIGURATION_REGISTER, MPU6050_ACCELEROMETER_FULL_SENSITIVITY))
     {
-        ROS_ERROR("Failed to set accelerometer sensitivity!");
+        RCLCPP_ERROR(get_logger(), "Failed to set accelerometer sensitivity!");
     }
     else
     {
-        ROS_INFO("Successfully set accelerometer sensitivity.");
+        RCLCPP_INFO(get_logger(), "Successfully set accelerometer sensitivity.");
     }
 }
 
@@ -185,11 +184,11 @@ void Imu::setGyroscopeSensitivity(void)
 {
     if (!writeByteInRegister(MPU6050_GYROSCOPE_CONFIGURATION_REGISTER, MPU6050_GYROSCOPE_FULL_SENSITIVITY))
     {
-        ROS_ERROR("Failed to set gyroscope sensitivity!");
+        RCLCPP_ERROR(get_logger(), "Failed to set gyroscope sensitivity!");
     }
     else
     {
-        ROS_INFO("Successfully set gyroscope sensitivity.");
+        RCLCPP_INFO(get_logger(), "Successfully set gyroscope sensitivity.");
     }
 }
 
@@ -197,21 +196,21 @@ void Imu::writeDmp(void)
 {
     hal_imu::hal_imuWriteDmpGoal imuDmpWritingGoal;
     imuActionClient_t imuDmpWritingClient("imuDMPWriting", true);
-    ROS_INFO("Waiting for DMP writing server...");
+    RCLCPP_INFO(get_logger(), "Waiting for DMP writing server...");
     imuDmpWritingClient.waitForServer();
-    ROS_INFO("Connected to DMP writing server.");
+    RCLCPP_INFO(get_logger(), "Connected to DMP writing server.");
     imuDmpWritingGoal.write = true;
-    ROS_INFO("Requesting DMP code writing...");
+    RCLCPP_INFO(get_logger(), "Requesting DMP code writing...");
     imuDmpWritingClient.sendGoal(imuDmpWritingGoal);
 
     imuDmpWritingClient.waitForResult();
     if (imuDmpWritingClient.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
     {
-        ROS_INFO("DMP code written successfully.");
+        RCLCPP_INFO(get_logger(), "DMP code written successfully.");
     }
     else
     {
-        ROS_ERROR("Error while writing DMP code!");
+        RCLCPP_ERROR(get_logger(), "Error while writing DMP code!");
     }
 }
 
@@ -235,28 +234,28 @@ void Imu::setDmpRate(uint16_t rate)
 
     if (!writeDataToDmp(MPU6050_DMP_SAMPLE_RATE_BANK, MPU6050_DMP_SAMPLE_RATE_ADDRESS, div_vec))
     {
-        ROS_ERROR("Failed to write DMP sample rate.");
+        RCLCPP_ERROR(get_logger(), "Failed to write DMP sample rate.");
         return;
     }
 
     if (!writeDataToDmp(MPU6050_DMP_DIVISER_BANK, MPU6050_DMP_DIVISER_ADDRESS, dmpRegisterDiviserData))
     {
-        ROS_ERROR("Failed to write DMP diviser data.");
+        RCLCPP_ERROR(get_logger(), "Failed to write DMP diviser data.");
         return;
     }
 
-    ROS_INFO("Successfully set DMP sample rate.");
+    RCLCPP_INFO(get_logger(), "Successfully set DMP sample rate.");
 }
 
 void Imu::resetFifo()
 {
     if (!writeBitInRegister(MPU6050_USER_CONTROL_REGISTER, MPU6050_FIFO_RESET_BIT, 1))
     {
-        ROS_ERROR("Failed to reset FIFO!");
+        RCLCPP_ERROR(get_logger(), "Failed to reset FIFO!");
     }
     else
     {
-        ROS_INFO("Successfully resetted FIFO.");
+        RCLCPP_INFO(get_logger(), "Successfully resetted FIFO.");
     }
 }
 
@@ -270,11 +269,11 @@ void Imu::setAccelerometerOffsets(void)
     
     if (!writeSensorBiases(accelerometerBiases))
     {
-        ROS_ERROR("Failed to set accelerometer offsets.");
+        RCLCPP_ERROR(get_logger(), "Failed to set accelerometer offsets.");
     }
     else
     {
-        ROS_INFO("Successfully set accelerometer offsets.");
+        RCLCPP_INFO(get_logger(), "Successfully set accelerometer offsets.");
     }
 }
 
@@ -288,11 +287,11 @@ void Imu::setGyroscopeOffsets(void)
     
     if (!writeSensorBiases(gyroscopeBiases))
     {
-        ROS_ERROR("Failed to set gyroscope offsets.");
+        RCLCPP_ERROR(get_logger(), "Failed to set gyroscope offsets.");
     }
     else
     {
-        ROS_INFO("Successfully set gyroscope offsets.");
+        RCLCPP_INFO(get_logger(), "Successfully set gyroscope offsets.");
     }
 }
 
@@ -305,13 +304,13 @@ bool Imu::writeSensorBiases(const std::vector<SensorBias> sensorBiases)
 
         if (!writeByteInRegister(sensorBias.msbRegister, sensorBiasMsb))
         {
-            ROS_ERROR("Failed to set sensor %c offset!", sensorBias.axis);
+            RCLCPP_ERROR(get_logger(), "Failed to set sensor %c offset!", sensorBias.axis);
             return false;
         }
 
         if (!writeByteInRegister(sensorBias.lsbRegister, sensorBiasLsb))
         {
-            ROS_ERROR("Failed to set sensor %c offset!", sensorBias.axis);
+            RCLCPP_ERROR(get_logger(), "Failed to set sensor %c offset!", sensorBias.axis);
             return false;
         }
     }
@@ -331,49 +330,49 @@ void Imu::configureDmpFeatures(void)
 
     if (!writeDataToDmp(MPU6050_DMP_FEATURE_SEND_SENSOR_DATA_BANK, MPU6050_DMP_FEATURE_SEND_SENSOR_DATA_ADDRESS, dmpNoSensorData))
     {
-        ROS_ERROR("Failed to configure DMP features (sensor data disabled)!");
+        RCLCPP_ERROR(get_logger(), "Failed to configure DMP features (sensor data disabled)!");
         return;
     }
 
     if (!writeDataToDmp(MPU6050_DMP_FEATURE_SEND_GESTURE_DATA_BANK, MPU6050_DMP_FEATURE_SEND_GESTURE_DATA_ADDRESS, dmpNoGestureData))
     {
-        ROS_ERROR("Failed to configure DMP features (gesture data disabled)!");
+        RCLCPP_ERROR(get_logger(), "Failed to configure DMP features (gesture data disabled)!");
         return;
     }
 
     if (!writeDataToDmp(MPU6050_CFG_MOTION_BIAS_BANK, MPU6050_CFG_MOTION_BIAS_ADDRESS, gyroscopeCalibrationDisabled))
     {
-        ROS_ERROR("Failed to configure DMP features (gyroscope calibration disabled)!");
+        RCLCPP_ERROR(get_logger(), "Failed to configure DMP features (gyroscope calibration disabled)!");
         return;
     }
 
     if (!writeDataToDmp(MPU6050_DMP_FEATURE_SEND_TAP_DATA_BANK, MPU6050_DMP_FEATURE_SEND_TAP_DATA_ADDRESS, dmpNoTapData))
     {
-        ROS_ERROR("Failed to configure DMP features (tap data disabled)!");
+        RCLCPP_ERROR(get_logger(), "Failed to configure DMP features (tap data disabled)!");
         return;
     }
 
     if (!writeDataToDmp(MPU6050_DMP_FEATURE_SEND_ANDROID_ORIENTATION_BANK, MPU6050_DMP_FEATURE_SEND_ANDROID_ORIENTATION_ADDRESS, dmpNoAndroidOrientation))
     {
-        ROS_ERROR("Failed to configure DMP features (android orientation disbaled)!");
+        RCLCPP_ERROR(get_logger(), "Failed to configure DMP features (android orientation disbaled)!");
         return;
     }
 
     if (!writeDataToDmp(MPU6050_DMP_FEATURE_QUATERNION_BANK, MPU6050_DMP_FEATURE_QUATERNION_ADDRESS, dmpQuaternionDisabled))
     {
-        ROS_ERROR("Failed to configure DMP features (quaternion computation disabled)!");
+        RCLCPP_ERROR(get_logger(), "Failed to configure DMP features (quaternion computation disabled)!");
         return;
     }
 
     if (!writeDataToDmp(MPU6050_DMP_FEATURE_6X_LP_QUAT_BANK, MPU6050_DMP_FEATURE_6X_LP_QUAT_ADDRESS, dmp6AxisQuaternionEnabled))
     {
-        ROS_ERROR("Failed to configure DMP features (6 axis quaternion computation enabled)!");
+        RCLCPP_ERROR(get_logger(), "Failed to configure DMP features (6 axis quaternion computation enabled)!");
         return;
     }
 
     resetFifo();
 
-    ROS_INFO("Successfully configured DMP features.");
+    RCLCPP_INFO(get_logger(), "Successfully configured DMP features.");
 }
 
 void Imu::enableDmp(void)
@@ -381,13 +380,13 @@ void Imu::enableDmp(void)
     /* Enable DMP and FIFO */
     if (!writeByteInRegister(MPU6050_USER_CONTROL_REGISTER, MPU6050_DMP_EMABLE | MPU6050_FIFO_ENABLE))
     {
-        ROS_ERROR("Failed to enable DMP!");
+        RCLCPP_ERROR(get_logger(), "Failed to enable DMP!");
         return;
     }
 
     resetFifo();
 
-    ROS_INFO("Successfully enabled DMP.");
+    RCLCPP_INFO(get_logger(), "Successfully enabled DMP.");
 }
 
 int16_t Imu::readByteFromRegister(uint8_t registerToRead)
@@ -405,7 +404,7 @@ int16_t Imu::readByteFromRegister(uint8_t registerToRead)
     }
     else
     {
-        ROS_ERROR("Failed to read byte!");
+        RCLCPP_ERROR(get_logger(), "Failed to read byte!");
         return -1;
     }
 }
@@ -473,19 +472,19 @@ bool Imu::writeDataToDmp(uint8_t bank, uint8_t addressInBank, std::vector<uint8_
 {
     if (!writeByteInRegister(MPU6050_BANK_SELECTION_REGISTER, bank))
     {
-        ROS_ERROR("Failed to write bank!");
+        RCLCPP_ERROR(get_logger(), "Failed to write bank!");
         return false;
     }
 
     if (!writeByteInRegister(MPU6050_ADDRESS_IN_BANK_REGISTER, addressInBank))
     {
-        ROS_ERROR("Failed to write address!");
+        RCLCPP_ERROR(get_logger(), "Failed to write address!");
         return false;
     }
 
     if (!writeDataBlock(MPU6050_READ_WRITE_REGISTER, data))
     {
-        ROS_ERROR("Failed to write data!");
+        RCLCPP_ERROR(get_logger(), "Failed to write data!");
         return false;
     }
 
@@ -532,16 +531,16 @@ bool Imu::isNotStarted(void)
 
     Imu imu(&imuServiceClientsRos, &imuSubscribersRos);
 
-    ROS_INFO("imu node waiting for I2C communication to be ready...");
+    RCLCPP_INFO(get_logger(), "imu node waiting for I2C communication to be ready...");
     while (ros::ok())
     {
         if (imu.isNotStarted() && imu.isI2cInitialised())
         {
             imu.getI2cHandle();
-            ROS_INFO("imu I2C communication ready.");
+            RCLCPP_INFO(get_logger(), "imu I2C communication ready.");
             imu.init();
             imu.starts();
-            ROS_INFO("imu node initialised.");
+            RCLCPP_INFO(get_logger(), "imu node initialised.");
             imu.startImuReading();
         }
 

@@ -23,7 +23,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio
         return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::ERROR;
     }
 
-    RCLCPP_INFO(get_logger(),"Pigpio handle: %d.", pigpioHandle);
+    RCLCPP_INFO(get_logger(), "Pigpio handle: %d.", pigpioHandle);
 
     i2cOpenService = this->create_service<hal_pigpio_interfaces::srv::HalPigpioI2cOpen>("hal_pigpioI2cOpen", std::bind(&Pigpio::i2cOpen, this, _1, _2));
     i2cCloseService = this->create_service<hal_pigpio_interfaces::srv::HalPigpioI2cClose>("hal_pigpioI2cClose", std::bind(&Pigpio::i2cClose, this, _1, _2));
@@ -57,7 +57,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio
     readQuaternionsAndPublishAnglesTimer = create_wall_timer(5ms, std::bind(&Pigpio::readQuaternionsAndPublishAngles, this));
     encoderCountTimer = create_wall_timer(5ms, std::bind(&Pigpio::publishEncoderCount, this));
 
-    RCLCPP_INFO(get_logger(),"hal_pigpio node configured!");
+    RCLCPP_INFO(get_logger(), "hal_pigpio node configured!");
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -68,7 +68,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio
     gpioEncoderCountPub->on_activate();
     anglesPublisher->on_activate();
 
-    RCLCPP_INFO(get_logger(),"hal_pigpio node activated!");
+    RCLCPP_INFO(get_logger(), "hal_pigpio node activated!");
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -85,7 +85,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio
 
     i2cHandle = PI_NO_HANDLE;
 
-    RCLCPP_INFO(get_logger(),"hal_pigpio node deactivated!");
+    RCLCPP_INFO(get_logger(), "hal_pigpio node deactivated!");
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -109,12 +109,12 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio
 
     if (pigpioHandle >= 0)
     {
-        RCLCPP_INFO(get_logger(),"Releasing pigpio daemon.");
+        RCLCPP_INFO(get_logger(), "Releasing pigpio daemon.");
         pigpio_stop(pigpioHandle);
         pigpioHandle = PI_NO_HANDLE;
     }
 
-    RCLCPP_INFO(get_logger(),"hal_pigpio node unconfigured!");
+    RCLCPP_INFO(get_logger(), "hal_pigpio node unconfigured!");
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -138,12 +138,12 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Pigpio
 
     if (pigpioHandle >= 0)
     {
-        RCLCPP_INFO(get_logger(),"Releasing pigpio daemon.");
+        RCLCPP_INFO(get_logger(), "Releasing pigpio daemon.");
         pigpio_stop(pigpioHandle);
         pigpioHandle = PI_NO_HANDLE;
     }
 
-    RCLCPP_INFO(get_logger(),"hal_pigpio node shutdown!");
+    RCLCPP_INFO(get_logger(), "hal_pigpio node shutdown!");
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }

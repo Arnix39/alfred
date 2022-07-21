@@ -24,7 +24,7 @@ void Pigpio::setPwmFrequency(const std::shared_ptr<hal_pigpio_interfaces::srv::H
     if ((pwmSettingResult != PI_NOT_PERMITTED) && (pwmSettingResult != PI_BAD_USER_GPIO))
     {
         response->has_succeeded = true;
-        RCLCPP_INFO(get_logger(),"Set PWM frequency of %u for GPIO %u.", request->frequency, request->gpio_id);
+        RCLCPP_INFO(get_logger(), "Set PWM frequency of %u for GPIO %u.", request->frequency, request->gpio_id);
     }
     else
     {

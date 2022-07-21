@@ -7,6 +7,7 @@ find_package(rclcpp_action REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(hal_pigpio_interfaces REQUIRED)
 find_package(hal_imu_interfaces REQUIRED)
+find_package(hal_common REQUIRED)
 
 ###########
 ## Build ##
@@ -19,7 +20,8 @@ set(dependencies
   rclcpp_action
   rclcpp_lifecycle
   hal_pigpio_interfaces
-  hal_imu_interfaces)
+  hal_imu_interfaces
+  hal_common)
 
 add_library(${PROJECT_NAME} OBJECT src/hal_imu.cpp)
 ament_target_dependencies(${PROJECT_NAME} ${dependencies})

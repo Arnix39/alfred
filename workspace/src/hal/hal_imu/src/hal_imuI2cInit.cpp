@@ -96,11 +96,11 @@ void ImuI2cInit::initI2cCommunication(void)
     if (i2cOpenSrv.response.hasSucceeded)
     {
         imuHandle = i2cOpenSrv.response.handle;
-        ROS_INFO("Handle %u received for communication with device %u on bus %u.", imuHandle, i2cOpenSrv.request.address, i2cOpenSrv.request.bus);
+        RCLCPP_INFO(get_logger(), "Handle %u received for communication with device %u on bus %u.", imuHandle, i2cOpenSrv.request.address, i2cOpenSrv.request.bus);
     }
     else
     {
-        ROS_ERROR("Unable to receive handle for communication with device %u on bus %u!", i2cOpenSrv.request.address, i2cOpenSrv.request.bus);
+        RCLCPP_ERROR(get_logger(), "Unable to receive handle for communication with device %u on bus %u!", i2cOpenSrv.request.address, i2cOpenSrv.request.bus);
     }
 }
 
@@ -144,16 +144,16 @@ bool ImuI2cInit::isNotStarted(void)
 
     ImuI2cInit imuI2cInit(&imuI2cInitServiceClients, &imuI2cInitServers, &imuI2cInitPublishers, &imuI2cInitSubscribers);
 
-    ROS_INFO("imuI2cInit node waiting for pigpio node to start...");
+    RCLCPP_INFO(get_logger(), "imuI2cInit node waiting for pigpio node to start...");
     while (ros::ok())
     {
         if (imuI2cInit.isNotStarted() && imuI2cInit.isPigpioNodeStarted())
         {
-            ROS_INFO("imuI2cInit node initialising...");
+            RCLCPP_INFO(get_logger(), "imuI2cInit node initialising...");
             imuI2cInit.initI2cCommunication();
             imuI2cInit.starts();
             heartbeatTimer = node.createTimer(ros::Duration(0.1), &ImuI2cInit::publishHeartbeat, &imuI2cInit);
-            ROS_INFO("imuI2cInit node initialised.");
+            RCLCPP_INFO(get_logger(), "imuI2cInit node initialised.");
         }
 
         ros::spinOnce();
