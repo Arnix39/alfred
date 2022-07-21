@@ -3,8 +3,8 @@
 
 #include "rclcpp_action/rclcpp_action.hpp"
 
-#include "hal_common.hpp"
-#include "hal_mpu6050.hpp"
+#include "common.hpp"
+#include "mpu6050.hpp"
 #include "hal_i2cRegistersServices.hpp"
 
 // Services and messages headers (generated)
@@ -12,7 +12,6 @@
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_write_byte_data.hpp"
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_write_block_data.hpp"
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_imu_reading.hpp"
-#include "hal_imu_interfaces/srv/hal_imu_get_handle.hpp"
 #include "hal_imu_interfaces/msg/hal_imu.hpp"
 #include "hal_imu_interfaces/action/hal_imu_write_dmp.hpp"
 
@@ -32,7 +31,6 @@ struct SensorBias
     const uint8_t lsbRegister;
 };
 
-using ImuGetHandleFuture_t = rclcpp::Client<hal_imu_interfaces::srv::HalImuGetHandle>::SharedFuture;
 using i2cImuReadingFuture_t = rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading>::SharedFuture;
 
 using HalImuWriteDmpAction = hal_imu_interfaces::action::HalImuWriteDmp;
@@ -62,7 +60,6 @@ public:
     LifecycleCallbackReturn_t on_cleanup(const rclcpp_lifecycle::State & previous_state);
     LifecycleCallbackReturn_t on_shutdown(const rclcpp_lifecycle::State & previous_state);
     LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
-    void getI2cHandle(void);
     void init(void);
     void writeDmp(void);
     void setDmpRate(uint16_t rate);

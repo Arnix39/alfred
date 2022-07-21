@@ -1,8 +1,8 @@
 #ifndef HAL_IMU_I2C_INIT
 #define HAL_IMU_I2C_INIT
 
-#include "hal_common.hpp"
-#include "hal_mpu6050.hpp"
+#include "common.hpp"
+#include "mpu6050.hpp"
 
 // Services and messages headers (generated)
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_open.hpp"

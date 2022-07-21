@@ -1,5 +1,4 @@
 #include "hal_imu.hpp"
-#include "hal_mpu6050.hpp"
 
 using namespace std::chrono_literals;
 using namespace std::placeholders;
@@ -25,6 +24,8 @@ LifecycleCallbackReturn_t Imu::on_configure(const rclcpp_lifecycle::State & prev
 
 LifecycleCallbackReturn_t Imu::on_activate(const rclcpp_lifecycle::State & previous_state)
 {
+    imuHandle = getI2cHandle(imuGetHandleClient);
+
     init();
     startImuReading();
 
@@ -88,17 +89,6 @@ void Imu::result_callback(const HalImuWriteDmpGoal::WrappedResult & result)
 void Imu::feedback_callback(HalImuWriteDmpGoal::SharedPtr, const std::shared_ptr<const HalImuWriteDmpAction::Feedback> feedback)
 {
     RCLCPP_INFO(get_logger(), "Bank %u written.", feedback->bank);
-}
-
-void Imu::getI2cHandle(void)
-{
-    auto imuGetHandleRequest = std::make_shared<hal_imu_interfaces::srv::HalImuGetHandle::Request>();
-
-    auto imuGetHandleCallback = [this](ImuGetHandleFuture_t future) 
-    {
-        imuHandle = future.get()->handle; 
-    };
-    auto imuGetHandleFuture = imuGetHandleClient->async_send_request(imuGetHandleRequest, imuGetHandleCallback);
 }
 
 void Imu::init(void)
