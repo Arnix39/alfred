@@ -122,7 +122,7 @@ void Imu::resetImu(void)
     RCLCPP_INFO(get_logger(), "IMU resetting...");
 
     /* Reset MPU6050 */
-    if (!writeByteInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, MPU6050_RESET))
+    if (!writeByteInRegister(i2cWriteByteDataClient, imuHandle, MPU6050_POWER_MANAGEMENT_1_REGISTER, MPU6050_RESET))
     {
         RCLCPP_ERROR(get_logger(), "Failed to reset IMU because chip couldn't be resetted.");
         return;
@@ -131,7 +131,7 @@ void Imu::resetImu(void)
     rclcpp::sleep_for(100ms);
 
     /* Reset signal paths */
-    if (!writeByteInRegister(MPU6050_SIGNAL_PATH_RESET_REGISTER, MPU6050_SIGNAL_PATH_RESET))
+    if (!writeByteInRegister(i2cWriteByteDataClient, imuHandle, MPU6050_SIGNAL_PATH_RESET_REGISTER, MPU6050_SIGNAL_PATH_RESET))
     {
         RCLCPP_ERROR(get_logger(), "Failed to reset IMU because signal paths couldn't be resetted.");
         return;
@@ -140,7 +140,7 @@ void Imu::resetImu(void)
     rclcpp::sleep_for(100ms);
 
     /* Disable sleep mode */
-    if (!writeByteInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, 0x00))
+    if (!writeByteInRegister(i2cWriteByteDataClient, imuHandle, MPU6050_POWER_MANAGEMENT_1_REGISTER, 0x00))
     {
         RCLCPP_ERROR(get_logger(), "Failed to reset IMU because sleep mode couldn't be disabled.");
         return;
@@ -151,7 +151,7 @@ void Imu::resetImu(void)
 
 void Imu::setClockSource(void)
 {
-    if (!writeByteInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, MPU6050_CLOCK_SOURCE_PLL_X))
+    if (!writeByteInRegister(i2cWriteByteDataClient, imuHandle, MPU6050_POWER_MANAGEMENT_1_REGISTER, MPU6050_CLOCK_SOURCE_PLL_X))
     {
         RCLCPP_ERROR(get_logger(), "Failed to enable PLL_X clock source.");
     }
@@ -176,7 +176,7 @@ void Imu::setMpuRate(uint16_t rate)
 
     div = MPU6050_MAX_SAMPLE_RATE / rate - 1;
 
-    if (!writeByteInRegister(MPU6050_SAMPLE_RATE_REGISTER, div))
+    if (!writeByteInRegister(i2cWriteByteDataClient, imuHandle, MPU6050_SAMPLE_RATE_REGISTER, div))
     {
         RCLCPP_ERROR(get_logger(), "Failed to set MPU sample rate.");
     }
@@ -188,7 +188,7 @@ void Imu::setMpuRate(uint16_t rate)
 
 void Imu::setConfiguration(void)
 {
-    if (!writeByteInRegister(MPU6050_CONFIGURATION_REGISTER, MPU6050_DLPF_BANDWITH_188))
+    if (!writeByteInRegister(i2cWriteByteDataClient, imuHandle, MPU6050_CONFIGURATION_REGISTER, MPU6050_DLPF_BANDWITH_188))
     {
         RCLCPP_ERROR(get_logger(), "Failed to write configuration of MPU.");
     }
@@ -200,7 +200,7 @@ void Imu::setConfiguration(void)
 
 void Imu::setAccelerometerSensitivity(void)
 {
-    if (!writeByteInRegister(MPU6050_ACCELEROMETER_CONFIGURATION_REGISTER, MPU6050_ACCELEROMETER_FULL_SENSITIVITY))
+    if (!writeByteInRegister(i2cWriteByteDataClient, imuHandle, MPU6050_ACCELEROMETER_CONFIGURATION_REGISTER, MPU6050_ACCELEROMETER_FULL_SENSITIVITY))
     {
         RCLCPP_ERROR(get_logger(), "Failed to set accelerometer sensitivity!");
     }
@@ -212,7 +212,7 @@ void Imu::setAccelerometerSensitivity(void)
 
 void Imu::setGyroscopeSensitivity(void)
 {
-    if (!writeByteInRegister(MPU6050_GYROSCOPE_CONFIGURATION_REGISTER, MPU6050_GYROSCOPE_FULL_SENSITIVITY))
+    if (!writeByteInRegister(i2cWriteByteDataClient, imuHandle, MPU6050_GYROSCOPE_CONFIGURATION_REGISTER, MPU6050_GYROSCOPE_FULL_SENSITIVITY))
     {
         RCLCPP_ERROR(get_logger(), "Failed to set gyroscope sensitivity!");
     }
@@ -269,7 +269,7 @@ void Imu::setDmpRate(uint16_t rate)
 
 void Imu::resetFifo()
 {
-    if (!writeBitInRegister(MPU6050_USER_CONTROL_REGISTER, MPU6050_FIFO_RESET_BIT, 1))
+    if (!writeBitInRegister(i2cReadByteDataClient, i2cWriteByteDataClient, imuHandle, MPU6050_USER_CONTROL_REGISTER, MPU6050_FIFO_RESET_BIT, 1))
     {
         RCLCPP_ERROR(get_logger(), "Failed to reset FIFO!");
     }
@@ -322,13 +322,13 @@ bool Imu::writeSensorBiases(const std::vector<SensorBias> sensorBiases)
         uint8_t sensorBiasMsb = static_cast<uint8_t>((sensorBias.bias >> 8) & 0xFF);
         uint8_t sensorBiasLsb = static_cast<uint8_t>(sensorBias.bias & 0xFF);
 
-        if (!writeByteInRegister(sensorBias.msbRegister, sensorBiasMsb))
+        if (!writeByteInRegister(i2cWriteByteDataClient, imuHandle, sensorBias.msbRegister, sensorBiasMsb))
         {
             RCLCPP_ERROR(get_logger(), "Failed to set sensor %c offset!", sensorBias.axis);
             return false;
         }
 
-        if (!writeByteInRegister(sensorBias.lsbRegister, sensorBiasLsb))
+        if (!writeByteInRegister(i2cWriteByteDataClient, imuHandle, sensorBias.lsbRegister, sensorBiasLsb))
         {
             RCLCPP_ERROR(get_logger(), "Failed to set sensor %c offset!", sensorBias.axis);
             return false;
@@ -398,7 +398,7 @@ void Imu::configureDmpFeatures(void)
 void Imu::enableDmp(void)
 {
     /* Enable DMP and FIFO */
-    if (!writeByteInRegister(MPU6050_USER_CONTROL_REGISTER, MPU6050_DMP_EMABLE | MPU6050_FIFO_ENABLE))
+    if (!writeByteInRegister(i2cWriteByteDataClient, imuHandle, MPU6050_USER_CONTROL_REGISTER, MPU6050_DMP_EMABLE | MPU6050_FIFO_ENABLE))
     {
         RCLCPP_ERROR(get_logger(), "Failed to enable DMP!");
         return;
@@ -411,19 +411,19 @@ void Imu::enableDmp(void)
 
 bool Imu::writeDataToDmp(uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data)
 {
-    if (!writeByteInRegister(MPU6050_BANK_SELECTION_REGISTER, bank))
+    if (!writeByteInRegister(i2cWriteByteDataClient, imuHandle, MPU6050_BANK_SELECTION_REGISTER, bank))
     {
         RCLCPP_ERROR(get_logger(), "Failed to write bank!");
         return false;
     }
 
-    if (!writeByteInRegister(MPU6050_ADDRESS_IN_BANK_REGISTER, addressInBank))
+    if (!writeByteInRegister(i2cWriteByteDataClient, imuHandle, MPU6050_ADDRESS_IN_BANK_REGISTER, addressInBank))
     {
         RCLCPP_ERROR(get_logger(), "Failed to write address!");
         return false;
     }
 
-    if (!writeDataBlock(MPU6050_READ_WRITE_REGISTER, data))
+    if (!writeDataBlock(i2cWriteBlockDataClient, imuHandle, MPU6050_READ_WRITE_REGISTER, data))
     {
         RCLCPP_ERROR(get_logger(), "Failed to write data!");
         return false;
