@@ -5,6 +5,7 @@
 
 #include "hal_common.hpp"
 #include "hal_mpu6050.hpp"
+#include "hal_i2cRegistersServices.hpp"
 
 // Services and messages headers (generated)
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_read_byte_data.hpp"
@@ -32,9 +33,6 @@ struct SensorBias
 };
 
 using ImuGetHandleFuture_t = rclcpp::Client<hal_imu_interfaces::srv::HalImuGetHandle>::SharedFuture;
-using i2cReadByteDataFuture_t = rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData>::SharedFuture;
-using i2cWriteByteDataFuture_t = rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData>::SharedFuture;
-using i2cWriteBlockDataFuture_t = rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData>::SharedFuture;
 using i2cImuReadingFuture_t = rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading>::SharedFuture;
 
 using HalImuWriteDmpAction = hal_imu_interfaces::action::HalImuWriteDmp;
@@ -83,10 +81,6 @@ public:
     void setAccelerometerOffsets(void);
     void setGyroscopeOffsets(void);
     bool writeSensorBiases(const std::vector<SensorBias> sensorBiases);
-    int16_t readByteFromRegister(uint8_t registerToRead);
-    bool writeBitInRegister(uint8_t registerToWrite, uint8_t bitToWrite, uint8_t valueOfBit);
-    bool writeByteInRegister(uint8_t registerToWrite, uint8_t value);
-    bool writeDataBlock(uint8_t registerToWrite, std::vector<uint8_t> data);
 };
 
 #endif
