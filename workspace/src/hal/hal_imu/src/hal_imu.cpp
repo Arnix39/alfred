@@ -1,74 +1,104 @@
 #include "hal_imu.hpp"
 #include "hal_mpu6050.hpp"
 
-/* Subscriber interface implementation */
-ImuSubscribersRos::ImuSubscribersRos(ros::NodeHandle *node) : nodeHandle(node)
+using namespace std::chrono_literals;
+using namespace std::placeholders;
+
+Imu::Imu() : rclcpp_lifecycle::LifecycleNode("hal_imuI2cInit_node"),
+             imuHandle(MPU6050_I2C_NO_HANDLE)
 {
 }
 
-void ImuSubscribersRos::subscribe(Imu *imu)
+LifecycleCallbackReturn_t Imu::on_configure(const rclcpp_lifecycle::State & previous_state)
 {
-    imuImuI2cInitHBSubRos = nodeHandle->subscribe("hal_imuI2cHeartbeatMsg", 1000, &Imu::imuI2cInitHeartbeatCallback, imu);
+    i2cReadByteDataClient = this->create_client<hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData>("hal_pigpioI2cReadByteData");
+    i2cWriteByteDataClient = this->create_client<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData>("hal_pigpioI2cWriteByteData");
+    i2cWriteBlockDataClient = this->create_client<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData>("hal_pigpioI2cWriteBlockData");
+    i2cImuReadingClient = this->create_client<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading>("hal_pigpioI2cImuReading");
+    imuGetHandleClient = this->create_client<hal_imu_interfaces::srv::HalImuGetHandle>("hal_imuGetHandle");
+    imuDmpWritingClient = rclcpp_action::create_client<HalImuWriteDmpAction>(this, "hal_imuWriteDmp");
+
+    RCLCPP_INFO(get_logger(), "hal_imu node configured!");
+
+    return LifecycleCallbackReturn_t::SUCCESS;
 }
 
-/* Services clients interface implementation */
-ImuClientsRos::ImuClientsRos(ros::NodeHandle *node) : i2cReadByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cReadByteData>("hal_pigpioI2cReadByteData")),
-                                                      i2cWriteByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteByteData>("hal_pigpioI2cWriteByteData")),
-                                                      i2cWriteBlockDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteBlockData>("hal_pigpioI2cWriteBlockData")),
-                                                      i2cImuReadingClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cImuReading>("hal_pigpioI2cImuReading")),
-                                                      i2cGetHandleClientRos(node->serviceClient<hal_imu::hal_imuGetHandle>("hal_imuGetHandle"))
+LifecycleCallbackReturn_t Imu::on_activate(const rclcpp_lifecycle::State & previous_state)
 {
+    init();
+    startImuReading();
+
+    RCLCPP_INFO(get_logger(), "hal_imu node activated!");
+
+    return LifecycleCallbackReturn_t::SUCCESS;
 }
 
-ros::ServiceClient *ImuClientsRos::getReadByteDataClientHandle()
+LifecycleCallbackReturn_t Imu::on_deactivate(const rclcpp_lifecycle::State & previous_state)
 {
-    return &i2cReadByteDataClientRos;
+    stopImuReading();
+
+    RCLCPP_INFO(get_logger(), "hal_imu node dactivated!");
+
+    return LifecycleCallbackReturn_t::SUCCESS;
 }
 
-ros::ServiceClient *ImuClientsRos::getWriteByteDataClientHandle()
+LifecycleCallbackReturn_t Imu::on_cleanup(const rclcpp_lifecycle::State & previous_state)
 {
-    return &i2cWriteByteDataClientRos;
+    stopImuReading();
+
+    RCLCPP_INFO(get_logger(), "hal_imu node unconfigured!");
+
+    return LifecycleCallbackReturn_t::SUCCESS;
 }
 
-ros::ServiceClient *ImuClientsRos::getWriteBlockDataClientHandle()
+LifecycleCallbackReturn_t Imu::on_shutdown(const rclcpp_lifecycle::State & previous_state)
 {
-    return &i2cWriteBlockDataClientRos;
+    stopImuReading();
+
+    RCLCPP_INFO(get_logger(), "hal_imu node shutdown!");
+
+    return LifecycleCallbackReturn_t::SUCCESS;
 }
 
-ros::ServiceClient *ImuClientsRos::getGetHandleClientHandle()
+LifecycleCallbackReturn_t Imu::on_error(const rclcpp_lifecycle::State & previous_state)
 {
-    return &i2cGetHandleClientRos;
+    return LifecycleCallbackReturn_t::FAILURE;
 }
 
-ros::ServiceClient *ImuClientsRos::getImuReadingClientHandle()
+void Imu::goal_response_callback(HalImuWriteDmpGoal::SharedPtr goal_handle)
 {
-    return &i2cImuReadingClientRos;
+    if (!goal_handle) 
+    {
+        RCLCPP_ERROR(get_logger(), "Goal was rejected by server!");
+    }
 }
 
-/* IMU implementation */
-Imu::Imu(ImuClients *imuServiceClients, ImuSubscribers *imuSubscribers) : imuClients(imuServiceClients),
-                                                                          imuSubs(imuSubscribers),
-                                                                          i2cInitialised(false),
-                                                                          isStarted(false)
+void Imu::result_callback(const HalImuWriteDmpGoal::WrappedResult & result)
 {
-    imuSubs->subscribe(this);
+    if(result.code == rclcpp_action::ResultCode::SUCCEEDED)
+    {
+        RCLCPP_INFO(get_logger(), "DMP code written successfully.");
+    }
+    else
+    {
+        RCLCPP_ERROR(get_logger(), "Error while writing DMP code!");
+    }  
+}
+
+void Imu::feedback_callback(HalImuWriteDmpGoal::SharedPtr, const std::shared_ptr<const HalImuWriteDmpAction::Feedback> feedback)
+{
+    RCLCPP_INFO(get_logger(), "Bank %u written.", feedback->bank);
 }
 
 void Imu::getI2cHandle(void)
 {
-    hal_imu::hal_imuGetHandle i2cGetHandleSrv;
-    imuClients->getGetHandleClientHandle()->call(i2cGetHandleSrv);
-    imuHandle = i2cGetHandleSrv.response.handle;
-}
+    auto imuGetHandleRequest = std::make_shared<hal_imu_interfaces::srv::HalImuGetHandle::Request>();
 
-void Imu::imuI2cInitHeartbeatCallback(const hal_imu::hal_imuI2cHeartbeatMsg &msg)
-{
-    i2cInitialised = msg.isAlive;
-}
-
-bool Imu::isI2cInitialised(void)
-{
-    return i2cInitialised;
+    auto imuGetHandleCallback = [this](ImuGetHandleFuture_t future) 
+    {
+        imuHandle = future.get()->handle; 
+    };
+    auto imuGetHandleFuture = imuGetHandleClient->async_send_request(imuGetHandleRequest, imuGetHandleCallback);
 }
 
 void Imu::init(void)
@@ -98,7 +128,7 @@ void Imu::resetImu(void)
         return;
     }
 
-    ros::Duration(0.1).sleep();
+    rclcpp::sleep_for(100ms);
 
     /* Reset signal paths */
     if (!writeByteInRegister(MPU6050_SIGNAL_PATH_RESET_REGISTER, MPU6050_SIGNAL_PATH_RESET))
@@ -107,7 +137,7 @@ void Imu::resetImu(void)
         return;
     }
 
-    ros::Duration(0.1).sleep();
+    rclcpp::sleep_for(100ms);
 
     /* Disable sleep mode */
     if (!writeByteInRegister(MPU6050_POWER_MANAGEMENT_1_REGISTER, 0x00))
@@ -194,24 +224,14 @@ void Imu::setGyroscopeSensitivity(void)
 
 void Imu::writeDmp(void)
 {
-    hal_imu::hal_imuWriteDmpGoal imuDmpWritingGoal;
-    imuActionClient_t imuDmpWritingClient("imuDMPWriting", true);
-    RCLCPP_INFO(get_logger(), "Waiting for DMP writing server...");
-    imuDmpWritingClient.waitForServer();
-    RCLCPP_INFO(get_logger(), "Connected to DMP writing server.");
-    imuDmpWritingGoal.write = true;
-    RCLCPP_INFO(get_logger(), "Requesting DMP code writing...");
-    imuDmpWritingClient.sendGoal(imuDmpWritingGoal);
+    auto goal = HalImuWriteDmpAction::Goal();
 
-    imuDmpWritingClient.waitForResult();
-    if (imuDmpWritingClient.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
-    {
-        RCLCPP_INFO(get_logger(), "DMP code written successfully.");
-    }
-    else
-    {
-        RCLCPP_ERROR(get_logger(), "Error while writing DMP code!");
-    }
+    auto goal_callbacks = rclcpp_action::Client<HalImuWriteDmpAction>::SendGoalOptions();
+    goal_callbacks.goal_response_callback = std::bind(&Imu::goal_response_callback, this, _1);
+    goal_callbacks.feedback_callback = std::bind(&Imu::feedback_callback, this, _1, _2);
+    goal_callbacks.result_callback = std::bind(&Imu::result_callback, this, _1);
+
+    auto goal_future = imuDmpWritingClient->async_send_goal(goal, goal_callbacks);
 }
 
 void Imu::setDmpRate(uint16_t rate)
@@ -391,22 +411,27 @@ void Imu::enableDmp(void)
 
 int16_t Imu::readByteFromRegister(uint8_t registerToRead)
 {
-    hal_pigpio::hal_pigpioI2cReadByteData i2cReadByteDataSrv;
+    int16_t byteRead = -1;   
 
-    i2cReadByteDataSrv.request.handle = imuHandle;
-    i2cReadByteDataSrv.request.deviceRegister = registerToRead;
+    auto i2cReadByteDataRequest = std::make_shared<hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData::Request>();
 
-    imuClients->getReadByteDataClientHandle()->call(i2cReadByteDataSrv);
+    i2cReadByteDataRequest->handle = imuHandle;
+    i2cReadByteDataRequest->device_register = registerToRead;
 
-    if (i2cReadByteDataSrv.response.hasSucceeded)
+    auto i2cReadByteDataCallback = [this, &byteRead](i2cReadByteDataFuture_t future) 
     {
-        return i2cReadByteDataSrv.response.value;
-    }
-    else
-    {
-        RCLCPP_ERROR(get_logger(), "Failed to read byte!");
-        return -1;
-    }
+        if(future.get()->has_succeeded)
+        {
+            byteRead = future.get()->value;
+        }
+        else
+        {
+            RCLCPP_ERROR(get_logger(), "Failed to read byte!");
+        }   
+    };
+    auto i2cReadByteDataFuture = i2cReadByteDataClient->async_send_request(i2cReadByteDataRequest, i2cReadByteDataCallback);
+
+    return byteRead;
 }
 
 bool Imu::writeBitInRegister(uint8_t registerToWrite, uint8_t bitToWrite, uint8_t valueOfBit)
@@ -439,33 +464,51 @@ bool Imu::writeBitInRegister(uint8_t registerToWrite, uint8_t bitToWrite, uint8_
 
 bool Imu::writeByteInRegister(uint8_t registerToWrite, uint8_t value)
 {
-    hal_pigpio::hal_pigpioI2cWriteByteData i2cWriteByteDataSrv;
+    bool writeHasSucceeded = false;   
 
-    i2cWriteByteDataSrv.request.handle = imuHandle;
-    i2cWriteByteDataSrv.request.deviceRegister = registerToWrite;
-    i2cWriteByteDataSrv.request.value = value;
+    auto i2cWriteByteDataRequest = std::make_shared<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData::Request>();
 
-    imuClients->getWriteByteDataClientHandle()->call(i2cWriteByteDataSrv);
+    i2cWriteByteDataRequest->handle = imuHandle;
+    i2cWriteByteDataRequest->device_register = registerToWrite;
+    i2cWriteByteDataRequest->value = value;
 
-    return i2cWriteByteDataSrv.response.hasSucceeded;
+    auto i2cWriteByteDataCallback = [this, &writeHasSucceeded](i2cWriteByteDataFuture_t future) 
+    {
+        if(future.get()->has_succeeded)
+        {
+            writeHasSucceeded = true;
+        }
+    };
+    auto i2cWriteByteDataFuture = i2cWriteByteDataClient->async_send_request(i2cWriteByteDataRequest, i2cWriteByteDataCallback);
+
+    return writeHasSucceeded;
 }
 
 bool Imu::writeDataBlock(uint8_t registerToWrite, std::vector<uint8_t> data)
 {
-    hal_pigpio::hal_pigpioI2cWriteBlockData i2cWriteBlockDataSrv;
+    bool writeHasSucceeded = false;   
 
-    i2cWriteBlockDataSrv.request.handle = imuHandle;
-    i2cWriteBlockDataSrv.request.deviceRegister = registerToWrite;
-    i2cWriteBlockDataSrv.request.length = data.size();
+    auto i2cWriteBlockDataRequest = std::make_shared<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData::Request>();
+
+    i2cWriteBlockDataRequest->handle = imuHandle;
+    i2cWriteBlockDataRequest->device_register = registerToWrite;
+    i2cWriteBlockDataRequest->length = data.size();
 
     for (uint8_t index = 0; index < data.size(); ++index)
     {
-        i2cWriteBlockDataSrv.request.dataBlock.push_back(data.at(index));
+        i2cWriteBlockDataRequest->data_block.push_back(data.at(index));
     }
 
-    imuClients->getWriteBlockDataClientHandle()->call(i2cWriteBlockDataSrv);
+    auto i2cWriteBlockDataCallback = [this, &writeHasSucceeded](i2cWriteBlockDataFuture_t future) 
+    {
+        if(future.get()->has_succeeded)
+        {
+            writeHasSucceeded = true;
+        }
+    };
+    auto i2cWriteBlockDataFuture = i2cWriteBlockDataClient->async_send_request(i2cWriteBlockDataRequest, i2cWriteBlockDataCallback);
 
-    return i2cWriteBlockDataSrv.response.hasSucceeded;
+    return writeHasSucceeded;
 }
 
 bool Imu::writeDataToDmp(uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data)
@@ -493,59 +536,20 @@ bool Imu::writeDataToDmp(uint8_t bank, uint8_t addressInBank, std::vector<uint8_
 
 void Imu::startImuReading()
 {
-    hal_pigpio::hal_pigpioI2cImuReading i2cImuReadingSrv;
+    auto i2cImuReadingRequest = std::make_shared<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading::Request>();
 
-    i2cImuReadingSrv.request.isImuReady = true;
-    i2cImuReadingSrv.request.imuHandle = imuHandle;
+    i2cImuReadingRequest->imu_handle = imuHandle;
+    i2cImuReadingRequest->is_imu_ready = true;
 
-    imuClients->getImuReadingClientHandle()->call(i2cImuReadingSrv);
+    auto i2cImuReadingFuture = i2cImuReadingClient->async_send_request(i2cImuReadingRequest);
 }
 
 void Imu::stopImuReading()
 {
-    hal_pigpio::hal_pigpioI2cImuReading i2cImuReadingSrv;
+    auto i2cImuReadingRequest = std::make_shared<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading::Request>();
 
-    i2cImuReadingSrv.request.isImuReady = false;
-    i2cImuReadingSrv.request.imuHandle = imuHandle;
+    i2cImuReadingRequest->imu_handle = imuHandle;
+    i2cImuReadingRequest->is_imu_ready = false;
 
-    imuClients->getImuReadingClientHandle()->call(i2cImuReadingSrv);
+    auto i2cImuReadingFuture = i2cImuReadingClient->async_send_request(i2cImuReadingRequest);
 }
-
-void Imu::starts(void)
-{
-    isStarted = true;
-}
-
-bool Imu::isNotStarted(void)
-{
-    return !isStarted;
-}
-
-/*int main(int argc, char **argv)
-{
-    ros::init(argc, argv, "hal_imu");
-    ros::NodeHandle node;
-
-    ImuClientsRos imuServiceClientsRos(&node);
-    ImuSubscribersRos imuSubscribersRos(&node);
-
-    Imu imu(&imuServiceClientsRos, &imuSubscribersRos);
-
-    RCLCPP_INFO(get_logger(), "imu node waiting for I2C communication to be ready...");
-    while (ros::ok())
-    {
-        if (imu.isNotStarted() && imu.isI2cInitialised())
-        {
-            imu.getI2cHandle();
-            RCLCPP_INFO(get_logger(), "imu I2C communication ready.");
-            imu.init();
-            imu.starts();
-            RCLCPP_INFO(get_logger(), "imu node initialised.");
-            imu.startImuReading();
-        }
-
-        ros::spinOnce();
-    }
-
-    return 0;
-}*/
