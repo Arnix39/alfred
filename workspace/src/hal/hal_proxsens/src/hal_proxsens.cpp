@@ -133,8 +133,7 @@ void Proxsens::configureGpios(void)
     setInputModeRequest->gpio_id = PROXSENS_ECHO_GPIO;
     auto setInputModeCallback = [this](SetInputModeFuture_t future) 
     {
-        auto hasSucceeded = future.get()->has_succeeded;
-        if(!hasSucceeded)
+        if(!future.get()->has_succeeded)
         {
             RCLCPP_ERROR(get_logger(), "Failed to call service setInputMode");
         }   
@@ -145,8 +144,7 @@ void Proxsens::configureGpios(void)
     setCallbackRequest->edge_change_type = AS_EITHER_EDGE;
     auto setCallbackCallback = [this](SetCallbackFuture_t future) 
     {
-        auto hasSucceeded = future.get()->has_succeeded;
-        if(hasSucceeded)
+        if(future.get()->has_succeeded)
         {
             echoCallbackId = future.get()->callback_id;
         }
@@ -161,8 +159,7 @@ void Proxsens::configureGpios(void)
     setOutputModeForTriggerRequest->gpio_id = PROXSENS_TRIGGER_GPIO;
     auto setOutputModeForTriggerCallback = [this](SetOutputModeFuture_t future) 
     {
-        auto hasSucceeded = future.get()->has_succeeded;
-        if(!hasSucceeded)
+        if(!future.get()->has_succeeded)
         {
             RCLCPP_ERROR(get_logger(), "Failed to call service setOutputMode for trigger");
         }   
@@ -172,8 +169,7 @@ void Proxsens::configureGpios(void)
     setOutputModeForShifterRequest->gpio_id = PROXSENS_LEVEL_SHIFTER_OE_GPIO;
     auto setOutputModeForShifterCallback = [this](SetOutputModeFuture_t future) 
     {
-        auto hasSucceeded = future.get()->has_succeeded;
-        if(!hasSucceeded)
+        if(!future.get()->has_succeeded)
         {
             RCLCPP_ERROR(get_logger(), "Failed to call service setOutputMode for shifter");
         }   
@@ -189,8 +185,7 @@ void Proxsens::trigger(void)
     sendTriggerPulseRequest->pulse_length_in_us = PROXSENS_TRIGGER_LENGTH_US;
     auto sendTriggerPulseCallback = [this](SendTriggerPulseFuture_t future) 
     {
-        auto hasSucceeded = future.get()->has_succeeded;
-        if(!hasSucceeded)
+        if(!future.get()->has_succeeded)
         {
             RCLCPP_ERROR(get_logger(), "Failed to call service sendTriggerPulse");
         }   
@@ -205,8 +200,7 @@ void Proxsens::enableOutputLevelShifter(void)
     setGpioHighRequest->gpio_id = PROXSENS_LEVEL_SHIFTER_OE_GPIO;
     auto setGpioHighCallback = [this](SetGpioHighFuture_t future) 
     {
-        auto hasSucceeded = future.get()->has_succeeded;
-        if(!hasSucceeded)
+        if(!future.get()->has_succeeded)
         {
             RCLCPP_ERROR(get_logger(), "Failed to call service sendTriggerPulse");
         }   
