@@ -1,0 +1,1 @@
+This directory contains the common functions for all `hal` packages.
