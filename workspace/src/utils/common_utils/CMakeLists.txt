@@ -1,12 +1,9 @@
 cmake_minimum_required(VERSION 3.8)
-project(hal_common)
+project(common_utils)
 
 find_package(ament_cmake REQUIRED)
-find_package(hal_pigpio_interfaces REQUIRED)
-find_package(hal_imu_interfaces REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
-find_package(common_utils REQUIRED)
 
 ###########
 ## Build ##
@@ -15,17 +12,7 @@ include_directories(
   include
 )
 
-set(dependencies
-  rclcpp
-  rclcpp_lifecycle
-  hal_pigpio_interfaces
-  hal_imu_interfaces
-  common_utils)
-
-add_library(${PROJECT_NAME} SHARED
-  src/hal_i2cRegistersServices.cpp
-)
-ament_target_dependencies(${PROJECT_NAME} ${dependencies})
+add_library(${PROJECT_NAME} INTERFACE)
 
 #############
 ## Install ##

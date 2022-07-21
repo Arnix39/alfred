@@ -1,7 +1,7 @@
 #ifndef HAL_PIGPIO
 #define HAL_PIGPIO
 
-#include "hal_common.hpp"
+#include "common.hpp"
 
 // Pigpio library
 #include "pigpiod_if2.h"

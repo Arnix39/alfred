@@ -5,8 +5,8 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(hal_pigpio_interfaces REQUIRED)
-find_package(hal_common REQUIRED)
 find_package(pigpio REQUIRED)
+find_package(common_utils REQUIRED)
 
 ###########
 ## Build ##
@@ -19,7 +19,7 @@ set(dependencies
   rclcpp
   rclcpp_lifecycle
   hal_pigpio_interfaces
-  hal_common
+  common_utils
   pigpio)
 
 add_library(${PROJECT_NAME} OBJECT 

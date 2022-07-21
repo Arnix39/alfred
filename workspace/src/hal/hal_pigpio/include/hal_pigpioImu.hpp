@@ -6,7 +6,7 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-#include "hal_mpu6050.hpp"
+#include "mpu6050.hpp"
 
 // Services and messages headers (generated)
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_imu_reading.hpp"

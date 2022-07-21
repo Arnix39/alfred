@@ -1,5 +1,20 @@
 #include "hal_i2cRegistersServices.hpp"
 
+int32_t getI2cHandle(imuGetHandleClient_t imuGetHandleClient)
+{
+    int32_t imuHandle;
+    auto imuGetHandleRequest = std::make_shared<hal_imu_interfaces::srv::HalImuGetHandle::Request>();
+
+    auto imuGetHandleCallback = [&imuHandle](ImuGetHandleFuture_t future) 
+    {
+        imuHandle = future.get()->handle; 
+    };
+    auto imuGetHandleFuture = imuGetHandleClient->async_send_request(imuGetHandleRequest, imuGetHandleCallback);
+
+    return imuHandle;
+}
+
+
 int16_t readByteFromRegister(i2cReadByteDataClient_t i2cReadByteDataClient, int32_t imuHandle, uint8_t registerToRead)
 {
     int16_t byteRead = -1;   

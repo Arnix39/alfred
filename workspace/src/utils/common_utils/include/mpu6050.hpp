@@ -1,5 +1,5 @@
-#ifndef HAL_MPU6050
-#define HAL_MPU6050
+#ifndef MPU6050
+#define MPU6050
 
 #define MPU6050_I2C_ADDRESS 0x68
 

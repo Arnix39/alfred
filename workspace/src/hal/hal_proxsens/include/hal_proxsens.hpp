@@ -3,7 +3,7 @@
 
 #include "stdint.h"
 
-#include "hal_common.hpp"
+#include "common.hpp"
 
 // Services and messages headers (generated)
 #include "hal_pigpio_interfaces/srv/hal_pigpio_set_input_mode.hpp"

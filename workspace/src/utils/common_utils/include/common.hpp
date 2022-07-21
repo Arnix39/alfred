@@ -1,5 +1,5 @@
-#ifndef HAL_COMMON
-#define HAL_COMMON
+#ifndef COMMON
+#define COMMON
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_lifecycle/lifecycle_node.hpp"
