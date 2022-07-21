@@ -3,9 +3,7 @@
 
 #include "stdint.h"
 
-#include "rclcpp/rclcpp.hpp"
-#include "rclcpp_lifecycle/lifecycle_node.hpp"
-#include "lifecycle_msgs/msg/transition.hpp"
+#include "hal_common.hpp"
 
 // Services and messages headers (generated)
 #include "hal_pigpio_interfaces/srv/hal_pigpio_set_input_mode.hpp"
@@ -53,12 +51,12 @@ private:
 public:
     Proxsens();
     ~Proxsens() = default;
-    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_configure(const rclcpp_lifecycle::State & previous_state);
-    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_activate(const rclcpp_lifecycle::State & previous_state);
-    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_deactivate(const rclcpp_lifecycle::State & previous_state);
-    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_cleanup(const rclcpp_lifecycle::State & previous_state);
-    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_shutdown(const rclcpp_lifecycle::State & previous_state);
-    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_error(const rclcpp_lifecycle::State & previous_state);
+    LifecycleCallbackReturn_t on_configure(const rclcpp_lifecycle::State & previous_state);
+    LifecycleCallbackReturn_t on_activate(const rclcpp_lifecycle::State & previous_state);
+    LifecycleCallbackReturn_t on_deactivate(const rclcpp_lifecycle::State & previous_state);
+    LifecycleCallbackReturn_t on_cleanup(const rclcpp_lifecycle::State & previous_state);
+    LifecycleCallbackReturn_t on_shutdown(const rclcpp_lifecycle::State & previous_state);
+    LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
     void publishDistance(void);
     void configureGpios(void);
     void trigger(void);

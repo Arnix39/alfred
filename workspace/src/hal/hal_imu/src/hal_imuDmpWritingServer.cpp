@@ -1,6 +1,4 @@
 #include "hal_imuDmpWritingServer.hpp"
-#include "hal_imuDmpWritingServerInterfaces.hpp"
-#include "hal_mpu6050.hpp"
 
 /* Action server interface implementation */
 ImuDmpWritingActionServerRos::ImuDmpWritingActionServerRos(ros::NodeHandle *node) : imuWriteDmpServerRos(*node, "imuDMPWriting", false)

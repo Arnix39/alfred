@@ -1,40 +1,33 @@
 #ifndef HAL_IMU_DMP_WRITING_SERVER
 #define HAL_IMU_DMP_WRITING_SERVER
 
-#include "ros/ros.h"
-#include <actionlib/server/simple_action_server.h>
+#include "rclcpp/rclcpp.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
+#include "lifecycle_msgs/msg/transition.hpp"
+#include "rclcpp_action/rclcpp_action.hpp"
 
 #include "hal_imuDmpMemory.hpp"
-#include "hal_imuDmpWritingServerVirtuals.hpp"
+#include "hal_mpu6050.hpp"
 
 // Services and messages headers (generated)
-#include "hal_imu/hal_imuWriteDmpAction.h"
-#include "hal_imu/hal_imuWriteDmpResult.h"
-#include "hal_imu/hal_imuWriteDmpGoal.h"
-#include "hal_imu/hal_imuGetHandle.h"
-#include "hal_pigpio/hal_pigpioI2cWriteByteData.h"
-#include "hal_pigpio/hal_pigpioI2cWriteBlockData.h"
-#include "hal_imu/hal_imuI2cHeartbeatMsg.h"
+#include "hal_imu_interfaces/action/hal_imu_write_dmp.hpp"
+#include "hal_imu_interfaces/srv/hal_imu_get_handle.hpp"
+#include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_write_byte_data.hpp"
+#include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_write_block_data.hpp"
 
 class ImuDmpWritingServer
 {
 private:
-    ImuDmpWritingClients *imuDmpClients;
-    ImuDmpWritingActionServer *imuDmpWritingServer;
-    ImuDmpWritingServerSubscribers *imuDmpWritingServerSubs;
     hal_imu::hal_imuWriteDmpFeedback feedback;
     hal_imu::hal_imuWriteDmpResult result;
-    bool i2cInitialised;
-    bool isStarted;
     int32_t imuHandle;
 
 public:
-    ImuDmpWritingServer(ImuDmpWritingActionServer *imuWriteDmpServer, ImuDmpWritingClients *imuDmpServiceClients, ImuDmpWritingServerSubscribers *imuDmpWritingServerSubscribers);
+    ImuDmpWritingServer();
     ~ImuDmpWritingServer() = default;
     void getI2cHandle(void);
     void startServer(void);
     bool isI2cInitialised(void);
-    void imuDmpWritingServerI2cInitHeartbeatCallback(const hal_imu::hal_imuI2cHeartbeatMsg &msg);
     void writeDmp(void);
     bool writeByteInRegister(uint8_t registerToWrite, uint8_t value);
     bool writeData(uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data);

@@ -1,74 +1,8 @@
 #include "hal_imuI2cInit.hpp"
-#include "hal_imuI2cInitInterfaces.hpp"
 
-/* Publisher interface implementation */
-ImuI2cInitPublisherRos::ImuI2cInitPublisherRos(ros::NodeHandle *node) : imuI2cInitPubRos(node->advertise<hal_imu::hal_imuI2cHeartbeatMsg>("hal_imuI2cHeartbeatMsg", 1000))
+ImuI2cInit::ImuI2cInit() : rclcpp_lifecycle::LifecycleNode("hal_imuI2cInit_node"),
+                           imuHandle(MPU6050_I2C_NO_HANDLE)
 {
-}
-
-void ImuI2cInitPublisherRos::publish(hal_imu::hal_imuI2cHeartbeatMsg message)
-{
-    imuI2cInitPubRos.publish(message);
-}
-
-/* Subscriber interface implementation */
-ImuI2cInitSubscribersRos::ImuI2cInitSubscribersRos(ros::NodeHandle *node) : nodeHandle(node)
-{
-}
-
-void ImuI2cInitSubscribersRos::subscribe(ImuI2cInit *imuI2cInit)
-{
-    imuI2cInitPigpioHBSubRos = nodeHandle->subscribe("hal_pigpioHeartbeat", 1000, &ImuI2cInit::pigpioHeartbeatCallback, imuI2cInit);
-}
-
-/* Clients interface implementation */
-ImuI2cInitClientsRos::ImuI2cInitClientsRos(ros::NodeHandle *node) : i2cOpenClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cOpen>("hal_pigpioI2cOpen")),
-                                                                    i2cCloseClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cClose>("hal_pigpioI2cClose")),
-                                                                    i2cReadByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cReadByteData>("hal_pigpioI2cReadByteData")),
-                                                                    i2cWriteByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteByteData>("hal_pigpioI2cWriteByteData"))
-{
-}
-
-ros::ServiceClient *ImuI2cInitClientsRos::getI2cOpenHandle()
-{
-    return &i2cOpenClientRos;
-}
-
-ros::ServiceClient *ImuI2cInitClientsRos::getI2cCloseHandle()
-{
-    return &i2cCloseClientRos;
-}
-
-ros::ServiceClient *ImuI2cInitClientsRos::getI2cReadByteDataClientHandle()
-{
-    return &i2cReadByteDataClientRos;
-}
-
-ros::ServiceClient *ImuI2cInitClientsRos::getI2cWriteByteDataClientHandle()
-{
-    return &i2cWriteByteDataClientRos;
-}
-
-/* Servers interface implementation */
-ImuI2cInitServersRos::ImuI2cInitServersRos(ros::NodeHandle *node) : nodeHandle(node)
-{
-}
-
-void ImuI2cInitServersRos::advertiseGetHandleService(ImuI2cInit *imuI2cInit)
-{
-    imuGetHandleServerRos = nodeHandle->advertiseService("hal_imuGetHandle", &ImuI2cInit::getHandle, imuI2cInit);
-}
-
-/* Imu I2c Init implementation */
-ImuI2cInit::ImuI2cInit(ImuI2cInitClients *imuI2cInitServiceClients, ImuI2cInitServers *imuI2cInitServiceServers, ImuI2cInitPublisher *imuI2cInitPublisher, ImuI2cInitSubscribers *imuI2cInitSubscribers) : imuI2cInitClients(imuI2cInitServiceClients),
-                                                                                                                                                                                                           imuI2cInitServers(imuI2cInitServiceServers),
-                                                                                                                                                                                                           imuI2cInitPub(imuI2cInitPublisher),
-                                                                                                                                                                                                           imuI2cInitSubs(imuI2cInitSubscribers),
-                                                                                                                                                                                                           pigpioNodeStarted(false),
-                                                                                                                                                                                                           isStarted(false)
-{
-    imuI2cInitServiceServers->advertiseGetHandleService(this);
-    imuI2cInitSubs->subscribe(this);
 }
 
 ImuI2cInit::~ImuI2cInit()
@@ -77,6 +11,13 @@ ImuI2cInit::~ImuI2cInit()
     i2cCloseSrv.request.handle = imuHandle;
     imuI2cInitClients->getI2cCloseHandle()->call(i2cCloseSrv);
 }
+
+LifecycleCallbackReturn_t ImuI2cInit::on_configure(const rclcpp_lifecycle::State & previous_state);
+LifecycleCallbackReturn_t ImuI2cInit::on_activate(const rclcpp_lifecycle::State & previous_state);
+LifecycleCallbackReturn_t ImuI2cInit::on_deactivate(const rclcpp_lifecycle::State & previous_state);
+LifecycleCallbackReturn_t ImuI2cInit::on_cleanup(const rclcpp_lifecycle::State & previous_state);
+LifecycleCallbackReturn_t ImuI2cInit::on_shutdown(const rclcpp_lifecycle::State & previous_state);
+LifecycleCallbackReturn_t ImuI2cInit::on_error(const rclcpp_lifecycle::State & previous_state);
 
 bool ImuI2cInit::getHandle(hal_imu::hal_imuGetHandle::Request &req,
                            hal_imu::hal_imuGetHandle::Response &res)
@@ -102,33 +43,6 @@ void ImuI2cInit::initI2cCommunication(void)
     {
         RCLCPP_ERROR(get_logger(), "Unable to receive handle for communication with device %u on bus %u!", i2cOpenSrv.request.address, i2cOpenSrv.request.bus);
     }
-}
-
-void ImuI2cInit::pigpioHeartbeatCallback(const hal_pigpio::hal_pigpioHeartbeatMsg &msg)
-{
-    pigpioNodeStarted = msg.isAlive;
-}
-
-bool ImuI2cInit::isPigpioNodeStarted(void)
-{
-    return pigpioNodeStarted;
-}
-
-void ImuI2cInit::publishHeartbeat(const ros::TimerEvent &timerEvent)
-{
-    hal_imu::hal_imuI2cHeartbeatMsg heartbeat;
-    heartbeat.isAlive = true;
-    imuI2cInitPub->publish(heartbeat);
-}
-
-void ImuI2cInit::starts(void)
-{
-    isStarted = true;
-}
-
-bool ImuI2cInit::isNotStarted(void)
-{
-    return !isStarted;
 }
 
 /*int main(int argc, char **argv)

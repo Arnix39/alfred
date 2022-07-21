@@ -6,6 +6,7 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(hal_pigpio_interfaces REQUIRED)
 find_package(hal_proxsens_interfaces REQUIRED)
+find_package(hal_common REQUIRED)
 
 ###########
 ## Build ##
@@ -17,7 +18,8 @@ set(dependencies
   rclcpp
   rclcpp_lifecycle
   hal_pigpio_interfaces
-  hal_proxsens_interfaces)
+  hal_proxsens_interfaces
+  hal_common)
 
 add_library(${PROJECT_NAME} OBJECT src/hal_proxsens.cpp)
 ament_target_dependencies(${PROJECT_NAME} ${dependencies})

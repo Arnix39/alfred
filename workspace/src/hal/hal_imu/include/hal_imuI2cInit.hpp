@@ -1,47 +1,38 @@
 #ifndef HAL_IMU_I2C_INIT
 #define HAL_IMU_I2C_INIT
 
-#include "ros/ros.h"
-
+#include "hal_common.hpp"
 #include "hal_mpu6050.hpp"
-#include "hal_imuI2cInitVirtuals.hpp"
 
 // Services and messages headers (generated)
-#include "hal_pigpio/hal_pigpioI2cOpen.h"
-#include "hal_pigpio/hal_pigpioI2cClose.h"
-#include "hal_pigpio/hal_pigpioI2cReadByteData.h"
-#include "hal_pigpio/hal_pigpioI2cWriteByteData.h"
-#include "hal_pigpio/hal_pigpioHeartbeatMsg.h"
-#include "hal_imu/hal_imuI2cHeartbeatMsg.h"
-#include "hal_imu/hal_imuGetHandle.h"
+#include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_open.hpp"
+#include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_close.hpp"
+#include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_read_byte_data.hpp"
+#include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_write_byte_data.hpp"
+#include "hal_imu_interfaces/srv/hal_imu_get_handle.hpp"
 
 #define IMU_I2C_BUS 0x1
 
-class ImuI2cInit
+class ImuI2cInit : public rclcpp_lifecycle::LifecycleNode
 {
 private:
-    ImuI2cInitClients *imuI2cInitClients;
-    ImuI2cInitServers *imuI2cInitServers;
-    ImuI2cInitPublisher *imuI2cInitPub;
-    ImuI2cInitSubscribers *imuI2cInitSubs;
     int32_t imuHandle;
-    bool pigpioNodeStarted;
-    bool isStarted;
+    rclcpp::Service<hal_imu_interfaces::srv::HalImuGetHandle>::SharedPtr getHandleService;
+    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cOpen>::SharedPtr i2cOpenClient;
+    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cClose>::SharedPtr i2cCloseClient;
 
 public:
-    ImuI2cInit(ImuI2cInitClients *imuI2cInitServiceClients, ImuI2cInitServers *imuI2cInitServiceServers, ImuI2cInitPublisher *imuI2cInitPublisher, ImuI2cInitSubscribers *imuI2cInitSubscribers);
-    ~ImuI2cInit();
-    bool getHandle(hal_imu::hal_imuGetHandle::Request &req,
-                   hal_imu::hal_imuGetHandle::Response &res);
+    ImuI2cInit();
+    ~Pigpio() = default;
+    LifecycleCallbackReturn_t on_configure(const rclcpp_lifecycle::State & previous_state);
+    LifecycleCallbackReturn_t on_activate(const rclcpp_lifecycle::State & previous_state);
+    LifecycleCallbackReturn_t on_deactivate(const rclcpp_lifecycle::State & previous_state);
+    LifecycleCallbackReturn_t on_cleanup(const rclcpp_lifecycle::State & previous_state);
+    LifecycleCallbackReturn_t on_shutdown(const rclcpp_lifecycle::State & previous_state);
+    LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
+    bool getHandle(const std::shared_ptr<hal_imu_interfaces::srv::HalImuGetHandle::Request> request,
+                   std::shared_ptr<hal_imu_interfaces::srv::HalImuGetHandle::Response> response);
     void initI2cCommunication(void);
-    bool writeBitInRegister(uint8_t registerToWrite, uint8_t bitToWrite, uint8_t valueOfBit);
-    void setClockSource(void);
-    void setSleepDisabled(void);
-    bool isPigpioNodeStarted(void);
-    bool isNotStarted(void);
-    void starts(void);
-    void publishHeartbeat(const ros::TimerEvent &timerEvent);
-    void pigpioHeartbeatCallback(const hal_pigpio::hal_pigpioHeartbeatMsg &msg);
 };
 
 #endif

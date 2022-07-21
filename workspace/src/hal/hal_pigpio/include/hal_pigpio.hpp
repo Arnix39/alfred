@@ -1,9 +1,7 @@
 #ifndef HAL_PIGPIO
 #define HAL_PIGPIO
 
-#include "rclcpp/rclcpp.hpp"
-#include "rclcpp_lifecycle/lifecycle_node.hpp"
-#include "lifecycle_msgs/msg/transition.hpp"
+#include "hal_common.hpp"
 
 // Pigpio library
 #include "pigpiod_if2.h"
@@ -66,12 +64,12 @@ public:
     Pigpio();
     ~Pigpio() = default;
 
-    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_configure(const rclcpp_lifecycle::State & previous_state);
-    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_activate(const rclcpp_lifecycle::State & previous_state);
-    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_deactivate(const rclcpp_lifecycle::State & previous_state);
-    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_cleanup(const rclcpp_lifecycle::State & previous_state);
-    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_shutdown(const rclcpp_lifecycle::State & previous_state);
-    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_error(const rclcpp_lifecycle::State & previous_state);
+    LifecycleCallbackReturn_t on_configure(const rclcpp_lifecycle::State & previous_state);
+    LifecycleCallbackReturn_t on_activate(const rclcpp_lifecycle::State & previous_state);
+    LifecycleCallbackReturn_t on_deactivate(const rclcpp_lifecycle::State & previous_state);
+    LifecycleCallbackReturn_t on_cleanup(const rclcpp_lifecycle::State & previous_state);
+    LifecycleCallbackReturn_t on_shutdown(const rclcpp_lifecycle::State & previous_state);
+    LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
 
     void readQuaternions(void);
     void computeQuaternions(char (&data)[MPU6050_DMP_FIFO_QUAT_SIZE]);
