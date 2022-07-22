@@ -1,89 +1,81 @@
 #include "hal_imuDmpWritingServer.hpp"
 
-/* Action server interface implementation */
-ImuDmpWritingActionServerRos::ImuDmpWritingActionServerRos(ros::NodeHandle *node) : imuWriteDmpServerRos(*node, "imuDMPWriting", false)
+using namespace std::placeholders;
+
+ImuDmpWritingServer::ImuDmpWritingServer() : rclcpp_lifecycle::LifecycleNode("hal_imuDmpWritingServer_node"),
+                                             imuHandle(MPU6050_I2C_NO_HANDLE)
 {
 }
 
-void ImuDmpWritingActionServerRos::registerCallback(ImuDmpWritingServer *imuDmpWritingServer)
+LifecycleCallbackReturn_t ImuDmpWritingServer::on_configure(const rclcpp_lifecycle::State & previous_state)
 {
-    imuWriteDmpServerRos.registerGoalCallback((std::function<void()>)std::bind(&ImuDmpWritingServer::writeDmp, imuDmpWritingServer));
+    i2cWriteByteDataClient = this->create_client<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData>("hal_pigpioI2cWriteByteData");
+    i2cWriteBlockDataClient = this->create_client<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData>("hal_pigpioI2cWriteBlockData");
+    imuDmpWritingServer = rclcpp_action::create_server<HalImuWriteDmpAction>(this, 
+                                                                             "hal_imuWriteDmp", 
+                                                                             std::bind(&ImuDmpWritingServer::handle_goal, this, _1, _2),
+                                                                             std::bind(&ImuDmpWritingServer::handle_cancel, this, _1),
+                                                                             std::bind(&ImuDmpWritingServer::handle_accepted, this, _1));
+
+    RCLCPP_INFO(get_logger(), "hal_imuDmpWritingServer node configured!");
+
+    return LifecycleCallbackReturn_t::SUCCESS;
 }
 
-imuDmpWritingActionServer_t *ImuDmpWritingActionServerRos::getActionServerHandle()
+LifecycleCallbackReturn_t ImuDmpWritingServer::on_activate(const rclcpp_lifecycle::State & previous_state)
 {
-    return &imuWriteDmpServerRos;
+    RCLCPP_INFO(get_logger(), "hal_imuDmpWritingServer node activated!");
+
+    return LifecycleCallbackReturn_t::SUCCESS;
 }
 
-/* Services interface implementation */
-ImuDmpWritingClientsRos::ImuDmpWritingClientsRos(ros::NodeHandle *node) : i2cWriteByteDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteByteData>("hal_pigpioI2cWriteByteData")),
-                                                                          i2cWriteBlockDataClientRos(node->serviceClient<hal_pigpio::hal_pigpioI2cWriteBlockData>("hal_pigpioI2cWriteBlockData")),
-                                                                          i2cGetHandleClientRos(node->serviceClient<hal_imu::hal_imuGetHandle>("hal_imuGetHandle"))
+LifecycleCallbackReturn_t ImuDmpWritingServer::on_deactivate(const rclcpp_lifecycle::State & previous_state)
 {
+    RCLCPP_INFO(get_logger(), "hal_imuDmpWritingServer node deactivated!");
+
+    return LifecycleCallbackReturn_t::SUCCESS;
 }
 
-ros::ServiceClient *ImuDmpWritingClientsRos::getWriteByteDataClientHandle()
+LifecycleCallbackReturn_t ImuDmpWritingServer::on_cleanup(const rclcpp_lifecycle::State & previous_state)
 {
-    return &i2cWriteByteDataClientRos;
+    RCLCPP_INFO(get_logger(), "hal_imuDmpWritingServer node unconfigured!");
+
+    return LifecycleCallbackReturn_t::SUCCESS;
 }
 
-ros::ServiceClient *ImuDmpWritingClientsRos::getWriteBlockDataClientHandle()
+LifecycleCallbackReturn_t ImuDmpWritingServer::on_shutdown(const rclcpp_lifecycle::State & previous_state)
 {
-    return &i2cWriteBlockDataClientRos;
+    RCLCPP_INFO(get_logger(), "hal_imuDmpWritingServer node shutdown!");
+
+    return LifecycleCallbackReturn_t::SUCCESS;
 }
 
-ros::ServiceClient *ImuDmpWritingClientsRos::getGetHandleClientHandle()
+LifecycleCallbackReturn_t ImuDmpWritingServer::on_error(const rclcpp_lifecycle::State & previous_state)
 {
-    return &i2cGetHandleClientRos;
+    return LifecycleCallbackReturn_t::FAILURE;
 }
 
-/* Subscriber interface implementation */
-ImuDmpWritingServerSubscribersRos::ImuDmpWritingServerSubscribersRos(ros::NodeHandle *node) : nodeHandle(node)
+rclcpp_action::GoalResponse ImuDmpWritingServer::handle_goal(const rclcpp_action::GoalUUID & uuid, std::shared_ptr<const HalImuWriteDmpAction::Goal> goal)
 {
+    (void)uuid;
+    (void)goal;
+
+    return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
 }
 
-void ImuDmpWritingServerSubscribersRos::subscribe(ImuDmpWritingServer *imuDmpWritingServer)
+rclcpp_action::CancelResponse ImuDmpWritingServer::handle_cancel(const std::shared_ptr<HalImuWriteDmpGoal> goal_handle)
 {
-    imuDmpWritingServerImuI2cInitHBSubRos = nodeHandle->subscribe("hal_imuI2cHeartbeatMsg", 1000, &ImuDmpWritingServer::imuDmpWritingServerI2cInitHeartbeatCallback, imuDmpWritingServer);
+    (void)goal_handle;
+
+    return rclcpp_action::CancelResponse::ACCEPT;
 }
 
-/* IMU DMP implementation */
-ImuDmpWritingServer::ImuDmpWritingServer(ImuDmpWritingActionServer *imuWriteDmpServer, ImuDmpWritingClients *imuDmpServiceClients, ImuDmpWritingServerSubscribers *imuDmpWritingServerSubscribers) : imuDmpWritingServer(imuWriteDmpServer),
-                                                                                                                                                                                                     imuDmpClients(imuDmpServiceClients),
-                                                                                                                                                                                                     imuDmpWritingServerSubs(imuDmpWritingServerSubscribers),
-                                                                                                                                                                                                     i2cInitialised(false),
-                                                                                                                                                                                                     isStarted(false),
-                                                                                                                                                                                                     imuHandle(-1)
+void ImuDmpWritingServer::handle_accepted(const std::shared_ptr<HalImuWriteDmpGoal> goal_handle)
 {
-    imuDmpWritingServerSubs->subscribe(this);
-
-    imuDmpWritingServer->registerCallback(this);
+    std::thread{std::bind(&ImuDmpWritingServer::writeDmp, this, _1), goal_handle}.detach();
 }
 
-void ImuDmpWritingServer::getI2cHandle(void)
-{
-    hal_imu::hal_imuGetHandle i2cGetHandleSrv;
-    imuDmpClients->getGetHandleClientHandle()->call(i2cGetHandleSrv);
-    imuHandle = i2cGetHandleSrv.response.handle;
-}
-
-void ImuDmpWritingServer::startServer(void)
-{
-    imuDmpWritingServer->getActionServerHandle()->start();
-    RCLCPP_INFO(get_logger(), "Action server started.");
-}
-
-bool ImuDmpWritingServer::isI2cInitialised(void)
-{
-    return i2cInitialised;
-}
-
-void ImuDmpWritingServer::imuDmpWritingServerI2cInitHeartbeatCallback(const hal_imu::hal_imuI2cHeartbeatMsg &msg)
-{
-    i2cInitialised = msg.isAlive;
-}
-
-void ImuDmpWritingServer::writeDmp(void)
+void ImuDmpWritingServer::writeDmp(const std::shared_ptr<HalImuWriteDmpGoal> goal_handle)
 {
     /* This address is the start address of DMP code */
     /* It is coming from InvenSense */
@@ -97,9 +89,10 @@ void ImuDmpWritingServer::writeDmp(void)
     std::vector<uint8_t> data;
     bool writeSuccess = false;
 
-    bool writeRequest = imuDmpWritingServer->getActionServerHandle()->acceptNewGoal()->write;
+    auto feedback = std::make_shared<HalImuWriteDmpAction::Feedback>();
+    auto result = std::make_shared<HalImuWriteDmpAction::Result>();
 
-    result.success = true;
+    (void)goal_handle;
 
     RCLCPP_INFO(get_logger(), "Started writing DMP code.");
 
@@ -116,11 +109,17 @@ void ImuDmpWritingServer::writeDmp(void)
         {
             chunkAddressInBank = byteAddressInBank - indexInChunk;
             
+            if(chunkAddressInBank == 0)
+            {
+                /* A new bank is starting */
+                feedback->bank = bank;
+                goal_handle->publish_feedback(feedback);
+            }
+
             if (!writeData(bank, chunkAddressInBank, data))
             {
                 RCLCPP_ERROR(get_logger(), "Failed to write DMP code: chunk at address %u of bank %u not written!", chunkAddressInBank, bank);
-                result.success = false;
-                imuDmpWritingServer->getActionServerHandle()->setAborted(result);
+                goal_handle->abort(result);
                 return;
             }
 
@@ -128,18 +127,17 @@ void ImuDmpWritingServer::writeDmp(void)
         }
     }
 
-    writeSuccess = writeByteInRegister(MPU6050_DMP_START_ADDRESS_H_REGISTER, startAddressMsb);
-    writeSuccess &= writeByteInRegister(MPU6050_DMP_START_ADDRESS_L_REGISTER, startAddressLsb);
+    writeSuccess = writeByteInRegister(i2cWriteByteDataClient, imuHandle, MPU6050_DMP_START_ADDRESS_H_REGISTER, startAddressMsb);
+    writeSuccess &= writeByteInRegister(i2cWriteByteDataClient, imuHandle, MPU6050_DMP_START_ADDRESS_L_REGISTER, startAddressLsb);
     if (!writeSuccess)
     {
         RCLCPP_ERROR(get_logger(), "Failed to write DMP code: start address not written!");
-        result.success = false;
-        imuDmpWritingServer->getActionServerHandle()->setAborted(result);
+        goal_handle->abort(result);
         return;
     }
 
     RCLCPP_INFO(get_logger(), "Successfully wrote DMP code.");
-    imuDmpWritingServer->getActionServerHandle()->setSucceeded(result);
+    goal_handle->succeed(result);
 }
 
 bool ImuDmpWritingServer::writeData(uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data)
@@ -147,90 +145,21 @@ bool ImuDmpWritingServer::writeData(uint8_t bank, uint8_t addressInBank, std::ve
     if (addressInBank == 0)
     {
         /* A new bank is starting */
-        if (!writeByteInRegister(MPU6050_BANK_SELECTION_REGISTER, bank))
+        if (!writeByteInRegister(i2cWriteByteDataClient, imuHandle, MPU6050_BANK_SELECTION_REGISTER, bank))
         {
             return false;
         }
     }
 
-    if (!writeByteInRegister(MPU6050_ADDRESS_IN_BANK_REGISTER, addressInBank))
+    if (!writeByteInRegister(i2cWriteByteDataClient, imuHandle, MPU6050_ADDRESS_IN_BANK_REGISTER, addressInBank))
     {
         return false;
     }
 
-    if (!writeDataBlock(MPU6050_READ_WRITE_REGISTER, data))
+    if (!writeDataBlock(i2cWriteBlockDataClient, imuHandle, MPU6050_READ_WRITE_REGISTER, data))
     {
         return false;
     }
 
     return true;
 }
-
-bool ImuDmpWritingServer::writeByteInRegister(uint8_t registerToWrite, uint8_t value)
-{
-    hal_pigpio::hal_pigpioI2cWriteByteData i2cWriteByteDataSrv;
-
-    i2cWriteByteDataSrv.request.handle = imuHandle;
-    i2cWriteByteDataSrv.request.deviceRegister = registerToWrite;
-    i2cWriteByteDataSrv.request.value = value;
-
-    imuDmpClients->getWriteByteDataClientHandle()->call(i2cWriteByteDataSrv);
-
-    return i2cWriteByteDataSrv.response.hasSucceeded;
-}
-
-bool ImuDmpWritingServer::writeDataBlock(uint8_t registerToWrite, std::vector<uint8_t> data)
-{
-    hal_pigpio::hal_pigpioI2cWriteBlockData i2cWriteBlockDataSrv;
-
-    i2cWriteBlockDataSrv.request.handle = imuHandle;
-    i2cWriteBlockDataSrv.request.deviceRegister = registerToWrite;
-    i2cWriteBlockDataSrv.request.length = data.size();
-
-    for (uint8_t index = 0; index < data.size(); index++)
-    {
-        i2cWriteBlockDataSrv.request.dataBlock.push_back(data.at(index));
-    }
-
-    imuDmpClients->getWriteBlockDataClientHandle()->call(i2cWriteBlockDataSrv);
-
-    return i2cWriteBlockDataSrv.response.hasSucceeded;
-}
-
-void ImuDmpWritingServer::starts(void)
-{
-    isStarted = true;
-}
-
-bool ImuDmpWritingServer::isNotStarted(void)
-{
-    return !isStarted;
-}
-
-/*int main(int argc, char **argv)
-{
-    ros::init(argc, argv, "hal_imuDmpWritingServer");
-    ros::NodeHandle node;
-
-    ImuDmpWritingClientsRos imuServiceClients(&node);
-    ImuDmpWritingActionServerRos imuWriteDmpServer(&node);
-    ImuDmpWritingServerSubscribersRos imuDmpWritingServerSubscribers(&node);
-
-    ImuDmpWritingServer imuDmpWritingServer(&imuWriteDmpServer, &imuServiceClients, &imuDmpWritingServerSubscribers);
-
-    RCLCPP_INFO(get_logger(), "imuDmpWritingServer node waiting for I2C communication to be ready...");
-    while (ros::ok())
-    {
-        if (imuDmpWritingServer.isNotStarted() && imuDmpWritingServer.isI2cInitialised())
-        {
-            imuDmpWritingServer.getI2cHandle();
-            RCLCPP_INFO(get_logger(), "imuDmpWritingServer I2C communication ready.");
-            imuDmpWritingServer.startServer();
-            imuDmpWritingServer.starts();
-        }
-
-        ros::spinOnce();
-    }
-
-    return 0;
-}*/
