@@ -134,6 +134,13 @@ def generate_launch_description():
         )
     )
 
+    emit_event_to_request_hal_motor_control_configure_transition = launch.actions.EmitEvent(
+        event=launch_ros.events.lifecycle.ChangeState(
+            lifecycle_node_matcher=launch.events.matches_action(hal_motor_control_node),
+            transition_id=lifecycle_msgs.msg.Transition.TRANSITION_CONFIGURE,
+        )
+    )
+
     ld.add_action(register_event_handler_for_hal_pigpio_reaches_inactive_state)
     ld.add_action(register_event_handler_for_hal_pigpio_reaches_active_state)
     ld.add_action(register_event_handler_for_hal_imuI2cInit_reaches_active_state)
@@ -149,5 +156,6 @@ def generate_launch_description():
     ld.add_action(emit_event_to_request_hal_imuI2cInit_configure_transition)
     ld.add_action(emit_event_to_request_hal_imuDmpWritingServer_configure_transition)
     ld.add_action(emit_event_to_request_hal_imu_configure_transition)
+    ld.add_action(emit_event_to_request_hal_motor_control_configure_transition)
 
     return ld

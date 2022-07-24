@@ -37,6 +37,8 @@ LifecycleCallbackReturn_t MotorControl::on_activate(const rclcpp_lifecycle::Stat
 {
     motorControlPub->on_activate();
 
+    configureMotor();
+
     RCLCPP_INFO(get_logger(), "hal_motor_control node activated!");
 
     return LifecycleCallbackReturn_t::SUCCESS;
