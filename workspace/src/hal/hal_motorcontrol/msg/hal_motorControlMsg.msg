@@ -1,2 +1,0 @@
-uint32 motorLeftEncoderCount
-uint32 motorRightEncoderCount

@@ -1,5 +1,4 @@
 #include "hal_motorControl.hpp"
-#include "hal_motorControlInterfaces.hpp"
 
 /* Publishers interface implementation */
 MotorControlPublishersRos::MotorControlPublishersRos(ros::NodeHandle *node) : motorControlPubRos(node->advertise<hal_motorcontrol::hal_motorControlMsg>("motorsEncoderCountValue", 1000))
@@ -63,17 +62,13 @@ ros::ServiceClient *MotorControlClientsRos::getSetMotorDirectionClientHandle()
 }
 
 /* Motor control implementation */
-MotorControl::MotorControl(MotorControlSubscribers *motorControlSubscribers,
-                           MotorControlPublishers *motorControlPublishers, 
-                           MotorControlClients *motorControlServiceClients) : motorControlPubs(motorControlPublishers),
-                                                                              motorControlClients(motorControlServiceClients),
-                                                                              motorControlSubs(motorControlSubscribers),
-                                                                              motorLeft(MOTOR_LEFT_PWM_A_GPIO, MOTOR_LEFT_PWM_B_GPIO,
-                                                                                        MOTOR_LEFT_ENCODER_CH_A_GPIO, MOTOR_LEFT_ENCODER_CH_B_GPIO,
-                                                                                        MOTOR_LEFT),
-                                                                              motorRight(MOTOR_RIGHT_PWM_A_GPIO, MOTOR_RIGHT_PWM_B_GPIO,
-                                                                                         MOTOR_RIGHT_ENCODER_CH_A_GPIO, MOTOR_RIGHT_ENCODER_CH_B_GPIO,
-                                                                                         MOTOR_RIGHT)
+MotorControl::MotorControl() : rclcpp_lifecycle::LifecycleNode("hal_motorControl_node"),
+                               motorLeft(MOTOR_LEFT_PWM_A_GPIO, MOTOR_LEFT_PWM_B_GPIO,
+                                         MOTOR_LEFT_ENCODER_CH_A_GPIO, MOTOR_LEFT_ENCODER_CH_B_GPIO,
+                                         MOTOR_LEFT),
+                               motorRight(MOTOR_RIGHT_PWM_A_GPIO, MOTOR_RIGHT_PWM_B_GPIO,
+                                          MOTOR_RIGHT_ENCODER_CH_A_GPIO, MOTOR_RIGHT_ENCODER_CH_B_GPIO,
+                                          MOTOR_RIGHT)
 {
     motorControlSubs->subscribe(this);
 }
@@ -147,7 +142,7 @@ void MotorControl::setPwmRight(uint16_t dutycycle, bool direction)
     motorRight.setPwmDutyCycleAndDirection(dutycycle, direction);
 }
 
-int main(int argc, char **argv)
+/*int main(int argc, char **argv)
 {
     ros::init(argc, argv, "hal_motorcontrol");
     ros::NodeHandle node;
@@ -196,4 +191,4 @@ int main(int argc, char **argv)
     }
 
     return 0;
-}
+}*/
