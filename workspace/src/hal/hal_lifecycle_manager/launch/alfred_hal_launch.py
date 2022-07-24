@@ -31,6 +31,10 @@ def generate_launch_description():
         name='hal_imu', namespace='',
         package='hal_imu', executable='hal_imu_node', output='screen')
 
+    hal_motor_control_node = launch_ros.actions.LifecycleNode(
+        name='hal_motor_control', namespace='',
+        package='hal_motor_control', executable='hal_motor_control_node', output='screen')
+
     register_event_handler_for_hal_pigpio_reaches_inactive_state = launch.actions.RegisterEventHandler(
         launch_ros.event_handlers.OnStateTransition(
             target_lifecycle_node=hal_pigpio_node, goal_state='inactive',
@@ -50,7 +54,7 @@ def generate_launch_description():
             target_lifecycle_node=hal_pigpio_node, goal_state='active',
             entities=[
                 launch.actions.LogInfo(
-                    msg="hal_pigpio_node active, activating hal_proxsens_node and hal_imuI2cInit_node."),
+                    msg="hal_pigpio_node active, activating hal_proxsens_node, hal_imuI2cInit_node and hal_motor_control_node."),
                 launch.actions.EmitEvent(event=launch_ros.events.lifecycle.ChangeState(
                     lifecycle_node_matcher=launch.events.matches_action(hal_proxsens_node),
                     transition_id=lifecycle_msgs.msg.Transition.TRANSITION_ACTIVATE,
@@ -59,6 +63,10 @@ def generate_launch_description():
                     lifecycle_node_matcher=launch.events.matches_action(hal_imuI2cInit_node),
                     transition_id=lifecycle_msgs.msg.Transition.TRANSITION_ACTIVATE,
                 )),
+                launch.actions.EmitEvent(event=launch_ros.events.lifecycle.ChangeState(
+                    lifecycle_node_matcher=launch.events.matches_action(hal_motor_control_node),
+                    transition_id=lifecycle_msgs.msg.Transition.TRANSITION_ACTIVATE,
+                ))
             ],
         )
     )
@@ -135,6 +143,7 @@ def generate_launch_description():
     ld.add_action(hal_imuI2cInit_node)
     ld.add_action(hal_imuDmpWritingServer_node)
     ld.add_action(hal_imu_node)
+    ld.add_action(hal_motor_control_node)
     ld.add_action(emit_event_to_request_hal_pigpio_configure_transition)
     ld.add_action(emit_event_to_request_hal_proxsens_configure_transition)
     ld.add_action(emit_event_to_request_hal_imuI2cInit_configure_transition)
