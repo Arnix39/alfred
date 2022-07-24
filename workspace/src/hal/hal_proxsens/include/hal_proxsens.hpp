@@ -40,29 +40,35 @@ private:
     uint32_t timestamp;
     uint32_t echoCallbackId;
     uint16_t distanceInCm;
+
     rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>::SharedPtr gpioSetInputClient;
     rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>::SharedPtr gpioSetOutputClient;
     rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetCallback>::SharedPtr gpioSetCallbackClient;
     rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse>::SharedPtr gpioSendTriggerPulseClient;
     rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh>::SharedPtr gpioSetGpioHighClient;
+
     rclcpp_lifecycle::LifecyclePublisher<hal_proxsens_interfaces::msg::HalProxsens>::SharedPtr proxsensDistancePub;
+
     rclcpp::Subscription<hal_pigpio_interfaces::msg::HalPigpioEdgeChange>::SharedPtr proxsensEdgeChangeSub;
 
 public:
     Proxsens();
     ~Proxsens() = default;
+
     LifecycleCallbackReturn_t on_configure(const rclcpp_lifecycle::State & previous_state);
     LifecycleCallbackReturn_t on_activate(const rclcpp_lifecycle::State & previous_state);
     LifecycleCallbackReturn_t on_deactivate(const rclcpp_lifecycle::State & previous_state);
     LifecycleCallbackReturn_t on_cleanup(const rclcpp_lifecycle::State & previous_state);
     LifecycleCallbackReturn_t on_shutdown(const rclcpp_lifecycle::State & previous_state);
     LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
+    
     void publishDistance(void);
     void configureGpios(void);
     void trigger(void);
     void enableOutputLevelShifter(void);
-    void edgeChangeCallback(const hal_pigpio_interfaces::msg::HalPigpioEdgeChange &msg);
     void publishAndGetDistance(void);
+
+    void edgeChangeCallback(const hal_pigpio_interfaces::msg::HalPigpioEdgeChange &msg);
 };
 
 #endif

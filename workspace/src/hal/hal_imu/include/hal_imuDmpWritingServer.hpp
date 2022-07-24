@@ -23,9 +23,11 @@ class ImuDmpWritingServer : public rclcpp_lifecycle::LifecycleNode
 {
 private:
     int32_t imuHandle;
-    rclcpp_action::Server<HalImuWriteDmpAction>::SharedPtr imuDmpWritingServer;
+
     rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData>::SharedPtr i2cWriteByteDataClient;
     rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData>::SharedPtr i2cWriteBlockDataClient;
+
+    rclcpp_action::Server<HalImuWriteDmpAction>::SharedPtr imuDmpWritingServer;
     rclcpp_action::GoalResponse handle_goal(const rclcpp_action::GoalUUID & uuid, std::shared_ptr<const HalImuWriteDmpAction::Goal> goal);
     rclcpp_action::CancelResponse handle_cancel(const std::shared_ptr<HalImuWriteDmpGoal> goal_handle);
     void handle_accepted(const std::shared_ptr<HalImuWriteDmpGoal> goal_handle);
@@ -33,12 +35,14 @@ private:
 public:
     ImuDmpWritingServer();
     ~ImuDmpWritingServer() = default;
+
     LifecycleCallbackReturn_t on_configure(const rclcpp_lifecycle::State & previous_state);
     LifecycleCallbackReturn_t on_activate(const rclcpp_lifecycle::State & previous_state);
     LifecycleCallbackReturn_t on_deactivate(const rclcpp_lifecycle::State & previous_state);
     LifecycleCallbackReturn_t on_cleanup(const rclcpp_lifecycle::State & previous_state);
     LifecycleCallbackReturn_t on_shutdown(const rclcpp_lifecycle::State & previous_state);
     LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
+    
     void startServer(void);
     void writeDmp(const std::shared_ptr<HalImuWriteDmpGoal> goal_handle);
     bool writeData(uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data);

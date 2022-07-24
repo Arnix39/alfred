@@ -40,11 +40,13 @@ class Imu : public rclcpp_lifecycle::LifecycleNode
 {
 private:
     int32_t imuHandle;
+
     rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData>::SharedPtr i2cReadByteDataClient;
     rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData>::SharedPtr i2cWriteByteDataClient;
     rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData>::SharedPtr i2cWriteBlockDataClient;
     rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading>::SharedPtr i2cImuReadingClient;
     rclcpp::Client<hal_imu_interfaces::srv::HalImuGetHandle>::SharedPtr imuGetHandleClient;
+    
     rclcpp_action::Client<hal_imu_interfaces::action::HalImuWriteDmp>::SharedPtr imuDmpWritingClient;
 
     void goal_response_callback(HalImuWriteDmpGoal::SharedPtr goal_handle);
@@ -54,12 +56,14 @@ private:
 public:
     Imu();
     ~Imu() = default;
+
     LifecycleCallbackReturn_t on_configure(const rclcpp_lifecycle::State & previous_state);
     LifecycleCallbackReturn_t on_activate(const rclcpp_lifecycle::State & previous_state);
     LifecycleCallbackReturn_t on_deactivate(const rclcpp_lifecycle::State & previous_state);
     LifecycleCallbackReturn_t on_cleanup(const rclcpp_lifecycle::State & previous_state);
     LifecycleCallbackReturn_t on_shutdown(const rclcpp_lifecycle::State & previous_state);
     LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
+    
     void init(void);
     void writeDmp(void);
     void setDmpRate(uint16_t rate);
