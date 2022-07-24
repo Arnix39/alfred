@@ -1,44 +1,42 @@
 #ifndef HAL_MOTOR_CONTROL
 #define HAL_MOTOR_CONTROL
 
-#include "ros/ros.h"
-#include "hal_motorControlVirtuals.hpp"
-#include "commonDefinitions.hpp"
+#include "hal_motor_control_commonDefinitions.hpp"
 #include "hal_motor.hpp"
 
-// Services and messages headers (generated)
-#include "hal_pigpio/hal_pigpioSetInputMode.h"
-#include "hal_pigpio/hal_pigpioSetOutputMode.h"
-#include "hal_pigpio/hal_pigpioSetEncoderCallback.h"
-#include "hal_pigpio/hal_pigpioSetPwmFrequency.h"
-#include "hal_pigpio/hal_pigpioSetPwmDutycycle.h"
-#include "hal_pigpio/hal_pigpioSetMotorDirection.h"
-#include "hal_pigpio/hal_pigpioHeartbeatMsg.h"
-#include "hal_pigpio/hal_pigpioEncoderCountMsg.h"
-#include "hal_motorcontrol/hal_motorControlMsg.h"
-
-class MotorControl
+class MotorControl : public rclcpp_lifecycle::LifecycleNode
 {
 private:
-    MotorControlPublishers *motorControlPubs;
-    MotorControlClients *motorControlClients;
-    MotorControlSubscribers *motorControlSubs;
     Motor motorLeft;
     Motor motorRight;
-    bool pigpioNodeStarted;
-    bool isStarted;
+
+    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>::SharedPtr gpioSetInputClient;
+    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>::SharedPtr gpioSetOutputClient;
+    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback>::SharedPtr gpioSetEncoderCallbackClient;
+    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency>::SharedPtr gpioSetPwmFrequencyClient;
+    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle>::SharedPtr gpioSetPwmDutycycleClient;
+    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection>::SharedPtr gpioSetMotorDirectionClient;
+
+    rclcpp_lifecycle::LifecyclePublisher<hal_motor_control_interfaces::msg::HalMotorControl>::SharedPtr motorControlPub;
+
+    rclcpp::Subscription<hal_pigpio_interfaces::msg::HalPigpioEncoderCount>::SharedPtr motorControlECSub;
+
+    rclcpp::TimerBase::SharedPtr encoderCountsTimer;
 
 public:
-    MotorControl(MotorControlSubscribers *motorControlSubscribers, MotorControlPublishers *motorControlPublishers, MotorControlClients *motorControlServiceClients);
+    MotorControl();
     ~MotorControl() = default;
-    void configureMotor(void);
-    void publishMessage(const ros::TimerEvent &timerEvent);
-    bool isNotStarted(void);
-    void starts(void);
-    bool isPigpioNodeStarted(void);
-    void pigpioHeartbeatCallback(const hal_pigpio::hal_pigpioHeartbeatMsg &msg);
-    void pigpioEncoderCountCallback(const hal_pigpio::hal_pigpioEncoderCountMsg &msg);
 
+    LifecycleCallbackReturn_t on_configure(const rclcpp_lifecycle::State & previous_state);
+    LifecycleCallbackReturn_t on_activate(const rclcpp_lifecycle::State & previous_state);
+    LifecycleCallbackReturn_t on_deactivate(const rclcpp_lifecycle::State & previous_state);
+    LifecycleCallbackReturn_t on_cleanup(const rclcpp_lifecycle::State & previous_state);
+    LifecycleCallbackReturn_t on_shutdown(const rclcpp_lifecycle::State & previous_state);
+    LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
+    
+    void configureMotor(void);
+    void publishMessage(void);
+    void pigpioEncoderCountCallback(const hal_pigpio_interfaces::msg::HalPigpioEncoderCount &msg);
     void setPwmLeft(uint16_t dutycycle, bool direction);
     void setPwmRight(uint16_t dutycycle, bool direction);
 };

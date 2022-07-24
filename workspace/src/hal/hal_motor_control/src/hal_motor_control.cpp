@@ -1,67 +1,8 @@
-#include "hal_motorControl.hpp"
+#include "hal_motor_control.hpp"
 
-/* Publishers interface implementation */
-MotorControlPublishersRos::MotorControlPublishersRos(ros::NodeHandle *node) : motorControlPubRos(node->advertise<hal_motorcontrol::hal_motorControlMsg>("motorsEncoderCountValue", 1000))
-{
-}
+using namespace std::placeholders;
+using namespace std::chrono_literals;
 
-void MotorControlPublishersRos::publishEncoderCounts(hal_motorcontrol::hal_motorControlMsg message)
-{
-    motorControlPubRos.publish(message);
-}
-
-/* Subscriber interface implementation */
-MotorControlSubscribersRos::MotorControlSubscribersRos(ros::NodeHandle *node) : nodeHandle(node)
-{
-}
-
-void MotorControlSubscribersRos::subscribe(MotorControl *motorControl)
-{
-    motorControlPigpioHBSubRos = nodeHandle->subscribe("hal_pigpioHeartbeat", 1000, &MotorControl::pigpioHeartbeatCallback, motorControl);
-    motorControlPigpioECSubRos = nodeHandle->subscribe("hal_pigpioEncoderCount", 1000, &MotorControl::pigpioEncoderCountCallback, motorControl);
-}
-
-/* Services interface implementation */
-MotorControlClientsRos::MotorControlClientsRos(ros::NodeHandle *node) : gpioSetInputClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetInputMode>("hal_pigpioSetInputMode")),
-                                                                        gpioSetOutputClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetOutputMode>("hal_pigpioSetOutputMode")),
-                                                                        gpioSetEncoderCallbackClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetEncoderCallback>("hal_pigpioSetEncoderCallback")),
-                                                                        gpioSetPwmFrequencyClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetPwmFrequency>("hal_pigpioSetPwmFrequency")),
-                                                                        gpioSetPwmDutycycleClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetPwmDutycycle>("hal_pigpioSetPwmDutycycle")),
-                                                                        gpioSetMotorDirectionClientRos(node->serviceClient<hal_pigpio::hal_pigpioSetMotorDirection>("hal_pigpioSetMotorDirection"))
-{
-}
-
-ros::ServiceClient *MotorControlClientsRos::getSetInputClientHandle()
-{
-    return &gpioSetInputClientRos;
-}
-
-ros::ServiceClient *MotorControlClientsRos::getSetOutputClientHandle()
-{
-    return &gpioSetOutputClientRos;
-}
-
-ros::ServiceClient *MotorControlClientsRos::getSetEncoderCallbackClientHandle()
-{
-    return &gpioSetEncoderCallbackClientRos;
-}
-
-ros::ServiceClient *MotorControlClientsRos::getSetPwmFrequencyClientHandle()
-{
-    return &gpioSetPwmFrequencyClientRos;
-}
-
-ros::ServiceClient *MotorControlClientsRos::getSetPwmDutycycleClientHandle()
-{
-    return &gpioSetPwmDutycycleClientRos;
-}
-
-ros::ServiceClient *MotorControlClientsRos::getSetMotorDirectionClientHandle()
-{
-    return &gpioSetMotorDirectionClientRos;
-}
-
-/* Motor control implementation */
 MotorControl::MotorControl() : rclcpp_lifecycle::LifecycleNode("hal_motorControl_node"),
                                motorLeft(MOTOR_LEFT_PWM_A_GPIO, MOTOR_LEFT_PWM_B_GPIO,
                                          MOTOR_LEFT_ENCODER_CH_A_GPIO, MOTOR_LEFT_ENCODER_CH_B_GPIO,
@@ -70,31 +11,87 @@ MotorControl::MotorControl() : rclcpp_lifecycle::LifecycleNode("hal_motorControl
                                           MOTOR_RIGHT_ENCODER_CH_A_GPIO, MOTOR_RIGHT_ENCODER_CH_B_GPIO,
                                           MOTOR_RIGHT)
 {
-    motorControlSubs->subscribe(this);
 }
+
+LifecycleCallbackReturn_t MotorControl::on_configure(const rclcpp_lifecycle::State & previous_state)
+{
+    gpioSetInputClient = this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>("hal_pigpioSetInputMode");
+    gpioSetOutputClient = this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>("hal_pigpioSetOutputMode");
+    gpioSetEncoderCallbackClient = this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback>("hal_pigpioSetEncoderCallback");
+    gpioSetPwmFrequencyClient = this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency>("hal_pigpioSetPwmFrequency");
+    gpioSetPwmDutycycleClient = this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle>("hal_pigpioSetPwmDutycycle");
+    gpioSetMotorDirectionClient = this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection>("hal_pigpioSetMotorDirection");
+
+    motorControlPub = this->create_publisher<hal_motor_control_interfaces::msg::HalMotorControl>("motorsEncoderCountValue", 1000);
+
+    motorControlECSub = this->create_subscription<hal_pigpio_interfaces::msg::HalPigpioEncoderCount>("hal_pigpioEncoderCount", 1000, std::bind(&MotorControl::pigpioEncoderCountCallback, this, _1));
+    
+    encoderCountsTimer = create_wall_timer(5ms, std::bind(&MotorControl::publishMessage, this));
+
+    RCLCPP_INFO(get_logger(), "hal_motor_control node configured!");
+
+    return LifecycleCallbackReturn_t::SUCCESS;
+}
+
+LifecycleCallbackReturn_t MotorControl::on_activate(const rclcpp_lifecycle::State & previous_state)
+{
+    motorControlPub->on_activate();
+
+    RCLCPP_INFO(get_logger(), "hal_motor_control node activated!");
+
+    return LifecycleCallbackReturn_t::SUCCESS;
+}
+
+LifecycleCallbackReturn_t MotorControl::on_deactivate(const rclcpp_lifecycle::State & previous_state)
+{
+    motorControlPub->on_deactivate();
+
+    RCLCPP_INFO(get_logger(), "hal_motor_control node deactivated!");
+
+    return LifecycleCallbackReturn_t::SUCCESS;
+}
+
+LifecycleCallbackReturn_t MotorControl::on_cleanup(const rclcpp_lifecycle::State & previous_state)
+{
+    motorControlPub.reset();
+    encoderCountsTimer.reset();
+
+    RCLCPP_INFO(get_logger(), "hal_motor_control node unconfigured!");
+
+    return LifecycleCallbackReturn_t::SUCCESS;
+}
+
+LifecycleCallbackReturn_t MotorControl::on_shutdown(const rclcpp_lifecycle::State & previous_state)
+{
+    motorControlPub.reset();
+    encoderCountsTimer.reset();
+
+    RCLCPP_INFO(get_logger(), "hal_motor_control node shutdown!");
+
+    return LifecycleCallbackReturn_t::SUCCESS;
+}
+
+LifecycleCallbackReturn_t MotorControl::on_error(const rclcpp_lifecycle::State & previous_state)
+{
+    return LifecycleCallbackReturn_t::FAILURE;
+}
+
 
 void MotorControl::configureMotor(void)
 {
-    motorLeft.configureGpios(motorControlClients->getSetOutputClientHandle(), motorControlClients->getSetInputClientHandle(), 
-                             motorControlClients->getSetEncoderCallbackClientHandle(), motorControlClients->getSetPwmFrequencyClientHandle());
-    motorLeft.configureSetPwmDutycycleClientHandle(motorControlClients->getSetPwmDutycycleClientHandle());
-    motorLeft.configureSetMotorDirectionClientHandle(motorControlClients->getSetMotorDirectionClientHandle());
-
-    motorRight.configureGpios(motorControlClients->getSetOutputClientHandle(), motorControlClients->getSetInputClientHandle(), 
-                              motorControlClients->getSetEncoderCallbackClientHandle(), motorControlClients->getSetPwmFrequencyClientHandle());
-    motorRight.configureSetPwmDutycycleClientHandle(motorControlClients->getSetPwmDutycycleClientHandle());
-    motorRight.configureSetMotorDirectionClientHandle(motorControlClients->getSetMotorDirectionClientHandle());
+    motorLeft.configureGpios(gpioSetOutputClient, gpioSetInputClient, gpioSetEncoderCallbackClient, gpioSetPwmFrequencyClient);
+    motorRight.configureGpios(gpioSetOutputClient, gpioSetInputClient, gpioSetEncoderCallbackClient, gpioSetPwmFrequencyClient);
 }
 
-void MotorControl::pigpioEncoderCountCallback(const hal_pigpio::hal_pigpioEncoderCountMsg &msg)
+void MotorControl::pigpioEncoderCountCallback(const hal_pigpio_interfaces::msg::HalPigpioEncoderCount &msg)
 {
-    if (msg.motorId == MOTOR_LEFT)
+    if (msg.motor_id == MOTOR_LEFT)
     {
-        motorLeft.setEncoderCount(msg.encoderCount);
+        motorLeft.setEncoderCount(msg.encoder_count);
     }
-    else if (msg.motorId == MOTOR_RIGHT)
+    else if (msg.motor_id == MOTOR_RIGHT)
     {
-        motorRight.setEncoderCount(msg.encoderCount);
+        motorRight.setEncoderCount(msg.encoder_count);
     }
     else
     {
@@ -103,92 +100,21 @@ void MotorControl::pigpioEncoderCountCallback(const hal_pigpio::hal_pigpioEncode
     
 }
 
-void MotorControl::publishMessage(const ros::TimerEvent &timerEvent)
+void MotorControl::publishMessage(void)
 {
-    hal_motorcontrol::hal_motorControlMsg message;
+    auto encoderCounts = hal_motor_control_interfaces::msg::HalMotorControl();
 
-    message.motorLeftEncoderCount = motorLeft.getEncoderCount();
-    message.motorRightEncoderCount = motorRight.getEncoderCount();
-    motorControlPubs->publishEncoderCounts(message);
-}
-
-void MotorControl::starts(void)
-{
-    isStarted = true;
-}
-
-bool MotorControl::isNotStarted(void)
-{
-    return !isStarted;
-}
-
-void MotorControl::pigpioHeartbeatCallback(const hal_pigpio::hal_pigpioHeartbeatMsg &msg)
-{
-    pigpioNodeStarted = msg.isAlive;
-}
-
-bool MotorControl::isPigpioNodeStarted(void)
-{
-    return pigpioNodeStarted;
+    encoderCounts.motor_left_encoder_count = motorLeft.getEncoderCount();
+    encoderCounts.motor_right_encoder_count = motorRight.getEncoderCount();
+    motorControlPub->publish(encoderCounts);
 }
 
 void MotorControl::setPwmLeft(uint16_t dutycycle, bool direction)
 {
-    motorLeft.setPwmDutyCycleAndDirection(dutycycle, direction);
+    motorLeft.setPwmDutyCycleAndDirection(gpioSetPwmDutycycleClient, dutycycle, gpioSetMotorDirectionClient, direction);
 }
 
 void MotorControl::setPwmRight(uint16_t dutycycle, bool direction)
 {
-    motorRight.setPwmDutyCycleAndDirection(dutycycle, direction);
+    motorRight.setPwmDutyCycleAndDirection(gpioSetPwmDutycycleClient, dutycycle, gpioSetMotorDirectionClient, direction);
 }
-
-/*int main(int argc, char **argv)
-{
-    ros::init(argc, argv, "hal_motorcontrol");
-    ros::NodeHandle node;
-
-    MotorControlSubscribersRos motorControlSubscribersRos(&node);
-    MotorControlPublishersRos motorControlPublishersRos(&node);
-    MotorControlClientsRos motorControlServiceClientsRos(&node);
-
-    MotorControl motorControl(&motorControlSubscribersRos, &motorControlPublishersRos, &motorControlServiceClientsRos);
-
-    ros::Timer motorControlECTimer(node.createTimer(ros::Duration(0.05), &MotorControl::publishMessage, &motorControl));
-
-    ros::Rate rate(1);
-
-    RCLCPP_INFO(get_logger(), "motorControl node waiting for pigpio node to start...");
-    while (ros::ok())
-    {
-        if (motorControl.isNotStarted() && motorControl.isPigpioNodeStarted())
-        {
-            RCLCPP_INFO(get_logger(), "motorControl node initialising...");
-            motorControl.configureMotor();
-            motorControl.starts();
-            RCLCPP_INFO(get_logger(), "motorControl node initialised.");
-        }
-        else if(!motorControl.isNotStarted())
-        {
-            static uint16_t dutycycle = 0;
-            static bool direction = true;
-
-            if(dutycycle > 255)
-            {
-                direction = !direction;
-                dutycycle = 0;
-            }
-
-            RCLCPP_INFO(get_logger(), "Dutycycle: %d.", dutycycle);
-
-            motorControl.setPwmLeft(dutycycle, direction);
-            motorControl.setPwmRight(dutycycle, direction);
-
-            dutycycle = dutycycle + 10;
-        }
-
-        rate.sleep();
-        ros::spinOnce();
-    }
-
-    return 0;
-}*/
