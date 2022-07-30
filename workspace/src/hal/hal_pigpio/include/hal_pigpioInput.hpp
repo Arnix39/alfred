@@ -11,10 +11,10 @@
 
 struct Motor
 {
-    uint8_t id;
-    std::vector<unsigned> gpios;
-    int32_t encoderCount;
-    bool isDirectionForward;
+  uint8_t id;
+  std::vector<unsigned> gpios;
+  int32_t encoderCount;
+  bool isDirectionForward;
 };
 
 #endif

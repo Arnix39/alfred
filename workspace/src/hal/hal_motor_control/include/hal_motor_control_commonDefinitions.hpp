@@ -35,11 +35,17 @@
 #define RISING_EDGE 1
 #define NO_CHANGE 2
 
-using SetInputModeFuture_t = rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>::SharedFuture;
-using SetOutputModeFuture_t = rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>::SharedFuture;
-using SetEncoderCallbackFuture_t = rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback>::SharedFuture;
-using SetPwmFrequencyFuture_t = rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency>::SharedFuture;
-using SetPwmDutycycleFuture_t = rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle>::SharedFuture;
-using SetMotorDirectionFuture_t = rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection>::SharedFuture;
+using SetInputModeFuture_t =
+  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>::SharedFuture;
+using SetOutputModeFuture_t =
+  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>::SharedFuture;
+using SetEncoderCallbackFuture_t =
+  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback>::SharedFuture;
+using SetPwmFrequencyFuture_t =
+  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency>::SharedFuture;
+using SetPwmDutycycleFuture_t =
+  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle>::SharedFuture;
+using SetMotorDirectionFuture_t =
+  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection>::SharedFuture;
 
 #endif

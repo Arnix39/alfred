@@ -14,17 +14,17 @@
 
 struct Quaternions
 {
-    float w;
-    float x;
-    float y;
-    float z;
+  float w;
+  float x;
+  float y;
+  float z;
 };
 
 struct Angles
 {
-    float phi;
-    float theta;
-    float psi;
+  float phi;
+  float theta;
+  float psi;
 };
 
 #endif

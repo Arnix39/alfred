@@ -426,36 +426,36 @@ extern "C" {
 
 typedef struct
 {
-   uint16_t func;
-   uint16_t size;
+  uint16_t func;
+  uint16_t size;
 } gpioHeader_t;
 
 typedef struct
 {
-   size_t size;
-   void *ptr;
-   uint32_t data;
+  size_t size;
+  void * ptr;
+  uint32_t data;
 } gpioExtent_t;
 
 typedef struct
 {
-   uint32_t tick;
-   uint32_t level;
+  uint32_t tick;
+  uint32_t level;
 } gpioSample_t;
 
 typedef struct
 {
-   uint16_t seqno;
-   uint16_t flags;
-   uint32_t tick;
-   uint32_t level;
+  uint16_t seqno;
+  uint16_t flags;
+  uint32_t tick;
+  uint32_t level;
 } gpioReport_t;
 
 typedef struct
 {
-   uint32_t gpioOn;
-   uint32_t gpioOff;
-   uint32_t usDelay;
+  uint32_t gpioOn;
+  uint32_t gpioOff;
+  uint32_t usDelay;
 } gpioPulse_t;
 
 #define WAVE_FLAG_READ  1
@@ -463,10 +463,10 @@ typedef struct
 
 typedef struct
 {
-   uint32_t gpioOn;
-   uint32_t gpioOff;
-   uint32_t usDelay;
-   uint32_t flags;
+  uint32_t gpioOn;
+  uint32_t gpioOff;
+  uint32_t usDelay;
+  uint32_t flags;
 } rawWave_t;
 
 /*
@@ -484,46 +484,47 @@ from the top (topOOL/numTOOL).
 
 typedef struct
 {
-   uint16_t botCB;  /* first CB used by wave  */
-   uint16_t topCB;  /* last CB used by wave   */
-   uint16_t botOOL; /* first bottom OOL used by wave  */
+  uint16_t botCB;   /* first CB used by wave  */
+  uint16_t topCB;   /* last CB used by wave   */
+  uint16_t botOOL;  /* first bottom OOL used by wave  */
                     /* botOOL to botOOL + numBOOL - 1 are in use */
-   uint16_t topOOL; /* last top OOL used by wave */
+  uint16_t topOOL;  /* last top OOL used by wave */
                     /* topOOL - numTOOL to topOOL are in use.*/
-   uint16_t deleted;
-   uint16_t numCB;
-   uint16_t numBOOL;
-   uint16_t numTOOL;
+  uint16_t deleted;
+  uint16_t numCB;
+  uint16_t numBOOL;
+  uint16_t numTOOL;
 } rawWaveInfo_t;
 
 typedef struct
 {
-   int clk;     /* GPIO for clock           */
-   int mosi;    /* GPIO for MOSI            */
-   int miso;    /* GPIO for MISO            */
-   int ss_pol;  /* slave select off state   */
-   int ss_us;   /* delay after slave select */
-   int clk_pol; /* clock off state          */
-   int clk_pha; /* clock phase              */
-   int clk_us;  /* clock micros             */
+  int clk;      /* GPIO for clock           */
+  int mosi;     /* GPIO for MOSI            */
+  int miso;     /* GPIO for MISO            */
+  int ss_pol;   /* slave select off state   */
+  int ss_us;    /* delay after slave select */
+  int clk_pol;  /* clock off state          */
+  int clk_pha;  /* clock phase              */
+  int clk_us;   /* clock micros             */
 } rawSPI_t;
 
-typedef struct { /* linux/arch/arm/mach-bcm2708/include/mach/dma.h */
-   uint32_t info;
-   uint32_t src;
-   uint32_t dst;
-   uint32_t length;
-   uint32_t stride;
-   uint32_t next;
-   uint32_t pad[2];
+typedef struct   /* linux/arch/arm/mach-bcm2708/include/mach/dma.h */
+{
+  uint32_t info;
+  uint32_t src;
+  uint32_t dst;
+  uint32_t length;
+  uint32_t stride;
+  uint32_t next;
+  uint32_t pad[2];
 } rawCbs_t;
 
 typedef struct
 {
-   uint16_t addr;  /* slave address       */
-   uint16_t flags;
-   uint16_t len;   /* msg length          */
-   uint8_t  *buf;  /* pointer to msg data */
+  uint16_t addr;   /* slave address       */
+  uint16_t flags;
+  uint16_t len;    /* msg length          */
+  uint8_t * buf;   /* pointer to msg data */
 } pi_i2c_msg_t;
 
 /* BSC FIFO size */
@@ -532,54 +533,63 @@ typedef struct
 
 typedef struct
 {
-   uint32_t control;          /* Write */
-   int rxCnt;                 /* Read only */
-   char rxBuf[BSC_FIFO_SIZE]; /* Read only */
-   int txCnt;                 /* Write */
-   char txBuf[BSC_FIFO_SIZE]; /* Write */
+  uint32_t control;           /* Write */
+  int rxCnt;                  /* Read only */
+  char rxBuf[BSC_FIFO_SIZE];  /* Read only */
+  int txCnt;                  /* Write */
+  char txBuf[BSC_FIFO_SIZE];  /* Write */
 } bsc_xfer_t;
 
 
-typedef void (*gpioAlertFunc_t)    (int      gpio,
-                                    int      level,
-                                    uint32_t tick);
+typedef void (* gpioAlertFunc_t)    (
+  int gpio,
+  int level,
+  uint32_t tick);
 
-typedef void (*gpioAlertFuncEx_t)  (int      gpio,
-                                    int      level,
-                                    uint32_t tick,
-                                    void    *userdata);
+typedef void (* gpioAlertFuncEx_t)  (
+  int gpio,
+  int level,
+  uint32_t tick,
+  void * userdata);
 
-typedef void (*eventFunc_t)        (int      event,
-                                    uint32_t tick);
+typedef void (* eventFunc_t)        (
+  int event,
+  uint32_t tick);
 
-typedef void (*eventFuncEx_t)      (int      event,
-                                    uint32_t tick,
-                                    void    *userdata);
+typedef void (* eventFuncEx_t)      (
+  int event,
+  uint32_t tick,
+  void * userdata);
 
-typedef void (*gpioISRFunc_t)      (int      gpio,
-                                    int      level,
-                                    uint32_t tick);
+typedef void (* gpioISRFunc_t)      (
+  int gpio,
+  int level,
+  uint32_t tick);
 
-typedef void (*gpioISRFuncEx_t)    (int      gpio,
-                                    int      level,
-                                    uint32_t tick,
-                                    void    *userdata);
+typedef void (* gpioISRFuncEx_t)    (
+  int gpio,
+  int level,
+  uint32_t tick,
+  void * userdata);
 
-typedef void (*gpioTimerFunc_t)    (void);
+typedef void (* gpioTimerFunc_t)    (void);
 
-typedef void (*gpioTimerFuncEx_t)  (void *userdata);
+typedef void (* gpioTimerFuncEx_t)  (void * userdata);
 
-typedef void (*gpioSignalFunc_t)   (int signum);
+typedef void (* gpioSignalFunc_t)   (int signum);
 
-typedef void (*gpioSignalFuncEx_t) (int    signum,
-                                    void  *userdata);
+typedef void (* gpioSignalFuncEx_t) (
+  int signum,
+  void * userdata);
 
-typedef void (*gpioGetSamplesFunc_t)   (const gpioSample_t *samples,
-                                        int                 numSamples);
+typedef void (* gpioGetSamplesFunc_t)   (
+  const gpioSample_t * samples,
+  int numSamples);
 
-typedef void (*gpioGetSamplesFuncEx_t) (const gpioSample_t *samples,
-                                        int                 numSamples,
-                                        void               *userdata);
+typedef void (* gpioGetSamplesFuncEx_t) (
+  const gpioSample_t * samples,
+  int numSamples,
+  void * userdata);
 
 typedef void *(gpioThreadFunc_t) (void *);
 
@@ -656,14 +666,14 @@ typedef void *(gpioThreadFunc_t) (void *);
 
 #define PI_NOTIFY_SLOTS  32
 
-#define PI_NTFY_FLAGS_EVENT    (1 <<7)
-#define PI_NTFY_FLAGS_ALIVE    (1 <<6)
-#define PI_NTFY_FLAGS_WDOG     (1 <<5)
-#define PI_NTFY_FLAGS_BIT(x) (((x)<<0)&31)
+#define PI_NTFY_FLAGS_EVENT    (1 << 7)
+#define PI_NTFY_FLAGS_ALIVE    (1 << 6)
+#define PI_NTFY_FLAGS_WDOG     (1 << 5)
+#define PI_NTFY_FLAGS_BIT(x) (((x) << 0) & 31)
 
 #define PI_WAVE_BLOCKS     4
 #define PI_WAVE_MAX_PULSES (PI_WAVE_BLOCKS * 3000)
-#define PI_WAVE_MAX_CHARS  (PI_WAVE_BLOCKS *  300)
+#define PI_WAVE_MAX_CHARS  (PI_WAVE_BLOCKS * 300)
 
 #define PI_BB_I2C_MIN_BAUD     50
 #define PI_BB_I2C_MAX_BAUD 500000
@@ -722,8 +732,8 @@ typedef void *(gpioThreadFunc_t) (void *);
 #define PI_NUM_AUX_SPI_CHANNEL 3
 #define PI_NUM_STD_SPI_CHANNEL 2
 
-#define PI_MAX_I2C_DEVICE_COUNT (1<<16)
-#define PI_MAX_SPI_DEVICE_COUNT (1<<16)
+#define PI_MAX_I2C_DEVICE_COUNT (1 << 16)
+#define PI_MAX_SPI_DEVICE_COUNT (1 << 16)
 
 /* max pi_i2c_msg_t per transaction */
 
@@ -755,15 +765,15 @@ typedef void *(gpioThreadFunc_t) (void *);
 
 /* SPI */
 
-#define PI_SPI_FLAGS_BITLEN(x) ((x&63)<<16)
-#define PI_SPI_FLAGS_RX_LSB(x)  ((x&1)<<15)
-#define PI_SPI_FLAGS_TX_LSB(x)  ((x&1)<<14)
-#define PI_SPI_FLAGS_3WREN(x)  ((x&15)<<10)
-#define PI_SPI_FLAGS_3WIRE(x)   ((x&1)<<9)
-#define PI_SPI_FLAGS_AUX_SPI(x) ((x&1)<<8)
-#define PI_SPI_FLAGS_RESVD(x)   ((x&7)<<5)
-#define PI_SPI_FLAGS_CSPOLS(x)  ((x&7)<<2)
-#define PI_SPI_FLAGS_MODE(x)    ((x&3))
+#define PI_SPI_FLAGS_BITLEN(x) ((x & 63) << 16)
+#define PI_SPI_FLAGS_RX_LSB(x)  ((x & 1) << 15)
+#define PI_SPI_FLAGS_TX_LSB(x)  ((x & 1) << 14)
+#define PI_SPI_FLAGS_3WREN(x)  ((x & 15) << 10)
+#define PI_SPI_FLAGS_3WIRE(x)   ((x & 1) << 9)
+#define PI_SPI_FLAGS_AUX_SPI(x) ((x & 1) << 8)
+#define PI_SPI_FLAGS_RESVD(x)   ((x & 7) << 5)
+#define PI_SPI_FLAGS_CSPOLS(x)  ((x & 7) << 2)
+#define PI_SPI_FLAGS_MODE(x)    ((x & 3))
 
 /* BSC registers */
 
@@ -906,11 +916,11 @@ typedef void *(gpioThreadFunc_t) (void *);
 
 #define PI_CFG_DBG_LEVEL         0 /* bits 0-3 */
 #define PI_CFG_ALERT_FREQ        4 /* bits 4-7 */
-#define PI_CFG_RT_PRIORITY       (1<<8)
-#define PI_CFG_STATS             (1<<9)
-#define PI_CFG_NOSIGHANDLER      (1<<10)
+#define PI_CFG_RT_PRIORITY       (1 << 8)
+#define PI_CFG_STATS             (1 << 9)
+#define PI_CFG_NOSIGHANDLER      (1 << 10)
 
-#define PI_CFG_ILLEGAL_VAL       (1<<11)
+#define PI_CFG_ILLEGAL_VAL       (1 << 11)
 
 
 /* gpioISR */
@@ -1071,7 +1081,7 @@ D*/
 
 
 /*F*/
-int gpioRead (unsigned gpio);
+int gpioRead(unsigned gpio);
 /*D
 Reads the GPIO level, on or off.
 
@@ -1481,7 +1491,7 @@ D*/
 
 /*F*/
 int gpioSetAlertFuncEx(
-   unsigned user_gpio, gpioAlertFuncEx_t f, void *userdata);
+  unsigned user_gpio, gpioAlertFuncEx_t f, void * userdata);
 /*D
 Registers a function to be called (a callback) when the specified
 GPIO changes state.
@@ -1524,7 +1534,7 @@ D*/
 
 /*F*/
 int gpioSetISRFunc(
-   unsigned gpio, unsigned edge, int timeout, gpioISRFunc_t f);
+  unsigned gpio, unsigned edge, int timeout, gpioISRFunc_t f);
 /*D
 Registers a function to be called (a callback) whenever the specified
 GPIO interrupt occurs.
@@ -1589,11 +1599,11 @@ D*/
 
 /*F*/
 int gpioSetISRFuncEx(
-   unsigned gpio,
-   unsigned edge,
-   int timeout,
-   gpioISRFuncEx_t f,
-   void *userdata);
+  unsigned gpio,
+  unsigned edge,
+  int timeout,
+  gpioISRFuncEx_t f,
+  void * userdata);
 /*D
 Registers a function to be called (a callback) whenever the specified
 GPIO interrupt occurs.
@@ -1823,7 +1833,7 @@ D*/
 
 
 /*F*/
-int gpioWaveAddGeneric(unsigned numPulses, gpioPulse_t *pulses);
+int gpioWaveAddGeneric(unsigned numPulses, gpioPulse_t * pulses);
 /*D
 This function adds a number of pulses to the current waveform.
 
@@ -1882,14 +1892,14 @@ D*/
 
 
 /*F*/
-int gpioWaveAddSerial
-   (unsigned user_gpio,
-    unsigned baud,
-    unsigned data_bits,
-    unsigned stop_bits,
-    unsigned offset,
-    unsigned numBytes,
-    char     *str);
+int gpioWaveAddSerial(
+  unsigned user_gpio,
+  unsigned baud,
+  unsigned data_bits,
+  unsigned stop_bits,
+  unsigned offset,
+  unsigned numBytes,
+  char * str);
 /*D
 This function adds a waveform representing serial data to the
 existing waveform (if any).  The serial data starts offset
@@ -1922,8 +1932,8 @@ numBytes is the number of bytes of data in str.
 
 The bytes required for each character depend upon data_bits.
 
-For data_bits 1-8 there will be one byte per character. 
-For data_bits 9-16 there will be two bytes per character. 
+For data_bits 1-8 there will be one byte per character.
+For data_bits 9-16 there will be two bytes per character.
 For data_bits 17-32 there will be four bytes per character.
 
 ...
@@ -1985,8 +1995,8 @@ typedef struct
 
 The fields specify
 
-1) the GPIO to be switched on at the start of the pulse. 
-2) the GPIO to be switched off at the start of the pulse. 
+1) the GPIO to be switched on at the start of the pulse.
+2) the GPIO to be switched off at the start of the pulse.
 3) the delay in microseconds before the next pulse.
 
 Any or all the fields can be zero.  It doesn't make any sense to
@@ -2092,7 +2102,7 @@ D*/
 
 
 /*F*/
-int gpioWaveChain(char *buf, unsigned bufSize);
+int gpioWaveChain(char * buf, unsigned bufSize);
 /*D
 This function transmits a chain of waveforms.
 
@@ -2197,7 +2207,7 @@ transmitted using [*gpioWaveTxSend*].  Chained waves are not supported.
 
 Returns the waveform id or one of the following special values:
 
-PI_WAVE_NOT_FOUND (9998) - transmitted wave not found. 
+PI_WAVE_NOT_FOUND (9998) - transmitted wave not found.
 PI_NO_TX_WAVE (9999) - no wave being transmitted.
 D*/
 
@@ -2336,7 +2346,7 @@ D*/
 
 
 /*F*/
-int gpioSerialRead(unsigned user_gpio, void *buf, size_t bufSize);
+int gpioSerialRead(unsigned user_gpio, void * buf, size_t bufSize);
 /*D
 This function copies up to bufSize bytes of data read from the
 bit bang serial cyclic buffer to the buffer starting at buf.
@@ -2353,8 +2363,8 @@ or PI_NOT_SERIAL_GPIO.
 The bytes returned for each character depend upon the number of
 data bits [*data_bits*] specified in the [*gpioSerialReadOpen*] command.
 
-For [*data_bits*] 1-8 there will be one byte per character. 
-For [*data_bits*] 9-16 there will be two bytes per character. 
+For [*data_bits*] 1-8 there will be one byte per character.
+For [*data_bits*] 9-16 there will be two bytes per character.
 For [*data_bits*] 17-32 there will be four bytes per character.
 D*/
 
@@ -2403,7 +2413,7 @@ of the function description.  The following abbreviations are used.
 S      (1 bit) : Start bit
 P      (1 bit) : Stop bit
 Rd/Wr  (1 bit) : Read/Write bit. Rd equals 1, Wr equals 0.
-A, NA  (1 bit) : Accept and not accept bit. 
+A, NA  (1 bit) : Accept and not accept bit.
 Addr   (7 bits): I2C 7 bit address.
 i2cReg (8 bits): Command byte, a byte which often selects a register.
 Data   (8 bits): A data byte.
@@ -2598,7 +2608,7 @@ D*/
 
 /*F*/
 int i2cWriteBlockData(
-unsigned handle, unsigned i2cReg, char *buf, unsigned count);
+  unsigned handle, unsigned i2cReg, char * buf, unsigned count);
 /*D
 This writes up to 32 bytes to the specified register of the device
 associated with handle.
@@ -2622,7 +2632,7 @@ D*/
 
 
 /*F*/
-int i2cReadBlockData(unsigned handle, unsigned i2cReg, char *buf);
+int i2cReadBlockData(unsigned handle, unsigned i2cReg, char * buf);
 /*D
 This reads a block of up to 32 bytes from the specified register of
 the device associated with handle.
@@ -2648,7 +2658,7 @@ D*/
 
 /*F*/
 int i2cBlockProcessCall(
-unsigned handle, unsigned i2cReg, char *buf, unsigned count);
+  unsigned handle, unsigned i2cReg, char * buf, unsigned count);
 /*D
 This writes data bytes to the specified register of the device
 associated with handle and reads a device specified number
@@ -2678,7 +2688,7 @@ D*/
 
 /*F*/
 int i2cReadI2CBlockData(
-unsigned handle, unsigned i2cReg, char *buf, unsigned count);
+  unsigned handle, unsigned i2cReg, char * buf, unsigned count);
 /*D
 This reads count bytes from the specified register of the device
 associated with handle .  The count may be 1-32.
@@ -2702,7 +2712,7 @@ D*/
 
 /*F*/
 int i2cWriteI2CBlockData(
-unsigned handle, unsigned i2cReg, char *buf, unsigned count);
+  unsigned handle, unsigned i2cReg, char * buf, unsigned count);
 /*D
 This writes 1 to 32 bytes to the specified register of the device
 associated with handle.
@@ -2723,7 +2733,7 @@ S Addr Wr [A] i2cReg [A] buf0 [A] buf1 [A] ... [A] bufn [A] P
 D*/
 
 /*F*/
-int i2cReadDevice(unsigned handle, char *buf, unsigned count);
+int i2cReadDevice(unsigned handle, char * buf, unsigned count);
 /*D
 This reads count bytes from the raw device into buf.
 
@@ -2743,7 +2753,7 @@ D*/
 
 
 /*F*/
-int i2cWriteDevice(unsigned handle, char *buf, unsigned count);
+int i2cWriteDevice(unsigned handle, char * buf, unsigned count);
 /*D
 This writes count bytes from buf to the raw device.
 
@@ -2777,7 +2787,7 @@ slave address will use a repeated start (rather than a stop/start).
 D*/
 
 /*F*/
-int i2cSegments(unsigned handle, pi_i2c_msg_t *segs, unsigned numSegs);
+int i2cSegments(unsigned handle, pi_i2c_msg_t * segs, unsigned numSegs);
 /*D
 This function executes multiple I2C segments in one transaction by
 calling the I2C_RDWR ioctl.
@@ -2793,11 +2803,11 @@ D*/
 
 /*F*/
 int i2cZip(
-   unsigned handle,
-   char    *inBuf,
-   unsigned inLen,
-   char    *outBuf,
-   unsigned outLen);
+  unsigned handle,
+  char * inBuf,
+  unsigned inLen,
+  char * outBuf,
+  unsigned outLen);
 /*D
 This function executes a sequence of I2C operations.  The
 operations to be performed are specified by the contents of inBuf
@@ -2860,9 +2870,9 @@ specified baud rate.
 Bit banging I2C allows for certain operations which are not possible
 with the standard I2C driver.
 
-o baud rates as low as 50 
-o repeated starts 
-o clock stretching 
+o baud rates as low as 50
+o repeated starts
+o clock stretching
 o I2C on any pair of spare GPIO
 
 . .
@@ -2895,11 +2905,11 @@ D*/
 
 /*F*/
 int bbI2CZip(
-   unsigned SDA,
-   char    *inBuf,
-   unsigned inLen,
-   char    *outBuf,
-   unsigned outLen);
+  unsigned SDA,
+  char * inBuf,
+  unsigned inLen,
+  char * outBuf,
+  unsigned outLen);
 /*D
 This function executes a sequence of bit banged I2C operations.  The
 operations to be performed are specified by the contents of inBuf
@@ -2965,7 +2975,7 @@ End
 D*/
 
 /*F*/
-int bscXfer(bsc_xfer_t *bsc_xfer);
+int bscXfer(bsc_xfer_t * bsc_xfer);
 /*D
 This function provides a low-level interface to the SPI/I2C Slave
 peripheral on the BCM chip.
@@ -3113,8 +3123,8 @@ D*/
 
 /*F*/
 int bbSPIOpen(
-   unsigned CS, unsigned MISO, unsigned MOSI, unsigned SCLK,
-   unsigned baud, unsigned spiFlags);
+  unsigned CS, unsigned MISO, unsigned MOSI, unsigned SCLK,
+  unsigned baud, unsigned spiFlags);
 /*D
 This function selects a set of GPIO for bit banging SPI with
 a specified baud rate and mode.
@@ -3182,10 +3192,10 @@ D*/
 
 /*F*/
 int bbSPIXfer(
-   unsigned CS,
-   char    *inBuf,
-   char    *outBuf,
-   unsigned count);
+  unsigned CS,
+  char * inBuf,
+  char * outBuf,
+  unsigned count);
 /*D
 This function executes a bit banged SPI transfer.
 
@@ -3343,8 +3353,8 @@ The [*spiRead*], [*spiWrite*], and [*spiXfer*] functions
 transfer data packed into 1, 2, or 4 bytes according to
 the word size in bits.
 
-For bits 1-8 there will be one byte per word. 
-For bits 9-16 there will be two bytes per word. 
+For bits 1-8 there will be one byte per word.
+For bits 9-16 there will be two bytes per word.
 For bits 17-32 there will be four bytes per word.
 
 Multi-byte transfers are made in least significant byte first order.
@@ -3372,7 +3382,7 @@ D*/
 
 
 /*F*/
-int spiRead(unsigned handle, char *buf, unsigned count);
+int spiRead(unsigned handle, char * buf, unsigned count);
 /*D
 This function reads count bytes of data from the SPI
 device associated with the handle.
@@ -3389,7 +3399,7 @@ D*/
 
 
 /*F*/
-int spiWrite(unsigned handle, char *buf, unsigned count);
+int spiWrite(unsigned handle, char * buf, unsigned count);
 /*D
 This function writes count bytes of data from buf to the SPI
 device associated with the handle.
@@ -3405,7 +3415,7 @@ PI_BAD_HANDLE, PI_BAD_SPI_COUNT, or PI_SPI_XFER_FAILED.
 D*/
 
 /*F*/
-int spiXfer(unsigned handle, char *txBuf, char *rxBuf, unsigned count);
+int spiXfer(unsigned handle, char * txBuf, char * rxBuf, unsigned count);
 /*D
 This function transfers count bytes of data from txBuf to the SPI
 device associated with the handle.  Simultaneously count bytes of
@@ -3424,7 +3434,7 @@ D*/
 
 
 /*F*/
-int serOpen(char *sertty, unsigned baud, unsigned serFlags);
+int serOpen(char * sertty, unsigned baud, unsigned serFlags);
 /*D
 This function opens a serial device at a specified baud rate
 and with specified flags.  The device name must start with
@@ -3488,7 +3498,7 @@ If no data is ready PI_SER_READ_NO_DATA is returned.
 D*/
 
 /*F*/
-int serWrite(unsigned handle, char *buf, unsigned count);
+int serWrite(unsigned handle, char * buf, unsigned count);
 /*D
 This function writes count bytes from buf to the the serial port
 associated with handle.
@@ -3505,7 +3515,7 @@ D*/
 
 
 /*F*/
-int serRead(unsigned handle, char *buf, unsigned count);
+int serRead(unsigned handle, char * buf, unsigned count);
 /*D
 This function reads up count bytes from the the serial port
 associated with handle and writes them to buf.
@@ -3692,7 +3702,7 @@ D*/
 
 /*F*/
 int gpioSetGetSamplesFuncEx(
-   gpioGetSamplesFuncEx_t f, uint32_t bits, void *userdata);
+  gpioGetSamplesFuncEx_t f, uint32_t bits, void * userdata);
 /*D
 Registers a function to be called (a callback) every millisecond
 with the latest GPIO samples.
@@ -3748,7 +3758,7 @@ D*/
 
 /*F*/
 int gpioSetTimerFuncEx(
-   unsigned timer, unsigned millis, gpioTimerFuncEx_t f, void *userdata);
+  unsigned timer, unsigned millis, gpioTimerFuncEx_t f, void * userdata);
 /*D
 Registers a function to be called (a callback) every millis milliseconds.
 
@@ -3771,7 +3781,7 @@ D*/
 
 
 /*F*/
-pthread_t *gpioStartThread(gpioThreadFunc_t f, void *userdata);
+pthread_t * gpioStartThread(gpioThreadFunc_t f, void * userdata);
 /*D
 Starts a new thread of execution with f as the main routine.
 
@@ -3825,7 +3835,7 @@ D*/
 
 
 /*F*/
-void gpioStopThread(pthread_t *pth);
+void gpioStopThread(pthread_t * pth);
 /*D
 Cancels the thread pointed at by pth.
 
@@ -3840,7 +3850,7 @@ D*/
 
 
 /*F*/
-int gpioStoreScript(char *script);
+int gpioStoreScript(char * script);
 /*D
 This function stores a null terminated script for later execution.
 
@@ -3856,7 +3866,7 @@ D*/
 
 
 /*F*/
-int gpioRunScript(unsigned script_id, unsigned numPar, uint32_t *param);
+int gpioRunScript(unsigned script_id, unsigned numPar, uint32_t * param);
 /*D
 This function runs a stored script.
 
@@ -3874,9 +3884,8 @@ the script as p0 to p9.
 D*/
 
 
-
 /*F*/
-int gpioUpdateScript(unsigned script_id, unsigned numPar, uint32_t *param);
+int gpioUpdateScript(unsigned script_id, unsigned numPar, uint32_t * param);
 /*D
 This function sets the parameters of a script.  The script may or
 may not be running.  The first numPar parameters of the script are
@@ -3897,7 +3906,7 @@ D*/
 
 
 /*F*/
-int gpioScriptStatus(unsigned script_id, uint32_t *param);
+int gpioScriptStatus(unsigned script_id, uint32_t * param);
 /*D
 This function returns the run status of a stored script as well as
 the current values of parameters 0 to 9.
@@ -3975,7 +3984,7 @@ D*/
 
 /*F*/
 int gpioSetSignalFuncEx(
-   unsigned signum, gpioSignalFuncEx_t f, void *userdata);
+  unsigned signum, gpioSignalFuncEx_t f, void * userdata);
 /*D
 Registers a function to be called (a callback) when a signal occurs.
 
@@ -4162,7 +4171,7 @@ automatically scaled to take this into account.
 D*/
 
 /*F*/
-int gpioTime(unsigned timetype, int *seconds, int *micros);
+int gpioTime(unsigned timetype, int * seconds, int * micros);
 /*D
 Updates the seconds and micros variables with the current time.
 
@@ -4293,8 +4302,8 @@ Type 2 boards have hardware revision numbers of 4, 5, 6, and 15.
 
 Type 3 boards have hardware revision numbers of 16 or greater.
 
-for "Revision       : 0002" the function returns 2. 
-for "Revision       : 000f" the function returns 15. 
+for "Revision       : 0002" the function returns 2.
+for "Revision       : 000f" the function returns 15.
 for "Revision       : 000g" the function returns 0.
 D*/
 
@@ -4400,7 +4409,7 @@ The callback may be cancelled by passing NULL as the function.
 D*/
 
 /*F*/
-int eventSetFuncEx(unsigned event, eventFuncEx_t f, void *userdata);
+int eventSetFuncEx(unsigned event, eventFuncEx_t f, void * userdata);
 /*D
 Registers a function to be called (a callback) when the specified
 event occurs.
@@ -4450,7 +4459,7 @@ D*/
 
 
 /*F*/
-int shell(char *scriptName, char *scriptString);
+int shell(char * scriptName, char * scriptString);
 /*D
 This function uses the system call to execute a shell script
 with the given string as its parameter.
@@ -4496,7 +4505,7 @@ D*/
 #pragma GCC diagnostic ignored "-Wcomment"
 
 /*F*/
-int fileOpen(char *file, unsigned mode);
+int fileOpen(char * file, unsigned mode);
 /*D
 This function returns a handle to a file opened in a specified mode.
 
@@ -4621,7 +4630,7 @@ D*/
 
 
 /*F*/
-int fileWrite(unsigned handle, char *buf, unsigned count);
+int fileWrite(unsigned handle, char * buf, unsigned count);
 /*D
 This function writes count bytes from buf to the the file
 associated with handle.
@@ -4650,7 +4659,7 @@ D*/
 
 
 /*F*/
-int fileRead(unsigned handle, char *buf, unsigned count);
+int fileRead(unsigned handle, char * buf, unsigned count);
 /*D
 This function reads up to count bytes from the the file
 associated with handle and writes them to buf.
@@ -4702,7 +4711,7 @@ D*/
 #pragma GCC diagnostic ignored "-Wcomment"
 
 /*F*/
-int fileList(char *fpat,  char *buf, unsigned count);
+int fileList(char * fpat, char * buf, unsigned count);
 /*D
 This function returns a list of files which match a pattern.  The
 pattern may contain wildcards.
@@ -4793,7 +4802,7 @@ D*/
 
 /*F*/
 int gpioCfgClock(
-   unsigned cfgMicros, unsigned cfgPeripheral, unsigned cfgSource);
+  unsigned cfgMicros, unsigned cfgPeripheral, unsigned cfgSource);
 /*D
 Configures pigpio to use a particular sample rate timed by a specified
 peripheral.
@@ -4897,8 +4906,8 @@ added to the mask.
 
 If the board revision is not recognised then GPIO 2-27 are allowed.
 
-Unknown board @ PI_DEFAULT_UPDATE_MASK_UNKNOWN @ 0x0FFFFFFC 
-Type 1 board  @ PI_DEFAULT_UPDATE_MASK_B1 @ 0x03E6CF93 
+Unknown board @ PI_DEFAULT_UPDATE_MASK_UNKNOWN @ 0x0FFFFFFC
+Type 1 board  @ PI_DEFAULT_UPDATE_MASK_B1 @ 0x03E6CF93
 Type 2 board  @ PI_DEFAULT_UPDATE_MASK_A_B2 @ 0xFBC6CF9C
 Type 3 board  @ PI_DEFAULT_UPDATE_MASK_R3 @ 0x0FFFFFFC
 D*/
@@ -4963,7 +4972,7 @@ D*/
 
 
 /*F*/
-int gpioCfgNetAddr(int numSockAddr, uint32_t *sockAddr);
+int gpioCfgNetAddr(int numSockAddr, uint32_t * sockAddr);
 /*D
 Sets the network addresses which are allowed to talk over the
 socket interface.
@@ -4998,7 +5007,7 @@ D*/
 
 
 /*F*/
-int gpioCustom1(unsigned arg1, unsigned arg2, char *argx, unsigned argc);
+int gpioCustom1(unsigned arg1, unsigned arg2, char * argx, unsigned argc);
 /*D
 This function is available for user customisation.
 
@@ -5016,8 +5025,9 @@ D*/
 
 
 /*F*/
-int gpioCustom2(unsigned arg1, char *argx, unsigned argc,
-                char *retBuf, unsigned retMax);
+int gpioCustom2(
+  unsigned arg1, char * argx, unsigned argc,
+  char * retBuf, unsigned retMax);
 /*D
 This function is available for user customisation.
 
@@ -5041,14 +5051,14 @@ D*/
 
 /*F*/
 int rawWaveAddSPI(
-   rawSPI_t *spi,
-   unsigned offset,
-   unsigned spiSS,
-   char *buf,
-   unsigned spiTxBits,
-   unsigned spiBitFirst,
-   unsigned spiBitLast,
-   unsigned spiBits);
+  rawSPI_t * spi,
+  unsigned offset,
+  unsigned spiSS,
+  char * buf,
+  unsigned spiTxBits,
+  unsigned spiBitFirst,
+  unsigned spiBitLast,
+  unsigned spiBits);
 /*D
 This function adds a waveform representing SPI data to the
 existing waveform (if any).
@@ -5071,7 +5081,7 @@ Not intended for general use.
 D*/
 
 /*F*/
-int rawWaveAddGeneric(unsigned numPulses, rawWave_t *pulses);
+int rawWaveAddGeneric(unsigned numPulses, rawWave_t * pulses);
 /*D
 This function adds a number of pulses to the current waveform.
 
@@ -5107,7 +5117,7 @@ Not intended for general use.
 D*/
 
 /*F*/
-rawCbs_t *rawWaveCBAdr(int cbNum);
+rawCbs_t * rawWaveCBAdr(int cbNum);
 /*D
 Return the (Linux) address of contol block cbNum.
 
@@ -5217,7 +5227,7 @@ Not intended for general use.
 D*/
 
 /*F*/
-int getBitInBytes(int bitPos, char *buf, int numBits);
+int getBitInBytes(int bitPos, char * buf, int numBits);
 /*D
 Returns the value of the bit bitPos bits from the start of buf.  Returns
 0 if bitPos is greater than or equal to numBits.
@@ -5231,7 +5241,7 @@ numBits: number of valid bits in buf
 D*/
 
 /*F*/
-void putBitInBytes(int bitPos, char *buf, int bit);
+void putBitInBytes(int bitPos, char * buf, int bit);
 /*D
 Sets the bit bitPos bits from the start of buf to bit.
 
@@ -5391,7 +5401,7 @@ cfgWhat::
 
 A number specifying a configuration item.
 
-562484977: print enhanced statistics at termination. 
+562484977: print enhanced statistics at termination.
 984762879: set the initial debug level.
 
 char::
@@ -5531,13 +5541,13 @@ gpioCfg*::
 
 These functions are only effective if called before [*gpioInitialise*].
 
-[*gpioCfgBufferSize*] 
-[*gpioCfgClock*] 
-[*gpioCfgDMAchannel*] 
-[*gpioCfgDMAchannels*] 
-[*gpioCfgPermissions*] 
-[*gpioCfgInterfaces*] 
-[*gpioCfgSocketPort*] 
+[*gpioCfgBufferSize*]
+[*gpioCfgClock*]
+[*gpioCfgDMAchannel*]
+[*gpioCfgDMAchannels*]
+[*gpioCfgPermissions*]
+[*gpioCfgInterfaces*]
+[*gpioCfgSocketPort*]
 [*gpioCfgMemAlloc*]
 
 gpioGetSamplesFunc_t::
@@ -5612,18 +5622,18 @@ gpioWaveAdd*::
 
 One of
 
-[*gpioWaveAddNew*] 
-[*gpioWaveAddGeneric*] 
+[*gpioWaveAddNew*]
+[*gpioWaveAddGeneric*]
 [*gpioWaveAddSerial*]
 
 handle::>=0
 
 A number referencing an object opened by one of
 
-[*fileOpen*] 
-[*gpioNotifyOpen*] 
-[*i2cOpen*] 
-[*serOpen*] 
+[*fileOpen*]
+[*gpioNotifyOpen*]
+[*i2cOpen*]
+[*serOpen*]
 [*spiOpen*]
 
 i2cAddr:: 0-0x7F
@@ -6131,10 +6141,10 @@ following technique.
 In the calling function:
 
 . .
-user_type *userdata; 
+user_type *userdata;
 user_type my_userdata;
 
-userdata = malloc(sizeof(user_type)); 
+userdata = malloc(sizeof(user_type));
 *userdata = my_userdata;
 . .
 
@@ -6569,4 +6579,3 @@ after this command is issued.
 /*DEF_E*/
 
 #endif
-

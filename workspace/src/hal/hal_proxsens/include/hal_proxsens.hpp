@@ -1,7 +1,19 @@
-#ifndef HAL_PROXSENS
-#define HAL_PROXSENS
+// Copyright (c) 2022 Arnix Robotix
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#include "stdint.h"
+#ifndef HAL_PROXSENS_HPP_
+#define HAL_PROXSENS_HPP_
 
 #include "common.hpp"
 
@@ -27,48 +39,59 @@
 #define RISING_EDGE 1
 #define NO_CHANGE 2
 
-using SetInputModeFuture_t = rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>::SharedFuture;
-using SetCallbackFuture_t = rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetCallback>::SharedFuture;
-using SetOutputModeFuture_t = rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>::SharedFuture;
-using SendTriggerPulseFuture_t = rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse>::SharedFuture;
-using SetGpioHighFuture_t = rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh>::SharedFuture;
+namespace hal_proxsens
+{
+
+namespace pigpio_srv = hal_pigpio_interfaces::srv;
+namespace pigpio_msg = hal_pigpio_interfaces::msg;
+namespace proxsens_msg = hal_proxsens_interfaces::msg;
+
+using SetInputModeFuture_t = rclcpp::Client<pigpio_srv::HalPigpioSetInputMode>::SharedFuture;
+using SetCallbackFuture_t = rclcpp::Client<pigpio_srv::HalPigpioSetCallback>::SharedFuture;
+using SetOutputModeFuture_t = rclcpp::Client<pigpio_srv::HalPigpioSetOutputMode>::SharedFuture;
+using SendTriggerPulseFuture_t =
+  rclcpp::Client<pigpio_srv::HalPigpioSendTriggerPulse>::SharedFuture;
+using SetGpioHighFuture_t = rclcpp::Client<pigpio_srv::HalPigpioSetGpioHigh>::SharedFuture;
 
 class Proxsens : public rclcpp_lifecycle::LifecycleNode
 {
 private:
-    uint8_t edgeChangeType;
-    uint32_t timestamp;
-    uint32_t echoCallbackId;
-    uint16_t distanceInCm;
+  uint8_t edgeChangeType;
+  uint32_t timestamp;
+  uint32_t echoCallbackId;
+  uint16_t distanceInCm;
 
-    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>::SharedPtr gpioSetInputClient;
-    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>::SharedPtr gpioSetOutputClient;
-    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetCallback>::SharedPtr gpioSetCallbackClient;
-    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse>::SharedPtr gpioSendTriggerPulseClient;
-    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh>::SharedPtr gpioSetGpioHighClient;
+  rclcpp::Client<pigpio_srv::HalPigpioSetInputMode>::SharedPtr gpioSetInputClient;
+  rclcpp::Client<pigpio_srv::HalPigpioSetOutputMode>::SharedPtr gpioSetOutputClient;
+  rclcpp::Client<pigpio_srv::HalPigpioSetCallback>::SharedPtr gpioSetCallbackClient;
+  rclcpp::Client<pigpio_srv::HalPigpioSendTriggerPulse>::SharedPtr gpioSendTriggerPulseClient;
+  rclcpp::Client<pigpio_srv::HalPigpioSetGpioHigh>::SharedPtr gpioSetGpioHighClient;
 
-    rclcpp_lifecycle::LifecyclePublisher<hal_proxsens_interfaces::msg::HalProxsens>::SharedPtr proxsensDistancePub;
+  rclcpp_lifecycle::LifecyclePublisher<proxsens_msg::HalProxsens>::SharedPtr proxsensDistancePub;
 
-    rclcpp::Subscription<hal_pigpio_interfaces::msg::HalPigpioEdgeChange>::SharedPtr proxsensEdgeChangeSub;
+  rclcpp::Subscription<pigpio_msg::HalPigpioEdgeChange>::SharedPtr proxsensEdgeChangeSub;
 
 public:
-    Proxsens();
-    ~Proxsens() = default;
+  Proxsens();
+  ~Proxsens() = default;
 
-    LifecycleCallbackReturn_t on_configure(const rclcpp_lifecycle::State & previous_state);
-    LifecycleCallbackReturn_t on_activate(const rclcpp_lifecycle::State & previous_state);
-    LifecycleCallbackReturn_t on_deactivate(const rclcpp_lifecycle::State & previous_state);
-    LifecycleCallbackReturn_t on_cleanup(const rclcpp_lifecycle::State & previous_state);
-    LifecycleCallbackReturn_t on_shutdown(const rclcpp_lifecycle::State & previous_state);
-    LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
-    
-    void publishDistance(void);
-    void configureGpios(void);
-    void trigger(void);
-    void enableOutputLevelShifter(void);
-    void publishAndGetDistance(void);
+  LifecycleCallbackReturn_t on_configure(const rclcpp_lifecycle::State & previous_state);
+  LifecycleCallbackReturn_t on_activate(const rclcpp_lifecycle::State & previous_state);
+  LifecycleCallbackReturn_t on_deactivate(const rclcpp_lifecycle::State & previous_state);
+  LifecycleCallbackReturn_t on_cleanup(const rclcpp_lifecycle::State & previous_state);
+  LifecycleCallbackReturn_t on_shutdown(const rclcpp_lifecycle::State & previous_state);
+  LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
 
-    void edgeChangeCallback(const hal_pigpio_interfaces::msg::HalPigpioEdgeChange &msg);
+  void publishDistance(void);
+  void configureGpios(void);
+  void trigger(void);
+  void enableOutputLevelShifter(void);
+  void publishAndGetDistance(void);
+
+  void edgeChangeCallback(const pigpio_msg::HalPigpioEdgeChange & msg);
 };
 
-#endif
+}  // namespace hal_proxsens
+
+
+#endif  // HAL_PROXSENS_HPP_
