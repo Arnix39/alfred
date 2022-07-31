@@ -63,13 +63,7 @@ public:
   }
   std::promise<uint16_t> distanceInCm;
 
-  /*void activateProxsensNode(void)
-  {
-    changeState(lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE);
-    changeState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
-  }*/
-
-  void changeState(std::uint8_t transition)
+  void changeProxsensNodeToState(std::uint8_t transition)
   {
     auto request = std::make_shared<lifecycle_msgs::srv::ChangeState::Request>();
     request->transition.id = transition;
@@ -100,9 +94,11 @@ protected:
     executor.add_node(proxsens->get_node_base_interface());
     executor.add_node(proxsensChecker);
 
-    proxsensChecker->changeState(lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE);
+    proxsensChecker->changeProxsensNodeToState(
+      lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE);
     executor.spin_some();
-    proxsensChecker->changeState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
+    proxsensChecker->changeProxsensNodeToState(
+      lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
     executor.spin_some();
   }
 
@@ -149,23 +145,9 @@ TEST_F(ProxsensTest, sensorDistance10cm)
 
 TEST_F(ProxsensTest, sensorDistanceTwoFallingEdges)
 {
-  uint32_t timestampRisingEdge = 10000;
-  uint32_t timestampFallingEdge = 15800;
-  uint32_t timestampFirstFallingEdge = 20000;
-  uint32_t timestampSecondFallingEdge = 20580;
+  uint32_t timestampFirstFallingEdge = 10000;
+  uint32_t timestampSecondFallingEdge = 10580;
   auto future = std::shared_future<uint16_t>(proxsensChecker->distanceInCm.get_future());
-
-  proxsens->edgeChangeCallback(
-    edgeChangeMessage(
-      PROXSENS_ECHO_GPIO, RISING_EDGE,
-      timestampRisingEdge));
-  proxsens->edgeChangeCallback(
-    edgeChangeMessage(
-      PROXSENS_ECHO_GPIO, FALLING_EDGE,
-      timestampFallingEdge));
-  proxsens->publishDistance();
-  ASSERT_EQ(executor.spin_until_future_complete(future, 1s), rclcpp::FutureReturnCode::SUCCESS);
-  ASSERT_EQ(future.get(), PROX_SENS_DISTANCE_100CM);
 
   proxsens->edgeChangeCallback(
     edgeChangeMessage(
@@ -177,7 +159,7 @@ TEST_F(ProxsensTest, sensorDistanceTwoFallingEdges)
       timestampSecondFallingEdge));
   proxsens->publishDistance();
   ASSERT_EQ(executor.spin_until_future_complete(future, 1s), rclcpp::FutureReturnCode::SUCCESS);
-  ASSERT_EQ(future.get(), PROX_SENS_DISTANCE_100CM);
+  ASSERT_EQ(future.get(), PROX_SENS_DISTANCE_DEFAULT_VALUE);
 }
 
 TEST_F(ProxsensTest, sensorDistance10cmWithTimestampRollout)
@@ -228,8 +210,8 @@ TEST_F(ProxsensTest, sensorDistanceFallingEdgeFirstWithRisingEdge)
 TEST_F(ProxsensTest, sensorDistanceTwoRisingEdges)
 {
   uint32_t timestampFirstRisingEdge = 10000;
-  uint32_t timestampSecondRisingEdge = 10580;
-  uint32_t timestampFallingEdge = 11160;
+  uint32_t timestampSecondRisingEdge = 11000;
+  uint32_t timestampFallingEdge = 11580;
   auto future = std::shared_future<uint16_t>(proxsensChecker->distanceInCm.get_future());
 
   proxsens->edgeChangeCallback(

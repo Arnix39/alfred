@@ -24,7 +24,7 @@
             "label": "ROS2: Run tests",
             "detail": "Run all unit tests and show results.",
             "type": "shell",
-            "command": "colcon test && colcon test-result --all --verbose",
+            "command": "colcon test && colcon test-result --all",
             "group": {
                 "kind": "test",
                 "isDefault": true

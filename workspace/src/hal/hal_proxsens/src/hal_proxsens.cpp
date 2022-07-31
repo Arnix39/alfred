@@ -121,8 +121,10 @@ void Proxsens::edgeChangeCallback(const pigpio_msg::HalPigpioEdgeChange & msg)
       } else {
         edgeLength = timestamp - lastTimestamp;
       }
-
       distanceInCm = static_cast<uint16_t>(edgeLength / 58.0);
+
+      lastEdgeChangeType = edgeChangeType;
+      lastTimestamp = timestamp;
     } else if (edgeChangeType == RISING_EDGE) {
       lastEdgeChangeType = edgeChangeType;
       lastTimestamp = timestamp;
