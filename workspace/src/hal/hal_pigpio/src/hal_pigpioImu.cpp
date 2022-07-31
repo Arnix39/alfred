@@ -1,3 +1,17 @@
+// Copyright (c) 2022 Arnix Robotix
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "hal_pigpio.hpp"
 
 void Pigpio::resetFifo()
@@ -7,6 +21,7 @@ void Pigpio::resetFifo()
   valueRead = i2c_read_byte_data(pigpioHandle, i2cHandle, MPU6050_USER_CONTROL_REGISTER);
   if (valueRead < 0) {
     RCLCPP_ERROR(get_logger(), "Failed to reset FIFO!");
+    // NOLINTNEXTLINE (impossible to have the curly brace on this line)
   } else if (i2c_write_byte_data(
       pigpioHandle, i2cHandle, MPU6050_USER_CONTROL_REGISTER,
       (static_cast<uint8_t>(valueRead) | (1 << MPU6050_FIFO_RESET_BIT))) != 0)

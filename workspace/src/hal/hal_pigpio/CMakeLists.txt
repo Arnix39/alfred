@@ -22,7 +22,7 @@ set(dependencies
   common_utils
   pigpio)
 
-add_library(${PROJECT_NAME} OBJECT 
+add_library(${PROJECT_NAME} OBJECT
   src/hal_pigpio.cpp
   src/hal_pigpioI2c.cpp
   src/hal_pigpioInit.cpp
@@ -31,19 +31,19 @@ add_library(${PROJECT_NAME} OBJECT
   src/hal_pigpioImu.cpp)
 ament_target_dependencies(${PROJECT_NAME} ${dependencies})
 
-add_executable(${PROJECT_NAME}_node 
+add_executable(${PROJECT_NAME}_node
   src/hal_pigpio_node.cpp
-  $<TARGET_OBJECTS:${PROJECT_NAME}>) 
+  $<TARGET_OBJECTS:${PROJECT_NAME}>)
 ament_target_dependencies(${PROJECT_NAME}_node ${dependencies})
 
 #############
 ## Testing ##
 #############
 if(BUILD_TESTING)
-  #find_package(ament_lint_auto REQUIRED)
+  find_package(ament_lint_auto REQUIRED)
   find_package(ament_cmake_gtest REQUIRED)
-  #ament_lint_auto_find_test_dependencies()
- 
+  ament_lint_auto_find_test_dependencies()
+
   ament_add_gtest(${PROJECT_NAME}_init_test test/test_hal_pigpio_init.cpp)
   ament_target_dependencies(${PROJECT_NAME}_init_test ${dependencies})
   target_link_libraries(${PROJECT_NAME}_init_test ${PROJECT_NAME})
