@@ -27,7 +27,7 @@ ament_target_dependencies(${PROJECT_NAME}_motor_lib ${dependencies})
 add_library(${PROJECT_NAME}_motor_control OBJECT src/hal_motor_control.cpp)
 ament_target_dependencies(${PROJECT_NAME}_motor_control ${dependencies})
 
-add_executable(${PROJECT_NAME}_node 
+add_executable(${PROJECT_NAME}_node
   src/hal_motor_control_node.cpp
   $<TARGET_OBJECTS:${PROJECT_NAME}_motor_lib>
   $<TARGET_OBJECTS:${PROJECT_NAME}_motor_control>)
@@ -37,10 +37,10 @@ ament_target_dependencies(${PROJECT_NAME}_node ${dependencies})
 ## Testing ##
 #############
 if(BUILD_TESTING)
-  #find_package(ament_lint_auto REQUIRED)
+  find_package(ament_lint_auto REQUIRED)
   find_package(ament_cmake_gtest REQUIRED)
-  #ament_lint_auto_find_test_dependencies()
-  
+  ament_lint_auto_find_test_dependencies()
+
 endif()
 
 #############

@@ -1,3 +1,17 @@
+// Copyright (c) 2022 Arnix Robotix
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "hal_motor.hpp"
 
 Motor::Motor(
@@ -14,10 +28,14 @@ Motor::Motor(
 }
 
 void Motor::configureGpios(
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>::SharedPtr gpioSetOutputModeClient,
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>::SharedPtr gpioSetInputModeClient,
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback>::SharedPtr gpioSetEncoderCallbackClient,
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency>::SharedPtr gpioSetPwmFrequencyClient)
+  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>::SharedPtr
+  gpioSetOutputModeClient,
+  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>::SharedPtr
+  gpioSetInputModeClient,
+  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback>::SharedPtr
+  gpioSetEncoderCallbackClient,
+  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency>::SharedPtr
+  gpioSetPwmFrequencyClient)
 {
   auto setInputModeEncoderChARequest =
     std::make_shared<hal_pigpio_interfaces::srv::HalPigpioSetInputMode::Request>();
@@ -119,9 +137,11 @@ void Motor::setEncoderCount(uint32_t count)
 }
 
 void Motor::setPwmDutyCycleAndDirection(
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle>::SharedPtr gpioSetPwmDutycycleClient,
+  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle>::SharedPtr
+  gpioSetPwmDutycycleClient,
   uint16_t dutycycle,
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection>::SharedPtr gpioSetMotorDirectionClient,
+  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection>::SharedPtr
+  gpioSetMotorDirectionClient,
   bool isDirectionForward)
 {
   auto setPwmDutycyclePwmChARequest =
