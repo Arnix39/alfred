@@ -14,6 +14,7 @@
 
 #include "gtest/gtest.h"
 #include "rclcpp/rclcpp.hpp"
+#include "lifecycle_msgs/srv/change_state.hpp"
 
 #include "hal_proxsens.hpp"
 
@@ -48,7 +49,11 @@ public:
       <hal_proxsens::proxsens_msg::HalProxsens>(
         "proxSensorValue",
         1000,
-        std::bind(&ProxsensCheckerNode::getProxsensDistance, this, _1)))
+        std::bind(&ProxsensCheckerNode::getProxsensDistance, this, _1))),
+    changeStateClient(this->create_client<lifecycle_msgs::srv::ChangeState>(
+        "hal_proxsens_node/change_state")),
+    stateChangeSuccessful(false),
+    stateChanging(false)
   {
   }
   ~ProxsensCheckerNode() = default;
@@ -58,8 +63,25 @@ public:
   }
   std::promise<uint16_t> distanceInCm;
 
+  /*void activateProxsensNode(void)
+  {
+    changeState(lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE);
+    changeState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
+  }*/
+
+  void changeState(std::uint8_t transition)
+  {
+    auto request = std::make_shared<lifecycle_msgs::srv::ChangeState::Request>();
+    request->transition.id = transition;
+    auto result = changeStateClient->async_send_request(request);
+  }
+
 private:
   rclcpp::Subscription<hal_proxsens::proxsens_msg::HalProxsens>::SharedPtr proxsensSub;
+  rclcpp::Client<lifecycle_msgs::srv::ChangeState>::SharedPtr changeStateClient;
+
+  bool stateChangeSuccessful;
+  bool stateChanging;
 };
 
 /* Test fixture */
@@ -77,6 +99,11 @@ protected:
 
     executor.add_node(proxsens->get_node_base_interface());
     executor.add_node(proxsensChecker);
+
+    proxsensChecker->changeState(lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE);
+    executor.spin_some();
+    proxsensChecker->changeState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
+    executor.spin_some();
   }
 
   void TearDown()
