@@ -34,17 +34,17 @@ ament_target_dependencies(${PROJECT_NAME}I2cInit ${dependencies})
 add_library(${PROJECT_NAME}DmpWritingServer OBJECT src/hal_imuDmpWritingServer.cpp)
 ament_target_dependencies(${PROJECT_NAME}DmpWritingServer ${dependencies})
 
-add_executable(${PROJECT_NAME}_node 
+add_executable(${PROJECT_NAME}_node
   src/hal_imu_node.cpp
   $<TARGET_OBJECTS:${PROJECT_NAME}>)
 ament_target_dependencies(${PROJECT_NAME}_node ${dependencies})
 
-add_executable(${PROJECT_NAME}I2cInit_node 
+add_executable(${PROJECT_NAME}I2cInit_node
   src/hal_imuI2cInit_node.cpp
   $<TARGET_OBJECTS:${PROJECT_NAME}I2cInit>)
 ament_target_dependencies(${PROJECT_NAME}I2cInit_node ${dependencies})
 
-add_executable(${PROJECT_NAME}DmpWritingServer_node 
+add_executable(${PROJECT_NAME}DmpWritingServer_node
   src/hal_imuDmpWritingServer_node.cpp
   $<TARGET_OBJECTS:${PROJECT_NAME}DmpWritingServer>)
 ament_target_dependencies(${PROJECT_NAME}DmpWritingServer_node ${dependencies})
@@ -53,10 +53,10 @@ ament_target_dependencies(${PROJECT_NAME}DmpWritingServer_node ${dependencies})
 ## Testing ##
 #############
 if(BUILD_TESTING)
-  #find_package(ament_lint_auto REQUIRED)
+  find_package(ament_lint_auto REQUIRED)
   find_package(ament_cmake_gtest REQUIRED)
-  #ament_lint_auto_find_test_dependencies()
-  
+  ament_lint_auto_find_test_dependencies()
+
 endif()
 
 #############
