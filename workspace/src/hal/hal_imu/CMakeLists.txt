@@ -57,6 +57,17 @@ if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
+  ament_add_gtest(${PROJECT_NAME}_test test/test_hal_imu.cpp)
+  ament_target_dependencies(${PROJECT_NAME}_test ${dependencies})
+  target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})
+
+  ament_add_gtest(${PROJECT_NAME}I2cInit_test test/test_hal_imuI2cInit.cpp)
+  ament_target_dependencies(${PROJECT_NAME}I2cInit_test ${dependencies})
+  target_link_libraries(${PROJECT_NAME}I2cInit_test ${PROJECT_NAME}I2cInit)
+
+  ament_add_gtest(${PROJECT_NAME}DmpWritingServer_test test/test_hal_imuDmpWritingServer.cpp)
+  ament_target_dependencies(${PROJECT_NAME}DmpWritingServer_test ${dependencies})
+  target_link_libraries(${PROJECT_NAME}DmpWritingServer_test ${PROJECT_NAME}DmpWritingServer)
 endif()
 
 #############
