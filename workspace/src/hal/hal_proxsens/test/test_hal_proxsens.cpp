@@ -51,9 +51,7 @@ public:
         1000,
         std::bind(&ProxsensCheckerNode::getProxsensDistance, this, _1))),
     changeStateClient(this->create_client<lifecycle_msgs::srv::ChangeState>(
-        "hal_proxsens_node/change_state")),
-    stateChangeSuccessful(false),
-    stateChanging(false)
+        "hal_proxsens_node/change_state"))
   {
   }
   ~ProxsensCheckerNode() = default;
@@ -73,9 +71,6 @@ public:
 private:
   rclcpp::Subscription<hal_proxsens::proxsens_msg::HalProxsens>::SharedPtr proxsensSub;
   rclcpp::Client<lifecycle_msgs::srv::ChangeState>::SharedPtr changeStateClient;
-
-  bool stateChangeSuccessful;
-  bool stateChanging;
 };
 
 /* Test fixture */
