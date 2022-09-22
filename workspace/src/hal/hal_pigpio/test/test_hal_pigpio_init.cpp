@@ -66,9 +66,9 @@ protected:
     pigioChecker->changePigpioNodeToState(
       lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE);
     executor.spin_some();
-    /*pigioChecker->changePigpioNodeToState(
+    pigioChecker->changePigpioNodeToState(
       lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
-    executor.spin_some();*/
+    executor.spin_some();
   }
 
   void TearDown()
@@ -92,7 +92,7 @@ TEST_F(PigpioInitTest, SetInputMode)
   auto setInputModeFuture = pigioChecker->getSetInputModeClient()->async_send_request(
     setInputModeRequest);
 
-  //executor.spin_some();
+  // executor.spin_some();
 
   ASSERT_EQ(setInputModeFuture.get()->has_succeeded, true);
 }

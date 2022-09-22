@@ -44,9 +44,9 @@ if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
-  ament_add_gtest(${PROJECT_NAME}_init_test test/test_hal_pigpio_init.cpp)
-  ament_target_dependencies(${PROJECT_NAME}_init_test ${dependencies})
-  target_link_libraries(${PROJECT_NAME}_init_test ${PROJECT_NAME})
+  #ament_add_gtest(${PROJECT_NAME}_init_test test/test_hal_pigpio_init.cpp)
+  #ament_target_dependencies(${PROJECT_NAME}_init_test ${dependencies})
+  #target_link_libraries(${PROJECT_NAME}_init_test ${PROJECT_NAME})
 
   ament_add_gtest(${PROJECT_NAME}_output_test test/test_hal_pigpio_output.cpp)
   ament_target_dependencies(${PROJECT_NAME}_output_test ${dependencies})
