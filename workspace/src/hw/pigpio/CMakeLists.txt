@@ -10,7 +10,7 @@ include_directories(
   include
 )
 
-if(BUILD_TESTING)
+if(SYNTHETIC_BUILD)
   add_library(${PROJECT_NAME}_pi_mock OBJECT src/mock/raspberrypi_mock.cpp)
 
   add_library(${PROJECT_NAME} SHARED 
