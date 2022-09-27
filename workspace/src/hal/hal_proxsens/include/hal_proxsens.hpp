@@ -68,6 +68,7 @@ private:
   rclcpp::Client<pigpio_srv::HalPigpioSetGpioHigh>::SharedPtr gpioSetGpioHighClient;
 
   rclcpp_lifecycle::LifecyclePublisher<proxsens_msg::HalProxsens>::SharedPtr proxsensDistancePub;
+  rclcpp::TimerBase::SharedPtr proxsensDistancePubTimer;
 
   rclcpp::Subscription<pigpio_msg::HalPigpioEdgeChange>::SharedPtr proxsensEdgeChangeSub;
 

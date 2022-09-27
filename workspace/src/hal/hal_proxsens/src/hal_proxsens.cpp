@@ -45,6 +45,8 @@ LifecycleCallbackReturn_t Proxsens::on_configure(const rclcpp_lifecycle::State &
   proxsensDistancePub =
     this->create_publisher<proxsens_msg::HalProxsens>("proxSensorValue", 1000);
 
+  proxsensDistancePubTimer = create_wall_timer(100ms, std::bind(&Proxsens::publishAndGetDistance, this));
+
   proxsensEdgeChangeSub =
     this->create_subscription<pigpio_msg::HalPigpioEdgeChange>(
     "gpioEdgeChange", 1000,
@@ -84,6 +86,7 @@ LifecycleCallbackReturn_t Proxsens::on_deactivate(const rclcpp_lifecycle::State 
 LifecycleCallbackReturn_t Proxsens::on_cleanup(const rclcpp_lifecycle::State & previous_state)
 {
   proxsensDistancePub.reset();
+  proxsensDistancePubTimer.reset();
 
   RCLCPP_INFO(get_logger(), "hal_proxsens node unconfigured!");
 
@@ -93,6 +96,7 @@ LifecycleCallbackReturn_t Proxsens::on_cleanup(const rclcpp_lifecycle::State & p
 LifecycleCallbackReturn_t Proxsens::on_shutdown(const rclcpp_lifecycle::State & previous_state)
 {
   proxsensDistancePub.reset();
+  proxsensDistancePubTimer.reset();
 
   RCLCPP_INFO(get_logger(), "hal_proxsens node shutdown!");
 
