@@ -16,7 +16,6 @@ int32_t getI2cHandle(imuGetHandleClient_t imuGetHandleClient)
   return imuHandle;
 }
 
-
 int16_t readByteFromRegister(
   i2cReadByteDataClient_t i2cReadByteDataClient, int32_t imuHandle,
   uint8_t registerToRead)

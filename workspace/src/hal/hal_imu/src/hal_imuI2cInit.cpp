@@ -122,8 +122,8 @@ void ImuI2cInit::initI2cCommunication(void)
   auto i2cOpenCallback = [this](I2cOpenFuture_t future)
     {
       if (future.get()->has_succeeded && future.get()->handle >= 0) {
-        imuHandle = future.get()->handle;
-        RCLCPP_INFO(get_logger(), "IMU I2C handle received.");
+        this->imuHandle = future.get()->handle;
+        RCLCPP_INFO(get_logger(), "IMU I2C handle %u received.", this->imuHandle);
       } else {
         RCLCPP_ERROR(get_logger(), "Unable to receive IMU I2C handle!");
       }

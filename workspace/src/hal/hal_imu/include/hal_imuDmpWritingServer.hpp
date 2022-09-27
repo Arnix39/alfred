@@ -44,6 +44,7 @@ private:
     i2cWriteByteDataClient;
   rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData>::SharedPtr
     i2cWriteBlockDataClient;
+  rclcpp::Client<hal_imu_interfaces::srv::HalImuGetHandle>::SharedPtr imuGetHandleClient;
 
   rclcpp_action::Server<HalImuWriteDmpAction>::SharedPtr imuDmpWritingServer;
   rclcpp_action::GoalResponse handle_goal(

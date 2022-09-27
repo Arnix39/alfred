@@ -23,8 +23,6 @@
 // Services and messages headers (generated)
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_open.hpp"
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_close.hpp"
-#include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_read_byte_data.hpp"
-#include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_write_byte_data.hpp"
 #include "hal_imu_interfaces/srv/hal_imu_get_handle.hpp"
 
 #define IMU_I2C_BUS 0x1

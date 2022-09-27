@@ -31,6 +31,8 @@ LifecycleCallbackReturn_t ImuDmpWritingServer::on_configure(
   i2cWriteBlockDataClient =
     this->create_client<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData>(
     "hal_pigpioI2cWriteBlockData");
+  imuGetHandleClient = this->create_client<hal_imu_interfaces::srv::HalImuGetHandle>(
+    "hal_imuGetHandle");
   imuDmpWritingServer = rclcpp_action::create_server<HalImuWriteDmpAction>(
     this,
     "hal_imuWriteDmp",
@@ -46,6 +48,8 @@ LifecycleCallbackReturn_t ImuDmpWritingServer::on_configure(
 LifecycleCallbackReturn_t ImuDmpWritingServer::on_activate(
   const rclcpp_lifecycle::State & previous_state)
 {
+  imuHandle = getI2cHandle(imuGetHandleClient);
+
   RCLCPP_INFO(get_logger(), "hal_imuDmpWritingServer node activated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
