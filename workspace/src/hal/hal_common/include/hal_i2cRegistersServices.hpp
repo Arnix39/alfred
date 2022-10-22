@@ -1,3 +1,17 @@
+// Copyright (c) 2022 Arnix Robotix
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #ifndef HAL_I2C_REGISTERS_SERVICES
 #define HAL_I2C_REGISTERS_SERVICES
 
@@ -10,35 +24,26 @@
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_write_block_data.hpp"
 #include "hal_imu_interfaces/srv/hal_imu_get_handle.hpp"
 
-using i2cReadByteDataFuture_t =
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData>::SharedFuture;
-using i2cWriteByteDataFuture_t =
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData>::SharedFuture;
-using i2cWriteBlockDataFuture_t =
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData>::SharedFuture;
-using ImuGetHandleFuture_t = rclcpp::Client<hal_imu_interfaces::srv::HalImuGetHandle>::SharedFuture;
+using i2cReadByteDataSyncClientNode_t = ServiceNodeSync<hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData>;
+using i2cWriteByteDataSyncClientNode_t = ServiceNodeSync<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData>;
+using i2cWriteBlockDataSyncClientNode_t = ServiceNodeSync<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData>;
 
-using i2cReadByteDataClient_t =
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData>::SharedPtr;
-using i2cWriteByteDataClient_t =
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData>::SharedPtr;
-using i2cWriteBlockDataClient_t =
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData>::SharedPtr;
-using imuGetHandleClient_t = rclcpp::Client<hal_imu_interfaces::srv::HalImuGetHandle>::SharedPtr;
+using imuGetHandleSyncClientNode_t = ServiceNodeSync<hal_imu_interfaces::srv::HalImuGetHandle>;
 
-int32_t getI2cHandle(imuGetHandleClient_t imuGetHandleClient);
+int32_t getI2cHandle(imuGetHandleSyncClientNode_t imuGetHandleSyncClientNode);
+
 int16_t readByteFromRegister(
-  i2cReadByteDataClient_t i2cReadByteDataClient, int32_t imuHandle,
+  i2cReadByteDataSyncClientNode_t i2cReadByteDataSyncClientNode, int32_t imuHandle,
   uint8_t registerToRead);
 bool writeBitInRegister(
-  i2cReadByteDataClient_t i2cReadByteDataClient,
-  i2cWriteByteDataClient_t i2cWriteByteDataClient, int32_t imuHandle,
+  i2cReadByteDataSyncClientNode_t i2cReadByteDataSyncClientNode,
+  i2cWriteByteDataSyncClientNode_t i2cWriteByteDataSyncClientNode, int32_t imuHandle,
   uint8_t registerToWrite, uint8_t bitToWrite, uint8_t valueOfBit);
 bool writeByteInRegister(
-  i2cWriteByteDataClient_t i2cWriteByteDataClient, int32_t imuHandle,
+  i2cWriteByteDataSyncClientNode_t i2cWriteByteDataSyncClientNode, int32_t imuHandle,
   uint8_t registerToWrite, uint8_t value);
 bool writeDataBlock(
-  i2cWriteBlockDataClient_t i2cWriteBlockDataClient, int32_t imuHandle,
+  i2cWriteBlockDataSyncClientNode_t i2cWriteBlockDataSyncClientNode, int32_t imuHandle,
   uint8_t registerToWrite, std::vector<uint8_t> data);
 
 #endif

@@ -18,21 +18,16 @@ using namespace std::placeholders;
 
 ImuDmpWritingServer::ImuDmpWritingServer()
 : rclcpp_lifecycle::LifecycleNode("hal_imuDmpWritingServer_node"),
-  imuHandle(MPU6050_I2C_NO_HANDLE)
+  imuHandle(MPU6050_I2C_NO_HANDLE),
+  imuGetHandleSyncClient("getHandleSyncClientDmp_node"),
+  i2cWriteByteDataSyncClient("writeByteDataSyncClientDmp_node"),
+  i2cWriteBlockDataSyncClient("writeBlockDataSyncClientDmp_node")
 {
 }
 
 LifecycleCallbackReturn_t ImuDmpWritingServer::on_configure(
   const rclcpp_lifecycle::State & previous_state)
 {
-  i2cWriteByteDataClient =
-    this->create_client<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData>(
-    "hal_pigpioI2cWriteByteData");
-  i2cWriteBlockDataClient =
-    this->create_client<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData>(
-    "hal_pigpioI2cWriteBlockData");
-  imuGetHandleClient = this->create_client<hal_imu_interfaces::srv::HalImuGetHandle>(
-    "hal_imuGetHandle");
   imuDmpWritingServer = rclcpp_action::create_server<HalImuWriteDmpAction>(
     this,
     "hal_imuWriteDmp",
@@ -48,10 +43,8 @@ LifecycleCallbackReturn_t ImuDmpWritingServer::on_configure(
 LifecycleCallbackReturn_t ImuDmpWritingServer::on_activate(
   const rclcpp_lifecycle::State & previous_state)
 {
-  imuHandle = getI2cHandle(imuGetHandleClient);
-
-  RCLCPP_INFO(get_logger(), "hal_imuDmpWritingServer node activated!");
-
+  imuHandle = getI2cHandle(imuGetHandleSyncClient);
+  
   return LifecycleCallbackReturn_t::SUCCESS;
 }
 
@@ -161,10 +154,10 @@ void ImuDmpWritingServer::writeDmp(const std::shared_ptr<HalImuWriteDmpGoal> goa
   }
 
   writeSuccess = writeByteInRegister(
-    i2cWriteByteDataClient, imuHandle,
+    i2cWriteByteDataSyncClient, imuHandle,
     MPU6050_DMP_START_ADDRESS_H_REGISTER, startAddressMsb);
   writeSuccess &= writeByteInRegister(
-    i2cWriteByteDataClient, imuHandle,
+    i2cWriteByteDataSyncClient, imuHandle,
     MPU6050_DMP_START_ADDRESS_L_REGISTER, startAddressLsb);
   if (!writeSuccess) {
     RCLCPP_ERROR(get_logger(), "Failed to write DMP code: start address not written!");
@@ -181,7 +174,7 @@ bool ImuDmpWritingServer::writeData(uint8_t bank, uint8_t addressInBank, std::ve
   if (addressInBank == 0) {
     /* A new bank is starting */
     if (!writeByteInRegister(
-        i2cWriteByteDataClient, imuHandle, MPU6050_BANK_SELECTION_REGISTER,
+        i2cWriteByteDataSyncClient, imuHandle, MPU6050_BANK_SELECTION_REGISTER,
         bank))
     {
       return false;
@@ -189,13 +182,13 @@ bool ImuDmpWritingServer::writeData(uint8_t bank, uint8_t addressInBank, std::ve
   }
 
   if (!writeByteInRegister(
-      i2cWriteByteDataClient, imuHandle, MPU6050_ADDRESS_IN_BANK_REGISTER,
+      i2cWriteByteDataSyncClient, imuHandle, MPU6050_ADDRESS_IN_BANK_REGISTER,
       addressInBank))
   {
     return false;
   }
 
-  if (!writeDataBlock(i2cWriteBlockDataClient, imuHandle, MPU6050_READ_WRITE_REGISTER, data)) {
+  if (!writeDataBlock(i2cWriteBlockDataSyncClient, imuHandle, MPU6050_READ_WRITE_REGISTER, data)) {
     return false;
   }
 

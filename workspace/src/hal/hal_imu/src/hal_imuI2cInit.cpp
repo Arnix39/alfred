@@ -15,6 +15,7 @@
 #include "hal_imuI2cInit.hpp"
 
 using namespace std::placeholders;
+using namespace std::chrono_literals;
 
 ImuI2cInit::ImuI2cInit()
 : rclcpp_lifecycle::LifecycleNode("hal_imuI2cInit_node"),

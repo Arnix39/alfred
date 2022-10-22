@@ -31,6 +31,7 @@
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_imu_reading.hpp"
 #include "hal_imu_interfaces/msg/hal_imu.hpp"
 #include "hal_imu_interfaces/action/hal_imu_write_dmp.hpp"
+#include "hal_imu_interfaces/srv/hal_imu_get_handle.hpp"
 
 #define IMU_GYROSCOPE_X_OFFSET 0
 #define IMU_GYROSCOPE_Y_OFFSET -34
@@ -59,14 +60,11 @@ class Imu : public rclcpp_lifecycle::LifecycleNode
 private:
   int32_t imuHandle;
 
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData>::SharedPtr
-    i2cReadByteDataClient;
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData>::SharedPtr
-    i2cWriteByteDataClient;
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData>::SharedPtr
-    i2cWriteBlockDataClient;
   rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading>::SharedPtr i2cImuReadingClient;
-  rclcpp::Client<hal_imu_interfaces::srv::HalImuGetHandle>::SharedPtr imuGetHandleClient;
+  i2cReadByteDataSyncClientNode_t i2cReadByteDataSyncClient;
+  i2cWriteByteDataSyncClientNode_t i2cWriteByteDataSyncClient;
+  i2cWriteBlockDataSyncClientNode_t i2cWriteBlockDataSyncClient;
+  imuGetHandleSyncClientNode_t imuGetHandleSyncClient;
 
   rclcpp_action::Client<hal_imu_interfaces::action::HalImuWriteDmp>::SharedPtr imuDmpWritingClient;
 
@@ -76,6 +74,7 @@ private:
     const std::shared_ptr<const HalImuWriteDmpAction::Feedback> feedback);
   void result_callback(const HalImuWriteDmpGoal::WrappedResult & result);
 
+  //void getI2cHandle(imuGetHandleClient_t imuGetHandleClient);
 public:
   Imu();
   ~Imu() = default;

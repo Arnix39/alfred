@@ -87,7 +87,10 @@
 			"typeindex": "cpp",
 			"typeinfo": "cpp",
 			"variant": "cpp",
-			"ranges": "cpp"
+			"ranges": "cpp",
+			"valarray": "cpp",
+			"*.ipp": "cpp",
+			"*.idl": "cpp"
 		}
 	}
 }

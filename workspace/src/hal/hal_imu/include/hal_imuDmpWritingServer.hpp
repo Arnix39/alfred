@@ -40,11 +40,9 @@ class ImuDmpWritingServer : public rclcpp_lifecycle::LifecycleNode
 private:
   int32_t imuHandle;
 
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData>::SharedPtr
-    i2cWriteByteDataClient;
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData>::SharedPtr
-    i2cWriteBlockDataClient;
-  rclcpp::Client<hal_imu_interfaces::srv::HalImuGetHandle>::SharedPtr imuGetHandleClient;
+  i2cWriteByteDataSyncClientNode_t i2cWriteByteDataSyncClient;
+  i2cWriteBlockDataSyncClientNode_t i2cWriteBlockDataSyncClient;
+  imuGetHandleSyncClientNode_t imuGetHandleSyncClient;
 
   rclcpp_action::Server<HalImuWriteDmpAction>::SharedPtr imuDmpWritingServer;
   rclcpp_action::GoalResponse handle_goal(
