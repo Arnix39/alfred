@@ -45,7 +45,8 @@ LifecycleCallbackReturn_t Proxsens::on_configure(const rclcpp_lifecycle::State &
   proxsensDistancePub =
     this->create_publisher<proxsens_msg::HalProxsens>("proxSensorValue", 1000);
 
-  proxsensDistancePubTimer = create_wall_timer(100ms, std::bind(&Proxsens::publishAndGetDistance, this));
+  proxsensDistancePubTimer =
+    create_wall_timer(100ms, std::bind(&Proxsens::publishAndGetDistance, this));
 
   proxsensEdgeChangeSub =
     this->create_subscription<pigpio_msg::HalPigpioEdgeChange>(

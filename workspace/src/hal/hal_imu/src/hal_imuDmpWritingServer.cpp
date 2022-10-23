@@ -44,7 +44,7 @@ LifecycleCallbackReturn_t ImuDmpWritingServer::on_activate(
   const rclcpp_lifecycle::State & previous_state)
 {
   imuHandle = getI2cHandle(imuGetHandleSyncClient);
-  
+
   return LifecycleCallbackReturn_t::SUCCESS;
 }
 

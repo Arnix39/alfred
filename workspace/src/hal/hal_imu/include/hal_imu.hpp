@@ -74,7 +74,6 @@ private:
     const std::shared_ptr<const HalImuWriteDmpAction::Feedback> feedback);
   void result_callback(const HalImuWriteDmpGoal::WrappedResult & result);
 
-  //void getI2cHandle(imuGetHandleClient_t imuGetHandleClient);
 public:
   Imu();
   ~Imu() = default;

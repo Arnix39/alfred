@@ -183,7 +183,9 @@ void Imu::setMpuRate(uint16_t rate)
 
   div = MPU6050_MAX_SAMPLE_RATE / rate - 1;
 
-  if (!writeByteInRegister(i2cWriteByteDataSyncClient, imuHandle, MPU6050_SAMPLE_RATE_REGISTER, div)) {
+  if (!writeByteInRegister(
+      i2cWriteByteDataSyncClient, imuHandle, MPU6050_SAMPLE_RATE_REGISTER, div))
+  {
     RCLCPP_ERROR(get_logger(), "Failed to set MPU sample rate.");
   } else {
     RCLCPP_INFO(get_logger(), "Successfully set MPU sample rate.");
