@@ -34,6 +34,9 @@ LifecycleCallbackReturn_t ImuDmpWritingServer::on_configure(
     std::bind(&ImuDmpWritingServer::handle_goal, this, _1, _2),
     std::bind(&ImuDmpWritingServer::handle_cancel, this, _1),
     std::bind(&ImuDmpWritingServer::handle_accepted, this, _1));
+  imuGetHandleSyncClient.init("hal_imuGetHandle");
+  i2cWriteByteDataSyncClient.init("hal_pigpioI2cWriteByteData");
+  i2cWriteBlockDataSyncClient.init("hal_pigpioI2cWriteBlockData");
 
   RCLCPP_INFO(get_logger(), "hal_imuDmpWritingServer node configured!");
 

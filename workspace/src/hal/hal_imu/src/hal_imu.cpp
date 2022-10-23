@@ -32,6 +32,10 @@ LifecycleCallbackReturn_t Imu::on_configure(const rclcpp_lifecycle::State & prev
   i2cImuReadingClient = this->create_client<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading>(
     "hal_pigpioI2cImuReading");
   imuDmpWritingClient = rclcpp_action::create_client<HalImuWriteDmpAction>(this, "hal_imuWriteDmp");
+  imuGetHandleSyncClient.init("hal_imuGetHandle");
+  i2cReadByteDataSyncClient.init("hal_pigpioI2cReadByteData");
+  i2cWriteByteDataSyncClient.init("hal_pigpioI2cWriteByteData");
+  i2cWriteBlockDataSyncClient.init("hal_pigpioI2cWriteBlockData");
 
   RCLCPP_INFO(get_logger(), "hal_imu node configured!");
 
@@ -42,8 +46,13 @@ LifecycleCallbackReturn_t Imu::on_activate(const rclcpp_lifecycle::State & previ
 {
   imuHandle = getI2cHandle(imuGetHandleSyncClient);
 
-  init();
-  startImuReading();
+  resetImu();
+  setClockSource();
+  setAccelerometerSensitivity();
+  setGyroscopeSensitivity();
+  setConfiguration();
+  setMpuRate(MPU6050_DMP_SAMPLE_RATE);
+  dmpInit();
 
   RCLCPP_INFO(get_logger(), "hal_imu node activated!");
 
@@ -93,6 +102,11 @@ void Imu::result_callback(const HalImuWriteDmpGoal::WrappedResult & result)
 {
   if (result.code == rclcpp_action::ResultCode::SUCCEEDED) {
     RCLCPP_INFO(get_logger(), "DMP code written successfully.");
+    setDmpRate(MPU6050_DMP_SAMPLE_RATE);
+    setAccelerometerOffsets();
+    setGyroscopeOffsets();
+    configureDmpFeatures();
+    enableDmpAndStartReading();
   } else {
     RCLCPP_ERROR(get_logger(), "Error while writing DMP code!");
   }
@@ -103,22 +117,6 @@ void Imu::feedback_callback(
   const std::shared_ptr<const HalImuWriteDmpAction::Feedback> feedback)
 {
   RCLCPP_INFO(get_logger(), "Bank %u written.", feedback->bank);
-}
-
-void Imu::init(void)
-{
-  resetImu();
-  setClockSource();
-  setAccelerometerSensitivity();
-  setGyroscopeSensitivity();
-  setConfiguration();
-  setMpuRate(MPU6050_DMP_SAMPLE_RATE);
-  writeDmp();
-  setDmpRate(MPU6050_DMP_SAMPLE_RATE);
-  setAccelerometerOffsets();
-  setGyroscopeOffsets();
-  configureDmpFeatures();
-  enableDmp();
 }
 
 void Imu::resetImu(void)
@@ -228,7 +226,7 @@ void Imu::setGyroscopeSensitivity(void)
   }
 }
 
-void Imu::writeDmp(void)
+void Imu::dmpInit(void)
 {
   auto goal = HalImuWriteDmpAction::Goal();
 
@@ -424,7 +422,7 @@ void Imu::configureDmpFeatures(void)
   RCLCPP_INFO(get_logger(), "Successfully configured DMP features.");
 }
 
-void Imu::enableDmp(void)
+void Imu::enableDmpAndStartReading(void)
 {
   /* Enable DMP and FIFO */
   if (!writeByteInRegister(
@@ -436,6 +434,8 @@ void Imu::enableDmp(void)
   }
 
   resetFifo();
+
+  startImuReading();
 
   RCLCPP_INFO(get_logger(), "Successfully enabled DMP.");
 }

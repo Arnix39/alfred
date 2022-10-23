@@ -85,11 +85,10 @@ public:
   LifecycleCallbackReturn_t on_shutdown(const rclcpp_lifecycle::State & previous_state);
   LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
 
-  void init(void);
-  void writeDmp(void);
+  void dmpInit(void);
   void setDmpRate(uint16_t rate);
   void setMpuRate(uint16_t rate);
-  void enableDmp(void);
+  void enableDmpAndStartReading(void);
   void configureDmpFeatures(void);
   void resetImu(void);
   void resetFifo(void);
