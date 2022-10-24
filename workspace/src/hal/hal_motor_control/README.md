@@ -1,4 +1,4 @@
-# Desciption
+# Description
 
 This directory contains the `hal` component related to the motors control (`GA25-371`).
 

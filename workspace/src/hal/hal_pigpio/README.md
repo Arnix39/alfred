@@ -1,4 +1,4 @@
-# Desciption
+# Description
 
 This directory contains the `hal` components related to GPIOs (including I2C and PWM).
 
