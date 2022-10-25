@@ -63,7 +63,7 @@ LifecycleCallbackReturn_t Imu::on_deactivate(const rclcpp_lifecycle::State & pre
 {
   stopImuReading();
 
-  RCLCPP_INFO(get_logger(), "hal_imu node dactivated!");
+  RCLCPP_INFO(get_logger(), "hal_imu node deactivated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
