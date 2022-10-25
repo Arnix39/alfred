@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef HAL_CAMERA
-#define HAL_CAMERA
+#ifndef HAL_CAMERA_HPP_
+#define HAL_CAMERA_HPP_
 
 #include "common.hpp"
 
 class Camera : public rclcpp_lifecycle::LifecycleNode
 {
-private:
 public:
   Camera();
   ~Camera() = default;
@@ -32,4 +31,4 @@ public:
   LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
 };
 
-#endif
+#endif  // HAL_CAMERA_HPP_"

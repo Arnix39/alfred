@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef HAL_I2C_REGISTERS_SERVICES
-#define HAL_I2C_REGISTERS_SERVICES
+#ifndef HAL_I2CREGISTERSSERVICES_HPP_
+#define HAL_I2CREGISTERSSERVICES_HPP_
+
+#include <vector>
 
 #include "common.hpp"
 #include "mpu6050.hpp"
@@ -24,9 +26,12 @@
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_write_block_data.hpp"
 #include "hal_imu_interfaces/srv/hal_imu_get_handle.hpp"
 
-using i2cReadByteDataSyncClientNode_t = ServiceNodeSync<hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData>;
-using i2cWriteByteDataSyncClientNode_t = ServiceNodeSync<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData>;
-using i2cWriteBlockDataSyncClientNode_t = ServiceNodeSync<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData>;
+using i2cReadByteDataSyncClientNode_t =
+  ServiceNodeSync<hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData>;
+using i2cWriteByteDataSyncClientNode_t =
+  ServiceNodeSync<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData>;
+using i2cWriteBlockDataSyncClientNode_t =
+  ServiceNodeSync<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData>;
 
 using imuGetHandleSyncClientNode_t = ServiceNodeSync<hal_imu_interfaces::srv::HalImuGetHandle>;
 
@@ -46,4 +51,4 @@ bool writeDataBlock(
   i2cWriteBlockDataSyncClientNode_t i2cWriteBlockDataSyncClientNode, int32_t imuHandle,
   uint8_t registerToWrite, std::vector<uint8_t> data);
 
-#endif
+#endif  // HAL_I2CREGISTERSSERVICES_HPP_

@@ -34,9 +34,9 @@ int16_t readByteFromRegister(
   i2cReadByteDataRequest->device_register = registerToRead;
 
   auto response = i2cReadByteDataSyncClientNode.sendRequest(i2cReadByteDataRequest);
-  
-  if(response.has_succeeded) {
-    byteRead =  response.value;
+
+  if (response.has_succeeded) {
+    byteRead = response.value;
   }
 
   return byteRead;
@@ -64,7 +64,11 @@ bool writeBitInRegister(
     newRegisterValue = registerValue & ~(1 << bitToWrite);
   }
 
-  return writeByteInRegister(i2cWriteByteDataSyncClientNode, imuHandle, registerToWrite, newRegisterValue);
+  return writeByteInRegister(
+    i2cWriteByteDataSyncClientNode,
+    imuHandle,
+    registerToWrite,
+    newRegisterValue);
 }
 
 bool writeByteInRegister(
