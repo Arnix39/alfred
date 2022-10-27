@@ -1,3 +1,3 @@
 # Description
 
-This directory contains a template package
+This directory contains a package template

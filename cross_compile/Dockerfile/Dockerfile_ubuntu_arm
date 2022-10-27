@@ -22,14 +22,34 @@ RUN apt update && apt install -y \
     bash-completion \
     dirmngr \
     gnupg2 \
-    python3.10
+    python3.10 \
+    cmake \
+    wget \
+    g++ \
+    unzip
+
+# Install Open CV
+RUN mkdir -p ~/opencv cd ~/opencv && \
+    wget -O opencv.zip https://github.com/opencv/opencv/archive/4.x.zip && \
+    unzip opencv.zip && \
+    rm opencv.zip && \
+    mv opencv-4.x OpenCV && \
+    cd OpenCV && \
+    mkdir build && \ 
+    cd build && \
+    cmake -D CMAKE_BUILD_TYPE=RELEASE \
+    -D CMAKE_INSTALL_PREFIX=/usr/local \ 
+    -D INSTALL_C_EXAMPLES=OFF \ 
+    -D INSTALL_PYTHON_EXAMPLES=OFF \ 
+    -D BUILD_EXAMPLES=OFF .. && \
+    make -j4 && \
+    make install && \ 
+    ldconfig
 
 # ROS2 dependencies
 RUN apt install -y --no-install-recommends \
     build-essential \
-    cmake \
-    git \
-    wget
+    git
 
 ENV LANG en_US.UTF-8
 ENV LC_ALL C.UTF-8
@@ -67,7 +87,7 @@ RUN python3 -m pip install -U \
 RUN apt install --no-install-recommends -y \
     libasio-dev \
     libtinyxml2-dev
-
+    
 WORKDIR /ros2_ws
 RUN rosdep init
 RUN rosdep update
@@ -82,6 +102,6 @@ RUN rosdep install --from-paths src \
         rti-connext-dds-5.3.1 \
         urdfdom_headers"
 
-WORKDIR /
+WORKDIR /   
 RUN apt-get install -y symlinks
 RUN symlinks -rc .

@@ -19,7 +19,8 @@ set(dependencies
   rclcpp
   rclcpp_lifecycle
   hal_camera_interfaces
-  common_utils)
+  common_utils
+  OpenCV)
 
 add_library(${PROJECT_NAME} OBJECT src/hal_camera.cpp)
   ament_target_dependencies(${PROJECT_NAME} ${dependencies})

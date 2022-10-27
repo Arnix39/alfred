@@ -16,6 +16,7 @@
 #define HAL_CAMERA_HPP_
 
 #include "common.hpp"
+#include <opencv2/opencv.hpp>
 
 class Camera : public rclcpp_lifecycle::LifecycleNode
 {
