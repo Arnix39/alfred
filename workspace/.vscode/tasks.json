@@ -5,6 +5,9 @@
             "label": "ROS2: Build workspace",
             "detail": "Build workspace for host machine.",
             "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
             "command": "colcon",
             "args": [
                 "build",
@@ -27,6 +30,9 @@
             "label": "ROS2: Run tests",
             "detail": "Run all unit tests and show results.",
             "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
             "command": "colcon test && colcon test-result --all",
             "group": {
                 "kind": "test",
@@ -37,6 +43,9 @@
             "label": "ROS2: Clean host files",
             "detail": "Clean workspace for host build files.",
             "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
             "command": "colcon",
             "args": [
                 "build",
@@ -62,6 +71,7 @@
             "detail": "Build workspace for Raspberry Pi 3B+.",
             "type": "shell",
             "options": {
+                "cwd": "${workspaceFolder}",
                 "env": {
                     "TARGET_ARCH": "aarch64",
                     "CROSS_COMPILE": "/usr/bin/aarch64-linux-gnu-",
@@ -94,6 +104,7 @@
             "detail": "Clean workspace for target build files.",
             "type": "shell",
             "options": {
+                "cwd": "${workspaceFolder}",
                 "env": {
                   "TARGET_ARCH": "aarch64",
                   "CROSS_COMPILE": "/usr/bin/aarch64-linux-gnu-",
@@ -121,6 +132,9 @@
             "detail": "Purge workspace by deleting all generated files.",
             "type": "shell",
             "command": "rm",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
             "args": [
                 "-fr",
                 "build",
@@ -141,10 +155,10 @@
             "label": "OpenCV: Build",
             "detail": "Build a selection of OpenCV modules for host machine.",
             "type": "shell",
-            "command": "../scripts/buildOpenCV.sh",
-            "args": [
-                "/home/arnix/src/opencv/opencv-4.x",
-            ],
+            "options": {
+                "cwd": "${workspaceFolder}/opencv"
+            },
+            "command": "${workspaceFolder}/opencv/buildOpenCV.sh",
         },
     ]
 }

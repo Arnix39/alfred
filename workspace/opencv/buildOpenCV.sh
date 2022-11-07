@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
-cd $1
 rm -fR build
 mkdir build && cd build
-cmake  .. \
+cmake  .. -Wno-dev \
 -D BUILD_opencv_calib3d=OFF \
 -D BUILD_opencv_core=ON \
 -D BUILD_opencv_dnn=OFF \
