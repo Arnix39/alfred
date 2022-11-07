@@ -1,9 +1,5 @@
-workspace/build/
-workspace/devel/
 workspace/.vscode/browse.vc.db
+workspace/build/
+workspace/install/
 workspace/log/
-workspace/install
-workspace/host/
-workspace/target/
 workspace/cross_compile/sysroot
-cross_compile/sysroot

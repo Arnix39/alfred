@@ -9,9 +9,9 @@
             "args": [
                 "build",
                 "--build-base",
-                "host/build",
+                "build/host",
                 "--install-base",
-                "host/install",
+                "install/host",
                 "--symlink-install",
                 "--cmake-args",
                 "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
@@ -54,17 +54,17 @@
             "args": [
                 "build",
                 "--build-base",
-                "target/build",
+                "build/target",
                 "--install-base",
-                "target/install",
+                "install/target",
                 "--symlink-install",
                 "--cmake-args",
-                "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON",
                 "-DCMAKE_TOOLCHAIN_FILE=${CROSS_COMPILE_DIR}/cmake-toolchains/generic_linux.cmake"
             ],
             "group": {
                 "kind": "build"
             },
+            "problemMatcher": "$gcc"
         },
         {
             "label": "ROS2: Install on target",
@@ -93,9 +93,9 @@
             "args": [
                 "build",
                 "--build-base",
-                "host/build",
+                "build/host",
                 "--install-base",
-                "host/install",
+                "install/host",
                 "--cmake-target",
                 "clean"
             ],
@@ -121,9 +121,9 @@
             "args": [
                 "build",
                 "--build-base",
-                "target/build",
+                "build/target",
                 "--install-base",
-                "target/install",
+                "install/target",
                 "--cmake-target",
                 "clean"
             ],
@@ -135,9 +135,9 @@
             "command": "rm",
             "args": [
                 "-fr",
-                "host",
-                "log",
-                "target"
+                "build",
+                "install",
+                "log"
             ],
         },
         {
