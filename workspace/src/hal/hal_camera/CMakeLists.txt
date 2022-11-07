@@ -6,7 +6,10 @@ find_package(hal_camera_interfaces REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(common_utils REQUIRED)
-find_package(OpenCV 4.6.0 REQUIRED)
+find_package(OpenCV REQUIRED COMPONENTS core imgproc videoio)
+find_package(cv_bridge REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
 
 ###########
 ## Build ##
@@ -20,7 +23,10 @@ set(dependencies
   rclcpp_lifecycle
   hal_camera_interfaces
   common_utils
-  OpenCV)
+  OpenCV
+  cv_bridge
+  sensor_msgs
+  std_msgs)
 
 add_library(${PROJECT_NAME} OBJECT src/hal_camera.cpp)
   ament_target_dependencies(${PROJECT_NAME} ${dependencies})

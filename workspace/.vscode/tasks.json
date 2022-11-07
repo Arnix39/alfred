@@ -76,7 +76,7 @@
                     "TARGET_ARCH": "aarch64",
                     "CROSS_COMPILE": "/usr/bin/aarch64-linux-gnu-",
                     "SYSROOT": "${workspaceFolder}/cross_compile/sysroot",
-                    "ROS2_INSTALL_PATH": "${workspaceFolder}/target/install",
+                    "ROS2_INSTALL_PATH": "${workspaceFolder}/install/target",
                     "PYTHON_SOABI": "cpython-310-aarch64-linux-gnu",
                     "CC": "/usr/bin/aarch64-linux-gnu-gcc",
                     "CXX": "/usr/bin/aarch64-linux-gnu-g++",
@@ -92,6 +92,7 @@
                 "install/target",
                 "--symlink-install",
                 "--cmake-args",
+                "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON",
                 "-DCMAKE_TOOLCHAIN_FILE=${CROSS_COMPILE_DIR}/cmake-toolchains/generic_linux.cmake"
             ],
             "group": {
@@ -108,8 +109,8 @@
                 "env": {
                   "TARGET_ARCH": "aarch64",
                   "CROSS_COMPILE": "/usr/bin/aarch64-linux-gnu-",
-                  "SYSROOT": "${workspaceFolder}/cross_compile/sysroot",
-                  "ROS2_INSTALL_PATH": "${workspaceFolder}/target/install",
+                  "SYSROOT": "${workspaceFolder}/cross_compile/sysroot/",
+                  "ROS2_INSTALL_PATH": "${workspaceFolder}/install/target",
                   "PYTHON_SOABI": "cpython-310-aarch64-linux-gnu",
                   "CC": "/usr/bin/aarch64-linux-gnu-gcc",
                   "CXX": "/usr/bin/aarch64-linux-gnu-g++",
@@ -148,7 +149,7 @@
             "type": "shell",
             "command": "../scripts/install_on_Alfred.sh",
             "args": [
-                "${workspaceFolder}/target",
+                "${workspaceFolder}/install/target",
             ],
         },
         {

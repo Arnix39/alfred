@@ -13,32 +13,23 @@ RUN echo 'Etc/UTC' > /etc/timezone && \
     ln -s /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
     apt-get update && apt-get install -q -y tzdata && rm -rf /var/lib/apt/lists/*
 
+# Install common tools
 RUN apt update && apt install -y \
-    pkg-config \
-    lsb-release \
-    curl \
-    gfortran \
-    libpcre3 \
-    libpcre3-dev \
-    bash-completion \
-    dirmngr \
-    gnupg2 \
     cmake \
-    wget \
+    git \
+    python3-pip \
     g++ \
-    unzip
+    pkg-config \
+    curl \
+    lsb-release \
+    gnupg
 
 # Install Open CV
-RUN cd opencv && \
-    ./buildOpenCV.sh && \ 
-    ldconfig
+#RUN cd opencv && \
+#    ./buildOpenCV.sh && \ 
+#    ldconfig
 
 # ROS2 dependencies
-RUN apt update && apt install -y --no-install-recommends \
-    build-essential \
-    git \
-    python3.10
-
 ENV LANG en_US.UTF-8
 ENV LC_ALL C.UTF-8
 
@@ -47,34 +38,26 @@ RUN sh -c 'echo "deb [arch=amd64,arm64] http://repo.ros2.org/ubuntu/main \
     `lsb_release -cs` main" > /etc/apt/sources.list.d/ros2-latest.list'
 
 RUN apt update && apt install -y \
+    build-essential \
     python3-colcon-common-extensions \
+    python3-flake8 \
+    python3-flake8-docstrings \
     python3-pip \
-    python3-rosdep
+    python3-pytest \
+    python3-pytest-cov \
+    python3-rosdep \
+    python3-setuptools \
+    python3-vcstool \
+    python3-flake8-blind-except \
+    python3-flake8-builtins \
+    python3-flake8-class-newline \
+    python3-flake8-comprehensions \
+    python3-flake8-deprecated \
+    python3-flake8-import-order \
+    python3-flake8-quotes \
+    python3-pytest-repeat \
+    python3-pytest-rerunfailures
 
-RUN python3 -m pip install -U \
-    argcomplete \
-    flake8 \
-    flake8-blind-except \
-    flake8-builtins \
-    flake8-class-newline \
-    flake8-comprehensions \
-    flake8-deprecated \
-    flake8-docstrings \
-    flake8-import-order \
-    flake8-quotes \
-    pytest-repeat \
-    pytest-rerunfailures
-
-RUN python3 -m pip install -U \
-    pytest \
-    pytest-cov \
-    pytest-runner \
-    setuptools
-
-RUN apt update && apt install --no-install-recommends -y \
-    libasio-dev \
-    libtinyxml2-dev
-    
 WORKDIR /ros2_ws
 RUN rosdep init
 RUN rosdep update

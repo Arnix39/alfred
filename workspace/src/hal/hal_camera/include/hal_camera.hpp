@@ -17,9 +17,19 @@
 
 #include "common.hpp"
 #include <opencv2/opencv.hpp>
+#include <opencv2/videoio.hpp>
+#include <cv_bridge/cv_bridge.h>
+#include "sensor_msgs/msg/image.hpp"
+#include "std_msgs/msg/header.hpp"
 
 class Camera : public rclcpp_lifecycle::LifecycleNode
 {
+private:
+  rclcpp_lifecycle::LifecyclePublisher<sensor_msgs::msg::Image>::SharedPtr imagePublisher;
+  rclcpp::TimerBase::SharedPtr imagePublisherTimer;
+
+  cv::VideoCapture capture;
+
 public:
   Camera();
   ~Camera() = default;
@@ -30,6 +40,8 @@ public:
   LifecycleCallbackReturn_t on_cleanup(const rclcpp_lifecycle::State & previous_state);
   LifecycleCallbackReturn_t on_shutdown(const rclcpp_lifecycle::State & previous_state);
   LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
+
+  void captureAndPublishFrame(void);
 };
 
 #endif  // HAL_CAMERA_HPP_"
