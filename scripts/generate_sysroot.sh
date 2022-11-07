@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd cross_compile
+cd $2
 
 if [ -d "sysroot" ]; then rm -Rf sysroot; fi
 
@@ -8,7 +8,7 @@ mkdir qemu-user-static
 mkdir workspace
 
 cp /usr/bin/qemu-*-static qemu-user-static
-cp -r ../workspace/src workspace
+cp -r $1/src workspace
 
 docker build -t arm_ros2:latest -f ./Dockerfile/Dockerfile_ubuntu_arm .
 docker run --name arm_sysroot arm_ros2:latest

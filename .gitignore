@@ -1,9 +1,9 @@
 workspace/build/
 workspace/devel/
 workspace/.vscode/browse.vc.db
-workspace/build_aarch64/
-workspace/cc_internals/
-workspace/install_aarch64/
 workspace/log/
 workspace/install
+workspace/host/
+workspace/target/
+workspace/cross_compile/sysroot
 cross_compile/sysroot

@@ -3,10 +3,15 @@
     "tasks": [
         {
             "label": "ROS2: Build workspace",
+            "detail": "Build workspace for host machine.",
             "type": "shell",
             "command": "colcon",
             "args": [
                 "build",
+                "--build-base",
+                "host/build",
+                "--install-base",
+                "host/install",
                 "--symlink-install",
                 "--cmake-args",
                 "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
@@ -19,13 +24,56 @@
             "problemMatcher": "$gcc"
         },
         {
-            "label": "ROS2: Build workspace for Raspberry Pi 3B+",
+            "label": "ROS2: Generate sysroot for target",
+            "detail": "Generate sysroot for cross compilation for Raspberry Pi 3B+.",
             "type": "shell",
-            "command": "../cross_compile.sh",
+            "command": "../scripts/generate_sysroot.sh",
+            "args": [
+                ".",
+                "${CROSS_COMPILE_DIR}",
+            ],
+        },
+        {
+            "options": {
+                "env": {
+                  "TARGET_ARCH": "aarch64",
+                  "TARGET_TRIPLE": "aarch64-linux-gnu",
+                  "CC": "/usr/bin/aarch64-linux-gnu-gcc",
+                  "CXX": "/usr/bin/aarch64-linux-gnu-g++",
+                  "CROSS_COMPILE": "/usr/bin/aarch64-linux-gnu-",
+                  "CROSS_COMPILE_DIR": "${workspaceFolder}/cross_compile",
+                  "SYSROOT": "${workspaceFolder}/cross_compile/sysroot",
+                  "ROS2_INSTALL_PATH": "${workspaceFolder}/target/install",
+                  "PYTHON_SOABI": "cpython-310-aarch64-linux-gnu",
+                }
+            },
+            "label": "ROS2: Build workspace for target",
+            "detail": "Build workspace for Raspberry Pi 3B+.",
+            "type": "shell",
+            "command": "colcon",
+            "args": [
+                "build",
+                "--build-base",
+                "target/build",
+                "--install-base",
+                "target/install",
+                "--symlink-install",
+                "--cmake-args",
+                "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON",
+                "-DCMAKE_TOOLCHAIN_FILE=${CROSS_COMPILE_DIR}/cmake-toolchains/generic_linux.cmake"
+            ],
             "group": {
                 "kind": "build"
             },
-            "problemMatcher": "$gcc"
+        },
+        {
+            "label": "ROS2: Install on target",
+            "detail": "Install workspace on Raspberry Pi 3B+.",
+            "type": "shell",
+            "command": "../scripts/install_on_Alfred.sh",
+            "args": [
+                "${workspaceFolder}/target",
+            ],
         },
         {
             "label": "ROS2: Run tests",
@@ -38,16 +86,47 @@
             }
         },
         {
-            "label": "ROS2: Clean",
-            "detail": "Run the clean target",
+            "label": "ROS2: Clean host files",
+            "detail": "Clean workspace for host build.",
             "type": "shell",
             "command": "colcon",
             "args": [
                 "build",
+                "--build-base",
+                "host/build",
+                "--install-base",
+                "host/install",
                 "--cmake-target",
                 "clean"
             ],
-            "problemMatcher": "$gcc"
+        },
+        {
+            "options": {
+                "env": {
+                  "TARGET_ARCH": "aarch64",
+                  "TARGET_TRIPLE": "aarch64-linux-gnu",
+                  "CC": "/usr/bin/aarch64-linux-gnu-gcc",
+                  "CXX": "/usr/bin/aarch64-linux-gnu-g++",
+                  "CROSS_COMPILE": "/usr/bin/aarch64-linux-gnu-",
+                  "CROSS_COMPILE_DIR": "${workspaceFolder}/cross_compile",
+                  "SYSROOT": "${workspaceFolder}/cross_compile/sysroot",
+                  "ROS2_INSTALL_PATH": "${workspaceFolder}/target/install",
+                  "PYTHON_SOABI": "cpython-310-aarch64-linux-gnu",
+                }
+            },
+            "label": "ROS2: Clean target files",
+            "detail": "Clean workspace for target build.",
+            "type": "shell",
+            "command": "colcon",
+            "args": [
+                "build",
+                "--build-base",
+                "target/build",
+                "--install-base",
+                "target/install",
+                "--cmake-target",
+                "clean"
+            ],
         },
         {
             "label": "ROS2: Purge",
@@ -56,11 +135,19 @@
             "command": "rm",
             "args": [
                 "-fr",
-                "build",
-                "install",
-                "log"
+                "host",
+                "log",
+                "target"
             ],
-            "problemMatcher": []
-        }
+        },
+        {
+            "label": "OpenCV: Build",
+            "detail": "Build a selection of OpenCV modules for host machine.",
+            "type": "shell",
+            "command": "../scripts/buildOpenCV.sh",
+            "args": [
+                "/home/arnix/src/opencv/opencv-4.x",
+            ],
+        },
     ]
 }
