@@ -152,14 +152,5 @@
                 "${workspaceFolder}/install/target",
             ],
         },
-        {
-            "label": "OpenCV: Build",
-            "detail": "Build a selection of OpenCV modules for host machine.",
-            "type": "shell",
-            "options": {
-                "cwd": "${workspaceFolder}/opencv"
-            },
-            "command": "${workspaceFolder}/opencv/buildOpenCV.sh",
-        },
     ]
 }
