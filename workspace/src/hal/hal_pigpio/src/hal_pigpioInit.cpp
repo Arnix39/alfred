@@ -61,7 +61,7 @@ void Pigpio::setPullUp(
     response->has_succeeded = true;
     RCLCPP_INFO(get_logger(), "Sucessfully set pull-up resistor for GPIO %u.", request->gpio_id);
   } else {
-    response->has_succeeded = true;
+    response->has_succeeded = false;
     RCLCPP_INFO(get_logger(), "Failed to set pull-up resistor for GPIO %u!", request->gpio_id);
   }
 }
@@ -74,7 +74,7 @@ void Pigpio::setPullDown(
     response->has_succeeded = true;
     RCLCPP_INFO(get_logger(), "Sucessfully set pull-down resistor for GPIO %u.", request->gpio_id);
   } else {
-    response->has_succeeded = true;
+    response->has_succeeded = false;
     RCLCPP_INFO(get_logger(), "Failed to set pull-down resistor for GPIO %u!", request->gpio_id);
   }
 }
@@ -87,7 +87,7 @@ void Pigpio::clearResistor(
     response->has_succeeded = true;
     RCLCPP_INFO(get_logger(), "Sucessfully clear resistor for GPIO %u.", request->gpio_id);
   } else {
-    response->has_succeeded = true;
+    response->has_succeeded = false;
     RCLCPP_INFO(get_logger(), "Failed to clear resistor for GPIO %u!", request->gpio_id);
   }
 }
