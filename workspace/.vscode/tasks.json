@@ -27,20 +27,54 @@
             "problemMatcher": "$gcc"
         },
         {
-            "label": "ROS2: Run tests",
-            "detail": "Run all unit tests and show results.",
+            "label": "ROS2: Unit tests",
+            "detail": "Run unit tests.",
             "type": "shell",
             "options": {
                 "cwd": "${workspaceFolder}"
             },
-            "command": "colcon test && colcon test-result --all",
+            "command": "colcon",
+            "args": [
+                "test",
+                "--build-base",
+                "build/host",
+                "--install-base",
+                "install/host",
+            ],
+            "group": {
+                "kind": "test",
+            }
+        },
+        {
+            "label": "ROS2: Tests results",
+            "detail": "Show unit tests results.",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "command": "colcon",
+            "args": [
+                "test-result",
+                "--test-result-base",
+                "build/host",
+            ],
+            "group": {
+                "kind": "test",
+            }
+        },
+        {
+            "label": "ROS2: Run tests",
+            "detail": "Run all unit tests and show results.",
+            "type": "shell",
+            "dependsOrder": "sequence",
+            "dependsOn": ["ROS2: Build workspace", "ROS2: Unit tests", "ROS2: Tests results"],
             "group": {
                 "kind": "test",
                 "isDefault": true
             }
         },
         {
-            "label": "ROS2: Clean host files",
+            "label": "Workspace: Clean host files",
             "detail": "Clean workspace for host build files.",
             "type": "shell",
             "options": {
@@ -58,7 +92,7 @@
             ],
         },
         {
-            "label": "ROS2: Generate sysroot for target",
+            "label": "Workspace: Generate sysroot for target",
             "detail": "Generate sysroot for cross compilation for Raspberry Pi 3B+.",
             "type": "shell",
             "options": {
@@ -101,7 +135,7 @@
             "problemMatcher": "$gcc"
         },
         {
-            "label": "ROS2: Clean target files",
+            "label": "Workspace: Clean target files",
             "detail": "Clean workspace for target build files.",
             "type": "shell",
             "options": {
@@ -129,7 +163,7 @@
             ],
         },
         {
-            "label": "ROS2: Purge",
+            "label": "Workspace: Purge",
             "detail": "Purge workspace by deleting all generated files.",
             "type": "shell",
             "command": "rm",
@@ -144,7 +178,7 @@
             ],
         },
         {
-            "label": "ROS2: Install on target",
+            "label": "Install on target",
             "detail": "Install workspace on Raspberry Pi 3B+.",
             "type": "shell",
             "command": "../scripts/install_on_Alfred.sh",
