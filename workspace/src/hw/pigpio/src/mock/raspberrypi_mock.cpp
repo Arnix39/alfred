@@ -33,44 +33,54 @@ void RaspberryPi::addGpio(uint8_t gpioId)
   gpios.insert({gpioId, newGpio});
 }
 
-void RaspberryPi::setGpioType(uint8_t gpioId, gpioType type)
+int RaspberryPi::setGpioType(uint8_t gpioId, gpioType type)
 {
   auto gpio = gpios.find(gpioId);
   if (gpio != gpios.end()) {
     gpio->second.type = type;
+    return 0;
   }
+  return -1;
 }
 
-void RaspberryPi::setGpioResistor(uint8_t gpioId, gpioResistor resistorConfiguration)
+int RaspberryPi::setGpioResistor(uint8_t gpioId, gpioResistor resistorConfiguration)
 {
   auto gpio = gpios.find(gpioId);
   if (gpio != gpios.end()) {
     gpio->second.resistorConfiguration = resistorConfiguration;
+    return 0;
   }
+  return -1;
 }
 
-void RaspberryPi::setGpioLevel(uint8_t gpioId, gpioLevel level)
+int RaspberryPi::setGpioLevel(uint8_t gpioId, gpioLevel level)
 {
   auto gpio = gpios.find(gpioId);
   if (gpio != gpios.end()) {
     gpio->second.level = level;
+    return 0;
   }
+  return -1;
 }
 
-void RaspberryPi::setGpioPwm(uint8_t gpioId, gpioPwm pwm)
+int RaspberryPi::setGpioPwm(uint8_t gpioId, gpioPwm pwm)
 {
   auto gpio = gpios.find(gpioId);
   if (gpio != gpios.end()) {
     gpio->second.pwm = pwm;
+    return 0;
   }
+  return -1;
 }
 
-void RaspberryPi::setGpioCallback(uint8_t gpioId, gpioCallback callback)
+int RaspberryPi::setGpioCallback(uint8_t gpioId, gpioCallback callback)
 {
   auto gpio = gpios.find(gpioId);
   if (gpio != gpios.end()) {
     gpio->second.callback = callback;
+    return 0;
   }
+  return -1;
 }
 
 std::tuple<bool, gpioType> RaspberryPi::getGpioType(uint8_t gpioId)

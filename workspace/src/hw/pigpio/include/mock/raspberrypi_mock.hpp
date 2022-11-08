@@ -78,11 +78,11 @@ public:
   RaspberryPi();
   ~RaspberryPi();
   void addGpio(uint8_t gpioId);
-  void setGpioType(uint8_t gpioId, gpioType type);
-  void setGpioResistor(uint8_t gpioId, gpioResistor resistorConfiguration);
-  void setGpioLevel(uint8_t gpioId, gpioLevel level);
-  void setGpioPwm(uint8_t gpioId, gpioPwm pwm);
-  void setGpioCallback(uint8_t gpioId, gpioCallback callback);
+  int setGpioType(uint8_t gpioId, gpioType type);
+  int setGpioResistor(uint8_t gpioId, gpioResistor resistorConfiguration);
+  int setGpioLevel(uint8_t gpioId, gpioLevel level);
+  int setGpioPwm(uint8_t gpioId, gpioPwm pwm);
+  int setGpioCallback(uint8_t gpioId, gpioCallback callback);
   std::tuple<bool, gpioType> getGpioType(uint8_t gpioId);
   std::tuple<bool, gpioResistor> getGpioResistor(uint8_t gpioId);
   std::tuple<bool, gpioLevel> getGpioLevel(uint8_t gpioId);
