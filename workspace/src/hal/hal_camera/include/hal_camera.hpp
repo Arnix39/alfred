@@ -15,12 +15,12 @@
 #ifndef HAL_CAMERA_HPP_
 #define HAL_CAMERA_HPP_
 
-#include "common.hpp"
+#include <cv_bridge/cv_bridge.h>
 #include <opencv2/opencv.hpp>
 #include <opencv2/videoio.hpp>
-#include <cv_bridge/cv_bridge.h>
 #include "sensor_msgs/msg/image.hpp"
 #include "std_msgs/msg/header.hpp"
+#include "common.hpp"
 
 class Camera : public rclcpp_lifecycle::LifecycleNode
 {

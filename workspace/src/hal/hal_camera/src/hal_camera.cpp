@@ -31,8 +31,7 @@ LifecycleCallbackReturn_t Camera::on_configure(const rclcpp_lifecycle::State & p
 
   capture.open(0, 0);
 
-  if(!capture.isOpened())
-  {
+  if (!capture.isOpened()) {
     RCLCPP_ERROR(get_logger(), "hal_camera node not able to open camera!");
     return LifecycleCallbackReturn_t::FAILURE;
   }
@@ -90,7 +89,8 @@ void Camera::captureAndPublishFrame(void)
   cv::Mat frame;
   capture.read(frame);
 
-  sensor_msgs::msg::Image::SharedPtr imageMsg = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", frame).toImageMsg();
+  sensor_msgs::msg::Image::SharedPtr imageMsg = cv_bridge::CvImage(
+    std_msgs::msg::Header(), "bgr8", frame).toImageMsg();
 
   imagePublisher->publish(*imageMsg);
 }
