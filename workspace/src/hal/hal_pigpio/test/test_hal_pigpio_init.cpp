@@ -18,33 +18,37 @@
 
 #include "hal_pigpio.hpp"
 
+using HalPigpioSetInputMode_t = hal_pigpio_interfaces::srv::HalPigpioSetInputMode;
+using setInputModeFuture_t = rclcpp::Client<HalPigpioSetInputMode_t>::SharedFuture;
+using Transition_t = lifecycle_msgs::msg::Transition;
+
 class PigioCheckerNode : public rclcpp::Node
 {
+private:
+  rclcpp::Client<lifecycle_msgs::srv::ChangeState>::SharedPtr changeStateClient;
+  rclcpp::Client<HalPigpioSetInputMode_t>::SharedPtr setInputModeClient;
+
 public:
   PigioCheckerNode()
   : rclcpp::Node("hal_pigpio_checker_node"),
     changeStateClient(this->create_client<lifecycle_msgs::srv::ChangeState>(
         "hal_pigpio_node/change_state")),
-    setInputModeClient(this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>(
-        "hal_pigpioSetInputMode"))
+    setInputModeClient(this->create_client<HalPigpioSetInputMode_t>("hal_pigpioSetInputMode"))
   {
   }
   ~PigioCheckerNode() = default;
+
   void changePigpioNodeToState(std::uint8_t transition)
   {
     auto request = std::make_shared<lifecycle_msgs::srv::ChangeState::Request>();
     request->transition.id = transition;
     auto result = changeStateClient->async_send_request(request);
   }
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>::SharedPtr
-  getSetInputModeClient(void)
+
+  rclcpp::Client<HalPigpioSetInputMode_t>::SharedPtr getSetInputModeClient(void)
   {
     return setInputModeClient;
   }
-
-private:
-  rclcpp::Client<lifecycle_msgs::srv::ChangeState>::SharedPtr changeStateClient;
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>::SharedPtr setInputModeClient;
 };
 
 /* Test fixture */
@@ -63,11 +67,9 @@ protected:
     executor.add_node(pigpioInit->get_node_base_interface());
     executor.add_node(pigioChecker);
 
-    pigioChecker->changePigpioNodeToState(
-      lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE);
+    pigioChecker->changePigpioNodeToState(Transition_t::TRANSITION_CONFIGURE);
     executor.spin_some();
-    pigioChecker->changePigpioNodeToState(
-      lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
+    pigioChecker->changePigpioNodeToState(Transition_t::TRANSITION_ACTIVATE);
     executor.spin_some();
   }
 
@@ -84,15 +86,14 @@ protected:
 /* Test cases */
 TEST_F(PigpioInitTest, SetInputMode)
 {
-  auto setInputModeRequest =
-    std::make_shared<hal_pigpio_interfaces::srv::HalPigpioSetInputMode::Request>();
+  auto setInputModeRequest = std::make_shared<HalPigpioSetInputMode_t::Request>();
 
   setInputModeRequest->gpio_id = 1;
 
   auto setInputModeFuture = pigioChecker->getSetInputModeClient()->async_send_request(
     setInputModeRequest);
 
-  // executor.spin_some();
+  executor.spin_until_future_complete(setInputModeFuture);
 
   ASSERT_EQ(setInputModeFuture.get()->has_succeeded, true);
 }
