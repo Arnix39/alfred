@@ -20,17 +20,28 @@
 
 using Transition_t = lifecycle_msgs::msg::Transition;
 using HalPigpioSetInputMode_t = hal_pigpio_interfaces::srv::HalPigpioSetInputMode;
-using setInputModeFuture_t = rclcpp::Client<HalPigpioSetInputMode_t>::SharedFuture;
 using HalPigpioSetOutputMode_t = hal_pigpio_interfaces::srv::HalPigpioSetOutputMode;
-using setOutputModeFuture_t = rclcpp::Client<HalPigpioSetOutputMode_t>::SharedFuture;
 using HalPigpioGetMode_t = hal_pigpio_interfaces::srv::HalPigpioGetMode;
-using getModeFuture_t = rclcpp::Client<HalPigpioGetMode_t>::SharedFuture;
 using HalPigpioSetPullUp_t = hal_pigpio_interfaces::srv::HalPigpioSetPullUp;
-using setPullUpFuture_t = rclcpp::Client<HalPigpioSetPullUp_t>::SharedFuture;
 using HalPigpioSetPullDown_t = hal_pigpio_interfaces::srv::HalPigpioSetPullDown;
-using setPullDownFuture_t = rclcpp::Client<HalPigpioSetPullDown_t>::SharedFuture;
 using HalPigpioClearResistor_t = hal_pigpio_interfaces::srv::HalPigpioClearResistor;
-using clearResistorFuture_t = rclcpp::Client<HalPigpioClearResistor_t>::SharedFuture;
+
+template<typename T>
+bool hal_pigpioInitTest(
+  uint8_t gpio_id,
+  std::shared_ptr<rclcpp::Client<T>> serviceClient,
+  rclcpp::executors::SingleThreadedExecutor * executor)
+{
+  auto request = std::make_shared<typename T::Request>();
+
+  request->gpio_id = gpio_id;
+
+  auto future = serviceClient->async_send_request(request);
+
+  executor->spin_until_future_complete(future);
+
+  return future.get()->has_succeeded;
+}
 
 class PigioCheckerNode : public rclcpp::Node
 {
@@ -126,170 +137,62 @@ protected:
 /* Test cases */
 TEST_F(PigpioInitTest, SetInputModeSuccess)
 {
-  auto setInputModeRequest = std::make_shared<HalPigpioSetInputMode_t::Request>();
-
-  setInputModeRequest->gpio_id = 1;
-
-  auto setInputModeFuture = pigioChecker->getSetInputModeClient()->async_send_request(
-    setInputModeRequest);
-
-  executor.spin_until_future_complete(setInputModeFuture);
-
-  ASSERT_EQ(setInputModeFuture.get()->has_succeeded, true);
+  ASSERT_EQ(hal_pigpioInitTest(1, pigioChecker->getSetInputModeClient(), &executor), true);
 }
 
 TEST_F(PigpioInitTest, SetInputModeFailure)
 {
-  auto setInputModeRequest = std::make_shared<HalPigpioSetInputMode_t::Request>();
-
-  setInputModeRequest->gpio_id = 41;
-
-  auto setInputModeFuture = pigioChecker->getSetInputModeClient()->async_send_request(
-    setInputModeRequest);
-
-  executor.spin_until_future_complete(setInputModeFuture);
-
-  ASSERT_EQ(setInputModeFuture.get()->has_succeeded, false);
+  ASSERT_EQ(hal_pigpioInitTest(41, pigioChecker->getSetInputModeClient(), &executor), false);
 }
 
 TEST_F(PigpioInitTest, SetOutputModeSuccess)
 {
-  auto setOutputModeRequest = std::make_shared<HalPigpioSetOutputMode_t::Request>();
-
-  setOutputModeRequest->gpio_id = 1;
-
-  auto setOutputModeFuture = pigioChecker->getSetOutputModeClient()->async_send_request(
-    setOutputModeRequest);
-
-  executor.spin_until_future_complete(setOutputModeFuture);
-
-  ASSERT_EQ(setOutputModeFuture.get()->has_succeeded, true);
+  ASSERT_EQ(hal_pigpioInitTest(1, pigioChecker->getSetOutputModeClient(), &executor), true);
 }
 
 TEST_F(PigpioInitTest, SetOutputModeFailure)
 {
-  auto setOutputModeRequest = std::make_shared<HalPigpioSetOutputMode_t::Request>();
-
-  setOutputModeRequest->gpio_id = 41;
-
-  auto setOutputModeFuture = pigioChecker->getSetOutputModeClient()->async_send_request(
-    setOutputModeRequest);
-
-  executor.spin_until_future_complete(setOutputModeFuture);
-
-  ASSERT_EQ(setOutputModeFuture.get()->has_succeeded, false);
+  ASSERT_EQ(hal_pigpioInitTest(41, pigioChecker->getSetOutputModeClient(), &executor), false);
 }
 
 TEST_F(PigpioInitTest, GetModeSuccess)
 {
-  auto getModeRequest = std::make_shared<HalPigpioGetMode_t::Request>();
-
-  getModeRequest->gpio_id = 1;
-
-  auto getModeFuture = pigioChecker->getGetModeClient()->async_send_request(
-    getModeRequest);
-
-  executor.spin_until_future_complete(getModeFuture);
-
-  ASSERT_EQ(getModeFuture.get()->has_succeeded, true);
+  ASSERT_EQ(hal_pigpioInitTest(1, pigioChecker->getGetModeClient(), &executor), true);
 }
 
 TEST_F(PigpioInitTest, GetModeFailure)
 {
-  auto getModeRequest = std::make_shared<HalPigpioGetMode_t::Request>();
-
-  getModeRequest->gpio_id = 41;
-
-  auto getModeFuture = pigioChecker->getGetModeClient()->async_send_request(
-    getModeRequest);
-
-  executor.spin_until_future_complete(getModeFuture);
-
-  ASSERT_EQ(getModeFuture.get()->has_succeeded, false);
+  ASSERT_EQ(hal_pigpioInitTest(41, pigioChecker->getGetModeClient(), &executor), false);
 }
 
 TEST_F(PigpioInitTest, SetPullUpSuccess)
 {
-  auto setPullUpRequest = std::make_shared<HalPigpioSetPullUp_t::Request>();
-
-  setPullUpRequest->gpio_id = 1;
-
-  auto setPullUpFuture = pigioChecker->getSetPullUpClient()->async_send_request(
-    setPullUpRequest);
-
-  executor.spin_until_future_complete(setPullUpFuture);
-
-  ASSERT_EQ(setPullUpFuture.get()->has_succeeded, true);
+  ASSERT_EQ(hal_pigpioInitTest(1, pigioChecker->getSetPullUpClient(), &executor), true);
 }
 
 TEST_F(PigpioInitTest, SetPullUpFailure)
 {
-  auto setPullUpRequest = std::make_shared<HalPigpioSetPullUp_t::Request>();
-
-  setPullUpRequest->gpio_id = 41;
-
-  auto setPullUpFuture = pigioChecker->getSetPullUpClient()->async_send_request(
-    setPullUpRequest);
-
-  executor.spin_until_future_complete(setPullUpFuture);
-
-  ASSERT_EQ(setPullUpFuture.get()->has_succeeded, false);
+  ASSERT_EQ(hal_pigpioInitTest(41, pigioChecker->getSetPullUpClient(), &executor), false);
 }
 
 TEST_F(PigpioInitTest, SetPullDownSuccess)
 {
-  auto setPullDownRequest = std::make_shared<HalPigpioSetPullDown_t::Request>();
-
-  setPullDownRequest->gpio_id = 1;
-
-  auto setPullDownFuture = pigioChecker->getSetPullDownClient()->async_send_request(
-    setPullDownRequest);
-
-  executor.spin_until_future_complete(setPullDownFuture);
-
-  ASSERT_EQ(setPullDownFuture.get()->has_succeeded, true);
+  ASSERT_EQ(hal_pigpioInitTest(1, pigioChecker->getSetPullDownClient(), &executor), true);
 }
 
 TEST_F(PigpioInitTest, SetPullDownFailure)
 {
-  auto setPullDownRequest = std::make_shared<HalPigpioSetPullDown_t::Request>();
-
-  setPullDownRequest->gpio_id = 41;
-
-  auto setPullDownFuture = pigioChecker->getSetPullDownClient()->async_send_request(
-    setPullDownRequest);
-
-  executor.spin_until_future_complete(setPullDownFuture);
-
-  ASSERT_EQ(setPullDownFuture.get()->has_succeeded, false);
+  ASSERT_EQ(hal_pigpioInitTest(41, pigioChecker->getSetPullDownClient(), &executor), false);
 }
 
 TEST_F(PigpioInitTest, ClearResistorSuccess)
 {
-  auto clearResistorRequest = std::make_shared<HalPigpioClearResistor_t::Request>();
-
-  clearResistorRequest->gpio_id = 1;
-
-  auto clearResistorFuture = pigioChecker->getClearResistorClient()->async_send_request(
-    clearResistorRequest);
-
-  executor.spin_until_future_complete(clearResistorFuture);
-
-  ASSERT_EQ(clearResistorFuture.get()->has_succeeded, true);
+  ASSERT_EQ(hal_pigpioInitTest(1, pigioChecker->getClearResistorClient(), &executor), true);
 }
 
 TEST_F(PigpioInitTest, ClearResistorFailure)
 {
-  auto clearResistorRequest = std::make_shared<HalPigpioClearResistor_t::Request>();
-
-  clearResistorRequest->gpio_id = 41;
-
-  auto clearResistorFuture = pigioChecker->getClearResistorClient()->async_send_request(
-    clearResistorRequest);
-
-  executor.spin_until_future_complete(clearResistorFuture);
-
-  ASSERT_EQ(clearResistorFuture.get()->has_succeeded, false);
+  ASSERT_EQ(hal_pigpioInitTest(41, pigioChecker->getClearResistorClient(), &executor), false);
 }
 
 int main(int argc, char ** argv)

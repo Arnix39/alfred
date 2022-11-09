@@ -90,7 +90,21 @@
 			"ranges": "cpp",
 			"valarray": "cpp",
 			"*.ipp": "cpp",
-			"*.idl": "cpp"
+			"*.idl": "cpp",
+			"csetjmp": "cpp",
+			"barrier": "cpp",
+			"charconv": "cpp",
+			"coroutine": "cpp",
+			"cuchar": "cpp",
+			"netfwd": "cpp",
+			"regex": "cpp",
+			"source_location": "cpp",
+			"rope": "cpp",
+			"slist": "cpp",
+			"latch": "cpp",
+			"scoped_allocator": "cpp",
+			"span": "cpp",
+			"syncstream": "cpp"
 		}
 	}
 }
