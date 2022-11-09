@@ -56,7 +56,7 @@ int RaspberryPi::setGpioResistor(uint8_t gpioId, gpioResistor resistorConfigurat
 int RaspberryPi::setGpioLevel(uint8_t gpioId, gpioLevel level)
 {
   auto gpio = gpios.find(gpioId);
-  if (gpio != gpios.end()) {
+  if (gpio != gpios.end() && std::get<1>(getGpioType(gpioId)) == output) {
     gpio->second.level = level;
     return 0;
   }
@@ -66,11 +66,11 @@ int RaspberryPi::setGpioLevel(uint8_t gpioId, gpioLevel level)
 int RaspberryPi::setGpioPwm(uint8_t gpioId, gpioPwm pwm)
 {
   auto gpio = gpios.find(gpioId);
-  if (gpio != gpios.end()) {
+  if (gpio != gpios.end() && std::get<1>(getGpioType(gpioId)) == output) {
     gpio->second.pwm = pwm;
     return 0;
   }
-  return -1;
+  return -2;
 }
 
 int RaspberryPi::setGpioCallback(uint8_t gpioId, gpioCallback callback)

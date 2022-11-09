@@ -28,7 +28,7 @@
 
 template<typename T>
 bool hal_pigpioGpioSet(
-  uint8_t gpio_id,
+  uint16_t gpio_id,
   std::shared_ptr<rclcpp::Client<T>> serviceClient,
   rclcpp::executors::SingleThreadedExecutor * executor)
 {
@@ -144,6 +144,57 @@ public:
   rclcpp::Client<HalPigpioSendTriggerPulse_t>::SharedPtr getSendTriggerPulseClient(void)
   {
     return sendTriggerPulseClient;
+  }
+
+  bool setPwmDutycycle(
+    uint16_t gpio_id,
+    uint8_t dutycycle,
+    rclcpp::executors::SingleThreadedExecutor * executor)
+  {
+    auto request = std::make_shared<HalPigpioSetPwmDutycycle_t::Request>();
+
+    request->gpio_id = gpio_id;
+    request->dutycycle = dutycycle;
+
+    auto future = getSetPwmDutycycleClient()->async_send_request(request);
+
+    executor->spin_until_future_complete(future);
+
+    return future.get()->has_succeeded;
+  }
+
+  bool setPwmFrequency(
+    uint16_t gpio_id,
+    uint16_t frequency,
+    rclcpp::executors::SingleThreadedExecutor * executor)
+  {
+    auto request = std::make_shared<HalPigpioSetPwmFrequency_t::Request>();
+
+    request->gpio_id = gpio_id;
+    request->frequency = frequency;
+
+    auto future = getSetPwmFrequencyClient()->async_send_request(request);
+
+    executor->spin_until_future_complete(future);
+
+    return future.get()->has_succeeded;
+  }
+
+  bool sendTriggerPulse(
+    uint16_t gpio_id,
+    uint16_t pulse_length_in_us,
+    rclcpp::executors::SingleThreadedExecutor * executor)
+  {
+    auto request = std::make_shared<HalPigpioSendTriggerPulse_t::Request>();
+
+    request->gpio_id = gpio_id;
+    request->pulse_length_in_us = pulse_length_in_us;
+
+    auto future = getSendTriggerPulseClient()->async_send_request(request);
+
+    executor->spin_until_future_complete(future);
+
+    return future.get()->has_succeeded;
   }
 };
 

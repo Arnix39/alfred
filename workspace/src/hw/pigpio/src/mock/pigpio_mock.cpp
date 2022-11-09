@@ -77,7 +77,21 @@ int callback_ex(int pi, unsigned user_gpio, unsigned edge, CBFuncEx_t f, void * 
 }
 
 /* Output */
-int set_PWM_dutycycle(int pi, unsigned user_gpio, unsigned dutycycle) {return 0;}
-int set_PWM_frequency(int pi, unsigned user_gpio, unsigned frequency) {return 0;}
-int gpio_write(int pi, unsigned gpio, unsigned level) {return 0;}
-int gpio_trigger(int pi, unsigned user_gpio, unsigned pulseLen, unsigned level) {return 0;}
+int set_PWM_dutycycle(int pi, unsigned user_gpio, unsigned dutycycle)
+{
+  gpioPwm pwm = {true, static_cast<uint16_t>(dutycycle), 0};
+  return raspberryPi.setGpioPwm(user_gpio, pwm);
+}
+int set_PWM_frequency(int pi, unsigned user_gpio, unsigned frequency)
+{
+  gpioPwm pwm = {true, 0, static_cast<uint16_t>(frequency)};
+  return raspberryPi.setGpioPwm(user_gpio, pwm);
+}
+int gpio_write(int pi, unsigned gpio, unsigned level)
+{
+  return raspberryPi.setGpioLevel(gpio, static_cast<gpioLevel>(level));
+}
+int gpio_trigger(int pi, unsigned user_gpio, unsigned pulseLen, unsigned level)
+{
+  return raspberryPi.setGpioLevel(user_gpio, static_cast<gpioLevel>(level));
+}
