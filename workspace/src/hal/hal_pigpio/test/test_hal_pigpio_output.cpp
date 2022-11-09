@@ -14,119 +14,77 @@
 
 #include "hal_pigpio_tests.hpp"
 
-using HalPigpioSetPwmDutycycle_t = hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle;
-using HalPigpioSetPwmFrequency_t = hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency;
-using HalPigpioSetGpioHigh_t = hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh;
-using HalPigpioSetGpioLow_t = hal_pigpio_interfaces::srv::HalPigpioSetGpioLow;
-using HalPigpioSendTriggerPulse_t = hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse;
-
-class PigioOutputCheckerNode : public rclcpp::Node
-{
-private:
-  rclcpp::Client<lifecycle_msgs::srv::ChangeState>::SharedPtr changeStateClient;
-  rclcpp::Client<HalPigpioSetPwmDutycycle_t>::SharedPtr setPwmDutycycleClient;
-  rclcpp::Client<HalPigpioSetPwmFrequency_t>::SharedPtr setPwmFrequencyClient;
-  rclcpp::Client<HalPigpioSetGpioHigh_t>::SharedPtr setGpioHighClient;
-  rclcpp::Client<HalPigpioSetGpioLow_t>::SharedPtr setGpioLowClient;
-  rclcpp::Client<HalPigpioSendTriggerPulse_t>::SharedPtr sendTriggerPulseClient;
-
-public:
-  PigioOutputCheckerNode()
-  : rclcpp::Node("hal_pigpio_checker_node"),
-    changeStateClient(this->create_client<lifecycle_msgs::srv::ChangeState>(
-        "hal_pigpio_node/change_state")),
-    setPwmDutycycleClient(this->create_client<HalPigpioSetPwmDutycycle_t>(
-        "hal_pigpioSetPwmDutycycle")),
-    setPwmFrequencyClient(this->create_client<HalPigpioSetPwmFrequency_t>(
-        "hal_pigpioSetPwmFrequency")),
-    setGpioHighClient(this->create_client<HalPigpioSetGpioHigh_t>("hal_pigpioSetGpioHigh")),
-    setGpioLowClient(this->create_client<HalPigpioSetGpioLow_t>("hal_pigpioSetGpioLow")),
-    sendTriggerPulseClient(this->create_client<HalPigpioSendTriggerPulse_t>(
-        "hal_pigpioSendTriggerPulse"))
-  {
-  }
-  ~PigioOutputCheckerNode() = default;
-
-  void changePigpioNodeToState(std::uint8_t transition)
-  {
-    auto request = std::make_shared<lifecycle_msgs::srv::ChangeState::Request>();
-    request->transition.id = transition;
-    auto result = changeStateClient->async_send_request(request);
-  }
-
-  rclcpp::Client<HalPigpioSetPwmDutycycle_t>::SharedPtr getSetPwmDutycycleClient(void)
-  {
-    return setPwmDutycycleClient;
-  }
-  rclcpp::Client<HalPigpioSetPwmFrequency_t>::SharedPtr getSetPwmFrequencyClient(void)
-  {
-    return setPwmFrequencyClient;
-  }
-  rclcpp::Client<HalPigpioSetGpioHigh_t>::SharedPtr getSetGpioHighClient(void)
-  {
-    return setGpioHighClient;
-  }
-  rclcpp::Client<HalPigpioSetGpioLow_t>::SharedPtr getSetGpioLowClient(void)
-  {
-    return setGpioLowClient;
-  }
-  rclcpp::Client<HalPigpioSendTriggerPulse_t>::SharedPtr getSendTriggerPulseClient(void)
-  {
-    return sendTriggerPulseClient;
-  }
-};
-
-using PigpioOutputTest = PigpioTest<PigioOutputCheckerNode>;
-
 /* Test cases */
-TEST_F(PigpioOutputTest, SetPwmDutycycleSuccess)
+TEST_F(PigpioTest, SetPwmDutycycleSuccess)
 {
-  ASSERT_EQ(hal_pigpioBoolTest(1, pigioChecker->getSetPwmDutycycleClient(), &executor), true);
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetOutputModeClient(), &executor);
+  ASSERT_EQ(
+    hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetPwmDutycycleClient(), &executor),
+    true);
 }
 
-TEST_F(PigpioOutputTest, SetPwmDutycycleFailure)
+TEST_F(PigpioTest, SetPwmDutycycleFailure)
 {
-  ASSERT_EQ(hal_pigpioBoolTest(41, pigioChecker->getSetPwmDutycycleClient(), &executor), false);
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetInputModeClient(), &executor);
+  ASSERT_EQ(
+    hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetPwmDutycycleClient(), &executor),
+    false);
 }
 
-TEST_F(PigpioOutputTest, SetPwmFrequencySuccess)
+TEST_F(PigpioTest, SetPwmFrequencySuccess)
 {
-  ASSERT_EQ(hal_pigpioBoolTest(1, pigioChecker->getSetPwmFrequencyClient(), &executor), true);
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetOutputModeClient(), &executor);
+  ASSERT_EQ(
+    hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetPwmFrequencyClient(), &executor),
+    true);
 }
 
-TEST_F(PigpioOutputTest, SetPwmFrequencyFailure)
+TEST_F(PigpioTest, SetPwmFrequencyFailure)
 {
-  ASSERT_EQ(hal_pigpioBoolTest(41, pigioChecker->getSetPwmFrequencyClient(), &executor), false);
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetInputModeClient(), &executor);
+  ASSERT_EQ(
+    hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetPwmFrequencyClient(), &executor),
+    false);
 }
 
-TEST_F(PigpioOutputTest, SetGpioHighSuccess)
+TEST_F(PigpioTest, SetGpioHighSuccess)
 {
-  ASSERT_EQ(hal_pigpioBoolTest(1, pigioChecker->getSetGpioHighClient(), &executor), true);
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetOutputModeClient(), &executor);
+  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetGpioHighClient(), &executor), true);
 }
 
-TEST_F(PigpioOutputTest, SetGpioHighFailure)
+TEST_F(PigpioTest, SetGpioHighFailure)
 {
-  ASSERT_EQ(hal_pigpioBoolTest(41, pigioChecker->getSetGpioHighClient(), &executor), false);
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetInputModeClient(), &executor);
+  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetGpioHighClient(), &executor), false);
 }
 
-TEST_F(PigpioOutputTest, SetGpioLowSuccess)
+TEST_F(PigpioTest, SetGpioLowSuccess)
 {
-  ASSERT_EQ(hal_pigpioBoolTest(1, pigioChecker->getSetGpioLowClient(), &executor), true);
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetOutputModeClient(), &executor);
+  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetGpioLowClient(), &executor), true);
 }
 
-TEST_F(PigpioOutputTest, SetGpioLowFailure)
+TEST_F(PigpioTest, SetGpioLowFailure)
 {
-  ASSERT_EQ(hal_pigpioBoolTest(41, pigioChecker->getSetGpioLowClient(), &executor), false);
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetInputModeClient(), &executor);
+  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetGpioLowClient(), &executor), false);
 }
 
-TEST_F(PigpioOutputTest, SendTriggerPulseSuccess)
+TEST_F(PigpioTest, SendTriggerPulseSuccess)
 {
-  ASSERT_EQ(hal_pigpioBoolTest(1, pigioChecker->getSendTriggerPulseClient(), &executor), true);
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetOutputModeClient(), &executor);
+  ASSERT_EQ(
+    hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSendTriggerPulseClient(), &executor),
+    true);
 }
 
-TEST_F(PigpioOutputTest, SendTriggerPulseFailure)
+TEST_F(PigpioTest, SendTriggerPulseFailure)
 {
-  ASSERT_EQ(hal_pigpioBoolTest(41, pigioChecker->getSendTriggerPulseClient(), &executor), false);
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetInputModeClient(), &executor);
+  ASSERT_EQ(
+    hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSendTriggerPulseClient(), &executor),
+    false);
 }
 
 int main(int argc, char ** argv)
