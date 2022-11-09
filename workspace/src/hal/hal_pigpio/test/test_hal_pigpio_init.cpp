@@ -12,13 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "gtest/gtest.h"
-#include "rclcpp/rclcpp.hpp"
-#include "lifecycle_msgs/srv/change_state.hpp"
+#include "hal_pigpio_tests.hpp"
 
-#include "hal_pigpio.hpp"
-
-using Transition_t = lifecycle_msgs::msg::Transition;
 using HalPigpioSetInputMode_t = hal_pigpio_interfaces::srv::HalPigpioSetInputMode;
 using HalPigpioSetOutputMode_t = hal_pigpio_interfaces::srv::HalPigpioSetOutputMode;
 using HalPigpioGetMode_t = hal_pigpio_interfaces::srv::HalPigpioGetMode;
@@ -26,24 +21,7 @@ using HalPigpioSetPullUp_t = hal_pigpio_interfaces::srv::HalPigpioSetPullUp;
 using HalPigpioSetPullDown_t = hal_pigpio_interfaces::srv::HalPigpioSetPullDown;
 using HalPigpioClearResistor_t = hal_pigpio_interfaces::srv::HalPigpioClearResistor;
 
-template<typename T>
-bool hal_pigpioInitTest(
-  uint8_t gpio_id,
-  std::shared_ptr<rclcpp::Client<T>> serviceClient,
-  rclcpp::executors::SingleThreadedExecutor * executor)
-{
-  auto request = std::make_shared<typename T::Request>();
-
-  request->gpio_id = gpio_id;
-
-  auto future = serviceClient->async_send_request(request);
-
-  executor->spin_until_future_complete(future);
-
-  return future.get()->has_succeeded;
-}
-
-class PigioCheckerNode : public rclcpp::Node
+class PigioInitCheckerNode : public rclcpp::Node
 {
 private:
   rclcpp::Client<lifecycle_msgs::srv::ChangeState>::SharedPtr changeStateClient;
@@ -55,7 +33,7 @@ private:
   rclcpp::Client<HalPigpioClearResistor_t>::SharedPtr clearResistorClient;
 
 public:
-  PigioCheckerNode()
+  PigioInitCheckerNode()
   : rclcpp::Node("hal_pigpio_checker_node"),
     changeStateClient(this->create_client<lifecycle_msgs::srv::ChangeState>(
         "hal_pigpio_node/change_state")),
@@ -67,7 +45,7 @@ public:
     clearResistorClient(this->create_client<HalPigpioClearResistor_t>("hal_pigpioClearResistor"))
   {
   }
-  ~PigioCheckerNode() = default;
+  ~PigioInitCheckerNode() = default;
 
   void changePigpioNodeToState(std::uint8_t transition)
   {
@@ -102,97 +80,67 @@ public:
   }
 };
 
-/* Test fixture */
-class PigpioInitTest : public testing::Test
-{
-protected:
-  std::shared_ptr<Pigpio> pigpioInit;
-  std::shared_ptr<PigioCheckerNode> pigioChecker;
-  rclcpp::executors::SingleThreadedExecutor executor;
-
-  void SetUp()
-  {
-    pigioChecker = std::make_shared<PigioCheckerNode>();
-    pigpioInit = std::make_shared<Pigpio>();
-
-    executor.add_node(pigpioInit->get_node_base_interface());
-    executor.add_node(pigioChecker);
-
-    pigioChecker->changePigpioNodeToState(Transition_t::TRANSITION_CONFIGURE);
-    executor.spin_some();
-    pigioChecker->changePigpioNodeToState(Transition_t::TRANSITION_ACTIVATE);
-    executor.spin_some();
-  }
-
-  void TearDown()
-  {
-    executor.cancel();
-    executor.remove_node(pigpioInit->get_node_base_interface());
-    executor.remove_node(pigioChecker);
-    pigpioInit.reset();
-    pigioChecker.reset();
-  }
-};
+using PigpioInitTest = PigpioTest<PigioInitCheckerNode>;
 
 /* Test cases */
 TEST_F(PigpioInitTest, SetInputModeSuccess)
 {
-  ASSERT_EQ(hal_pigpioInitTest(1, pigioChecker->getSetInputModeClient(), &executor), true);
+  ASSERT_EQ(hal_pigpioBoolTest(1, pigioChecker->getSetInputModeClient(), &executor), true);
 }
 
 TEST_F(PigpioInitTest, SetInputModeFailure)
 {
-  ASSERT_EQ(hal_pigpioInitTest(41, pigioChecker->getSetInputModeClient(), &executor), false);
+  ASSERT_EQ(hal_pigpioBoolTest(41, pigioChecker->getSetInputModeClient(), &executor), false);
 }
 
 TEST_F(PigpioInitTest, SetOutputModeSuccess)
 {
-  ASSERT_EQ(hal_pigpioInitTest(1, pigioChecker->getSetOutputModeClient(), &executor), true);
+  ASSERT_EQ(hal_pigpioBoolTest(1, pigioChecker->getSetOutputModeClient(), &executor), true);
 }
 
 TEST_F(PigpioInitTest, SetOutputModeFailure)
 {
-  ASSERT_EQ(hal_pigpioInitTest(41, pigioChecker->getSetOutputModeClient(), &executor), false);
+  ASSERT_EQ(hal_pigpioBoolTest(41, pigioChecker->getSetOutputModeClient(), &executor), false);
 }
 
 TEST_F(PigpioInitTest, GetModeSuccess)
 {
-  ASSERT_EQ(hal_pigpioInitTest(1, pigioChecker->getGetModeClient(), &executor), true);
+  ASSERT_EQ(hal_pigpioBoolTest(1, pigioChecker->getGetModeClient(), &executor), true);
 }
 
 TEST_F(PigpioInitTest, GetModeFailure)
 {
-  ASSERT_EQ(hal_pigpioInitTest(41, pigioChecker->getGetModeClient(), &executor), false);
+  ASSERT_EQ(hal_pigpioBoolTest(41, pigioChecker->getGetModeClient(), &executor), false);
 }
 
 TEST_F(PigpioInitTest, SetPullUpSuccess)
 {
-  ASSERT_EQ(hal_pigpioInitTest(1, pigioChecker->getSetPullUpClient(), &executor), true);
+  ASSERT_EQ(hal_pigpioBoolTest(1, pigioChecker->getSetPullUpClient(), &executor), true);
 }
 
 TEST_F(PigpioInitTest, SetPullUpFailure)
 {
-  ASSERT_EQ(hal_pigpioInitTest(41, pigioChecker->getSetPullUpClient(), &executor), false);
+  ASSERT_EQ(hal_pigpioBoolTest(41, pigioChecker->getSetPullUpClient(), &executor), false);
 }
 
 TEST_F(PigpioInitTest, SetPullDownSuccess)
 {
-  ASSERT_EQ(hal_pigpioInitTest(1, pigioChecker->getSetPullDownClient(), &executor), true);
+  ASSERT_EQ(hal_pigpioBoolTest(1, pigioChecker->getSetPullDownClient(), &executor), true);
 }
 
 TEST_F(PigpioInitTest, SetPullDownFailure)
 {
-  ASSERT_EQ(hal_pigpioInitTest(41, pigioChecker->getSetPullDownClient(), &executor), false);
+  ASSERT_EQ(hal_pigpioBoolTest(41, pigioChecker->getSetPullDownClient(), &executor), false);
 }
 
 TEST_F(PigpioInitTest, ClearResistorSuccess)
 {
-  ASSERT_EQ(hal_pigpioInitTest(1, pigioChecker->getClearResistorClient(), &executor), true);
+  ASSERT_EQ(hal_pigpioBoolTest(1, pigioChecker->getClearResistorClient(), &executor), true);
 }
 
 TEST_F(PigpioInitTest, ClearResistorFailure)
 {
-  ASSERT_EQ(hal_pigpioInitTest(41, pigioChecker->getClearResistorClient(), &executor), false);
+  ASSERT_EQ(hal_pigpioBoolTest(41, pigioChecker->getClearResistorClient(), &executor), false);
 }
 
 int main(int argc, char ** argv)
