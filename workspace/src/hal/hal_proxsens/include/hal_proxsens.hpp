@@ -26,9 +26,9 @@
 #include "hal_pigpio_interfaces/msg/hal_pigpio_edge_change.hpp"
 #include "hal_proxsens_interfaces/msg/hal_proxsens.hpp"
 
-#define PROXSENS_TRIGGER_GPIO 5
-#define PROXSENS_ECHO_GPIO 6
-#define PROXSENS_LEVEL_SHIFTER_OE_GPIO 10
+#define PROXSENS_TRIGGER_GPIO GPIO5
+#define PROXSENS_ECHO_GPIO GPIO6
+#define PROXSENS_LEVEL_SHIFTER_OE_GPIO GPIO10
 #define PROXSENS_TRIGGER_LENGTH_US 20
 
 #define AS_RISING_EDGE 0
