@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RASPBERRY_PI_MOCK
-#define RASPBERRY_PI_MOCK
+#ifndef RASPBERRY_PI_MOCK_HPP_
+#define RASPBERRY_PI_MOCK_HPP_
 
 #include <cstdint>
 #include <map>
 #include <tuple>
+
+#include "gpioDefinitions.hpp"
 
 enum gpioType
 {
@@ -77,17 +79,17 @@ private:
 public:
   RaspberryPi();
   ~RaspberryPi();
-  void addGpio(uint8_t gpioId);
-  int setGpioType(uint8_t gpioId, gpioType type);
-  int setGpioResistor(uint8_t gpioId, gpioResistor resistorConfiguration);
-  int setGpioLevel(uint8_t gpioId, gpioLevel level);
-  int setGpioPwm(uint8_t gpioId, gpioPwm pwm);
-  int setGpioCallback(uint8_t gpioId, gpioCallback callback);
-  std::tuple<bool, gpioType> getGpioType(uint8_t gpioId);
-  std::tuple<bool, gpioResistor> getGpioResistor(uint8_t gpioId);
-  std::tuple<bool, gpioLevel> getGpioLevel(uint8_t gpioId);
-  std::tuple<bool, gpioPwm> getGpioPwm(uint8_t gpioId);
-  std::tuple<bool, gpioCallback> getGpioCallback(uint8_t gpioId);
+  void addGpio(gpioId gpioId);
+  int setGpioType(gpioId gpioId, gpioType type);
+  int setGpioResistor(gpioId gpioId, gpioResistor resistorConfiguration);
+  int setGpioLevel(gpioId gpioId, gpioLevel level);
+  int setGpioPwm(gpioId gpioId, gpioPwm pwm);
+  int setGpioCallback(gpioId gpioId, gpioCallback callback);
+  std::tuple<bool, gpioType> getGpioType(gpioId gpioId);
+  std::tuple<bool, gpioResistor> getGpioResistor(gpioId gpioId);
+  std::tuple<bool, gpioLevel> getGpioLevel(gpioId gpioId);
+  std::tuple<bool, gpioPwm> getGpioPwm(gpioId gpioId);
+  std::tuple<bool, gpioCallback> getGpioCallback(gpioId gpioId);
 };
 
-#endif
+#endif // RASPBERRY_PI_MOCK_HPP_

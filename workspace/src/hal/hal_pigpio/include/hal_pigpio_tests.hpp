@@ -23,8 +23,8 @@
 
 #include "hal_pigpio.hpp"
 
-#define GOOD_GPIO 1
-#define BAD_GPIO 41
+#define GOOD_GPIO GPIO2
+#define BAD_GPIO GPIO1
 
 template<typename T>
 bool hal_pigpioGpioSet(

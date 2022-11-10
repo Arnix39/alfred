@@ -37,11 +37,11 @@ int i2c_write_i2c_block_data(int pi, unsigned handle, unsigned i2c_reg, char * b
 /* Init */
 int pigpio_start(const char * addrStr, const char * portStr) 
 {
-  for (uint8_t index = 1; index <= 40; ++index)
+  for (uint8_t index = static_cast<uint8_t>(GPIO0); index < static_cast<uint8_t>(LAST_GPIO); ++index)
   {
-    if (index != 27 && index != 28)
+    if (index != static_cast<uint8_t>(GPIO0) && index != static_cast<uint8_t>(GPIO1))
     {
-      raspberryPi.addGpio(index);
+      raspberryPi.addGpio(static_cast<gpioId>(index));
     }
   }
   return 0;
@@ -51,21 +51,21 @@ void pigpio_stop(int pi) {}
 
 int set_mode(int pi, unsigned gpio, unsigned mode)
 {
-  return raspberryPi.setGpioType(gpio, static_cast<gpioType>(mode));
+  return raspberryPi.setGpioType(static_cast<gpioId>(gpio), static_cast<gpioType>(mode));
 }
 
 int get_mode(int pi, unsigned gpio)
 {
-  if (std::get<0>(raspberryPi.getGpioType(gpio)))
+  if (std::get<0>(raspberryPi.getGpioType(static_cast<gpioId>(gpio))))
   {
-    return std::get<1>(raspberryPi.getGpioType(gpio));
+    return std::get<1>(raspberryPi.getGpioType(static_cast<gpioId>(gpio)));
   }
   return -1;
 }
 
 int set_pull_up_down(int pi, unsigned gpio, unsigned pud)
 {
-  return raspberryPi.setGpioResistor(gpio, static_cast<gpioResistor>(pud));
+  return raspberryPi.setGpioResistor(static_cast<gpioId>(gpio), static_cast<gpioResistor>(pud));
 }
 
 /* Input */
@@ -80,18 +80,18 @@ int callback_ex(int pi, unsigned user_gpio, unsigned edge, CBFuncEx_t f, void * 
 int set_PWM_dutycycle(int pi, unsigned user_gpio, unsigned dutycycle)
 {
   gpioPwm pwm = {true, static_cast<uint16_t>(dutycycle), 0};
-  return raspberryPi.setGpioPwm(user_gpio, pwm);
+  return raspberryPi.setGpioPwm(static_cast<gpioId>(user_gpio), pwm);
 }
 int set_PWM_frequency(int pi, unsigned user_gpio, unsigned frequency)
 {
   gpioPwm pwm = {true, 0, static_cast<uint16_t>(frequency)};
-  return raspberryPi.setGpioPwm(user_gpio, pwm);
+  return raspberryPi.setGpioPwm(static_cast<gpioId>(user_gpio), pwm);
 }
 int gpio_write(int pi, unsigned gpio, unsigned level)
 {
-  return raspberryPi.setGpioLevel(gpio, static_cast<gpioLevel>(level));
+  return raspberryPi.setGpioLevel(static_cast<gpioId>(gpio), static_cast<gpioLevel>(level));
 }
 int gpio_trigger(int pi, unsigned user_gpio, unsigned pulseLen, unsigned level)
 {
-  return raspberryPi.setGpioLevel(user_gpio, static_cast<gpioLevel>(level));
+  return raspberryPi.setGpioLevel(static_cast<gpioId>(user_gpio), static_cast<gpioLevel>(level));
 }

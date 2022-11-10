@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.8)
 project(pigpio)
 
 find_package(ament_cmake REQUIRED)
+find_package(common_utils REQUIRED)
 
 ###########
 ## Build ##
@@ -10,12 +11,18 @@ include_directories(
   include
 )
 
+set(dependencies
+  common_utils)
+
 if(SYNTHETIC_BUILD)
   add_library(${PROJECT_NAME}_pi_mock OBJECT src/mock/raspberrypi_mock.cpp)
+  ament_target_dependencies(${PROJECT_NAME}_pi_mock ${dependencies})
 
   add_library(${PROJECT_NAME} SHARED 
     src/mock/pigpio_mock.cpp
     $<TARGET_OBJECTS:${PROJECT_NAME}_pi_mock>)
+  ament_target_dependencies(${PROJECT_NAME} ${dependencies})
+  
 else()
   add_library(${PROJECT_NAME}_command OBJECT src/command.c)
   target_compile_options(${PROJECT_NAME}_command PRIVATE -O3 -pthread -fpic)
