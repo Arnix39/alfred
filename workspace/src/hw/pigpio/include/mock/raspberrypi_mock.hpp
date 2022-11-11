@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RASPBERRY_PI_MOCK_HPP_
-#define RASPBERRY_PI_MOCK_HPP_
+#ifndef MOCK__RASPBERRYPI_MOCK_HPP_
+#define MOCK__RASPBERRYPI_MOCK_HPP_
 
 #include <cstdint>
 #include <map>
@@ -92,4 +92,4 @@ public:
   std::tuple<bool, gpioCallback> getGpioCallback(gpioId gpioId);
 };
 
-#endif // RASPBERRY_PI_MOCK_HPP_
+#endif  // MOCK__RASPBERRYPI_MOCK_HPP_

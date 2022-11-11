@@ -56,9 +56,14 @@ int RaspberryPi::setGpioResistor(gpioId gpioId, gpioResistor resistorConfigurati
 int RaspberryPi::setGpioLevel(gpioId gpioId, gpioLevel level)
 {
   auto gpio = gpios.find(gpioId);
-  if (gpio != gpios.end() && std::get<1>(getGpioType(gpioId)) == output) {
+  if (gpio != gpios.end()) {
     gpio->second.level = level;
-    return 0;
+
+    if (std::get<1>(getGpioType(gpioId)) == output) {
+      return 0;
+    } else {
+      return 1;
+    }
   }
   return -1;
 }

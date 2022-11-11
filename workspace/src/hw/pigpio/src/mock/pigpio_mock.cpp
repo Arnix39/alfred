@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "pigpiod_if2.h"
+#include "pigpiod_if2.h" // NOLINT
 
 #include "mock/raspberrypi_mock.hpp"
 
@@ -35,12 +35,13 @@ int i2c_write_i2c_block_data(int pi, unsigned handle, unsigned i2c_reg, char * b
 }
 
 /* Init */
-int pigpio_start(const char * addrStr, const char * portStr) 
+int pigpio_start(const char * addrStr, const char * portStr)
 {
-  for (uint8_t index = static_cast<uint8_t>(GPIO0); index < static_cast<uint8_t>(LAST_GPIO); ++index)
+  for (uint8_t index = static_cast<uint8_t>(GPIO0);
+    index < static_cast<uint8_t>(LAST_GPIO);
+    ++index)
   {
-    if (index != static_cast<uint8_t>(GPIO0) && index != static_cast<uint8_t>(GPIO1))
-    {
+    if (index != static_cast<uint8_t>(GPIO0) && index != static_cast<uint8_t>(GPIO1)) {
       raspberryPi.addGpio(static_cast<gpioId>(index));
     }
   }
@@ -56,8 +57,7 @@ int set_mode(int pi, unsigned gpio, unsigned mode)
 
 int get_mode(int pi, unsigned gpio)
 {
-  if (std::get<0>(raspberryPi.getGpioType(static_cast<gpioId>(gpio))))
-  {
+  if (std::get<0>(raspberryPi.getGpioType(static_cast<gpioId>(gpio)))) {
     return std::get<1>(raspberryPi.getGpioType(static_cast<gpioId>(gpio)));
   }
   return -1;
