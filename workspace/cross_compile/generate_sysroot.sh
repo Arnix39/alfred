@@ -7,7 +7,6 @@ mkdir workspace
 
 cp /usr/bin/qemu-*-static qemu-user-static
 cp -r ../src workspace
-cp -r ../opencv .
 
 docker build -t arm_ros2:latest -f ./Dockerfile/Dockerfile_ubuntu_arm .
 docker run --name arm_sysroot arm_ros2:latest
@@ -20,4 +19,3 @@ docker rm arm_sysroot
 rm sysroot.tar
 rm -r qemu-user-static
 rm -r workspace
-rm -r opencv

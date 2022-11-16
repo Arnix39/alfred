@@ -6,7 +6,6 @@ FROM ${ARM_ARCH}/ubuntu:jammy
 
 COPY ./qemu-user-static/* /usr/bin/
 COPY ./workspace/src /ros2_ws/src
-COPY ./opencv /opencv
 
 # Set timezone
 RUN echo 'Etc/UTC' > /etc/timezone && \
@@ -23,11 +22,6 @@ RUN apt update && apt install -y \
     curl \
     lsb-release \
     gnupg
-
-# Install Open CV
-#RUN cd opencv && \
-#    ./buildOpenCV.sh && \ 
-#    ldconfig
 
 # ROS2 dependencies
 ENV LANG en_US.UTF-8
