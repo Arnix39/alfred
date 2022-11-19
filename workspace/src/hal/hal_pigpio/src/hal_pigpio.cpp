@@ -107,8 +107,8 @@ LifecycleCallbackReturn_t Pigpio::on_configure(const rclcpp_lifecycle::State & p
     "hal_pigpioAngles", 1000);
 
   readQuaternionsAndPublishAnglesTimer =
-    create_wall_timer(5ms, std::bind(&Pigpio::readQuaternionsAndPublishAngles, this));
-  encoderCountTimer = create_wall_timer(5ms, std::bind(&Pigpio::publishEncoderCount, this));
+    create_wall_timer(10ms, std::bind(&Pigpio::readQuaternionsAndPublishAngles, this));
+  encoderCountTimer = create_wall_timer(10ms, std::bind(&Pigpio::publishEncoderCount, this));
 
   RCLCPP_INFO(get_logger(), "hal_pigpio node configured!");
 

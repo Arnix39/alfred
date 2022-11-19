@@ -53,7 +53,7 @@ LifecycleCallbackReturn_t MotorControl::on_configure(const rclcpp_lifecycle::Sta
   motorControlECSub = this->create_subscription<hal_pigpio_interfaces::msg::HalPigpioEncoderCount>(
     "hal_pigpioEncoderCount", 1000, std::bind(&MotorControl::pigpioEncoderCountCallback, this, _1));
 
-  encoderCountsTimer = create_wall_timer(5ms, std::bind(&MotorControl::publishMessage, this));
+  encoderCountsTimer = create_wall_timer(10ms, std::bind(&MotorControl::publishMessage, this));
 
   RCLCPP_INFO(get_logger(), "hal_motor_control node configured!");
 

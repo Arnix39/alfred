@@ -27,9 +27,8 @@ LifecycleCallbackReturn_t Camera::on_configure(const rclcpp_lifecycle::State & p
     this->create_publisher<sensor_msgs::msg::Image>("cameraImage", 10);
 
   imagePublisherTimer =
-    create_wall_timer(1s, std::bind(&Camera::captureAndPublishFrame, this));
+    create_wall_timer(200ms, std::bind(&Camera::captureAndPublishFrame, this));
 
-  //capture.open(0, cv::CAP_V4L2);
   capture.open(0, 0);
   capture.set(cv::CAP_PROP_FRAME_WIDTH, static_cast<double>(320));
   capture.set(cv::CAP_PROP_FRAME_HEIGHT, static_cast<double>(240));
@@ -99,8 +98,8 @@ void Camera::captureAndPublishFrame(void)
   } else {
     cv::flip(frameFlipped, frame, 1);
     sensor_msgs::msg::Image::SharedPtr imageMsg = cv_bridge::CvImage(
-    std_msgs::msg::Header(), "bgr8", frame).toImageMsg();
+      std_msgs::msg::Header(), "bgr8", frame).toImageMsg();
 
-  imagePublisher->publish(*imageMsg);
+    imagePublisher->publish(*imageMsg);
   }
 }
