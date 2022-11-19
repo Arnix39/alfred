@@ -29,7 +29,10 @@ LifecycleCallbackReturn_t Camera::on_configure(const rclcpp_lifecycle::State & p
   imagePublisherTimer =
     create_wall_timer(1s, std::bind(&Camera::captureAndPublishFrame, this));
 
+  //capture.open(0, cv::CAP_V4L2);
   capture.open(0, 0);
+  capture.set(cv::CAP_PROP_FRAME_WIDTH, static_cast<double>(320));
+  capture.set(cv::CAP_PROP_FRAME_HEIGHT, static_cast<double>(240));
 
   if (!capture.isOpened()) {
     RCLCPP_ERROR(get_logger(), "hal_camera node not able to open camera!");
@@ -63,6 +66,7 @@ LifecycleCallbackReturn_t Camera::on_cleanup(const rclcpp_lifecycle::State & pre
 {
   imagePublisher.reset();
   imagePublisherTimer.reset();
+  capture.release();
 
   RCLCPP_INFO(get_logger(), "hal_camera node unconfigured!");
 
@@ -87,10 +91,16 @@ LifecycleCallbackReturn_t Camera::on_error(const rclcpp_lifecycle::State & previ
 void Camera::captureAndPublishFrame(void)
 {
   cv::Mat frame;
-  capture.read(frame);
+  cv::Mat frameFlipped;
+  capture.read(frameFlipped);
 
-  sensor_msgs::msg::Image::SharedPtr imageMsg = cv_bridge::CvImage(
+  if (frameFlipped.empty()) {
+    RCLCPP_ERROR(get_logger(), "Captured frame is empty!");
+  } else {
+    cv::flip(frameFlipped, frame, 1);
+    sensor_msgs::msg::Image::SharedPtr imageMsg = cv_bridge::CvImage(
     std_msgs::msg::Header(), "bgr8", frame).toImageMsg();
 
   imagePublisher->publish(*imageMsg);
+  }
 }
