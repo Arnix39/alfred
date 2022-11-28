@@ -25,6 +25,7 @@
 
 #define GOOD_GPIO GPIO2
 #define BAD_GPIO GPIO1
+#define MOTOR_ID_1 0
 
 template<typename T>
 bool hal_pigpioGpioSet(
@@ -58,6 +59,7 @@ class PigioCheckerNode : public rclcpp::Node
   using HalPigpioSendTriggerPulse_t = hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse;
   using HalPigpioReadGpio_t = hal_pigpio_interfaces::srv::HalPigpioReadGpio;
   using HalPigpioSetCallback_t = hal_pigpio_interfaces::srv::HalPigpioSetCallback;
+  using HalPigpioSetEncoderCallback_t = hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback;
 
 private:
   rclcpp::Client<lifecycle_msgs::srv::ChangeState>::SharedPtr changeStateClient;
@@ -74,6 +76,7 @@ private:
   rclcpp::Client<HalPigpioSendTriggerPulse_t>::SharedPtr sendTriggerPulseClient;
   rclcpp::Client<HalPigpioReadGpio_t>::SharedPtr readGpioClient;
   rclcpp::Client<HalPigpioSetCallback_t>::SharedPtr setCallbackClient;
+  rclcpp::Client<HalPigpioSetEncoderCallback_t>::SharedPtr setEncoderCallbackClient;
 
 public:
   PigioCheckerNode()
@@ -95,7 +98,9 @@ public:
     sendTriggerPulseClient(this->create_client<HalPigpioSendTriggerPulse_t>(
         "hal_pigpioSendTriggerPulse")),
     readGpioClient(this->create_client<HalPigpioReadGpio_t>("hal_pigpioReadGpio")),
-    setCallbackClient(this->create_client<HalPigpioSetCallback_t>("hal_pigpioSetCallback"))
+    setCallbackClient(this->create_client<HalPigpioSetCallback_t>("hal_pigpioSetCallback")),
+    setEncoderCallbackClient(this->create_client<HalPigpioSetEncoderCallback_t>(
+        "hal_pigpioSetEncoderCallback"))
   {
   }
   ~PigioCheckerNode() = default;
@@ -158,6 +163,10 @@ public:
   rclcpp::Client<HalPigpioSetCallback_t>::SharedPtr getSetCallbackClient(void)
   {
     return setCallbackClient;
+  }
+  rclcpp::Client<HalPigpioSetEncoderCallback_t>::SharedPtr getSetEncoderCallbackClient(void)
+  {
+    return setEncoderCallbackClient;
   }
 
   bool setPwmDutycycle(
@@ -243,6 +252,25 @@ public:
     request->edge_change_type = edge_change_type;
 
     auto future = getSetCallbackClient()->async_send_request(request);
+
+    executor->spin_until_future_complete(future);
+
+    return future.get()->has_succeeded;
+  }
+
+  bool setEncoderCallback(
+    uint16_t gpio_id,
+    uint8_t edge_change_type,
+    uint8_t motor_id,
+    rclcpp::executors::SingleThreadedExecutor * executor)
+  {
+    auto request = std::make_shared<HalPigpioSetEncoderCallback_t::Request>();
+
+    request->gpio_id = gpio_id;
+    request->edge_change_type = edge_change_type;
+    request->motor_id = motor_id;
+
+    auto future = getSetEncoderCallbackClient()->async_send_request(request);
 
     executor->spin_until_future_complete(future);
 

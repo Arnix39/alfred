@@ -38,6 +38,22 @@ TEST_F(PigpioTest, SetCallbackFailure)
   ASSERT_EQ(pigioChecker->setCallback(GOOD_GPIO, AS_EITHER_EDGE, &executor), false);
 }
 
+TEST_F(PigpioTest, SetEncoderCallbackSuccess)
+{
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetInputModeClient(), &executor);
+  ASSERT_EQ(
+    pigioChecker->setEncoderCallback(GOOD_GPIO, AS_EITHER_EDGE, MOTOR_ID_1, &executor),
+    true);
+}
+
+TEST_F(PigpioTest, SetEncoderCallbackFailure)
+{
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetOutputModeClient(), &executor);
+  ASSERT_EQ(
+    pigioChecker->setEncoderCallback(GOOD_GPIO, AS_EITHER_EDGE, MOTOR_ID_1, &executor),
+    false);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
