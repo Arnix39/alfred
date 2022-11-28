@@ -64,24 +64,6 @@ class PigioCheckerNode : public rclcpp::Node
   using HalPigpioSetEncoderCallback_t = hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback;
   using HalPigpioSetMotorDirection_t = hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection;
 
-private:
-  rclcpp::Client<lifecycle_msgs::srv::ChangeState>::SharedPtr changeStateClient;
-  rclcpp::Client<HalPigpioSetInputMode_t>::SharedPtr setInputModeClient;
-  rclcpp::Client<HalPigpioSetOutputMode_t>::SharedPtr setOutputModeClient;
-  rclcpp::Client<HalPigpioGetMode_t>::SharedPtr getModeClient;
-  rclcpp::Client<HalPigpioSetPullUp_t>::SharedPtr setPullUpClient;
-  rclcpp::Client<HalPigpioSetPullDown_t>::SharedPtr setPullDownClient;
-  rclcpp::Client<HalPigpioClearResistor_t>::SharedPtr clearResistorClient;
-  rclcpp::Client<HalPigpioSetPwmDutycycle_t>::SharedPtr setPwmDutycycleClient;
-  rclcpp::Client<HalPigpioSetPwmFrequency_t>::SharedPtr setPwmFrequencyClient;
-  rclcpp::Client<HalPigpioSetGpioHigh_t>::SharedPtr setGpioHighClient;
-  rclcpp::Client<HalPigpioSetGpioLow_t>::SharedPtr setGpioLowClient;
-  rclcpp::Client<HalPigpioSendTriggerPulse_t>::SharedPtr sendTriggerPulseClient;
-  rclcpp::Client<HalPigpioReadGpio_t>::SharedPtr readGpioClient;
-  rclcpp::Client<HalPigpioSetCallback_t>::SharedPtr setCallbackClient;
-  rclcpp::Client<HalPigpioSetEncoderCallback_t>::SharedPtr setEncoderCallbackClient;
-  rclcpp::Client<HalPigpioSetMotorDirection_t>::SharedPtr setMotorDirectionClient;
-
 public:
   PigioCheckerNode()
   : rclcpp::Node("hal_pigpio_checker_node"),
@@ -111,72 +93,28 @@ public:
   }
   ~PigioCheckerNode() = default;
 
+  rclcpp::Client<lifecycle_msgs::srv::ChangeState>::SharedPtr changeStateClient;
+  rclcpp::Client<HalPigpioSetInputMode_t>::SharedPtr setInputModeClient;
+  rclcpp::Client<HalPigpioSetOutputMode_t>::SharedPtr setOutputModeClient;
+  rclcpp::Client<HalPigpioGetMode_t>::SharedPtr getModeClient;
+  rclcpp::Client<HalPigpioSetPullUp_t>::SharedPtr setPullUpClient;
+  rclcpp::Client<HalPigpioSetPullDown_t>::SharedPtr setPullDownClient;
+  rclcpp::Client<HalPigpioClearResistor_t>::SharedPtr clearResistorClient;
+  rclcpp::Client<HalPigpioSetPwmDutycycle_t>::SharedPtr setPwmDutycycleClient;
+  rclcpp::Client<HalPigpioSetPwmFrequency_t>::SharedPtr setPwmFrequencyClient;
+  rclcpp::Client<HalPigpioSetGpioHigh_t>::SharedPtr setGpioHighClient;
+  rclcpp::Client<HalPigpioSetGpioLow_t>::SharedPtr setGpioLowClient;
+  rclcpp::Client<HalPigpioSendTriggerPulse_t>::SharedPtr sendTriggerPulseClient;
+  rclcpp::Client<HalPigpioReadGpio_t>::SharedPtr readGpioClient;
+  rclcpp::Client<HalPigpioSetCallback_t>::SharedPtr setCallbackClient;
+  rclcpp::Client<HalPigpioSetEncoderCallback_t>::SharedPtr setEncoderCallbackClient;
+  rclcpp::Client<HalPigpioSetMotorDirection_t>::SharedPtr setMotorDirectionClient;
+
   void changePigpioNodeToState(std::uint8_t transition)
   {
     auto request = std::make_shared<lifecycle_msgs::srv::ChangeState::Request>();
     request->transition.id = transition;
     auto result = changeStateClient->async_send_request(request);
-  }
-
-  rclcpp::Client<HalPigpioSetInputMode_t>::SharedPtr getSetInputModeClient(void)
-  {
-    return setInputModeClient;
-  }
-  rclcpp::Client<HalPigpioSetOutputMode_t>::SharedPtr getSetOutputModeClient(void)
-  {
-    return setOutputModeClient;
-  }
-  rclcpp::Client<HalPigpioGetMode_t>::SharedPtr getGetModeClient(void)
-  {
-    return getModeClient;
-  }
-  rclcpp::Client<HalPigpioSetPullUp_t>::SharedPtr getSetPullUpClient(void)
-  {
-    return setPullUpClient;
-  }
-  rclcpp::Client<HalPigpioSetPullDown_t>::SharedPtr getSetPullDownClient(void)
-  {
-    return setPullDownClient;
-  }
-  rclcpp::Client<HalPigpioClearResistor_t>::SharedPtr getClearResistorClient(void)
-  {
-    return clearResistorClient;
-  }
-  rclcpp::Client<HalPigpioSetPwmDutycycle_t>::SharedPtr getSetPwmDutycycleClient(void)
-  {
-    return setPwmDutycycleClient;
-  }
-  rclcpp::Client<HalPigpioSetPwmFrequency_t>::SharedPtr getSetPwmFrequencyClient(void)
-  {
-    return setPwmFrequencyClient;
-  }
-  rclcpp::Client<HalPigpioSetGpioHigh_t>::SharedPtr getSetGpioHighClient(void)
-  {
-    return setGpioHighClient;
-  }
-  rclcpp::Client<HalPigpioSetGpioLow_t>::SharedPtr getSetGpioLowClient(void)
-  {
-    return setGpioLowClient;
-  }
-  rclcpp::Client<HalPigpioSendTriggerPulse_t>::SharedPtr getSendTriggerPulseClient(void)
-  {
-    return sendTriggerPulseClient;
-  }
-  rclcpp::Client<HalPigpioReadGpio_t>::SharedPtr getReadGpioClient(void)
-  {
-    return readGpioClient;
-  }
-  rclcpp::Client<HalPigpioSetCallback_t>::SharedPtr getSetCallbackClient(void)
-  {
-    return setCallbackClient;
-  }
-  rclcpp::Client<HalPigpioSetEncoderCallback_t>::SharedPtr getSetEncoderCallbackClient(void)
-  {
-    return setEncoderCallbackClient;
-  }
-  rclcpp::Client<HalPigpioSetMotorDirection_t>::SharedPtr getSetMotorDirectionClient(void)
-  {
-    return setMotorDirectionClient;
   }
 
   bool setPwmDutycycle(
@@ -189,7 +127,7 @@ public:
     request->gpio_id = gpio_id;
     request->dutycycle = dutycycle;
 
-    auto future = getSetPwmDutycycleClient()->async_send_request(request);
+    auto future = setPwmDutycycleClient->async_send_request(request);
 
     executor->spin_until_future_complete(future);
 
@@ -206,7 +144,7 @@ public:
     request->gpio_id = gpio_id;
     request->frequency = frequency;
 
-    auto future = getSetPwmFrequencyClient()->async_send_request(request);
+    auto future = setPwmFrequencyClient->async_send_request(request);
 
     executor->spin_until_future_complete(future);
 
@@ -223,7 +161,7 @@ public:
     request->gpio_id = gpio_id;
     request->pulse_length_in_us = pulse_length_in_us;
 
-    auto future = getSendTriggerPulseClient()->async_send_request(request);
+    auto future = sendTriggerPulseClient->async_send_request(request);
 
     executor->spin_until_future_complete(future);
 
@@ -239,7 +177,7 @@ public:
 
     request->gpio_id = gpio_id;
 
-    auto future = getReadGpioClient()->async_send_request(request);
+    auto future = readGpioClient->async_send_request(request);
 
     executor->spin_until_future_complete(future);
 
@@ -261,7 +199,7 @@ public:
     request->gpio_id = gpio_id;
     request->edge_change_type = edge_change_type;
 
-    auto future = getSetCallbackClient()->async_send_request(request);
+    auto future = setCallbackClient->async_send_request(request);
 
     executor->spin_until_future_complete(future);
 
@@ -280,7 +218,7 @@ public:
     request->edge_change_type = edge_change_type;
     request->motor_id = motor_id;
 
-    auto future = getSetEncoderCallbackClient()->async_send_request(request);
+    auto future = setEncoderCallbackClient->async_send_request(request);
 
     executor->spin_until_future_complete(future);
 
@@ -297,7 +235,7 @@ public:
     request->is_direction_forward = is_direction_forward;
     request->motor_id = motor_id;
 
-    auto future = getSetMotorDirectionClient()->async_send_request(request);
+    auto future = setMotorDirectionClient->async_send_request(request);
 
     executor->spin_until_future_complete(future);
 

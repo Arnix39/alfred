@@ -17,7 +17,7 @@
 /* Test cases */
 TEST_F(PigpioTest, ReadGpioSuccess)
 {
-  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetGpioHighClient(), &executor);
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setGpioHighClient, &executor);
   ASSERT_EQ(pigioChecker->readGpioAndCheckLevel(GOOD_GPIO, PI_HIGH, &executor), true);
 }
 
@@ -28,19 +28,19 @@ TEST_F(PigpioTest, ReadGpioFailure)
 
 TEST_F(PigpioTest, SetCallbackSuccess)
 {
-  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetInputModeClient(), &executor);
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setInputModeClient, &executor);
   ASSERT_EQ(pigioChecker->setCallback(GOOD_GPIO, AS_EITHER_EDGE, &executor), true);
 }
 
 TEST_F(PigpioTest, SetCallbackFailure)
 {
-  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetOutputModeClient(), &executor);
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setOutputModeClient, &executor);
   ASSERT_EQ(pigioChecker->setCallback(GOOD_GPIO, AS_EITHER_EDGE, &executor), false);
 }
 
 TEST_F(PigpioTest, SetEncoderCallbackSuccess)
 {
-  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetInputModeClient(), &executor);
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setInputModeClient, &executor);
   ASSERT_EQ(
     pigioChecker->setEncoderCallback(GOOD_GPIO, AS_EITHER_EDGE, MOTOR_ID_1, &executor),
     true);
@@ -48,7 +48,7 @@ TEST_F(PigpioTest, SetEncoderCallbackSuccess)
 
 TEST_F(PigpioTest, SetEncoderCallbackFailure)
 {
-  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetOutputModeClient(), &executor);
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setOutputModeClient, &executor);
   ASSERT_EQ(
     pigioChecker->setEncoderCallback(GOOD_GPIO, AS_EITHER_EDGE, MOTOR_ID_1, &executor),
     false);
@@ -56,14 +56,14 @@ TEST_F(PigpioTest, SetEncoderCallbackFailure)
 
 TEST_F(PigpioTest, SetMotorDireectionSuccess)
 {
-  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetInputModeClient(), &executor);
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setInputModeClient, &executor);
   pigioChecker->setEncoderCallback(GOOD_GPIO, AS_EITHER_EDGE, MOTOR_ID_1, &executor);
   ASSERT_EQ(pigioChecker->setMotorDirection(FORWARD, MOTOR_ID_1, &executor), true);
 }
 
 TEST_F(PigpioTest, SetMotorDirectionFailure)
 {
-  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetOutputModeClient(), &executor);
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setOutputModeClient, &executor);
   pigioChecker->setEncoderCallback(GOOD_GPIO, AS_EITHER_EDGE, MOTOR_ID_1, &executor);
   ASSERT_EQ(pigioChecker->setMotorDirection(FORWARD, MOTOR_ID_2, &executor), false);
 }
