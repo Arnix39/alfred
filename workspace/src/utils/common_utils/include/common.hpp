@@ -7,6 +7,14 @@
 
 #include "gpioDefinitions.hpp"
 
+#define AS_RISING_EDGE 0
+#define AS_FALLING_EDGE 1
+#define AS_EITHER_EDGE 2
+
+#define FALLING_EDGE 0
+#define RISING_EDGE 1
+#define NO_CHANGE 2
+
 using LifecycleCallbackReturn_t =
   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 

@@ -40,13 +40,16 @@ int32_t getI2cHandle(imuGetHandleSyncClientNode_t imuGetHandleSyncClientNode);
 int16_t readByteFromRegister(
   i2cReadByteDataSyncClientNode_t i2cReadByteDataSyncClientNode, int32_t imuHandle,
   uint8_t registerToRead);
+
 bool writeBitInRegister(
   i2cReadByteDataSyncClientNode_t i2cReadByteDataSyncClientNode,
   i2cWriteByteDataSyncClientNode_t i2cWriteByteDataSyncClientNode, int32_t imuHandle,
   uint8_t registerToWrite, uint8_t bitToWrite, uint8_t valueOfBit);
+
 bool writeByteInRegister(
   i2cWriteByteDataSyncClientNode_t i2cWriteByteDataSyncClientNode, int32_t imuHandle,
   uint8_t registerToWrite, uint8_t value);
+
 bool writeDataBlock(
   i2cWriteBlockDataSyncClientNode_t i2cWriteBlockDataSyncClientNode, int32_t imuHandle,
   uint8_t registerToWrite, std::vector<uint8_t> data);

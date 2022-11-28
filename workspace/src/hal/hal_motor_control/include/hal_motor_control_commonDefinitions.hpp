@@ -41,14 +41,6 @@
 
 #define MOTOR_PWM_FREQUENCY 1000
 
-#define AS_RISING_EDGE 0
-#define AS_FALLING_EDGE 1
-#define AS_EITHER_EDGE 2
-
-#define FALLING_EDGE 0
-#define RISING_EDGE 1
-#define NO_CHANGE 2
-
 using SetInputModeFuture_t =
   rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>::SharedFuture;
 using SetOutputModeFuture_t =
