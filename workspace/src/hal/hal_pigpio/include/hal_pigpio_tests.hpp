@@ -56,6 +56,7 @@ class PigioCheckerNode : public rclcpp::Node
   using HalPigpioSetGpioHigh_t = hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh;
   using HalPigpioSetGpioLow_t = hal_pigpio_interfaces::srv::HalPigpioSetGpioLow;
   using HalPigpioSendTriggerPulse_t = hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse;
+  using HalPigpioReadGpio_t = hal_pigpio_interfaces::srv::HalPigpioReadGpio;
 
 private:
   rclcpp::Client<lifecycle_msgs::srv::ChangeState>::SharedPtr changeStateClient;
@@ -70,6 +71,7 @@ private:
   rclcpp::Client<HalPigpioSetGpioHigh_t>::SharedPtr setGpioHighClient;
   rclcpp::Client<HalPigpioSetGpioLow_t>::SharedPtr setGpioLowClient;
   rclcpp::Client<HalPigpioSendTriggerPulse_t>::SharedPtr sendTriggerPulseClient;
+  rclcpp::Client<HalPigpioReadGpio_t>::SharedPtr readGpioClient;
 
 public:
   PigioCheckerNode()
@@ -89,7 +91,8 @@ public:
     setGpioHighClient(this->create_client<HalPigpioSetGpioHigh_t>("hal_pigpioSetGpioHigh")),
     setGpioLowClient(this->create_client<HalPigpioSetGpioLow_t>("hal_pigpioSetGpioLow")),
     sendTriggerPulseClient(this->create_client<HalPigpioSendTriggerPulse_t>(
-        "hal_pigpioSendTriggerPulse"))
+        "hal_pigpioSendTriggerPulse")),
+    readGpioClient(this->create_client<HalPigpioReadGpio_t>("hal_pigpioReadGpio"))
   {
   }
   ~PigioCheckerNode() = default;
@@ -145,6 +148,10 @@ public:
   {
     return sendTriggerPulseClient;
   }
+  rclcpp::Client<HalPigpioReadGpio_t>::SharedPtr getReadGpioClient(void)
+  {
+    return readGpioClient;
+  }
 
   bool setPwmDutycycle(
     uint16_t gpio_id,
@@ -195,6 +202,27 @@ public:
     executor->spin_until_future_complete(future);
 
     return future.get()->has_succeeded;
+  }
+
+  bool readGpioAndCheckLevel(
+    uint16_t gpio_id,
+    uint8_t gpio_level,
+    rclcpp::executors::SingleThreadedExecutor * executor)
+  {
+    auto request = std::make_shared<HalPigpioReadGpio_t::Request>();
+
+    request->gpio_id = gpio_id;
+
+    auto future = getReadGpioClient()->async_send_request(request);
+
+    executor->spin_until_future_complete(future);
+
+    auto response = future.get();
+
+    if (response->has_succeeded && response->level == gpio_level) {
+      return true;
+    }
+    return false;
   }
 };
 

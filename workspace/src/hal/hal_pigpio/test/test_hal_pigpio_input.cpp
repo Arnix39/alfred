@@ -14,6 +14,18 @@
 
 #include "hal_pigpio_tests.hpp"
 
+/* Test cases */
+TEST_F(PigpioTest, ReadGpioSuccess)
+{
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetGpioHighClient(), &executor);
+  ASSERT_EQ(pigioChecker->readGpioAndCheckLevel(GOOD_GPIO, PI_HIGH, &executor), true);
+}
+
+TEST_F(PigpioTest, ReadGpioFailure)
+{
+  ASSERT_EQ(pigioChecker->readGpioAndCheckLevel(BAD_GPIO, PI_LOW, &executor), false);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
