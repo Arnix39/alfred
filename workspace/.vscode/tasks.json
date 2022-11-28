@@ -39,10 +39,10 @@
                 "--build-base",
                 "build/host",
                 "--install-base",
-                "install/host",
+                "install/host"
             ],
             "group": {
-                "kind": "test",
+                "kind": "test"
             }
         },
         {
@@ -56,10 +56,10 @@
             "args": [
                 "test-result",
                 "--test-result-base",
-                "build/host",
+                "build/host"
             ],
             "group": {
-                "kind": "test",
+                "kind": "test"
             }
         },
         {
@@ -67,7 +67,11 @@
             "detail": "Run all unit tests and show results.",
             "type": "shell",
             "dependsOrder": "sequence",
-            "dependsOn": ["ROS2: Build workspace", "ROS2: Unit tests", "ROS2: Tests results"],
+            "dependsOn": [
+                "ROS2: Build workspace",
+                "ROS2: Unit tests",
+                "ROS2: Tests results"
+            ],
             "group": {
                 "kind": "test",
                 "isDefault": true
@@ -89,7 +93,7 @@
                 "install/host",
                 "--cmake-target",
                 "clean"
-            ],
+            ]
         },
         {
             "label": "Workspace: Generate sysroot for target",
@@ -98,7 +102,7 @@
             "options": {
                 "cwd": "${workspaceFolder}/cross_compile"
             },
-            "command": "${workspaceFolder}/cross_compile/generate_sysroot.sh",
+            "command": "${workspaceFolder}/cross_compile/generate_sysroot.sh"
         },
         {
             "label": "ROS2: Build workspace for target",
@@ -114,7 +118,7 @@
                     "PYTHON_SOABI": "cpython-310-aarch64-linux-gnu",
                     "CC": "/usr/bin/aarch64-linux-gnu-gcc",
                     "CXX": "/usr/bin/aarch64-linux-gnu-g++",
-                    "CROSS_COMPILE_DIR": "${workspaceFolder}/cross_compile",
+                    "CROSS_COMPILE_DIR": "${workspaceFolder}/cross_compile"
                 }
             },
             "command": "colcon",
@@ -135,20 +139,40 @@
             "problemMatcher": "$gcc"
         },
         {
+            "label": "ROS2: Install on target",
+            "detail": "Install application on Raspberry Pi 3B+.",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "command": "rsync",
+            "args": [
+                "--delete",
+                "--copy-links",
+                "-av",
+                "${workspaceFolder}/install/target/",
+                "arnix@alfred:/home/arnix/Alfred/"
+            ],
+            "group": {
+                "kind": "build"
+            },
+            "problemMatcher": "$gcc"
+        },
+        {
             "label": "Workspace: Clean target files",
             "detail": "Clean workspace for target build files.",
             "type": "shell",
             "options": {
                 "cwd": "${workspaceFolder}",
                 "env": {
-                  "TARGET_ARCH": "aarch64",
-                  "CROSS_COMPILE": "/usr/bin/aarch64-linux-gnu-",
-                  "SYSROOT": "${workspaceFolder}/cross_compile/sysroot/",
-                  "ROS2_INSTALL_PATH": "${workspaceFolder}/install/target",
-                  "PYTHON_SOABI": "cpython-310-aarch64-linux-gnu",
-                  "CC": "/usr/bin/aarch64-linux-gnu-gcc",
-                  "CXX": "/usr/bin/aarch64-linux-gnu-g++",
-                  "CROSS_COMPILE_DIR": "${workspaceFolder}/cross_compile",
+                    "TARGET_ARCH": "aarch64",
+                    "CROSS_COMPILE": "/usr/bin/aarch64-linux-gnu-",
+                    "SYSROOT": "${workspaceFolder}/cross_compile/sysroot/",
+                    "ROS2_INSTALL_PATH": "${workspaceFolder}/install/target",
+                    "PYTHON_SOABI": "cpython-310-aarch64-linux-gnu",
+                    "CC": "/usr/bin/aarch64-linux-gnu-gcc",
+                    "CXX": "/usr/bin/aarch64-linux-gnu-g++",
+                    "CROSS_COMPILE_DIR": "${workspaceFolder}/cross_compile"
                 }
             },
             "command": "colcon",
@@ -161,6 +185,7 @@
                 "--cmake-target",
                 "clean"
             ],
+            "problemMatcher": []
         },
         {
             "label": "Workspace: Purge",
@@ -175,16 +200,7 @@
                 "build",
                 "install",
                 "log"
-            ],
-        },
-        {
-            "label": "Install on target",
-            "detail": "Install workspace on Raspberry Pi 3B+.",
-            "type": "shell",
-            "command": "../scripts/install_on_Alfred.sh",
-            "args": [
-                "${workspaceFolder}/install/target",
-            ],
-        },
+            ]
+        }
     ]
 }
