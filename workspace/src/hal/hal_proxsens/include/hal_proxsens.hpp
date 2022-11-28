@@ -31,14 +31,6 @@
 #define PROXSENS_LEVEL_SHIFTER_OE_GPIO GPIO10
 #define PROXSENS_TRIGGER_LENGTH_US 20
 
-#define AS_RISING_EDGE 0
-#define AS_FALLING_EDGE 1
-#define AS_EITHER_EDGE 2
-
-#define FALLING_EDGE 0
-#define RISING_EDGE 1
-#define NO_CHANGE 2
-
 namespace hal_proxsens
 {
 

@@ -147,15 +147,15 @@ void Pigpio::setMotorDirection(
   const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection::Request> request,
   std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection::Response> response)
 {
-  (void)response;
-
   auto motorIndex = find_if(
     motors.begin(), motors.end(), [request](Motor motor) {
       return motor.id == request->motor_id;
     });
   if (motorIndex != motors.end()) {
     motors.at(motorIndex - motors.begin()).isDirectionForward = request->is_direction_forward;
+    response->has_succeeded = true;
   } else {
+    response->has_succeeded = false;
     RCLCPP_ERROR(get_logger(), "Failed to set motor direction for motor %u!", request->motor_id);
   }
 }

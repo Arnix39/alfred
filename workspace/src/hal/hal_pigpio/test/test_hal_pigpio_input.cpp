@@ -26,6 +26,18 @@ TEST_F(PigpioTest, ReadGpioFailure)
   ASSERT_EQ(pigioChecker->readGpioAndCheckLevel(BAD_GPIO, PI_LOW, &executor), false);
 }
 
+TEST_F(PigpioTest, SetCallbackSuccess)
+{
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetInputModeClient(), &executor);
+  ASSERT_EQ(pigioChecker->setCallback(GOOD_GPIO, AS_EITHER_EDGE, &executor), true);
+}
+
+TEST_F(PigpioTest, SetCallbackFailure)
+{
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetOutputModeClient(), &executor);
+  ASSERT_EQ(pigioChecker->setCallback(GOOD_GPIO, AS_EITHER_EDGE, &executor), false);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);

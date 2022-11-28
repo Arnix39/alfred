@@ -49,10 +49,10 @@ struct gpioPwm
 
 enum gpioEdgeChangeType
 {
-  neitherEdge,
   risingEdge,
   fallingEdge,
-  eitherEdge
+  eitherEdge,
+  neitherEdge
 };
 
 struct gpioCallback

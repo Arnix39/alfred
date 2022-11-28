@@ -57,6 +57,7 @@ class PigioCheckerNode : public rclcpp::Node
   using HalPigpioSetGpioLow_t = hal_pigpio_interfaces::srv::HalPigpioSetGpioLow;
   using HalPigpioSendTriggerPulse_t = hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse;
   using HalPigpioReadGpio_t = hal_pigpio_interfaces::srv::HalPigpioReadGpio;
+  using HalPigpioSetCallback_t = hal_pigpio_interfaces::srv::HalPigpioSetCallback;
 
 private:
   rclcpp::Client<lifecycle_msgs::srv::ChangeState>::SharedPtr changeStateClient;
@@ -72,6 +73,7 @@ private:
   rclcpp::Client<HalPigpioSetGpioLow_t>::SharedPtr setGpioLowClient;
   rclcpp::Client<HalPigpioSendTriggerPulse_t>::SharedPtr sendTriggerPulseClient;
   rclcpp::Client<HalPigpioReadGpio_t>::SharedPtr readGpioClient;
+  rclcpp::Client<HalPigpioSetCallback_t>::SharedPtr setCallbackClient;
 
 public:
   PigioCheckerNode()
@@ -92,7 +94,8 @@ public:
     setGpioLowClient(this->create_client<HalPigpioSetGpioLow_t>("hal_pigpioSetGpioLow")),
     sendTriggerPulseClient(this->create_client<HalPigpioSendTriggerPulse_t>(
         "hal_pigpioSendTriggerPulse")),
-    readGpioClient(this->create_client<HalPigpioReadGpio_t>("hal_pigpioReadGpio"))
+    readGpioClient(this->create_client<HalPigpioReadGpio_t>("hal_pigpioReadGpio")),
+    setCallbackClient(this->create_client<HalPigpioSetCallback_t>("hal_pigpioSetCallback"))
   {
   }
   ~PigioCheckerNode() = default;
@@ -151,6 +154,10 @@ public:
   rclcpp::Client<HalPigpioReadGpio_t>::SharedPtr getReadGpioClient(void)
   {
     return readGpioClient;
+  }
+  rclcpp::Client<HalPigpioSetCallback_t>::SharedPtr getSetCallbackClient(void)
+  {
+    return setCallbackClient;
   }
 
   bool setPwmDutycycle(
@@ -223,6 +230,23 @@ public:
       return true;
     }
     return false;
+  }
+
+  bool setCallback(
+    uint16_t gpio_id,
+    uint8_t edge_change_type,
+    rclcpp::executors::SingleThreadedExecutor * executor)
+  {
+    auto request = std::make_shared<HalPigpioSetCallback_t::Request>();
+
+    request->gpio_id = gpio_id;
+    request->edge_change_type = edge_change_type;
+
+    auto future = getSetCallbackClient()->async_send_request(request);
+
+    executor->spin_until_future_complete(future);
+
+    return future.get()->has_succeeded;
   }
 };
 
