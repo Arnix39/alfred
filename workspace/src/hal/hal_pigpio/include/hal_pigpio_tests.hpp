@@ -26,6 +26,8 @@
 #define GOOD_GPIO GPIO2
 #define BAD_GPIO GPIO1
 #define MOTOR_ID_1 0
+#define MOTOR_ID_2 1
+#define FORWARD true
 
 template<typename T>
 bool hal_pigpioGpioSet(
@@ -60,6 +62,7 @@ class PigioCheckerNode : public rclcpp::Node
   using HalPigpioReadGpio_t = hal_pigpio_interfaces::srv::HalPigpioReadGpio;
   using HalPigpioSetCallback_t = hal_pigpio_interfaces::srv::HalPigpioSetCallback;
   using HalPigpioSetEncoderCallback_t = hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback;
+  using HalPigpioSetMotorDirection_t = hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection;
 
 private:
   rclcpp::Client<lifecycle_msgs::srv::ChangeState>::SharedPtr changeStateClient;
@@ -77,6 +80,7 @@ private:
   rclcpp::Client<HalPigpioReadGpio_t>::SharedPtr readGpioClient;
   rclcpp::Client<HalPigpioSetCallback_t>::SharedPtr setCallbackClient;
   rclcpp::Client<HalPigpioSetEncoderCallback_t>::SharedPtr setEncoderCallbackClient;
+  rclcpp::Client<HalPigpioSetMotorDirection_t>::SharedPtr setMotorDirectionClient;
 
 public:
   PigioCheckerNode()
@@ -100,7 +104,9 @@ public:
     readGpioClient(this->create_client<HalPigpioReadGpio_t>("hal_pigpioReadGpio")),
     setCallbackClient(this->create_client<HalPigpioSetCallback_t>("hal_pigpioSetCallback")),
     setEncoderCallbackClient(this->create_client<HalPigpioSetEncoderCallback_t>(
-        "hal_pigpioSetEncoderCallback"))
+        "hal_pigpioSetEncoderCallback")),
+    setMotorDirectionClient(this->create_client<HalPigpioSetMotorDirection_t>(
+        "hal_pigpioSetMotorDirection"))
   {
   }
   ~PigioCheckerNode() = default;
@@ -167,6 +173,10 @@ public:
   rclcpp::Client<HalPigpioSetEncoderCallback_t>::SharedPtr getSetEncoderCallbackClient(void)
   {
     return setEncoderCallbackClient;
+  }
+  rclcpp::Client<HalPigpioSetMotorDirection_t>::SharedPtr getSetMotorDirectionClient(void)
+  {
+    return setMotorDirectionClient;
   }
 
   bool setPwmDutycycle(
@@ -271,6 +281,23 @@ public:
     request->motor_id = motor_id;
 
     auto future = getSetEncoderCallbackClient()->async_send_request(request);
+
+    executor->spin_until_future_complete(future);
+
+    return future.get()->has_succeeded;
+  }
+
+  bool setMotorDirection(
+    bool is_direction_forward,
+    uint8_t motor_id,
+    rclcpp::executors::SingleThreadedExecutor * executor)
+  {
+    auto request = std::make_shared<HalPigpioSetMotorDirection_t::Request>();
+
+    request->is_direction_forward = is_direction_forward;
+    request->motor_id = motor_id;
+
+    auto future = getSetMotorDirectionClient()->async_send_request(request);
 
     executor->spin_until_future_complete(future);
 

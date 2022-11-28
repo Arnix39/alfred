@@ -54,6 +54,20 @@ TEST_F(PigpioTest, SetEncoderCallbackFailure)
     false);
 }
 
+TEST_F(PigpioTest, SetMotorDireectionSuccess)
+{
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetInputModeClient(), &executor);
+  pigioChecker->setEncoderCallback(GOOD_GPIO, AS_EITHER_EDGE, MOTOR_ID_1, &executor);
+  ASSERT_EQ(pigioChecker->setMotorDirection(FORWARD, MOTOR_ID_1, &executor), true);
+}
+
+TEST_F(PigpioTest, SetMotorDirectionFailure)
+{
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getSetOutputModeClient(), &executor);
+  pigioChecker->setEncoderCallback(GOOD_GPIO, AS_EITHER_EDGE, MOTOR_ID_1, &executor);
+  ASSERT_EQ(pigioChecker->setMotorDirection(FORWARD, MOTOR_ID_2, &executor), false);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
