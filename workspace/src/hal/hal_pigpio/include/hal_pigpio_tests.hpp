@@ -16,6 +16,7 @@
 #define HAL_PIGPIO_TESTS_HPP_
 
 #include <memory>
+#include <map>
 
 #include "gtest/gtest.h"
 #include "rclcpp/rclcpp.hpp"
@@ -24,10 +25,12 @@
 #include "hal_pigpio.hpp"
 
 #define GOOD_GPIO GPIO2
+#define GOOD_GPIO_2 GPIO3
 #define BAD_GPIO GPIO1
 #define MOTOR_ID_1 0
 #define MOTOR_ID_2 1
 #define FORWARD true
+#define BACKWARD false
 
 template<typename T>
 bool hal_pigpioGpioSet(
@@ -63,6 +66,8 @@ class PigioCheckerNode : public rclcpp::Node
   using HalPigpioSetCallback_t = hal_pigpio_interfaces::srv::HalPigpioSetCallback;
   using HalPigpioSetEncoderCallback_t = hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback;
   using HalPigpioSetMotorDirection_t = hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection;
+  using HalPigpioEdgeChangeMsg_t = hal_pigpio_interfaces::msg::HalPigpioEdgeChange;
+  using HalPigpioEncoderCountMsg_t = hal_pigpio_interfaces::msg::HalPigpioEncoderCount;
 
 public:
   PigioCheckerNode()
@@ -88,7 +93,19 @@ public:
     setEncoderCallbackClient(this->create_client<HalPigpioSetEncoderCallback_t>(
         "hal_pigpioSetEncoderCallback")),
     setMotorDirectionClient(this->create_client<HalPigpioSetMotorDirection_t>(
-        "hal_pigpioSetMotorDirection"))
+        "hal_pigpioSetMotorDirection")),
+    pigpioEdgeChangeSub(this->create_subscription<HalPigpioEdgeChangeMsg_t>(
+        "gpioEdgeChange",
+        1000,
+        std::bind(&PigioCheckerNode::edgeChangeCallback, this, std::placeholders::_1))),
+    pigpioEncoderCountSub(this->create_subscription<HalPigpioEncoderCountMsg_t>(
+        "hal_pigpioEncoderCount",
+        1000,
+        std::bind(&PigioCheckerNode::encoderCountCallback, this, std::placeholders::_1))),
+    edgeChangeMsg_gpioId(0),
+    edgeChangeMsg_edgeChangeType(0),
+    edgeChangeMsg_timeSinceBoot_us(0),
+    motorsEC({})
   {
   }
   ~PigioCheckerNode() = default;
@@ -109,6 +126,14 @@ public:
   rclcpp::Client<HalPigpioSetCallback_t>::SharedPtr setCallbackClient;
   rclcpp::Client<HalPigpioSetEncoderCallback_t>::SharedPtr setEncoderCallbackClient;
   rclcpp::Client<HalPigpioSetMotorDirection_t>::SharedPtr setMotorDirectionClient;
+  rclcpp::Subscription<HalPigpioEdgeChangeMsg_t>::SharedPtr pigpioEdgeChangeSub;
+  rclcpp::Subscription<HalPigpioEncoderCountMsg_t>::SharedPtr pigpioEncoderCountSub;
+
+  uint8_t edgeChangeMsg_gpioId;
+  uint8_t edgeChangeMsg_edgeChangeType;
+  uint32_t edgeChangeMsg_timeSinceBoot_us;
+
+  std::map<uint8_t, int32_t> motorsEC;
 
   void changePigpioNodeToState(std::uint8_t transition)
   {
@@ -240,6 +265,23 @@ public:
     executor->spin_until_future_complete(future);
 
     return future.get()->has_succeeded;
+  }
+
+  void edgeChangeCallback(const HalPigpioEdgeChangeMsg_t & msg)
+  {
+    edgeChangeMsg_gpioId = msg.gpio_id;
+    edgeChangeMsg_edgeChangeType = msg.edge_change_type;
+    edgeChangeMsg_timeSinceBoot_us = msg.time_since_boot_us;
+  }
+
+  void encoderCountCallback(const HalPigpioEncoderCountMsg_t & msg)
+  {
+    auto motorIndex = motorsEC.find(msg.motor_id);
+    if (motorIndex != motorsEC.end()) {
+      motorIndex->second = msg.encoder_count;
+    } else {
+      motorsEC.insert({msg.motor_id, msg.encoder_count});
+    }
   }
 };
 

@@ -83,7 +83,7 @@ int RaspberryPi::setGpioCallback(gpioId gpioId, gpioCallback callback)
   auto gpio = gpios.find(gpioId);
   if (gpio != gpios.end()) {
     gpio->second.callback = callback;
-    return 0;
+    return gpio->second.callback.id;
   }
   return -1;
 }

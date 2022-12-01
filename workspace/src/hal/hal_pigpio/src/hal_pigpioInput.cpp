@@ -42,8 +42,8 @@ void Pigpio::gpioEdgeChangeCallback(
   gpioEdgeChangePub->publish(edgeChange);
 }
 
-/** This is to pass the pointer of the callback function gpioEdgeChangeCallback to the pigpio
- * library API */
+// This is to pass the pointer of the callback function gpioEdgeChangeCallback to the pigpio
+// library API
 void Pigpio::c_gpioEdgeChangeCallback(
   int handle, unsigned gpioId, unsigned edgeChangeType,
   uint32_t timeSinceBoot_us, void * userData)
@@ -102,8 +102,8 @@ void Pigpio::gpioEncoderEdgeChangeCallback(
   }
 }
 
-/** This is to pass the pointer of the callback function gpioEncoderEdgeChangeCallback to the
- * pigpio library API */
+// This is to pass the pointer of the callback function gpioEncoderEdgeChangeCallback to the
+// pigpio library API
 void Pigpio::c_gpioEncoderEdgeChangeCallback(
   int handle, unsigned gpioId, unsigned edgeChangeType,
   uint32_t timeSinceBoot_us, void * userData)
@@ -128,8 +128,7 @@ void Pigpio::setEncoderCallback(
     if (motorIndex != motors.end()) {
       motors.at(motorIndex - motors.begin()).gpios.push_back(request->gpio_id);
     } else {
-      Motor motor = {request->motor_id, {request->gpio_id}, 0, true};
-      motors.push_back(motor);
+      motors.push_back({request->motor_id, {request->gpio_id}, 0, true});
     }
 
     response->has_succeeded = true;

@@ -88,15 +88,9 @@ private:
   rclcpp::TimerBase::SharedPtr readQuaternionsAndPublishAnglesTimer;
   rclcpp::TimerBase::SharedPtr encoderCountTimer;
 
-  inline void gpioEdgeChangeCallback(
-    int handle, unsigned gpioId, unsigned edgeChangeType,
-    uint32_t timeSinceBoot_us);
   static void c_gpioEdgeChangeCallback(
     int handle, unsigned gpioId, unsigned edgeChangeType,
     uint32_t timeSinceBoot_us, void * userData);
-  inline void gpioEncoderEdgeChangeCallback(
-    int handle, unsigned gpioId, unsigned edgeChangeType,
-    uint32_t timeSinceBoot_us);
   static void c_gpioEncoderEdgeChangeCallback(
     int handle, unsigned gpioId, unsigned edgeChangeType,
     uint32_t timeSinceBoot_us, void * userData);
@@ -121,6 +115,11 @@ public:
   uint16_t readFifoCount(void);
   bool isFifoOverflowed(void);
   void publishEncoderCount(void);
+
+  void gpioEdgeChangeCallback(
+    int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us);
+  void gpioEncoderEdgeChangeCallback(
+    int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us);
 
   void i2cOpen(
     const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cOpen::Request> request,
