@@ -44,23 +44,37 @@ if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
-  ament_add_gtest(${PROJECT_NAME}_init_test test/test_hal_pigpio_init.cpp)
+  add_library(${PROJECT_NAME}_test OBJECT
+    test/test_hal_pigpio.cpp)
+  ament_target_dependencies(${PROJECT_NAME}_test ${dependencies})
+
+  ament_add_gtest(${PROJECT_NAME}_init_test
+    test/test_hal_pigpio_init.cpp
+    $<TARGET_OBJECTS:${PROJECT_NAME}_test>)
   ament_target_dependencies(${PROJECT_NAME}_init_test ${dependencies})
   target_link_libraries(${PROJECT_NAME}_init_test ${PROJECT_NAME})
 
-  ament_add_gtest(${PROJECT_NAME}_output_test test/test_hal_pigpio_output.cpp)
+  ament_add_gtest(${PROJECT_NAME}_output_test
+    test/test_hal_pigpio_output.cpp
+    $<TARGET_OBJECTS:${PROJECT_NAME}_test>)
   ament_target_dependencies(${PROJECT_NAME}_output_test ${dependencies})
   target_link_libraries(${PROJECT_NAME}_output_test ${PROJECT_NAME})
 
-  ament_add_gtest(${PROJECT_NAME}_input_test test/test_hal_pigpio_input.cpp)
+  ament_add_gtest(${PROJECT_NAME}_input_test
+    test/test_hal_pigpio_input.cpp
+    $<TARGET_OBJECTS:${PROJECT_NAME}_test>)
   ament_target_dependencies(${PROJECT_NAME}_input_test ${dependencies})
   target_link_libraries(${PROJECT_NAME}_input_test ${PROJECT_NAME})
 
-  ament_add_gtest(${PROJECT_NAME}_i2c_test test/test_hal_pigpio_i2c.cpp)
+  ament_add_gtest(${PROJECT_NAME}_i2c_test
+    test/test_hal_pigpio_i2c.cpp
+    $<TARGET_OBJECTS:${PROJECT_NAME}_test>)
   ament_target_dependencies(${PROJECT_NAME}_i2c_test ${dependencies})
   target_link_libraries(${PROJECT_NAME}_i2c_test ${PROJECT_NAME})
 
-  ament_add_gtest(${PROJECT_NAME}_imu_test test/test_hal_pigpio_imu.cpp)
+  ament_add_gtest(${PROJECT_NAME}_imu_test
+    test/test_hal_pigpio_imu.cpp
+    $<TARGET_OBJECTS:${PROJECT_NAME}_test>)
   ament_target_dependencies(${PROJECT_NAME}_imu_test ${dependencies})
   target_link_libraries(${PROJECT_NAME}_imu_test ${PROJECT_NAME})
 endif()
