@@ -276,11 +276,13 @@ public:
 
   void encoderCountCallback(const HalPigpioEncoderCountMsg_t & msg)
   {
-    auto motorIndex = motorsEC.find(msg.motor_id);
-    if (motorIndex != motorsEC.end()) {
-      motorIndex->second = msg.encoder_count;
-    } else {
-      motorsEC.insert({msg.motor_id, msg.encoder_count});
+    for (uint8_t index = 0; index < msg.motor_id.size(); ++index) {
+      auto motorIndex = motorsEC.find(msg.motor_id[index]);
+      if (motorIndex != motorsEC.end()) {
+        motorIndex->second = msg.encoder_count[index];
+      } else {
+        motorsEC.insert({msg.motor_id[index], msg.encoder_count[index]});
+      }
     }
   }
 };

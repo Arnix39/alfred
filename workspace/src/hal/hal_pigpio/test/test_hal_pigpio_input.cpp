@@ -162,7 +162,7 @@ TEST_F(PigpioTest, PublishNegativeEncoderCountMessageTwice)
   ASSERT_EQ(motorIndex->second, -2);
 }
 
-TEST_F(PigpioTest, PublishEncoderCountMessage)
+TEST_F(PigpioTest, PublishEncoderCountMessageTwoMotors)
 {
   hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setInputModeClient, &executor);
   hal_pigpioGpioSet(GOOD_GPIO_2, pigioChecker->setInputModeClient, &executor);
@@ -180,7 +180,26 @@ TEST_F(PigpioTest, PublishEncoderCountMessage)
   ASSERT_EQ(motorIndex->second, -1);
 
   motorIndex = pigioChecker->motorsEC.find(MOTOR_ID_1);
-  ASSERT_EQ((motorIndex == pigioChecker->motorsEC.end()), true);
+  ASSERT_EQ((motorIndex != pigioChecker->motorsEC.end()), true);
+  ASSERT_EQ(motorIndex->second, 0);
+}
+
+TEST_F(PigpioTest, PublishEncoderCountMessageOneMotorTwoGpios)
+{
+  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setInputModeClient, &executor);
+  hal_pigpioGpioSet(GOOD_GPIO_2, pigioChecker->setInputModeClient, &executor);
+
+  pigioChecker->setEncoderCallback(GOOD_GPIO, AS_EITHER_EDGE, MOTOR_ID_2, &executor);
+  pigioChecker->setEncoderCallback(GOOD_GPIO_2, AS_EITHER_EDGE, MOTOR_ID_2, &executor);
+  pigioChecker->setMotorDirection(FORWARD, MOTOR_ID_2, &executor);
+  pigpio->gpioEncoderEdgeChangeCallback(0, GOOD_GPIO, RISING_EDGE, 1000);
+  pigpio->gpioEncoderEdgeChangeCallback(0, GOOD_GPIO_2, RISING_EDGE, 1000);
+  pigpio->publishEncoderCount();
+  executor.spin_some();
+
+  auto motorIndex = pigioChecker->motorsEC.find(MOTOR_ID_2);
+  ASSERT_EQ((motorIndex != pigioChecker->motorsEC.end()), true);
+  ASSERT_EQ(motorIndex->second, 2);
 }
 
 int main(int argc, char ** argv)
