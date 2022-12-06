@@ -120,12 +120,14 @@ void MotorControl::configureMotor(void)
 void MotorControl::pigpioEncoderCountCallback(
   const hal_pigpio_interfaces::msg::HalPigpioEncoderCount & msg)
 {
-  if (msg.motor_id == MOTOR_LEFT) {
-    motorLeft.setEncoderCount(msg.encoder_count);
-  } else if (msg.motor_id == MOTOR_RIGHT) {
-    motorRight.setEncoderCount(msg.encoder_count);
-  } else {
-    RCLCPP_ERROR(get_logger(), "Encoder count message received for unknown motor!");
+  for (uint8_t index = 0; index < msg.motor_id.size(); ++index) {
+    if (msg.motor_id[index] == MOTOR_LEFT) {
+      motorLeft.setEncoderCount(msg.encoder_count[index]);
+    } else if (msg.motor_id[index] == MOTOR_RIGHT) {
+      motorRight.setEncoderCount(msg.encoder_count[index]);
+    } else {
+      RCLCPP_ERROR(get_logger(), "Encoder count message received for unknown motor!");
+    }
   }
 }
 

@@ -75,11 +75,10 @@ void Pigpio::publishEncoderCount(void)
 
   if (motors.size() != 0) {
     for (Motor & motor : motors) {
-      encoderCount.motor_id = motor.id;
-      encoderCount.encoder_count = motor.encoderCount;
-
-      gpioEncoderCountPub->publish(encoderCount);
+      encoderCount.motor_id.push_back(motor.id);
+      encoderCount.encoder_count.push_back(motor.encoderCount);
     }
+    gpioEncoderCountPub->publish(encoderCount);
   }
 }
 
