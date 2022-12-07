@@ -99,6 +99,9 @@ protected:
 
   void TearDown()
   {
+    proxsensChecker->changeProxsensNodeToState(
+      lifecycle_msgs::msg::Transition::TRANSITION_ACTIVE_SHUTDOWN);
+    executor.spin_some();
     executor.cancel();
     executor.remove_node(proxsens->get_node_base_interface());
     executor.remove_node(proxsensChecker);
