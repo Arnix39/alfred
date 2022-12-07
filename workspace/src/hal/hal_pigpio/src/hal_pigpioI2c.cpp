@@ -22,17 +22,13 @@ void Pigpio::i2cOpen(
   if (response->handle >= 0) {
     response->has_succeeded = true;
     RCLCPP_INFO(
-      get_logger(),
-      "I2C bus %u open for device %u with handle %u.",
-      request->bus, request->address,
-      response->handle);
+      get_logger(), "I2C bus %u open for device %u with handle %u.",
+      request->bus, request->address, response->handle);
   } else {
     response->has_succeeded = false;
     RCLCPP_ERROR(
-      get_logger(),
-      "Failed to open I2C bus %u for device %u.",
-      request->bus,
-      request->address);
+      get_logger(), "Failed to open I2C bus %u for device %u.",
+      request->bus, request->address);
   }
 }
 
@@ -61,10 +57,8 @@ void Pigpio::i2cReadByteData(
     response->value = 0;
     response->has_succeeded = false;
     RCLCPP_ERROR(
-      get_logger(),
-      "Failed to read register %u on device with handle %u.",
-      request->device_register,
-      request->handle);
+      get_logger(), "Failed to read register %u on device with handle %u.",
+      request->device_register, request->handle);
   }
 }
 
@@ -80,10 +74,8 @@ void Pigpio::i2cReadWordData(
     response->value = 0;
     response->has_succeeded = false;
     RCLCPP_ERROR(
-      get_logger(),
-      "Failed to read register %u on device with handle %u.",
-      request->device_register,
-      request->handle);
+      get_logger(), "Failed to read register %u on device with handle %u.",
+      request->device_register, request->handle);
   }
 }
 
@@ -103,17 +95,13 @@ void Pigpio::i2cReadBlockData(
     }
 
     RCLCPP_INFO(
-      get_logger(),
-      "Successfuly read data block from register %u on device with handle %u.",
-      request->device_register,
-      request->handle);
+      get_logger(), "Successfuly read data block from register %u on device with handle %u.",
+      request->device_register, request->handle);
   } else {
     response->has_succeeded = false;
     RCLCPP_ERROR(
-      get_logger(),
-      "Failed to read register %u on device with handle %u.",
-      request->device_register,
-      request->handle);
+      get_logger(), "Failed to read register %u on device with handle %u.",
+      request->device_register, request->handle);
   }
 }
 
@@ -129,10 +117,8 @@ void Pigpio::i2cWriteByteData(
   } else {
     response->has_succeeded = false;
     RCLCPP_ERROR(
-      get_logger(),
-      "Failed to write register %u on device with handle %u.",
-      request->device_register,
-      request->handle);
+      get_logger(), "Failed to write register %u on device with handle %u.",
+      request->device_register, request->handle);
   }
 }
 
@@ -148,10 +134,8 @@ void Pigpio::i2cWriteWordData(
   } else {
     response->has_succeeded = false;
     RCLCPP_ERROR(
-      get_logger(),
-      "Failed to write register %u on device with handle %u.",
-      request->device_register,
-      request->handle);
+      get_logger(), "Failed to write register %u on device with handle %u.",
+      request->device_register, request->handle);
   }
 }
 
@@ -173,9 +157,7 @@ void Pigpio::i2cWriteBlockData(
   } else {
     response->has_succeeded = false;
     RCLCPP_ERROR(
-      get_logger(),
-      "Failed to write data block in register %u on device with handle %u.",
-      request->device_register,
-      request->handle);
+      get_logger(), "Failed to write data block in register %u on device with handle %u.",
+      request->device_register, request->handle);
   }
 }
