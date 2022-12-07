@@ -17,7 +17,8 @@
 RaspberryPi::RaspberryPi()
 : gpios({}),
   i2cHandles({}),
-  i2cRegisters({})
+  i2cRegisters({{MPU6050_I2C_ADDRESS_HIGH, 0x10, 1, {}}, {MPU6050_I2C_ADDRESS_HIGH, 0x20, 2, {}},
+      {MPU6050_I2C_ADDRESS_LOW, 0x10, 1, {}}, {MPU6050_I2C_ADDRESS_LOW, 0x20, 4, {}}})
 {
 }
 
@@ -32,7 +33,8 @@ void RaspberryPi::reset(void)
 {
   gpios = {};
   i2cHandles = {};
-  i2cRegisters = {};
+  i2cRegisters = {{MPU6050_I2C_ADDRESS_HIGH, 0x10, 1, {}}, {MPU6050_I2C_ADDRESS_HIGH, 0x20, 2, {}},
+    {MPU6050_I2C_ADDRESS_LOW, 0x10, 4, {}}, {MPU6050_I2C_ADDRESS_LOW, 0x20, 4, {}}};
 }
 
 void RaspberryPi::addGpio(gpioId gpioId)

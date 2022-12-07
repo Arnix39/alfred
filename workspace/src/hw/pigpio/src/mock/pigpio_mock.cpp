@@ -113,7 +113,7 @@ int i2c_write_byte_data(int pi, unsigned handle, unsigned i2c_reg, unsigned bVal
 
 int i2c_write_word_data(int pi, unsigned handle, unsigned i2c_reg, unsigned wVal)
 {
-  std::vector<uint8_t> bytes = {static_cast<uint8_t>(wVal & 0xFF), static_cast<uint8_t>(wVal >> 8)};
+  std::vector<uint8_t> bytes = {static_cast<uint8_t>(wVal >> 8), static_cast<uint8_t>(wVal & 0xFF)};
 
   if (raspberryPi.i2cHandleExists(handle) && raspberryPi.registerExists(i2c_reg)) {
     for (int index = 0; index < bytes.size(); ++index) {

@@ -48,6 +48,18 @@ PigioCheckerNode::PigioCheckerNode()
       std::bind(&PigioCheckerNode::encoderCountCallback, this, std::placeholders::_1))),
   i2cOpenClient(this->create_client<HalPigpioI2cOpen_t>("hal_pigpioI2cOpen")),
   i2cCloseClient(this->create_client<HalPigpioI2cClose_t>("hal_pigpioI2cClose")),
+  i2cReadByteDataClient(
+    this->create_client<HalPigpioI2cReadByteData_t>("hal_pigpioI2cReadByteData")),
+  i2cReadWordDataClient(
+    this->create_client<HalPigpioI2cReadWordData_t>("hal_pigpioI2cReadWordData")),
+  i2cReadBlockDataClient(
+    this->create_client<HalPigpioI2cReadBlockData_t>("hal_pigpioI2cReadBlockData")),
+  i2cWriteByteDataClient(
+    this->create_client<HalPigpioI2cWriteByteData_t>("hal_pigpioI2cWriteByteData")),
+  i2cWriteWordDataClient(
+    this->create_client<HalPigpioI2cWriteWordData_t>("hal_pigpioI2cWriteWordData")),
+  i2cWriteBlockDataClient(
+    this->create_client<HalPigpioI2cWriteBlockData_t>("hal_pigpioI2cWriteBlockData")),
   edgeChangeMsg_gpioId(0),
   edgeChangeMsg_edgeChangeType(0),
   edgeChangeMsg_timeSinceBoot_us(0),
@@ -236,4 +248,119 @@ bool PigioCheckerNode::i2cClose(
   executor->spin_until_future_complete(future);
 
   return future.get()->has_succeeded;
+}
+
+bool PigioCheckerNode::i2cWriteByteData(
+  int32_t i2cHandle,
+  uint8_t deviceRegister,
+  uint8_t value,
+  rclcpp::executors::SingleThreadedExecutor * executor)
+{
+  auto request = std::make_shared<HalPigpioI2cWriteByteData_t::Request>();
+
+  request->handle = i2cHandle;
+  request->device_register = deviceRegister;
+  request->value = value;
+
+  auto future = i2cWriteByteDataClient->async_send_request(request);
+
+  executor->spin_until_future_complete(future);
+
+  return future.get()->has_succeeded;
+}
+
+bool PigioCheckerNode::i2cWriteWordData(
+  int32_t i2cHandle,
+  uint8_t deviceRegister,
+  uint16_t value,
+  rclcpp::executors::SingleThreadedExecutor * executor)
+{
+  auto request = std::make_shared<HalPigpioI2cWriteWordData_t::Request>();
+
+  request->handle = i2cHandle;
+  request->device_register = deviceRegister;
+  request->value = value;
+
+  auto future = i2cWriteWordDataClient->async_send_request(request);
+
+  executor->spin_until_future_complete(future);
+
+  return future.get()->has_succeeded;
+}
+
+bool PigioCheckerNode::i2cWriteBlockData(
+  int32_t i2cHandle,
+  uint8_t deviceRegister,
+  std::vector<uint8_t> dataBlock,
+  uint8_t length,
+  rclcpp::executors::SingleThreadedExecutor * executor)
+{
+  auto request = std::make_shared<HalPigpioI2cWriteBlockData_t::Request>();
+
+  request->handle = i2cHandle;
+  request->device_register = deviceRegister;
+
+  for (int index = 0; index < length; ++index) {
+    request->data_block.push_back(dataBlock.at(index));
+  }
+  request->length = length;
+
+  auto future = i2cWriteBlockDataClient->async_send_request(request);
+
+  executor->spin_until_future_complete(future);
+
+  return future.get()->has_succeeded;
+}
+
+uint8_t PigioCheckerNode::i2cReadByteData(
+  int32_t i2cHandle,
+  uint8_t deviceRegister,
+  rclcpp::executors::SingleThreadedExecutor * executor)
+{
+  auto request = std::make_shared<HalPigpioI2cReadByteData_t::Request>();
+
+  request->handle = i2cHandle;
+  request->device_register = deviceRegister;
+
+  auto future = i2cReadByteDataClient->async_send_request(request);
+
+  executor->spin_until_future_complete(future);
+
+  return future.get()->value;
+}
+
+uint16_t PigioCheckerNode::i2cReadWordData(
+  int32_t i2cHandle,
+  uint8_t deviceRegister,
+  rclcpp::executors::SingleThreadedExecutor * executor)
+{
+  auto request = std::make_shared<HalPigpioI2cReadWordData_t::Request>();
+
+  request->handle = i2cHandle;
+  request->device_register = deviceRegister;
+
+  auto future = i2cReadWordDataClient->async_send_request(request);
+
+  executor->spin_until_future_complete(future);
+
+  return future.get()->value;
+}
+
+std::vector<uint8_t> PigioCheckerNode::i2cReadBlockData(
+  int32_t i2cHandle,
+  uint8_t deviceRegister,
+  uint8_t length,
+  rclcpp::executors::SingleThreadedExecutor * executor)
+{
+  auto request = std::make_shared<HalPigpioI2cReadBlockData_t::Request>();
+
+  request->handle = i2cHandle;
+  request->device_register = deviceRegister;
+  request->length = length;
+
+  auto future = i2cReadBlockDataClient->async_send_request(request);
+
+  executor->spin_until_future_complete(future);
+
+  return future.get()->data_block;
 }

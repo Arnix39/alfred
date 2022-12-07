@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <map>
+#include <vector>
 
 #include "gtest/gtest.h"
 #include "rclcpp/rclcpp.hpp"
@@ -33,11 +34,15 @@
 #define BACKWARD false
 #define I2C_BAD_ADDRESS 0x66
 #define I2C_GOOD_ADDRESS MPU6050_I2C_ADDRESS
+#define I2C_GOOD_ADDRESS_2 0x67
 #define I2C_GOOD_BUS_1 0
 #define I2C_GOOD_BUS_2 1
 #define I2C_BAD_BUS_2 2
 #define I2C_GOOD_HANDLE 0
 #define I2C_BAD_HANDLE 1
+#define I2C_GOOD_REGISTER 0x10
+#define I2C_GOOD_REGISTER_2 0x20
+#define I2C_BAD_REGISTER 0x30
 
 template<typename T>
 bool hal_pigpioGpioSet(
@@ -77,6 +82,12 @@ class PigioCheckerNode : public rclcpp::Node
   using HalPigpioEncoderCountMsg_t = hal_pigpio_interfaces::msg::HalPigpioEncoderCount;
   using HalPigpioI2cOpen_t = hal_pigpio_interfaces::srv::HalPigpioI2cOpen;
   using HalPigpioI2cClose_t = hal_pigpio_interfaces::srv::HalPigpioI2cClose;
+  using HalPigpioI2cReadByteData_t = hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData;
+  using HalPigpioI2cReadWordData_t = hal_pigpio_interfaces::srv::HalPigpioI2cReadWordData;
+  using HalPigpioI2cReadBlockData_t = hal_pigpio_interfaces::srv::HalPigpioI2cReadBlockData;
+  using HalPigpioI2cWriteByteData_t = hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData;
+  using HalPigpioI2cWriteWordData_t = hal_pigpio_interfaces::srv::HalPigpioI2cWriteWordData;
+  using HalPigpioI2cWriteBlockData_t = hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData;
 
 public:
   PigioCheckerNode();
@@ -102,6 +113,12 @@ public:
   rclcpp::Subscription<HalPigpioEncoderCountMsg_t>::SharedPtr pigpioEncoderCountSub;
   rclcpp::Client<HalPigpioI2cOpen_t>::SharedPtr i2cOpenClient;
   rclcpp::Client<HalPigpioI2cClose_t>::SharedPtr i2cCloseClient;
+  rclcpp::Client<HalPigpioI2cReadByteData_t>::SharedPtr i2cReadByteDataClient;
+  rclcpp::Client<HalPigpioI2cReadWordData_t>::SharedPtr i2cReadWordDataClient;
+  rclcpp::Client<HalPigpioI2cReadBlockData_t>::SharedPtr i2cReadBlockDataClient;
+  rclcpp::Client<HalPigpioI2cWriteByteData_t>::SharedPtr i2cWriteByteDataClient;
+  rclcpp::Client<HalPigpioI2cWriteWordData_t>::SharedPtr i2cWriteWordDataClient;
+  rclcpp::Client<HalPigpioI2cWriteBlockData_t>::SharedPtr i2cWriteBlockDataClient;
 
   uint8_t edgeChangeMsg_gpioId;
   uint8_t edgeChangeMsg_edgeChangeType;
@@ -147,6 +164,35 @@ public:
     rclcpp::executors::SingleThreadedExecutor * executor);
   bool i2cClose(
     int32_t handle,
+    rclcpp::executors::SingleThreadedExecutor * executor);
+  bool i2cWriteByteData(
+    int32_t i2cHandle,
+    uint8_t deviceRegister,
+    uint8_t value,
+    rclcpp::executors::SingleThreadedExecutor * executor);
+  bool i2cWriteWordData(
+    int32_t i2cHandle,
+    uint8_t deviceRegister,
+    uint16_t value,
+    rclcpp::executors::SingleThreadedExecutor * executor);
+  bool i2cWriteBlockData(
+    int32_t i2cHandle,
+    uint8_t deviceRegister,
+    std::vector<uint8_t> dataBlock,
+    uint8_t length,
+    rclcpp::executors::SingleThreadedExecutor * executor);
+  uint8_t i2cReadByteData(
+    int32_t i2cHandle,
+    uint8_t deviceRegister,
+    rclcpp::executors::SingleThreadedExecutor * executor);
+  uint16_t i2cReadWordData(
+    int32_t i2cHandle,
+    uint8_t deviceRegister,
+    rclcpp::executors::SingleThreadedExecutor * executor);
+  std::vector<uint8_t> i2cReadBlockData(
+    int32_t i2cHandle,
+    uint8_t deviceRegister,
+    uint8_t length,
     rclcpp::executors::SingleThreadedExecutor * executor);
 };
 

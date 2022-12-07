@@ -85,8 +85,7 @@ void Pigpio::i2cReadBlockData(
 {
   char buffer[I2C_BUFFER_MAX_BYTES];
   int result = i2c_read_i2c_block_data(
-    pigpioHandle, request->handle, request->device_register,
-    buffer, request->length);
+    pigpioHandle, request->handle, request->device_register, buffer, request->length);
   if (result > 0) {
     response->has_succeeded = true;
 
@@ -110,8 +109,7 @@ void Pigpio::i2cWriteByteData(
   std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData::Response> response)
 {
   if (i2c_write_byte_data(
-      pigpioHandle, request->handle, request->device_register,
-      request->value) == 0)
+      pigpioHandle, request->handle, request->device_register, request->value) == 0)
   {
     response->has_succeeded = true;
   } else {
@@ -127,8 +125,7 @@ void Pigpio::i2cWriteWordData(
   std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cWriteWordData::Response> response)
 {
   if (i2c_write_word_data(
-      pigpioHandle, request->handle, request->device_register,
-      request->value) == 0)
+      pigpioHandle, request->handle, request->device_register, request->value) == 0)
   {
     response->has_succeeded = true;
   } else {
@@ -150,8 +147,7 @@ void Pigpio::i2cWriteBlockData(
   }
 
   if (i2c_write_i2c_block_data(
-      pigpioHandle, request->handle, request->device_register, dataBlock,
-      request->length) == 0)
+      pigpioHandle, request->handle, request->device_register, dataBlock, request->length) == 0)
   {
     response->has_succeeded = true;
   } else {
