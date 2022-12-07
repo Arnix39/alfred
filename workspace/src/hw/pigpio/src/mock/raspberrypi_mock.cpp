@@ -16,7 +16,8 @@
 
 RaspberryPi::RaspberryPi()
 : gpios({}),
-  i2cHandles({})
+  i2cHandles({}),
+  i2cRegisters({})
 {
 }
 
@@ -24,12 +25,14 @@ RaspberryPi::~RaspberryPi()
 {
   gpios = {};
   i2cHandles = {};
+  i2cRegisters = {};
 }
 
 void RaspberryPi::reset(void)
 {
   gpios = {};
   i2cHandles = {};
+  i2cRegisters = {};
 }
 
 void RaspberryPi::addGpio(gpioId gpioId)
@@ -41,18 +44,40 @@ void RaspberryPi::addGpio(gpioId gpioId)
   gpios.insert({gpioId, newGpio});
 }
 
-int32_t RaspberryPi::addI2cHandle(uint8_t busAddress, uint8_t deviceAddress)
+uint32_t RaspberryPi::addI2cHandle(uint8_t busAddress, uint8_t deviceAddress)
+{
+  uint32_t newHandle = 0;
+
+  if (i2cHandles.size() != 0) {
+    newHandle = i2cHandles.back().handle + 1;
+  }
+
+  i2cHandles.push_back({static_cast<uint32_t>(newHandle), busAddress, deviceAddress});
+  return newHandle;
+}
+
+bool RaspberryPi::i2cHandleExists(uint8_t busAddress, uint8_t deviceAddress)
 {
   for (int index = 0; index < i2cHandles.size(); ++index) {
     if ((i2cHandles.at(index).busAddress == busAddress) &&
       (i2cHandles.at(index).deviceAddress == deviceAddress))
     {
-      return index;
+      return true;
     }
   }
 
-  i2cHandles.push_back({static_cast<uint32_t>(i2cHandles.size()), busAddress, deviceAddress});
-  return i2cHandles.size() - 1;
+  return false;
+}
+
+bool RaspberryPi::i2cHandleExists(uint32_t handle)
+{
+  for (int index = 0; index < i2cHandles.size(); ++index) {
+    if (i2cHandles.at(index).handle == handle) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 bool RaspberryPi::removeI2cHandle(uint32_t handle)
@@ -65,6 +90,21 @@ bool RaspberryPi::removeI2cHandle(uint32_t handle)
   }
 
   return false;
+}
+
+bool RaspberryPi::registerExists(uint32_t i2cRegister)
+{
+  return true;
+}
+
+int16_t RaspberryPi::readRegister(uint32_t handle, uint32_t i2cRegister)
+{
+  return 0;
+}
+
+bool RaspberryPi::writeRegister(uint32_t handle, uint32_t i2cRegister, uint8_t data)
+{
+  return true;
 }
 
 int RaspberryPi::setGpioType(gpioId gpioId, gpioType type)

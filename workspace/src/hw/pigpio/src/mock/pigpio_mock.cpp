@@ -25,8 +25,10 @@ int i2c_open(int pi, unsigned i2c_bus, unsigned i2c_addr, unsigned i2c_flags)
     return PI_BAD_I2C_BUS;
   } else if (i2c_addr != MPU6050_I2C_ADDRESS_HIGH && i2c_addr != MPU6050_I2C_ADDRESS_LOW) {
     return PI_BAD_I2C_ADDR;
+  } else if (raspberryPi.i2cHandleExists(i2c_bus, i2c_addr)) {
+    return PI_I2C_OPEN_FAILED;
   } else {
-    return raspberryPi.addI2cHandle(i2c_bus, i2c_addr);
+    return static_cast<int>(raspberryPi.addI2cHandle(i2c_bus, i2c_addr));
   }
 }
 
@@ -39,17 +41,108 @@ int i2c_close(int pi, unsigned handle)
   }
 }
 
-int i2c_read_byte_data(int pi, unsigned handle, unsigned i2c_reg) {return 0;}
-int i2c_read_word_data(int pi, unsigned handle, unsigned i2c_reg) {return 0;}
+int i2c_read_byte_data(int pi, unsigned handle, unsigned i2c_reg)
+{
+  if (raspberryPi.i2cHandleExists(handle) && raspberryPi.registerExists(i2c_reg)) {
+    int16_t result = raspberryPi.readRegister(handle, i2c_reg);
+    if (result >= 0) {
+      return static_cast<uint8_t>(result);
+    } else {
+      return PI_I2C_WRITE_FAILED;
+    }
+  } else if (!raspberryPi.i2cHandleExists(handle)) {
+    return PI_BAD_HANDLE;
+  } else {
+    return PI_BAD_PARAM;
+  }
+}
+
+int i2c_read_word_data(int pi, unsigned handle, unsigned i2c_reg)
+{
+  uint8_t bytes[2] = {0};
+  if (raspberryPi.i2cHandleExists(handle) && raspberryPi.registerExists(i2c_reg)) {
+    for (int index = 0; index < 2; ++index) {
+      int16_t result = raspberryPi.readRegister(handle, i2c_reg);
+      if (result < 0) {
+        return PI_I2C_WRITE_FAILED;
+      } else {
+        bytes[index] = static_cast<uint8_t>(result);
+      }
+    }
+    return static_cast<int>(bytes[0] << 8 | bytes[1]);
+  } else if (!raspberryPi.i2cHandleExists(handle)) {
+    return PI_BAD_HANDLE;
+  } else {
+    return PI_BAD_PARAM;
+  }
+}
+
 int i2c_read_i2c_block_data(int pi, unsigned handle, unsigned i2c_reg, char * buf, unsigned count)
 {
-  return 0;
+  if (raspberryPi.i2cHandleExists(handle) && raspberryPi.registerExists(i2c_reg)) {
+    for (int index = 0; index < count; ++index) {
+      int16_t result = raspberryPi.readRegister(handle, i2c_reg);
+      if (result < 0) {
+        return PI_I2C_WRITE_FAILED;
+      } else {
+        buf[index] = static_cast<uint8_t>(result);
+      }
+    }
+    return count;
+  } else if (!raspberryPi.i2cHandleExists(handle)) {
+    return PI_BAD_HANDLE;
+  } else {
+    return PI_BAD_PARAM;
+  }
 }
-int i2c_write_byte_data(int pi, unsigned handle, unsigned i2c_reg, unsigned bVal) {return 0;}
-int i2c_write_word_data(int pi, unsigned handle, unsigned i2c_reg, unsigned wVal) {return 0;}
+
+int i2c_write_byte_data(int pi, unsigned handle, unsigned i2c_reg, unsigned bVal)
+{
+  if (raspberryPi.i2cHandleExists(handle) && raspberryPi.registerExists(i2c_reg)) {
+    if (raspberryPi.writeRegister(handle, i2c_reg, bVal)) {
+      return 0;
+    } else {
+      return PI_I2C_WRITE_FAILED;
+    }
+  } else if (!raspberryPi.i2cHandleExists(handle)) {
+    return PI_BAD_HANDLE;
+  } else {
+    return PI_BAD_PARAM;
+  }
+}
+
+int i2c_write_word_data(int pi, unsigned handle, unsigned i2c_reg, unsigned wVal)
+{
+  std::vector<uint8_t> bytes = {static_cast<uint8_t>(wVal & 0xFF), static_cast<uint8_t>(wVal >> 8)};
+
+  if (raspberryPi.i2cHandleExists(handle) && raspberryPi.registerExists(i2c_reg)) {
+    for (int index = 0; index < bytes.size(); ++index) {
+      if (!raspberryPi.writeRegister(handle, i2c_reg, bytes.at(index))) {
+        return PI_I2C_WRITE_FAILED;
+      }
+    }
+    return 0;
+  } else if (!raspberryPi.i2cHandleExists(handle)) {
+    return PI_BAD_HANDLE;
+  } else {
+    return PI_BAD_PARAM;
+  }
+}
+
 int i2c_write_i2c_block_data(int pi, unsigned handle, unsigned i2c_reg, char * buf, unsigned count)
 {
-  return 0;
+  if (raspberryPi.i2cHandleExists(handle) && raspberryPi.registerExists(i2c_reg)) {
+    for (int index = 0; index < count; ++index) {
+      if (!raspberryPi.writeRegister(handle, i2c_reg, buf[index])) {
+        return PI_I2C_WRITE_FAILED;
+      }
+    }
+    return 0;
+  } else if (!raspberryPi.i2cHandleExists(handle)) {
+    return PI_BAD_HANDLE;
+  } else {
+    return PI_BAD_PARAM;
+  }
 }
 
 /* Init */

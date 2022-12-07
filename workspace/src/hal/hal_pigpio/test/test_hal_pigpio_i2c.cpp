@@ -36,6 +36,12 @@ TEST_F(PigpioTest, I2cOpenAddressFailure)
   ASSERT_EQ(pigioChecker->i2cOpen(I2C_GOOD_BUS_2, I2C_BAD_ADDRESS, &executor), PI_BAD_I2C_ADDR);
 }
 
+TEST_F(PigpioTest, I2cOpenFailure)
+{
+  pigioChecker->i2cOpen(I2C_GOOD_BUS_1, I2C_GOOD_ADDRESS, &executor);
+  ASSERT_EQ(pigioChecker->i2cOpen(I2C_GOOD_BUS_1, I2C_GOOD_ADDRESS, &executor), PI_I2C_OPEN_FAILED);
+}
+
 TEST_F(PigpioTest, I2cCloseSuccess)
 {
   auto handle = pigioChecker->i2cOpen(I2C_GOOD_BUS_1, I2C_GOOD_ADDRESS, &executor);
