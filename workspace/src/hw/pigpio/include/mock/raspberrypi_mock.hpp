@@ -20,6 +20,7 @@
 #include <utility>
 #include <vector>
 #include <tuple>
+#include <algorithm>
 
 #include "gpioDefinitions.hpp"
 
@@ -77,38 +78,40 @@ struct gpio
   gpioCallback callback;
 };
 
-struct i2cHandle
+struct i2cHandle_t
 {
   uint32_t handle;
-  uint8_t busAddress;
-  uint8_t deviceAddress;
+  uint8_t bus;
+  uint8_t device;
 };
 
-struct i2cRegister
+struct i2cRegister_t
 {
+  uint32_t device;
   uint32_t address;
-  std::vector<uint8_t> data;
+  uint16_t size;
+  std::vector<uint8_t> bytes;
 };
 
 class RaspberryPi
 {
 private:
   std::map<uint8_t, gpio> gpios;
-  std::vector<i2cHandle> i2cHandles;
-  std::vector<i2cRegister> i2cRegisters;
+  std::vector<i2cHandle_t> i2cHandles;
+  std::vector<i2cRegister_t> i2cRegisters;
 
 public:
   RaspberryPi();
   ~RaspberryPi();
   void reset(void);
   void addGpio(gpioId gpioId);
-  uint32_t addI2cHandle(uint8_t busAddress, uint8_t deviceAddress);
-  bool i2cHandleExists(uint8_t busAddress, uint8_t deviceAddress);
+  uint32_t addI2cHandle(uint8_t bus, uint8_t device);
+  bool i2cHandleExists(uint8_t bus, uint8_t device);
   bool i2cHandleExists(uint32_t handle);
   bool removeI2cHandle(uint32_t handle);
-  bool registerExists(uint32_t i2cRegister);
-  int16_t readRegister(uint32_t handle, uint32_t i2cRegister);
-  bool writeRegister(uint32_t handle, uint32_t i2cRegister, uint8_t data);
+  bool registerExists(uint32_t address);
+  int16_t readRegister(uint32_t i2cHandle, uint32_t address, uint16_t byteIndex);
+  bool writeRegister(uint32_t i2cHandle, uint32_t address, uint8_t byte);
   int setGpioType(gpioId gpioId, gpioType type);
   int setGpioResistor(gpioId gpioId, gpioResistor resistorConfiguration);
   int setGpioLevel(gpioId gpioId, gpioLevel level);

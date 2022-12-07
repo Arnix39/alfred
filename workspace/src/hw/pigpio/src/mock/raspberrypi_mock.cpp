@@ -44,7 +44,7 @@ void RaspberryPi::addGpio(gpioId gpioId)
   gpios.insert({gpioId, newGpio});
 }
 
-uint32_t RaspberryPi::addI2cHandle(uint8_t busAddress, uint8_t deviceAddress)
+uint32_t RaspberryPi::addI2cHandle(uint8_t bus, uint8_t device)
 {
   uint32_t newHandle = 0;
 
@@ -52,15 +52,15 @@ uint32_t RaspberryPi::addI2cHandle(uint8_t busAddress, uint8_t deviceAddress)
     newHandle = i2cHandles.back().handle + 1;
   }
 
-  i2cHandles.push_back({static_cast<uint32_t>(newHandle), busAddress, deviceAddress});
+  i2cHandles.push_back({static_cast<uint32_t>(newHandle), bus, device});
   return newHandle;
 }
 
-bool RaspberryPi::i2cHandleExists(uint8_t busAddress, uint8_t deviceAddress)
+bool RaspberryPi::i2cHandleExists(uint8_t bus, uint8_t device)
 {
   for (int index = 0; index < i2cHandles.size(); ++index) {
-    if ((i2cHandles.at(index).busAddress == busAddress) &&
-      (i2cHandles.at(index).deviceAddress == deviceAddress))
+    if ((i2cHandles.at(index).bus == bus) &&
+      (i2cHandles.at(index).device == device))
     {
       return true;
     }
@@ -92,19 +92,76 @@ bool RaspberryPi::removeI2cHandle(uint32_t handle)
   return false;
 }
 
-bool RaspberryPi::registerExists(uint32_t i2cRegister)
+bool RaspberryPi::registerExists(uint32_t address)
 {
-  return true;
+  for (int index = 0; index < i2cRegisters.size(); ++index) {
+    if (i2cRegisters.at(index).address == address) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
-int16_t RaspberryPi::readRegister(uint32_t handle, uint32_t i2cRegister)
+int16_t RaspberryPi::readRegister(uint32_t i2cHandle, uint32_t address, uint16_t byteIndex)
 {
-  return 0;
+  auto handleIndex = std::find_if(
+    i2cHandles.begin(),
+    i2cHandles.end(),
+    [i2cHandle](i2cHandle_t deviceHandle) {
+      return deviceHandle.handle == i2cHandle;
+    });
+
+  if (handleIndex != i2cHandles.end()) {
+    auto index = std::find_if(
+      i2cRegisters.begin(),
+      i2cRegisters.end(),
+      [this, handleIndex, address](i2cRegister_t i2cRegister) {
+        return i2cRegister.device == i2cHandles.at(
+          handleIndex - i2cHandles.begin()).device &&
+        i2cRegister.address == address;
+      });
+
+    if ((index != i2cRegisters.end()) &&
+      (byteIndex < i2cRegisters.at(index - i2cRegisters.begin()).bytes.size()))
+    {
+      return i2cRegisters.at(index - i2cRegisters.begin()).bytes.at(byteIndex);
+    }
+  }
+
+  return -1;
 }
 
-bool RaspberryPi::writeRegister(uint32_t handle, uint32_t i2cRegister, uint8_t data)
+bool RaspberryPi::writeRegister(uint32_t i2cHandle, uint32_t address, uint8_t byte)
 {
-  return true;
+  auto handleIndex = std::find_if(
+    i2cHandles.begin(),
+    i2cHandles.end(),
+    [i2cHandle](i2cHandle_t deviceHandle) {
+      return deviceHandle.handle == i2cHandle;
+    });
+
+  if (handleIndex != i2cHandles.end()) {
+    auto index = std::find_if(
+      i2cRegisters.begin(),
+      i2cRegisters.end(),
+      [this, handleIndex, address](i2cRegister_t i2cRegister) {
+        return i2cRegister.device == i2cHandles.at(
+          handleIndex - i2cHandles.begin()).device &&
+        i2cRegister.address == address;
+      });
+
+    if (index != i2cRegisters.end()) {
+      i2cRegisters.at(index - i2cRegisters.begin()).bytes.push_back(byte);
+
+      if (i2cRegisters.at(index - i2cRegisters.begin()).bytes.size() <=
+        i2cRegisters.at(index - i2cRegisters.begin()).size)
+      {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 int RaspberryPi::setGpioType(gpioId gpioId, gpioType type)

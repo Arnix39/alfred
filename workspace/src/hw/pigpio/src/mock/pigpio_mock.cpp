@@ -44,11 +44,11 @@ int i2c_close(int pi, unsigned handle)
 int i2c_read_byte_data(int pi, unsigned handle, unsigned i2c_reg)
 {
   if (raspberryPi.i2cHandleExists(handle) && raspberryPi.registerExists(i2c_reg)) {
-    int16_t result = raspberryPi.readRegister(handle, i2c_reg);
+    int16_t result = raspberryPi.readRegister(handle, i2c_reg, 0);
     if (result >= 0) {
       return static_cast<uint8_t>(result);
     } else {
-      return PI_I2C_WRITE_FAILED;
+      return PI_I2C_READ_FAILED;
     }
   } else if (!raspberryPi.i2cHandleExists(handle)) {
     return PI_BAD_HANDLE;
@@ -62,9 +62,9 @@ int i2c_read_word_data(int pi, unsigned handle, unsigned i2c_reg)
   uint8_t bytes[2] = {0};
   if (raspberryPi.i2cHandleExists(handle) && raspberryPi.registerExists(i2c_reg)) {
     for (int index = 0; index < 2; ++index) {
-      int16_t result = raspberryPi.readRegister(handle, i2c_reg);
+      int16_t result = raspberryPi.readRegister(handle, i2c_reg, index);
       if (result < 0) {
-        return PI_I2C_WRITE_FAILED;
+        return PI_I2C_READ_FAILED;
       } else {
         bytes[index] = static_cast<uint8_t>(result);
       }
@@ -81,9 +81,9 @@ int i2c_read_i2c_block_data(int pi, unsigned handle, unsigned i2c_reg, char * bu
 {
   if (raspberryPi.i2cHandleExists(handle) && raspberryPi.registerExists(i2c_reg)) {
     for (int index = 0; index < count; ++index) {
-      int16_t result = raspberryPi.readRegister(handle, i2c_reg);
+      int16_t result = raspberryPi.readRegister(handle, i2c_reg, index);
       if (result < 0) {
-        return PI_I2C_WRITE_FAILED;
+        return PI_I2C_READ_FAILED;
       } else {
         buf[index] = static_cast<uint8_t>(result);
       }
