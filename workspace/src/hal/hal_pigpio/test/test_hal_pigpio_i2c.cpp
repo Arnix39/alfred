@@ -14,6 +14,47 @@
 
 #include "hal_pigpio_tests.hpp"
 
+/* Test cases */
+TEST_F(PigpioTest, I2cOpenSuccess)
+{
+  ASSERT_GE(pigioChecker->i2cOpen(I2C_GOOD_BUS_1, I2C_GOOD_ADDRESS, &executor), 0);
+}
+
+TEST_F(PigpioTest, I2cOpenTwoBusesSuccess)
+{
+  ASSERT_GE(pigioChecker->i2cOpen(I2C_GOOD_BUS_1, I2C_GOOD_ADDRESS, &executor), 0);
+  ASSERT_GE(pigioChecker->i2cOpen(I2C_GOOD_BUS_2, I2C_GOOD_ADDRESS, &executor), 0);
+}
+
+TEST_F(PigpioTest, I2cOpenBusFailure)
+{
+  ASSERT_EQ(pigioChecker->i2cOpen(I2C_BAD_BUS_2, I2C_GOOD_ADDRESS, &executor), PI_BAD_I2C_BUS);
+}
+
+TEST_F(PigpioTest, I2cOpenAddressFailure)
+{
+  ASSERT_EQ(pigioChecker->i2cOpen(I2C_GOOD_BUS_2, I2C_BAD_ADDRESS, &executor), PI_BAD_I2C_ADDR);
+}
+
+TEST_F(PigpioTest, I2cCloseSuccess)
+{
+  auto handle = pigioChecker->i2cOpen(I2C_GOOD_BUS_1, I2C_GOOD_ADDRESS, &executor);
+  ASSERT_EQ(pigioChecker->i2cClose(handle, &executor), true);
+}
+
+TEST_F(PigpioTest, I2cCloseTwoBusesSuccess)
+{
+  auto handle = pigioChecker->i2cOpen(I2C_GOOD_BUS_1, I2C_GOOD_ADDRESS, &executor);
+  auto handle2 = pigioChecker->i2cOpen(I2C_GOOD_BUS_2, I2C_GOOD_ADDRESS, &executor);
+  ASSERT_EQ(pigioChecker->i2cClose(handle2, &executor), true);
+}
+
+TEST_F(PigpioTest, I2cCloseFailure)
+{
+  auto handle = pigioChecker->i2cOpen(I2C_GOOD_BUS_1, I2C_GOOD_ADDRESS, &executor);
+  ASSERT_EQ(pigioChecker->i2cClose((handle + 1), &executor), false);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);

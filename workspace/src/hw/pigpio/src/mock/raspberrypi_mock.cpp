@@ -15,13 +15,21 @@
 #include "mock/raspberrypi_mock.hpp"
 
 RaspberryPi::RaspberryPi()
-: gpios({})
+: gpios({}),
+  i2cHandles({})
 {
 }
 
 RaspberryPi::~RaspberryPi()
 {
   gpios = {};
+  i2cHandles = {};
+}
+
+void RaspberryPi::reset(void)
+{
+  gpios = {};
+  i2cHandles = {};
 }
 
 void RaspberryPi::addGpio(gpioId gpioId)
@@ -31,6 +39,32 @@ void RaspberryPi::addGpio(gpioId gpioId)
   gpio newGpio({gpioType::input, gpioResistor::off, gpioLevel::low, gpioPwm, gpioCallback});
 
   gpios.insert({gpioId, newGpio});
+}
+
+int32_t RaspberryPi::addI2cHandle(uint8_t busAddress, uint8_t deviceAddress)
+{
+  for (int index = 0; index < i2cHandles.size(); ++index) {
+    if ((i2cHandles.at(index).at(1) == busAddress) &&
+      (i2cHandles.at(index).at(2) == deviceAddress))
+    {
+      return index;
+    }
+  }
+
+  i2cHandles.push_back({static_cast<uint8_t>(i2cHandles.size()), busAddress, deviceAddress});
+  return i2cHandles.size() - 1;
+}
+
+bool RaspberryPi::removeI2cHandle(uint32_t handle)
+{
+  for (int index = 0; index < i2cHandles.size(); ++index) {
+    if (i2cHandles.at(index).at(0) == handle) {
+      i2cHandles.erase(i2cHandles.begin() + index);
+      return true;
+    }
+  }
+
+  return false;
 }
 
 int RaspberryPi::setGpioType(gpioId gpioId, gpioType type)

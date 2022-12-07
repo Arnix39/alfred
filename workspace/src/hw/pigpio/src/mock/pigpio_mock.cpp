@@ -19,8 +19,26 @@
 static RaspberryPi raspberryPi;
 
 /* I2C */
-int i2c_open(int pi, unsigned i2c_bus, unsigned i2c_addr, unsigned i2c_flags) {return 0;}
-int i2c_close(int pi, unsigned handle) {return 0;}
+int i2c_open(int pi, unsigned i2c_bus, unsigned i2c_addr, unsigned i2c_flags)
+{
+  if (i2c_bus > MAX_I2C_BUS_ID) {
+    return PI_BAD_I2C_BUS;
+  } else if (i2c_addr != MPU6050_I2C_ADDRESS_HIGH && i2c_addr != MPU6050_I2C_ADDRESS_LOW) {
+    return PI_BAD_I2C_ADDR;
+  } else {
+    return raspberryPi.addI2cHandle(i2c_bus, i2c_addr);
+  }
+}
+
+int i2c_close(int pi, unsigned handle)
+{
+  if (!raspberryPi.removeI2cHandle(handle)) {
+    return PI_BAD_HANDLE;
+  } else {
+    return 0;
+  }
+}
+
 int i2c_read_byte_data(int pi, unsigned handle, unsigned i2c_reg) {return 0;}
 int i2c_read_word_data(int pi, unsigned handle, unsigned i2c_reg) {return 0;}
 int i2c_read_i2c_block_data(int pi, unsigned handle, unsigned i2c_reg, char * buf, unsigned count)
@@ -48,7 +66,10 @@ int pigpio_start(const char * addrStr, const char * portStr)
   return 0;
 }
 
-void pigpio_stop(int pi) {}
+void pigpio_stop(int pi)
+{
+  raspberryPi.reset();
+}
 
 int set_mode(int pi, unsigned gpio, unsigned mode)
 {

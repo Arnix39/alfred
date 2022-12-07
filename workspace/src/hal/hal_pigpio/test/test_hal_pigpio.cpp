@@ -46,6 +46,8 @@ PigioCheckerNode::PigioCheckerNode()
       "hal_pigpioEncoderCount",
       1000,
       std::bind(&PigioCheckerNode::encoderCountCallback, this, std::placeholders::_1))),
+  i2cOpenClient(this->create_client<HalPigpioI2cOpen_t>("hal_pigpioI2cOpen")),
+  i2cCloseClient(this->create_client<HalPigpioI2cClose_t>("hal_pigpioI2cClose")),
   edgeChangeMsg_gpioId(0),
   edgeChangeMsg_edgeChangeType(0),
   edgeChangeMsg_timeSinceBoot_us(0),
@@ -202,4 +204,36 @@ void PigioCheckerNode::encoderCountCallback(const HalPigpioEncoderCountMsg_t & m
       motorsEC.insert({msg.motor_id[index], msg.encoder_count[index]});
     }
   }
+}
+
+int32_t PigioCheckerNode::i2cOpen(
+  uint16_t bus,
+  uint16_t address,
+  rclcpp::executors::SingleThreadedExecutor * executor)
+{
+  auto request = std::make_shared<HalPigpioI2cOpen_t::Request>();
+
+  request->bus = bus;
+  request->address = address;
+
+  auto future = i2cOpenClient->async_send_request(request);
+
+  executor->spin_until_future_complete(future);
+
+  return future.get()->handle;
+}
+
+bool PigioCheckerNode::i2cClose(
+  int32_t handle,
+  rclcpp::executors::SingleThreadedExecutor * executor)
+{
+  auto request = std::make_shared<HalPigpioI2cClose_t::Request>();
+
+  request->handle = handle;
+
+  auto future = i2cCloseClient->async_send_request(request);
+
+  executor->spin_until_future_complete(future);
+
+  return future.get()->has_succeeded;
 }

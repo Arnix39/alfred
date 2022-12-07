@@ -17,9 +17,15 @@
 
 #include <cstdint>
 #include <map>
+#include <utility>
+#include <vector>
 #include <tuple>
 
 #include "gpioDefinitions.hpp"
+
+#define MPU6050_I2C_ADDRESS_LOW 0x67
+#define MPU6050_I2C_ADDRESS_HIGH 0x68
+#define MAX_I2C_BUS_ID 1
 
 enum gpioType
 {
@@ -75,11 +81,15 @@ class RaspberryPi
 {
 private:
   std::map<uint8_t, gpio> gpios;
+  std::vector<std::vector<uint8_t>> i2cHandles;
 
 public:
   RaspberryPi();
   ~RaspberryPi();
+  void reset(void);
   void addGpio(gpioId gpioId);
+  int32_t addI2cHandle(uint8_t busAddress, uint8_t deviceAddress);
+  bool removeI2cHandle(uint32_t handle);
   int setGpioType(gpioId gpioId, gpioType type);
   int setGpioResistor(gpioId gpioId, gpioResistor resistorConfiguration);
   int setGpioLevel(gpioId gpioId, gpioLevel level);

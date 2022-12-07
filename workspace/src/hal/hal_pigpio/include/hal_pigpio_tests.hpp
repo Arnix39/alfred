@@ -31,6 +31,13 @@
 #define MOTOR_ID_2 1
 #define FORWARD true
 #define BACKWARD false
+#define I2C_BAD_ADDRESS 0x66
+#define I2C_GOOD_ADDRESS MPU6050_I2C_ADDRESS
+#define I2C_GOOD_BUS_1 0
+#define I2C_GOOD_BUS_2 1
+#define I2C_BAD_BUS_2 2
+#define I2C_GOOD_HANDLE 0
+#define I2C_BAD_HANDLE 1
 
 template<typename T>
 bool hal_pigpioGpioSet(
@@ -68,6 +75,8 @@ class PigioCheckerNode : public rclcpp::Node
   using HalPigpioSetMotorDirection_t = hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection;
   using HalPigpioEdgeChangeMsg_t = hal_pigpio_interfaces::msg::HalPigpioEdgeChange;
   using HalPigpioEncoderCountMsg_t = hal_pigpio_interfaces::msg::HalPigpioEncoderCount;
+  using HalPigpioI2cOpen_t = hal_pigpio_interfaces::srv::HalPigpioI2cOpen;
+  using HalPigpioI2cClose_t = hal_pigpio_interfaces::srv::HalPigpioI2cClose;
 
 public:
   PigioCheckerNode();
@@ -91,6 +100,8 @@ public:
   rclcpp::Client<HalPigpioSetMotorDirection_t>::SharedPtr setMotorDirectionClient;
   rclcpp::Subscription<HalPigpioEdgeChangeMsg_t>::SharedPtr pigpioEdgeChangeSub;
   rclcpp::Subscription<HalPigpioEncoderCountMsg_t>::SharedPtr pigpioEncoderCountSub;
+  rclcpp::Client<HalPigpioI2cOpen_t>::SharedPtr i2cOpenClient;
+  rclcpp::Client<HalPigpioI2cClose_t>::SharedPtr i2cCloseClient;
 
   uint8_t edgeChangeMsg_gpioId;
   uint8_t edgeChangeMsg_edgeChangeType;
@@ -130,6 +141,13 @@ public:
     rclcpp::executors::SingleThreadedExecutor * executor);
   void edgeChangeCallback(const HalPigpioEdgeChangeMsg_t & msg);
   void encoderCountCallback(const HalPigpioEncoderCountMsg_t & msg);
+  int32_t i2cOpen(
+    uint16_t bus,
+    uint16_t address,
+    rclcpp::executors::SingleThreadedExecutor * executor);
+  bool i2cClose(
+    int32_t handle,
+    rclcpp::executors::SingleThreadedExecutor * executor);
 };
 
 /* Test fixture */
@@ -156,6 +174,9 @@ protected:
 
   void TearDown()
   {
+    pigioChecker->changePigpioNodeToState(
+      lifecycle_msgs::msg::Transition::TRANSITION_ACTIVE_SHUTDOWN);
+    executor.spin_some();
     executor.cancel();
     executor.remove_node(pigpio->get_node_base_interface());
     executor.remove_node(pigioChecker);
