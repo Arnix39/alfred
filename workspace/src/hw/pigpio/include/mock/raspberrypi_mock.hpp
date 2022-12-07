@@ -77,11 +77,18 @@ struct gpio
   gpioCallback callback;
 };
 
+struct i2cHandle
+{
+  uint32_t handle;
+  uint8_t busAddress;
+  uint8_t deviceAddress;
+};
+
 class RaspberryPi
 {
 private:
   std::map<uint8_t, gpio> gpios;
-  std::vector<std::vector<uint8_t>> i2cHandles;
+  std::vector<i2cHandle> i2cHandles;
 
 public:
   RaspberryPi();

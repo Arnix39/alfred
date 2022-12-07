@@ -44,21 +44,21 @@ void RaspberryPi::addGpio(gpioId gpioId)
 int32_t RaspberryPi::addI2cHandle(uint8_t busAddress, uint8_t deviceAddress)
 {
   for (int index = 0; index < i2cHandles.size(); ++index) {
-    if ((i2cHandles.at(index).at(1) == busAddress) &&
-      (i2cHandles.at(index).at(2) == deviceAddress))
+    if ((i2cHandles.at(index).busAddress == busAddress) &&
+      (i2cHandles.at(index).deviceAddress == deviceAddress))
     {
       return index;
     }
   }
 
-  i2cHandles.push_back({static_cast<uint8_t>(i2cHandles.size()), busAddress, deviceAddress});
+  i2cHandles.push_back({static_cast<uint32_t>(i2cHandles.size()), busAddress, deviceAddress});
   return i2cHandles.size() - 1;
 }
 
 bool RaspberryPi::removeI2cHandle(uint32_t handle)
 {
   for (int index = 0; index < i2cHandles.size(); ++index) {
-    if (i2cHandles.at(index).at(0) == handle) {
+    if (i2cHandles.at(index).handle == handle) {
       i2cHandles.erase(i2cHandles.begin() + index);
       return true;
     }
