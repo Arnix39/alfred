@@ -17,62 +17,62 @@
 /* Test cases */
 TEST_F(PigpioTest, SetInputModeSuccess)
 {
-  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setInputModeClient, &executor), true);
+  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setInputModeClient, &executor), true);
 }
 
 TEST_F(PigpioTest, SetInputModeFailure)
 {
-  ASSERT_EQ(hal_pigpioGpioSet(BAD_GPIO, pigioChecker->setInputModeClient, &executor), false);
+  ASSERT_EQ(hal_pigpioGpioSet(BAD_GPIO, pigpioChecker->setInputModeClient, &executor), false);
 }
 
 TEST_F(PigpioTest, SetOutputModeSuccess)
 {
-  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setOutputModeClient, &executor), true);
+  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setOutputModeClient, &executor), true);
 }
 
 TEST_F(PigpioTest, SetOutputModeFailure)
 {
-  ASSERT_EQ(hal_pigpioGpioSet(BAD_GPIO, pigioChecker->setOutputModeClient, &executor), false);
+  ASSERT_EQ(hal_pigpioGpioSet(BAD_GPIO, pigpioChecker->setOutputModeClient, &executor), false);
 }
 
 TEST_F(PigpioTest, GetModeSuccess)
 {
-  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->getModeClient, &executor), true);
+  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->getModeClient, &executor), true);
 }
 
 TEST_F(PigpioTest, GetModeFailure)
 {
-  ASSERT_EQ(hal_pigpioGpioSet(BAD_GPIO, pigioChecker->getModeClient, &executor), false);
+  ASSERT_EQ(hal_pigpioGpioSet(BAD_GPIO, pigpioChecker->getModeClient, &executor), false);
 }
 
 TEST_F(PigpioTest, SetPullUpSuccess)
 {
-  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setPullUpClient, &executor), true);
+  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setPullUpClient, &executor), true);
 }
 
 TEST_F(PigpioTest, SetPullUpFailure)
 {
-  ASSERT_EQ(hal_pigpioGpioSet(BAD_GPIO, pigioChecker->setPullUpClient, &executor), false);
+  ASSERT_EQ(hal_pigpioGpioSet(BAD_GPIO, pigpioChecker->setPullUpClient, &executor), false);
 }
 
 TEST_F(PigpioTest, SetPullDownSuccess)
 {
-  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setPullDownClient, &executor), true);
+  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setPullDownClient, &executor), true);
 }
 
 TEST_F(PigpioTest, SetPullDownFailure)
 {
-  ASSERT_EQ(hal_pigpioGpioSet(BAD_GPIO, pigioChecker->setPullDownClient, &executor), false);
+  ASSERT_EQ(hal_pigpioGpioSet(BAD_GPIO, pigpioChecker->setPullDownClient, &executor), false);
 }
 
 TEST_F(PigpioTest, ClearResistorSuccess)
 {
-  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->clearResistorClient, &executor), true);
+  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->clearResistorClient, &executor), true);
 }
 
 TEST_F(PigpioTest, ClearResistorFailure)
 {
-  ASSERT_EQ(hal_pigpioGpioSet(BAD_GPIO, pigioChecker->clearResistorClient, &executor), false);
+  ASSERT_EQ(hal_pigpioGpioSet(BAD_GPIO, pigpioChecker->clearResistorClient, &executor), false);
 }
 
 int main(int argc, char ** argv)

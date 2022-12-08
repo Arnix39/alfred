@@ -17,73 +17,73 @@
 /* Test cases */
 TEST_F(PigpioTest, SetPwmDutycycleSuccess)
 {
-  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setOutputModeClient, &executor);
+  hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setOutputModeClient, &executor);
   ASSERT_EQ(
-    pigioChecker->setPwmDutycycle(GOOD_GPIO, 50, &executor),
+    pigpioChecker->setPwmDutycycle(GOOD_GPIO, 50, &executor),
     true);
 }
 
 TEST_F(PigpioTest, SetPwmDutycycleFailure)
 {
-  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setInputModeClient, &executor);
+  hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setInputModeClient, &executor);
   ASSERT_EQ(
-    pigioChecker->setPwmDutycycle(GOOD_GPIO, 50, &executor),
+    pigpioChecker->setPwmDutycycle(GOOD_GPIO, 50, &executor),
     false);
 }
 
 TEST_F(PigpioTest, SetPwmFrequencySuccess)
 {
-  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setOutputModeClient, &executor);
+  hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setOutputModeClient, &executor);
   ASSERT_EQ(
-    pigioChecker->setPwmFrequency(GOOD_GPIO, 1000, &executor),
+    pigpioChecker->setPwmFrequency(GOOD_GPIO, 1000, &executor),
     true);
 }
 
 TEST_F(PigpioTest, SetPwmFrequencyFailure)
 {
-  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setInputModeClient, &executor);
+  hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setInputModeClient, &executor);
   ASSERT_EQ(
-    pigioChecker->setPwmFrequency(GOOD_GPIO, 1000, &executor),
+    pigpioChecker->setPwmFrequency(GOOD_GPIO, 1000, &executor),
     false);
 }
 
 TEST_F(PigpioTest, SetGpioHighSuccess)
 {
-  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setOutputModeClient, &executor);
-  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setGpioHighClient, &executor), true);
+  hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setOutputModeClient, &executor);
+  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setGpioHighClient, &executor), true);
 }
 
 TEST_F(PigpioTest, SetGpioHighFailure)
 {
-  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setInputModeClient, &executor);
-  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setGpioHighClient, &executor), false);
+  hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setInputModeClient, &executor);
+  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setGpioHighClient, &executor), false);
 }
 
 TEST_F(PigpioTest, SetGpioLowSuccess)
 {
-  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setOutputModeClient, &executor);
-  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setGpioLowClient, &executor), true);
+  hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setOutputModeClient, &executor);
+  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setGpioLowClient, &executor), true);
 }
 
 TEST_F(PigpioTest, SetGpioLowFailure)
 {
-  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setInputModeClient, &executor);
-  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setGpioLowClient, &executor), false);
+  hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setInputModeClient, &executor);
+  ASSERT_EQ(hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setGpioLowClient, &executor), false);
 }
 
 TEST_F(PigpioTest, SendTriggerPulseSuccess)
 {
-  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setOutputModeClient, &executor);
+  hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setOutputModeClient, &executor);
   ASSERT_EQ(
-    pigioChecker->sendTriggerPulse(GOOD_GPIO, 100, &executor),
+    pigpioChecker->sendTriggerPulse(GOOD_GPIO, 100, &executor),
     true);
 }
 
 TEST_F(PigpioTest, SendTriggerPulseFailure)
 {
-  hal_pigpioGpioSet(GOOD_GPIO, pigioChecker->setInputModeClient, &executor);
+  hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setInputModeClient, &executor);
   ASSERT_EQ(
-    pigioChecker->sendTriggerPulse(GOOD_GPIO, 100, &executor),
+    pigpioChecker->sendTriggerPulse(GOOD_GPIO, 100, &executor),
     false);
 }
 

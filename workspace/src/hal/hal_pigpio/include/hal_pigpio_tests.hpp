@@ -201,33 +201,33 @@ class PigpioTest : public testing::Test
 {
 protected:
   std::shared_ptr<Pigpio> pigpio;
-  std::shared_ptr<PigioCheckerNode> pigioChecker;
+  std::shared_ptr<PigioCheckerNode> pigpioChecker;
   rclcpp::executors::SingleThreadedExecutor executor;
 
   void SetUp()
   {
-    pigioChecker = std::make_shared<PigioCheckerNode>();
+    pigpioChecker = std::make_shared<PigioCheckerNode>();
     pigpio = std::make_shared<Pigpio>();
 
     executor.add_node(pigpio->get_node_base_interface());
-    executor.add_node(pigioChecker);
+    executor.add_node(pigpioChecker);
 
-    pigioChecker->changePigpioNodeToState(lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE);
+    pigpioChecker->changePigpioNodeToState(lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE);
     executor.spin_some();
-    pigioChecker->changePigpioNodeToState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
+    pigpioChecker->changePigpioNodeToState(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
     executor.spin_some();
   }
 
   void TearDown()
   {
-    pigioChecker->changePigpioNodeToState(
+    pigpioChecker->changePigpioNodeToState(
       lifecycle_msgs::msg::Transition::TRANSITION_ACTIVE_SHUTDOWN);
     executor.spin_some();
     executor.cancel();
     executor.remove_node(pigpio->get_node_base_interface());
-    executor.remove_node(pigioChecker);
+    executor.remove_node(pigpioChecker);
     pigpio.reset();
-    pigioChecker.reset();
+    pigpioChecker.reset();
   }
 };
 
