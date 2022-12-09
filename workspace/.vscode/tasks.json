@@ -18,7 +18,8 @@
                 "--symlink-install",
                 "--cmake-args",
                 "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
-                "-DSYNTHETIC_BUILD:BOOL=ON"
+                "-DSYNTHETIC_BUILD:BOOL=ON",
+                "--no-warn-unused-cli"
             ],
             "group": {
                 "kind": "build",
@@ -131,7 +132,8 @@
                 "--symlink-install",
                 "--cmake-args",
                 "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON",
-                "-DCMAKE_TOOLCHAIN_FILE=${CROSS_COMPILE_DIR}/cmake-toolchains/generic_linux.cmake"
+                "-DCMAKE_TOOLCHAIN_FILE=${CROSS_COMPILE_DIR}/cmake-toolchains/generic_linux.cmake",
+                "--no-warn-unused-cli"
             ],
             "group": {
                 "kind": "build"

@@ -13,4 +13,4 @@ export PYTHON_SOABI=cpython-310-aarch64-linux-gnu
 export CC=/usr/bin/aarch64-linux-gnu-gcc
 export CXX=/usr/bin/aarch64-linux-gnu-g++
 export CROSS_COMPILE_DIR=${WORKSPACE}/workspace/cross_compile
-colcon build --build-base build/target --install-base install/target --symlink-install --cmake-args -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_TOOLCHAIN_FILE=${CROSS_COMPILE_DIR}/cmake-toolchains/generic_linux.cmake
+colcon build --build-base build/target --install-base install/target --symlink-install --cmake-args -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_TOOLCHAIN_FILE=${CROSS_COMPILE_DIR}/cmake-toolchains/generic_linux.cmake --no-warn-unused-cli
