@@ -14,6 +14,8 @@
 
 #include "hal_pigpio_tests.hpp"
 
+using namespace std::placeholders;
+
 PigioCheckerNode::PigioCheckerNode()
 : rclcpp::Node("hal_pigpio_checker_node"),
   changeStateClient(this->create_client<lifecycle_msgs::srv::ChangeState>(
@@ -60,6 +62,12 @@ PigioCheckerNode::PigioCheckerNode()
     this->create_client<HalPigpioI2cWriteWordData_t>("hal_pigpioI2cWriteWordData")),
   i2cWriteBlockDataClient(
     this->create_client<HalPigpioI2cWriteBlockData_t>("hal_pigpioI2cWriteBlockData")),
+  i2cImuReadingClient(this->create_client<HalPigpioI2cImuReading_t>("hal_pigpioI2cImuReading")),
+  anglesSubscriber(
+    this->create_subscription<HalPigpioAnglesMsg_t>(
+      "hal_pigpioAngles",
+      1000,
+      std::bind(&PigioCheckerNode::getAngles, this, _1))),
   edgeChangeMsg_gpioId(0),
   edgeChangeMsg_edgeChangeType(0),
   edgeChangeMsg_timeSinceBoot_us(0),
@@ -299,10 +307,7 @@ bool PigioCheckerNode::i2cWriteBlockData(
 
   request->handle = i2cHandle;
   request->device_register = deviceRegister;
-
-  for (int index = 0; index < length; ++index) {
-    request->data_block.push_back(dataBlock.at(index));
-  }
+  request->data_block = dataBlock;
   request->length = length;
 
   auto future = i2cWriteBlockDataClient->async_send_request(request);
@@ -363,4 +368,39 @@ std::vector<uint8_t> PigioCheckerNode::i2cReadBlockData(
   executor->spin_until_future_complete(future);
 
   return future.get()->data_block;
+}
+
+void PigioCheckerNode::i2cStartImuReading(
+  int32_t i2cHandle,
+  rclcpp::executors::SingleThreadedExecutor * executor)
+{
+  auto request = std::make_shared<HalPigpioI2cImuReading_t::Request>();
+
+  request->imu_handle = i2cHandle;
+  request->is_imu_ready = true;
+
+  auto future = i2cImuReadingClient->async_send_request(request);
+
+  executor->spin_until_future_complete(future);
+}
+
+void PigioCheckerNode::i2cStopImuReading(
+  int32_t i2cHandle,
+  rclcpp::executors::SingleThreadedExecutor * executor)
+{
+  auto request = std::make_shared<HalPigpioI2cImuReading_t::Request>();
+
+  request->imu_handle = i2cHandle;
+  request->is_imu_ready = false;
+
+  auto future = i2cImuReadingClient->async_send_request(request);
+
+  executor->spin_until_future_complete(future);
+}
+
+void PigioCheckerNode::getAngles(const HalPigpioAnglesMsg_t & message)
+{
+  imuAnglePhi.set_value(message.phi);
+  imuAngleTheta.set_value(message.theta);
+  imuAnglePsi.set_value(message.psi);
 }

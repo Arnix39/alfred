@@ -98,8 +98,10 @@ int i2c_read_i2c_block_data(int pi, unsigned handle, unsigned i2c_reg, char * bu
 
 int i2c_write_byte_data(int pi, unsigned handle, unsigned i2c_reg, unsigned bVal)
 {
+  std::vector<uint8_t> bytes = {static_cast<uint8_t>(bVal)};
+
   if (raspberryPi.i2cHandleExists(handle) && raspberryPi.registerExists(i2c_reg)) {
-    if (raspberryPi.writeRegister(handle, i2c_reg, bVal)) {
+    if (raspberryPi.writeRegister(handle, i2c_reg, bytes)) {
       return 0;
     } else {
       return PI_I2C_WRITE_FAILED;
@@ -116,11 +118,10 @@ int i2c_write_word_data(int pi, unsigned handle, unsigned i2c_reg, unsigned wVal
   std::vector<uint8_t> bytes = {static_cast<uint8_t>(wVal >> 8), static_cast<uint8_t>(wVal & 0xFF)};
 
   if (raspberryPi.i2cHandleExists(handle) && raspberryPi.registerExists(i2c_reg)) {
-    for (int index = 0; index < bytes.size(); ++index) {
-      if (!raspberryPi.writeRegister(handle, i2c_reg, bytes.at(index))) {
-        return PI_I2C_WRITE_FAILED;
-      }
+    if (!raspberryPi.writeRegister(handle, i2c_reg, bytes)) {
+      return PI_I2C_WRITE_FAILED;
     }
+
     return 0;
   } else if (!raspberryPi.i2cHandleExists(handle)) {
     return PI_BAD_HANDLE;
@@ -131,11 +132,13 @@ int i2c_write_word_data(int pi, unsigned handle, unsigned i2c_reg, unsigned wVal
 
 int i2c_write_i2c_block_data(int pi, unsigned handle, unsigned i2c_reg, char * buf, unsigned count)
 {
+  std::vector<uint8_t> bytes;
   if (raspberryPi.i2cHandleExists(handle) && raspberryPi.registerExists(i2c_reg)) {
     for (int index = 0; index < count; ++index) {
-      if (!raspberryPi.writeRegister(handle, i2c_reg, buf[index])) {
-        return PI_I2C_WRITE_FAILED;
-      }
+      bytes.push_back(buf[index]);
+    }
+    if (!raspberryPi.writeRegister(handle, i2c_reg, bytes)) {
+      return PI_I2C_WRITE_FAILED;
     }
     return 0;
   } else if (!raspberryPi.i2cHandleExists(handle)) {

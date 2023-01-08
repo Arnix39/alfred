@@ -18,7 +18,12 @@ RaspberryPi::RaspberryPi()
 : gpios({}),
   i2cHandles({}),
   i2cRegisters({{MPU6050_I2C_ADDRESS_HIGH, 0x10, 1, {}}, {MPU6050_I2C_ADDRESS_HIGH, 0x20, 2, {}},
-      {MPU6050_I2C_ADDRESS_LOW, 0x10, 1, {}}, {MPU6050_I2C_ADDRESS_LOW, 0x20, 4, {}}})
+      {MPU6050_I2C_ADDRESS_LOW, 0x10, 1, {}}, {MPU6050_I2C_ADDRESS_LOW, 0x20, 4, {}},
+      {MPU6050_I2C_ADDRESS_HIGH, MPU6050_USER_CONTROL_REGISTER, 1, {}},
+      {MPU6050_I2C_ADDRESS_HIGH, MPU6050_FIFO_COUNT_H_REGISTER, 1, {}},
+      {MPU6050_I2C_ADDRESS_HIGH, MPU6050_FIFO_COUNT_L_REGISTER, 1, {}},
+      {MPU6050_I2C_ADDRESS_HIGH, MPU6050_INTERRUPT_STATUS_REGISTER, 1, {}},
+      {MPU6050_I2C_ADDRESS_HIGH, MPU6050_FIFO_REGISTER, 16, {}}})
 {
 }
 
@@ -34,7 +39,12 @@ void RaspberryPi::reset(void)
   gpios = {};
   i2cHandles = {};
   i2cRegisters = {{MPU6050_I2C_ADDRESS_HIGH, 0x10, 1, {}}, {MPU6050_I2C_ADDRESS_HIGH, 0x20, 2, {}},
-    {MPU6050_I2C_ADDRESS_LOW, 0x10, 4, {}}, {MPU6050_I2C_ADDRESS_LOW, 0x20, 4, {}}};
+    {MPU6050_I2C_ADDRESS_LOW, 0x10, 1, {}}, {MPU6050_I2C_ADDRESS_LOW, 0x20, 4, {}},
+    {MPU6050_I2C_ADDRESS_HIGH, MPU6050_USER_CONTROL_REGISTER, 1, {}},
+    {MPU6050_I2C_ADDRESS_HIGH, MPU6050_FIFO_COUNT_H_REGISTER, 1, {}},
+    {MPU6050_I2C_ADDRESS_HIGH, MPU6050_FIFO_COUNT_L_REGISTER, 1, {}},
+    {MPU6050_I2C_ADDRESS_HIGH, MPU6050_INTERRUPT_STATUS_REGISTER, 1, {}},
+    {MPU6050_I2C_ADDRESS_HIGH, MPU6050_FIFO_REGISTER, 16, {}}};
 }
 
 void RaspberryPi::addGpio(gpioId gpioId)
@@ -134,7 +144,7 @@ int16_t RaspberryPi::readRegister(uint32_t i2cHandle, uint32_t address, uint16_t
   return -1;
 }
 
-bool RaspberryPi::writeRegister(uint32_t i2cHandle, uint32_t address, uint8_t byte)
+bool RaspberryPi::writeRegister(uint32_t i2cHandle, uint32_t address, std::vector<uint8_t> bytes)
 {
   auto handleIndex = std::find_if(
     i2cHandles.begin(),
@@ -154,11 +164,12 @@ bool RaspberryPi::writeRegister(uint32_t i2cHandle, uint32_t address, uint8_t by
       });
 
     if (index != i2cRegisters.end()) {
-      i2cRegisters.at(index - i2cRegisters.begin()).bytes.push_back(byte);
+      i2cRegister_t & deviceRegister = i2cRegisters.at(index - i2cRegisters.begin());
 
-      if (i2cRegisters.at(index - i2cRegisters.begin()).bytes.size() <=
-        i2cRegisters.at(index - i2cRegisters.begin()).size)
-      {
+      if (bytes.size() <= deviceRegister.size) {
+        deviceRegister.bytes.clear();
+        deviceRegister.bytes = bytes;
+
         return true;
       }
     }

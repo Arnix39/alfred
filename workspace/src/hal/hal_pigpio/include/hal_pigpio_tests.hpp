@@ -43,6 +43,8 @@
 #define I2C_GOOD_REGISTER 0x10
 #define I2C_GOOD_REGISTER_2 0x20
 #define I2C_BAD_REGISTER 0x30
+#define FIFO_NOT_OVERFLOWED 0x2F
+#define FIFO_OVERFLOWED 0x10
 
 template<typename T>
 bool hal_pigpioGpioSet(
@@ -88,6 +90,8 @@ class PigioCheckerNode : public rclcpp::Node
   using HalPigpioI2cWriteByteData_t = hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData;
   using HalPigpioI2cWriteWordData_t = hal_pigpio_interfaces::srv::HalPigpioI2cWriteWordData;
   using HalPigpioI2cWriteBlockData_t = hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData;
+  using HalPigpioI2cImuReading_t = hal_pigpio_interfaces::srv::HalPigpioI2cImuReading;
+  using HalPigpioAnglesMsg_t = hal_pigpio_interfaces::msg::HalPigpioAngles;
 
 public:
   PigioCheckerNode();
@@ -119,12 +123,18 @@ public:
   rclcpp::Client<HalPigpioI2cWriteByteData_t>::SharedPtr i2cWriteByteDataClient;
   rclcpp::Client<HalPigpioI2cWriteWordData_t>::SharedPtr i2cWriteWordDataClient;
   rclcpp::Client<HalPigpioI2cWriteBlockData_t>::SharedPtr i2cWriteBlockDataClient;
+  rclcpp::Client<HalPigpioI2cImuReading_t>::SharedPtr i2cImuReadingClient;
+  rclcpp::Subscription<HalPigpioAnglesMsg_t>::SharedPtr anglesSubscriber;
 
   uint8_t edgeChangeMsg_gpioId;
   uint8_t edgeChangeMsg_edgeChangeType;
   uint32_t edgeChangeMsg_timeSinceBoot_us;
 
   std::map<uint8_t, int32_t> motorsEC;
+
+  std::promise<float> imuAnglePhi;
+  std::promise<float> imuAngleTheta;
+  std::promise<float> imuAnglePsi;
 
   void changePigpioNodeToState(std::uint8_t transition);
   bool setPwmDutycycle(
@@ -194,6 +204,9 @@ public:
     uint8_t deviceRegister,
     uint8_t length,
     rclcpp::executors::SingleThreadedExecutor * executor);
+  void i2cStartImuReading(int32_t i2cHandle, rclcpp::executors::SingleThreadedExecutor * executor);
+  void i2cStopImuReading(int32_t i2cHandle, rclcpp::executors::SingleThreadedExecutor * executor);
+  void getAngles(const HalPigpioAnglesMsg_t & message);
 };
 
 /* Test fixture */

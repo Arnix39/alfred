@@ -26,6 +26,11 @@
 
 #define MPU6050_I2C_ADDRESS_LOW 0x67
 #define MPU6050_I2C_ADDRESS_HIGH 0x68
+#define MPU6050_USER_CONTROL_REGISTER 0x6A
+#define MPU6050_FIFO_COUNT_H_REGISTER 0x72
+#define MPU6050_FIFO_COUNT_L_REGISTER 0x73
+#define MPU6050_FIFO_REGISTER 0x74
+#define MPU6050_INTERRUPT_STATUS_REGISTER 0x3A
 #define MAX_I2C_BUS_ID 1
 
 enum gpioType
@@ -111,7 +116,7 @@ public:
   bool removeI2cHandle(uint32_t handle);
   bool registerExists(uint32_t address);
   int16_t readRegister(uint32_t i2cHandle, uint32_t address, uint16_t byteIndex);
-  bool writeRegister(uint32_t i2cHandle, uint32_t address, uint8_t byte);
+  bool writeRegister(uint32_t i2cHandle, uint32_t address, std::vector<uint8_t> bytes);
   int setGpioType(gpioId gpioId, gpioType type);
   int setGpioResistor(gpioId gpioId, gpioResistor resistorConfiguration);
   int setGpioLevel(gpioId gpioId, gpioLevel level);

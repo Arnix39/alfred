@@ -14,6 +14,102 @@
 
 #include "hal_pigpio_tests.hpp"
 
+using namespace std::chrono_literals;
+
+/* Test cases */
+TEST_F(PigpioTest, ImuStartReading)
+{
+  auto handle = pigpioChecker->i2cOpen(I2C_GOOD_BUS_1, I2C_GOOD_ADDRESS, &executor);
+  pigpioChecker->i2cWriteByteData(handle, MPU6050_USER_CONTROL_REGISTER, 0x0, &executor);
+  pigpioChecker->i2cStartImuReading(handle, &executor);
+  ASSERT_EQ(
+    pigpioChecker->i2cReadByteData(handle, MPU6050_USER_CONTROL_REGISTER, &executor),
+    MPU6050_FIFO_RESET);
+}
+
+TEST_F(PigpioTest, ImuResetFIFO)
+{
+  auto handle = pigpioChecker->i2cOpen(I2C_GOOD_BUS_1, I2C_GOOD_ADDRESS, &executor);
+  pigpioChecker->i2cStartImuReading(handle, &executor);
+  pigpioChecker->i2cWriteByteData(handle, MPU6050_USER_CONTROL_REGISTER, 0x0, &executor);
+  pigpio->resetFifo();
+  ASSERT_EQ(
+    pigpioChecker->i2cReadByteData(handle, MPU6050_USER_CONTROL_REGISTER, &executor),
+    MPU6050_FIFO_RESET);
+}
+
+TEST_F(PigpioTest, ImuReadFIFOCount)
+{
+  auto handle = pigpioChecker->i2cOpen(I2C_GOOD_BUS_1, I2C_GOOD_ADDRESS, &executor);
+  pigpioChecker->i2cWriteByteData(handle, MPU6050_USER_CONTROL_REGISTER, 0x0, &executor);
+  pigpioChecker->i2cStartImuReading(handle, &executor);
+  pigpioChecker->i2cWriteByteData(handle, MPU6050_FIFO_COUNT_H_REGISTER, 0x15, &executor);
+  pigpioChecker->i2cWriteByteData(handle, MPU6050_FIFO_COUNT_L_REGISTER, 0x14, &executor);
+  ASSERT_EQ(pigpio->readFifoCount(), 0x1514);
+}
+
+TEST_F(PigpioTest, ImuFIFOOverflowed)
+{
+  auto handle = pigpioChecker->i2cOpen(I2C_GOOD_BUS_1, I2C_GOOD_ADDRESS, &executor);
+  pigpioChecker->i2cWriteByteData(handle, MPU6050_USER_CONTROL_REGISTER, 0x0, &executor);
+  pigpioChecker->i2cStartImuReading(handle, &executor);
+  pigpioChecker->i2cWriteByteData(
+    handle, MPU6050_INTERRUPT_STATUS_REGISTER, FIFO_OVERFLOWED, &executor);
+  ASSERT_EQ(pigpio->isFifoOverflowed(), true);
+}
+
+TEST_F(PigpioTest, ImuFIFONotOverflowed)
+{
+  auto handle = pigpioChecker->i2cOpen(I2C_GOOD_BUS_1, I2C_GOOD_ADDRESS, &executor);
+  pigpioChecker->i2cWriteByteData(handle, MPU6050_USER_CONTROL_REGISTER, 0x0, &executor);
+  pigpioChecker->i2cStartImuReading(handle, &executor);
+  pigpioChecker->i2cWriteByteData(
+    handle, MPU6050_INTERRUPT_STATUS_REGISTER, FIFO_NOT_OVERFLOWED, &executor);
+  ASSERT_EQ(pigpio->isFifoOverflowed(), false);
+}
+
+TEST_F(PigpioTest, ImuComputeAndPublishZeroAnglesSuccess)
+{
+  std::vector<uint8_t> dataQuarternions = {
+    0x40, 0x0, 0x0, 0x0,
+    0x0, 0x0, 0x0, 0x0,
+    0x0, 0x0, 0x0, 0x0,
+    0x0, 0x0, 0x0, 0x0};
+  auto futurePhi = std::shared_future<float>(pigpioChecker->imuAnglePhi.get_future());
+  auto futureTheta = std::shared_future<float>(pigpioChecker->imuAngleTheta.get_future());
+  auto futurePsi = std::shared_future<float>(pigpioChecker->imuAnglePsi.get_future());
+
+  auto handle = pigpioChecker->i2cOpen(I2C_GOOD_BUS_1, I2C_GOOD_ADDRESS, &executor);
+  pigpioChecker->i2cWriteByteData(handle, MPU6050_USER_CONTROL_REGISTER, 0x0, &executor);
+  pigpioChecker->i2cStartImuReading(handle, &executor);
+  pigpioChecker->i2cWriteByteData(
+    handle, MPU6050_INTERRUPT_STATUS_REGISTER, FIFO_NOT_OVERFLOWED, &executor);
+  pigpioChecker->i2cWriteByteData(handle, MPU6050_FIFO_COUNT_H_REGISTER, 0x00, &executor);
+  pigpioChecker->i2cWriteByteData(handle, MPU6050_FIFO_COUNT_L_REGISTER, 0x10, &executor);
+  pigpioChecker->i2cWriteBlockData(
+    handle, MPU6050_FIFO_REGISTER, dataQuarternions, MPU6050_DMP_FIFO_QUAT_SIZE, &executor);
+
+  pigpio->readQuaternionsAndPublishAngles();
+  ASSERT_EQ(executor.spin_until_future_complete(futurePhi, 1s), rclcpp::FutureReturnCode::SUCCESS);
+
+  EXPECT_NEAR(futurePhi.get(), 0, 0.1);
+  EXPECT_NEAR(futureTheta.get(), 0, 0.1);
+  EXPECT_NEAR(futurePsi.get(), 0, 0.1);
+}
+
+TEST_F(PigpioTest, ImuComputeAndPublishAnglesFIFOOverflowed)
+{
+  auto handle = pigpioChecker->i2cOpen(I2C_GOOD_BUS_1, I2C_GOOD_ADDRESS, &executor);
+  pigpioChecker->i2cWriteByteData(handle, MPU6050_USER_CONTROL_REGISTER, 0x0, &executor);
+  pigpioChecker->i2cStartImuReading(handle, &executor);
+  pigpioChecker->i2cWriteByteData(
+    handle, MPU6050_INTERRUPT_STATUS_REGISTER, FIFO_OVERFLOWED, &executor);
+  pigpio->readQuaternionsAndPublishAngles();
+  ASSERT_EQ(
+    pigpioChecker->i2cReadByteData(handle, MPU6050_USER_CONTROL_REGISTER, &executor),
+    MPU6050_FIFO_RESET);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
