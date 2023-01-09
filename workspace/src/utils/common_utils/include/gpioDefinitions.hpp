@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GPIO_DEFINITIONS_HPP_
-#define GPIO_DEFINITIONS_HPP_
+#ifndef GPIODEFINITIONS_HPP_
+#define GPIODEFINITIONS_HPP_
 
 enum gpioId
 {
@@ -48,4 +48,4 @@ enum gpioId
   LAST_GPIO
 };
 
-#endif // GPIO_DEFINITIONS_HPP_
+#endif  // GPIODEFINITIONS_HPP_

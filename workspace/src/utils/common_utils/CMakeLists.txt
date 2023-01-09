@@ -15,6 +15,15 @@ include_directories(
 add_library(${PROJECT_NAME} INTERFACE)
 
 #############
+## Testing ##
+#############
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  find_package(ament_cmake_gtest REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+endif()
+
+#############
 ## Install ##
 #############
 install(

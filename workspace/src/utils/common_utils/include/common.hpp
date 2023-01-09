@@ -1,5 +1,22 @@
+// Copyright (c) 2022 Arnix Robotix
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #ifndef COMMON_HPP_
 #define COMMON_HPP_
+
+#include <string>
+#include <memory>
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_lifecycle/lifecycle_node.hpp"
@@ -18,14 +35,15 @@
 using LifecycleCallbackReturn_t =
   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
-template <class ServiceT>
+template<class ServiceT>
 class ServiceNodeSync
 {
   typedef typename ServiceT::Request RequestT;
   typedef typename ServiceT::Response ResponseT;
+
 public:
-  ServiceNodeSync(std::string name): node(std::make_shared<rclcpp::Node>(name)) 
-  {}
+  explicit ServiceNodeSync(std::string name)
+  : node(std::make_shared<rclcpp::Node>(name)) {}
 
   void init(std::string service)
   {
@@ -33,12 +51,12 @@ public:
     client->wait_for_service();
   }
 
-  ResponseT sendRequest(const RequestT &req)
+  ResponseT sendRequest(const RequestT & req)
   {
     return sendRequest(std::make_shared<RequestT>(req));
   }
 
-  ResponseT sendRequest(const std::shared_ptr<RequestT> &req_ptr)
+  ResponseT sendRequest(const std::shared_ptr<RequestT> & req_ptr)
   {
     auto result = client->async_send_request(req_ptr);
     rclcpp::spin_until_future_complete(node, result);
