@@ -12,10 +12,11 @@
   <!-- Dependencies -->
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <exec_depend>hal_camera</exec_depend>
+  <exec_depend>hal_imu</exec_depend>
+  <exec_depend>hal_motor_control</exec_depend>
   <exec_depend>hal_pigpio</exec_depend>
   <exec_depend>hal_proxsens</exec_depend>
-  <exec_depend>hal_motor_control</exec_depend>
-  <exec_depend>hal_imu</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
