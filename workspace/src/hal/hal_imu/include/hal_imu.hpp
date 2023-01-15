@@ -49,8 +49,8 @@ struct SensorBias
   const uint8_t lsbRegister;
 };
 
-using i2cImuReadingFuture_t =
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading>::SharedFuture;
+using i2cImuReading_t = hal_pigpio_interfaces::srv::HalPigpioI2cImuReading;
+using i2cImuReadingFuture_t = rclcpp::Client<i2cImuReading_t>::SharedFuture;
 
 using HalImuWriteDmpAction = hal_imu_interfaces::action::HalImuWriteDmp;
 using HalImuWriteDmpGoal = rclcpp_action::ClientGoalHandle<HalImuWriteDmpAction>;
@@ -60,13 +60,13 @@ class Imu : public rclcpp_lifecycle::LifecycleNode
 private:
   int32_t imuHandle;
 
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading>::SharedPtr i2cImuReadingClient;
+  rclcpp::Client<i2cImuReading_t>::SharedPtr i2cImuReadingClient;
   i2cReadByteDataSyncClientNode_t i2cReadByteDataSyncClient;
   i2cWriteByteDataSyncClientNode_t i2cWriteByteDataSyncClient;
   i2cWriteBlockDataSyncClientNode_t i2cWriteBlockDataSyncClient;
   imuGetHandleSyncClientNode_t imuGetHandleSyncClient;
 
-  rclcpp_action::Client<hal_imu_interfaces::action::HalImuWriteDmp>::SharedPtr imuDmpWritingClient;
+  rclcpp_action::Client<HalImuWriteDmpAction>::SharedPtr imuDmpWritingClient;
 
   void goal_response_callback(HalImuWriteDmpGoal::SharedPtr goal_handle);
   void feedback_callback(
