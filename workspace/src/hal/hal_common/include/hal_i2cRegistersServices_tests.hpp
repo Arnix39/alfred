@@ -38,8 +38,10 @@
 #define I2C_GOOD_REGISTER 0x10
 #define I2C_GOOD_REGISTER_2 0x20
 #define I2C_BUFFER_MAX_BYTES 32
+#define IMU_GOOD_HANDLE 1
 
 using HalPigpioI2cOpen_t = hal_pigpio_interfaces::srv::HalPigpioI2cOpen;
+using HalImuGetHandle_t = hal_imu_interfaces::srv::HalImuGetHandle;
 using HalPigpioI2cReadByteData_t = hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData;
 using HalPigpioI2cWriteByteData_t = hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData;
 using HalPigpioI2cWriteBlockData_t = hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData;
@@ -52,10 +54,14 @@ public:
 
   int piHandle;
 
+  rclcpp::Service<HalImuGetHandle_t>::SharedPtr imuGetHandleService;
   rclcpp::Service<HalPigpioI2cReadByteData_t>::SharedPtr i2cReadByteDataService;
   rclcpp::Service<HalPigpioI2cWriteByteData_t>::SharedPtr i2cWriteByteDataService;
   rclcpp::Service<HalPigpioI2cWriteBlockData_t>::SharedPtr i2cWriteBlockDataService;
 
+  void getHandle(
+    const std::shared_ptr<HalImuGetHandle_t::Request> request,
+    std::shared_ptr<HalImuGetHandle_t::Response> response);
   void i2cReadByteData(
     const std::shared_ptr<HalPigpioI2cReadByteData_t::Request> request,
     std::shared_ptr<HalPigpioI2cReadByteData_t::Response> response);
@@ -94,7 +100,7 @@ protected:
     executor.add_node(halDummyNode);
     executor.add_node(i2cRegistersServicesChecker);
 
-    // i2cRegistersServicesChecker->imuGetHandleSyncClient.init("hal_imuGetHandle");
+    i2cRegistersServicesChecker->imuGetHandleSyncClient.init("hal_imuGetHandle");
     i2cRegistersServicesChecker->i2cReadByteDataSyncClient.init("hal_pigpioI2cReadByteData");
     i2cRegistersServicesChecker->i2cWriteByteDataSyncClient.init("hal_pigpioI2cWriteByteData");
     i2cRegistersServicesChecker->i2cWriteBlockDataSyncClient.init("hal_pigpioI2cWriteBlockData");
