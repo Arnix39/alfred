@@ -18,7 +18,7 @@ int32_t getI2cHandle(imuGetHandleSyncClientNode_t imuGetHandleSyncClient)
 {
   auto imuGetHandleRequest = std::make_shared<hal_imu_interfaces::srv::HalImuGetHandle::Request>();
 
-  return imuGetHandleSyncClient.sendRequest(imuGetHandleRequest).handle;
+  return imuGetHandleSyncClient.sendRequest(imuGetHandleRequest)->handle;
 }
 
 int16_t readByteFromRegister(
@@ -35,8 +35,8 @@ int16_t readByteFromRegister(
 
   auto response = i2cReadByteDataSyncClientNode.sendRequest(i2cReadByteDataRequest);
 
-  if (response.has_succeeded) {
-    byteRead = response.value;
+  if (response->has_succeeded) {
+    byteRead = response->value;
   }
 
   return byteRead;
@@ -82,7 +82,7 @@ bool writeByteInRegister(
   i2cWriteByteDataRequest->device_register = registerToWrite;
   i2cWriteByteDataRequest->value = value;
 
-  return i2cWriteByteDataSyncClientNode.sendRequest(i2cWriteByteDataRequest).has_succeeded;
+  return i2cWriteByteDataSyncClientNode.sendRequest(i2cWriteByteDataRequest)->has_succeeded;
 }
 
 bool writeDataBlock(
@@ -100,5 +100,5 @@ bool writeDataBlock(
     i2cWriteBlockDataRequest->data_block.push_back(data.at(index));
   }
 
-  return i2cWriteBlockDataSyncClientNode.sendRequest(i2cWriteBlockDataRequest).has_succeeded;
+  return i2cWriteBlockDataSyncClientNode.sendRequest(i2cWriteBlockDataRequest)->has_succeeded;
 }
