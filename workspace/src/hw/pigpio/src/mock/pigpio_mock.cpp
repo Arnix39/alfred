@@ -21,7 +21,9 @@ static RaspberryPi raspberryPi;
 /* I2C */
 int i2c_open(int pi, unsigned i2c_bus, unsigned i2c_addr, unsigned i2c_flags)
 {
-  if (i2c_bus > MAX_I2C_BUS_ID) {
+  if (pi < 0) {
+    return PI_NO_HANDLE;
+  } else if (i2c_bus > MAX_I2C_BUS_ID) {
     return PI_BAD_I2C_BUS;
   } else if (i2c_addr != MPU6050_I2C_ADDRESS_HIGH && i2c_addr != MPU6050_I2C_ADDRESS_LOW) {
     return PI_BAD_I2C_ADDR;

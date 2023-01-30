@@ -21,6 +21,7 @@
   <build_depend>rclcpp_lifecycle</build_depend>
   <exec_depend>rclcpp_lifecycle</exec_depend>
 
+  <test_depend>pigpio</test_depend>
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
   <test_depend>ament_cmake_gtest</test_depend>

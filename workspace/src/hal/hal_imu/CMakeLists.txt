@@ -55,6 +55,7 @@ ament_target_dependencies(${PROJECT_NAME}DmpWritingServer_node ${dependencies})
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   find_package(ament_cmake_gtest REQUIRED)
+  find_package(pigpio REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
   ament_add_gtest(${PROJECT_NAME}_test test/test_hal_imu.cpp)
@@ -62,7 +63,7 @@ if(BUILD_TESTING)
   target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})
 
   ament_add_gtest(${PROJECT_NAME}I2cInit_test test/test_hal_imuI2cInit.cpp)
-  ament_target_dependencies(${PROJECT_NAME}I2cInit_test ${dependencies})
+  ament_target_dependencies(${PROJECT_NAME}I2cInit_test ${dependencies} pigpio)
   target_link_libraries(${PROJECT_NAME}I2cInit_test ${PROJECT_NAME}I2cInit)
 
   ament_add_gtest(${PROJECT_NAME}DmpWritingServer_test test/test_hal_imuDmpWritingServer.cpp)

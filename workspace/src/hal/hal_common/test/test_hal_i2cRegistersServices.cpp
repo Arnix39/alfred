@@ -26,7 +26,7 @@ I2cRegistersServicesCheckerNode::I2cRegistersServicesCheckerNode()
 {}
 
 HalDummyNode::HalDummyNode()
-: rclcpp::Node("hal_pigpioDummy_node"),
+: rclcpp::Node("hal_dummy_node"),
   piHandle(pigpio_start(NULL, NULL)),
   imuGetHandleService(this->create_service<HalImuGetHandle_t>(
       "hal_imuGetHandle",
