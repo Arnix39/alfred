@@ -42,6 +42,28 @@ int16_t readByteFromRegister(
   return byteRead;
 }
 
+std::vector<uint8_t> readBlockFromRegister(
+  i2cReadBlockDataSyncClientNode_t i2cReadBlockDataSyncClient, int32_t imuHandle,
+  uint8_t registerToRead, uint8_t bytesToRead)
+{
+  std::vector<uint8_t> dataRead;
+
+  auto i2cReadBlockDataRequest =
+    std::make_shared<hal_pigpio_interfaces::srv::HalPigpioI2cReadBlockData::Request>();
+
+  i2cReadBlockDataRequest->handle = imuHandle;
+  i2cReadBlockDataRequest->device_register = registerToRead;
+  i2cReadBlockDataRequest->length = bytesToRead;
+
+  auto response = i2cReadBlockDataSyncClient.sendRequest(i2cReadBlockDataRequest);
+
+  if (response->has_succeeded) {
+    dataRead = response->data_block;
+  }
+
+  return dataRead;
+}
+
 bool writeBitInRegister(
   i2cReadByteDataSyncClientNode_t i2cReadByteDataSyncClientNode,
   i2cWriteByteDataSyncClientNode_t i2cWriteByteDataSyncClientNode, int32_t imuHandle,

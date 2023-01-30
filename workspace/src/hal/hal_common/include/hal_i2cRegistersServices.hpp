@@ -25,6 +25,7 @@
 
 // Services and messages headers (generated)
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_read_byte_data.hpp"
+#include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_read_block_data.hpp"
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_write_byte_data.hpp"
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_write_block_data.hpp"
 #include "hal_imu_interfaces/srv/hal_imu_get_handle.hpp"
@@ -77,6 +78,8 @@ protected:
 
 using i2cReadByteDataSyncClientNode_t =
   ServiceNodeSync<hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData>;
+using i2cReadBlockDataSyncClientNode_t =
+  ServiceNodeSync<hal_pigpio_interfaces::srv::HalPigpioI2cReadBlockData>;
 using i2cWriteByteDataSyncClientNode_t =
   ServiceNodeSync<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData>;
 using i2cWriteBlockDataSyncClientNode_t =
@@ -89,6 +92,10 @@ int32_t getI2cHandle(imuGetHandleSyncClientNode_t imuGetHandleSyncClientNode);
 int16_t readByteFromRegister(
   i2cReadByteDataSyncClientNode_t i2cReadByteDataSyncClientNode, int32_t imuHandle,
   uint8_t registerToRead);
+
+std::vector<uint8_t> readBlockFromRegister(
+  i2cReadBlockDataSyncClientNode_t i2cReadBlockDataSyncClient, int32_t imuHandle,
+  uint8_t registerToRead, uint8_t bytesToRead);
 
 bool writeBitInRegister(
   i2cReadByteDataSyncClientNode_t i2cReadByteDataSyncClientNode,

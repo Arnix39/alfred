@@ -39,6 +39,25 @@ int16_t readByteFromRegister(
   return static_cast<int16_t>(i2c_read_byte_data(piHandle, imuHandle, registerToRead));
 }
 
+std::vector<uint8_t> readBlockFromRegister(
+  i2cReadBlockDataSyncClientNode_t i2cReadBlockDataSyncClient, int32_t imuHandle,
+  uint8_t registerToRead, uint8_t bytesToRead)
+{
+  (void)i2cReadBlockDataSyncClient;
+  std::vector<uint8_t> dataRead;
+  char buffer[I2C_BUFFER_MAX_BYTES];
+
+  int result = i2c_read_i2c_block_data(piHandle, imuHandle, registerToRead, buffer, bytesToRead);
+
+  if (result == bytesToRead) {
+    for (uint8_t index = 0; index < result; index++) {
+      dataRead.push_back(buffer[index]);
+    }
+  }
+
+  return dataRead;
+}
+
 bool writeBitInRegister(
   i2cReadByteDataSyncClientNode_t i2cReadByteDataSyncClientNode,
   i2cWriteByteDataSyncClientNode_t i2cWriteByteDataSyncClientNode, int32_t imuHandle,

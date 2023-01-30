@@ -39,10 +39,12 @@
 #define I2C_GOOD_REGISTER_2 0x20
 #define I2C_BUFFER_MAX_BYTES 32
 #define IMU_GOOD_HANDLE 1
+#define DATA_BLOCK_SIZE 5
 
 using HalPigpioI2cOpen_t = hal_pigpio_interfaces::srv::HalPigpioI2cOpen;
 using HalImuGetHandle_t = hal_imu_interfaces::srv::HalImuGetHandle;
 using HalPigpioI2cReadByteData_t = hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData;
+using HalPigpioI2cReadBlockData_t = hal_pigpio_interfaces::srv::HalPigpioI2cReadBlockData;
 using HalPigpioI2cWriteByteData_t = hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData;
 using HalPigpioI2cWriteBlockData_t = hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData;
 
@@ -56,6 +58,7 @@ public:
 
   rclcpp::Service<HalImuGetHandle_t>::SharedPtr imuGetHandleService;
   rclcpp::Service<HalPigpioI2cReadByteData_t>::SharedPtr i2cReadByteDataService;
+  rclcpp::Service<HalPigpioI2cReadBlockData_t>::SharedPtr i2cReadBlockDataService;
   rclcpp::Service<HalPigpioI2cWriteByteData_t>::SharedPtr i2cWriteByteDataService;
   rclcpp::Service<HalPigpioI2cWriteBlockData_t>::SharedPtr i2cWriteBlockDataService;
 
@@ -65,6 +68,9 @@ public:
   void i2cReadByteData(
     const std::shared_ptr<HalPigpioI2cReadByteData_t::Request> request,
     std::shared_ptr<HalPigpioI2cReadByteData_t::Response> response);
+  void i2cReadBlockData(
+    const std::shared_ptr<HalPigpioI2cReadBlockData_t::Request> request,
+    std::shared_ptr<HalPigpioI2cReadBlockData_t::Response> response);
   void i2cWriteByteData(
     const std::shared_ptr<HalPigpioI2cWriteByteData_t::Request> request,
     std::shared_ptr<HalPigpioI2cWriteByteData_t::Response> response);
@@ -80,6 +86,7 @@ public:
   ~I2cRegistersServicesCheckerNode() = default;
 
   i2cReadByteDataSyncClientNode_t i2cReadByteDataSyncClient;
+  i2cReadBlockDataSyncClientNode_t i2cReadBlockDataSyncClient;
   i2cWriteByteDataSyncClientNode_t i2cWriteByteDataSyncClient;
   i2cWriteBlockDataSyncClientNode_t i2cWriteBlockDataSyncClient;
   imuGetHandleSyncClientNode_t imuGetHandleSyncClient;
@@ -102,6 +109,7 @@ protected:
 
     i2cRegistersServicesChecker->imuGetHandleSyncClient.init("hal_imuGetHandle");
     i2cRegistersServicesChecker->i2cReadByteDataSyncClient.init("hal_pigpioI2cReadByteData");
+    i2cRegistersServicesChecker->i2cReadBlockDataSyncClient.init("hal_pigpioI2cReadBlockData");
     i2cRegistersServicesChecker->i2cWriteByteDataSyncClient.init("hal_pigpioI2cWriteByteData");
     i2cRegistersServicesChecker->i2cWriteBlockDataSyncClient.init("hal_pigpioI2cWriteBlockData");
 

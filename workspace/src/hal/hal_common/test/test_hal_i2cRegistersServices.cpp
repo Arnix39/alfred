@@ -21,6 +21,7 @@ I2cRegistersServicesCheckerNode::I2cRegistersServicesCheckerNode()
 : rclcpp::Node("hal_i2cRegistersServices_checker_node"),
   imuGetHandleSyncClient("getHandleSyncClientImu_node"),
   i2cReadByteDataSyncClient("readByteDataSyncClientImu_node"),
+  i2cReadBlockDataSyncClient("readBlockDataSyncClientImu_node"),
   i2cWriteByteDataSyncClient("writeByteDataSyncClientImu_node"),
   i2cWriteBlockDataSyncClient("writeBlockDataSyncClientImu_node")
 {}
@@ -34,6 +35,9 @@ HalDummyNode::HalDummyNode()
   i2cReadByteDataService(this->create_service<HalPigpioI2cReadByteData_t>(
       "hal_pigpioI2cReadByteData",
       std::bind(&HalDummyNode::i2cReadByteData, this, _1, _2))),
+  i2cReadBlockDataService(this->create_service<HalPigpioI2cReadBlockData_t>(
+      "hal_pigpioI2cReadBlockData",
+      std::bind(&HalDummyNode::i2cReadBlockData, this, _1, _2))),
   i2cWriteByteDataService(this->create_service<HalPigpioI2cWriteByteData_t>(
       "hal_pigpioI2cWriteByteData",
       std::bind(&HalDummyNode::i2cWriteByteData, this, _1, _2))),
@@ -66,6 +70,24 @@ void HalDummyNode::i2cReadByteData(
     response->has_succeeded = true;
   } else {
     response->value = 0;
+    response->has_succeeded = false;
+  }
+}
+
+void HalDummyNode::i2cReadBlockData(
+  const std::shared_ptr<HalPigpioI2cReadBlockData_t::Request> request,
+  std::shared_ptr<HalPigpioI2cReadBlockData_t::Response> response)
+{
+  char buffer[I2C_BUFFER_MAX_BYTES];
+  int result = i2c_read_i2c_block_data(
+    piHandle, request->handle, request->device_register, buffer, request->length);
+  if (result > 0) {
+    response->has_succeeded = true;
+
+    for (uint8_t index = 0; index < result; index++) {
+      response->data_block.push_back(buffer[index]);
+    }
+  } else {
     response->has_succeeded = false;
   }
 }
@@ -156,6 +178,60 @@ TEST_F(I2cRegistersServicesTest, readByteFromRegisterFailure)
 
   if (status == rclcpp::FutureReturnCode::SUCCESS) {
     ASSERT_EQ(future.get(), -1);
+  } else {
+    FAIL();
+  }
+
+  i2c_close(halDummyNode->piHandle, i2cHandle);
+}
+
+TEST_F(I2cRegistersServicesTest, readBlockFromRegisterSuccess)
+{
+  char valuesToRead[DATA_BLOCK_SIZE] = {0x1, 0x2, 0x3, 0x4, 0x5};
+  auto i2cHandle = i2c_open(
+    halDummyNode->piHandle, I2C_GOOD_BUS_1, I2C_GOOD_ADDRESS, 0);
+  i2c_write_i2c_block_data(
+    halDummyNode->piHandle, i2cHandle, MPU6050_READ_WRITE_REGISTER, valuesToRead, DATA_BLOCK_SIZE);
+
+  auto future = std::async(
+    std::launch::async, readBlockFromRegister,
+    i2cRegistersServicesChecker->i2cReadBlockDataSyncClient,
+    i2cHandle,
+    MPU6050_READ_WRITE_REGISTER,
+    DATA_BLOCK_SIZE);
+
+  auto status = executor.spin_until_future_complete(future);
+
+  if (status == rclcpp::FutureReturnCode::SUCCESS) {
+    auto reading = future.get();
+    ASSERT_EQ(reading.size(), DATA_BLOCK_SIZE);
+    for (uint8_t index; index < reading.size(); ++index) {
+      ASSERT_EQ(reading.at(index), valuesToRead[index]);
+    }
+  } else {
+    FAIL();
+  }
+
+  i2c_close(halDummyNode->piHandle, i2cHandle);
+}
+
+TEST_F(I2cRegistersServicesTest, readBlockFromRegisterFailure)
+{
+  auto i2cHandle = i2c_open(
+    halDummyNode->piHandle, I2C_GOOD_BUS_1, I2C_GOOD_ADDRESS, 0);
+
+  auto future = std::async(
+    std::launch::async, readBlockFromRegister,
+    i2cRegistersServicesChecker->i2cReadBlockDataSyncClient,
+    i2cHandle,
+    I2C_BAD_REGISTER,
+    0x1);
+
+  auto status = executor.spin_until_future_complete(future);
+
+  if (status == rclcpp::FutureReturnCode::SUCCESS) {
+    auto reading = future.get();
+    ASSERT_EQ(reading.size(), 0);
   } else {
     FAIL();
   }
