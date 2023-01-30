@@ -13,12 +13,15 @@
 // limitations under the License.
 
 #include "hal_i2cRegistersServices.hpp"
-#include "pigpiod_if2.h" // NOLINT
-
-#define IMU_I2C_BUS 0x1
-#define I2C_BUFFER_MAX_BYTES 32
+#include "mock/hal_i2cRegistersServicesMock.hpp"
 
 static int piHandle = pigpio_start(NULL, NULL);
+
+void closePigpio(int32_t i2cHandle)
+{
+  i2c_close(piHandle, i2cHandle);
+  pigpio_stop(piHandle);
+}
 
 int32_t getI2cHandle(imuGetHandleSyncClientNode_t imuGetHandleSyncClient)
 {
@@ -41,14 +44,11 @@ bool writeBitInRegister(
   i2cWriteByteDataSyncClientNode_t i2cWriteByteDataSyncClientNode, int32_t imuHandle,
   uint8_t registerToWrite, uint8_t bitToWrite, uint8_t valueOfBit)
 {
-  (void)i2cReadByteDataSyncClientNode;
-  (void)i2cWriteByteDataSyncClientNode;
-
   uint8_t registerValue;
   int16_t valueRead;
   uint8_t newRegisterValue;
 
-  valueRead = static_cast<int16_t>(i2c_read_byte_data(piHandle, imuHandle, registerToWrite));
+  valueRead = readByteFromRegister(i2cReadByteDataSyncClientNode, imuHandle, registerToWrite);
   if (valueRead < 0) {
     return false;
   } else {
@@ -61,11 +61,11 @@ bool writeBitInRegister(
     newRegisterValue = registerValue & ~(1 << bitToWrite);
   }
 
-  if (i2c_write_byte_data(piHandle, imuHandle, registerToWrite, newRegisterValue) == 0) {
-    return true;
-  } else {
-    return false;
-  }
+  return writeByteInRegister(
+    i2cWriteByteDataSyncClientNode,
+    imuHandle,
+    registerToWrite,
+    newRegisterValue);
 }
 
 bool writeByteInRegister(

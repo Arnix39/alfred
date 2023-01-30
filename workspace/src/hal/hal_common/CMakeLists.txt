@@ -29,7 +29,7 @@ ament_target_dependencies(${PROJECT_NAME} ${dependencies})
 if(BUILD_TESTING)
   find_package(pigpio REQUIRED)
   add_library(${PROJECT_NAME}_mock SHARED
-  src/hal_i2cRegistersServices_mock.cpp)
+  src/mock/hal_i2cRegistersServices_mock.cpp)
   ament_target_dependencies(${PROJECT_NAME}_mock ${dependencies} pigpio)
 endif()
 
