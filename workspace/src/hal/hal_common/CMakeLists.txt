@@ -23,9 +23,15 @@ set(dependencies
   common_utils)
 
 add_library(${PROJECT_NAME} SHARED
-  src/hal_i2cRegistersServices.cpp
-)
+  src/hal_i2cRegistersServices.cpp)
 ament_target_dependencies(${PROJECT_NAME} ${dependencies})
+
+if(BUILD_TESTING)
+  find_package(pigpio REQUIRED)
+  add_library(${PROJECT_NAME}_mock SHARED
+  src/hal_i2cRegistersServices_mock.cpp)
+  ament_target_dependencies(${PROJECT_NAME}_mock ${dependencies} pigpio)
+endif()
 
 #############
 ## Testing ##
@@ -49,13 +55,23 @@ install(
   DIRECTORY include/
   DESTINATION include)
 
-install(
-  TARGETS ${PROJECT_NAME}
-  EXPORT ${PROJECT_NAME}_lib
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-  RUNTIME DESTINATION bin
-  INCLUDES DESTINATION include)
+if(BUILD_TESTING)
+  install(
+    TARGETS ${PROJECT_NAME}_mock
+    EXPORT ${PROJECT_NAME}_lib
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include)
+else()
+  install(
+    TARGETS ${PROJECT_NAME}
+    EXPORT ${PROJECT_NAME}_lib
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include)
+endif()
 
 ament_export_targets(${PROJECT_NAME}_lib HAS_LIBRARY_TARGET)
 
