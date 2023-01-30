@@ -63,7 +63,6 @@ public:
   LifecycleCallbackReturn_t on_shutdown(const rclcpp_lifecycle::State & previous_state);
   LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
 
-  void startServer(void);
   void writeDmp(const std::shared_ptr<HalImuWriteDmpGoal> goal_handle);
   bool writeData(uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data);
 };

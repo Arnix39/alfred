@@ -86,22 +86,23 @@ public:
   LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
 
   void dmpInit(void);
-  void setDmpRate(uint16_t rate);
-  void setMpuRate(uint16_t rate);
-  void enableDmpAndStartReading(void);
-  void configureDmpFeatures(void);
-  void resetImu(void);
-  void resetFifo(void);
-  void setClockSource(void);
-  bool writeDataToDmp(uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data);
+  void setDmpRate(int32_t imuHandle, uint16_t rate);
+  void setMpuRate(int32_t imuHandle, uint16_t rate);
+  void enableDmpAndStartReading(int32_t imuHandle);
+  void configureDmpFeatures(int32_t imuHandle);
+  void resetImu(int32_t imuHandle);
+  void resetFifo(int32_t imuHandle);
+  void setClockSource(int32_t imuHandle);
+  bool writeDataToDmp(
+    int32_t imuHandle, uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data);
   void startImuReading(void);
   void stopImuReading(void);
-  void setConfiguration(void);
-  void setGyroscopeSensitivity(void);
-  void setAccelerometerSensitivity(void);
-  void setAccelerometerOffsets(void);
-  void setGyroscopeOffsets(void);
-  bool writeSensorBiases(const std::vector<SensorBias> sensorBiases);
+  void setConfiguration(int32_t imuHandle);
+  void setGyroscopeSensitivity(int32_t imuHandle);
+  void setAccelerometerSensitivity(int32_t imuHandle);
+  void setAccelerometerOffsets(int32_t imuHandle);
+  void setGyroscopeOffsets(int32_t imuHandle);
+  bool writeSensorBiases(int32_t imuHandle, const std::vector<SensorBias> sensorBiases);
 };
 
 #endif  // HAL_IMU_HPP_

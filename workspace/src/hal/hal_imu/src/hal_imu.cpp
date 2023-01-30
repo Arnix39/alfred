@@ -46,12 +46,12 @@ LifecycleCallbackReturn_t Imu::on_activate(const rclcpp_lifecycle::State & previ
 {
   imuHandle = getI2cHandle(imuGetHandleSyncClient);
 
-  resetImu();
-  setClockSource();
-  setAccelerometerSensitivity();
-  setGyroscopeSensitivity();
-  setConfiguration();
-  setMpuRate(MPU6050_DMP_SAMPLE_RATE);
+  resetImu(imuHandle);
+  setClockSource(imuHandle);
+  setAccelerometerSensitivity(imuHandle);
+  setGyroscopeSensitivity(imuHandle);
+  setConfiguration(imuHandle);
+  setMpuRate(imuHandle, MPU6050_DMP_SAMPLE_RATE);
   dmpInit();
 
   RCLCPP_INFO(get_logger(), "hal_imu node activated!");
@@ -102,11 +102,11 @@ void Imu::result_callback(const HalImuWriteDmpGoal::WrappedResult & result)
 {
   if (result.code == rclcpp_action::ResultCode::SUCCEEDED) {
     RCLCPP_INFO(get_logger(), "DMP code written successfully.");
-    setDmpRate(MPU6050_DMP_SAMPLE_RATE);
-    setAccelerometerOffsets();
-    setGyroscopeOffsets();
-    configureDmpFeatures();
-    enableDmpAndStartReading();
+    setDmpRate(imuHandle, MPU6050_DMP_SAMPLE_RATE);
+    setAccelerometerOffsets(imuHandle);
+    setGyroscopeOffsets(imuHandle);
+    configureDmpFeatures(imuHandle);
+    enableDmpAndStartReading(imuHandle);
   } else {
     RCLCPP_ERROR(get_logger(), "Error while writing DMP code!");
   }
@@ -119,7 +119,7 @@ void Imu::feedback_callback(
   RCLCPP_INFO(get_logger(), "Bank %u written.", feedback->bank);
 }
 
-void Imu::resetImu(void)
+void Imu::resetImu(int32_t imuHandle)
 {
   RCLCPP_INFO(get_logger(), "IMU resetting...");
 
@@ -157,7 +157,7 @@ void Imu::resetImu(void)
   RCLCPP_INFO(get_logger(), "Successfully resetted IMU.");
 }
 
-void Imu::setClockSource(void)
+void Imu::setClockSource(int32_t imuHandle)
 {
   if (!writeByteInRegister(
       i2cWriteByteDataSyncClient, imuHandle, MPU6050_POWER_MANAGEMENT_1_REGISTER,
@@ -169,7 +169,7 @@ void Imu::setClockSource(void)
   }
 }
 
-void Imu::setMpuRate(uint16_t rate)
+void Imu::setMpuRate(int32_t imuHandle, uint16_t rate)
 {
   uint8_t div;
 
@@ -190,7 +190,7 @@ void Imu::setMpuRate(uint16_t rate)
   }
 }
 
-void Imu::setConfiguration(void)
+void Imu::setConfiguration(int32_t imuHandle)
 {
   if (!writeByteInRegister(
       i2cWriteByteDataSyncClient, imuHandle, MPU6050_CONFIGURATION_REGISTER,
@@ -202,7 +202,7 @@ void Imu::setConfiguration(void)
   }
 }
 
-void Imu::setAccelerometerSensitivity(void)
+void Imu::setAccelerometerSensitivity(int32_t imuHandle)
 {
   if (!writeByteInRegister(
       i2cWriteByteDataSyncClient, imuHandle,
@@ -214,7 +214,7 @@ void Imu::setAccelerometerSensitivity(void)
   }
 }
 
-void Imu::setGyroscopeSensitivity(void)
+void Imu::setGyroscopeSensitivity(int32_t imuHandle)
 {
   if (!writeByteInRegister(
       i2cWriteByteDataSyncClient, imuHandle,
@@ -238,7 +238,7 @@ void Imu::dmpInit(void)
   auto goal_future = imuDmpWritingClient->async_send_goal(goal, goal_callbacks);
 }
 
-void Imu::setDmpRate(uint16_t rate)
+void Imu::setDmpRate(int32_t imuHandle, uint16_t rate)
 {
   uint16_t div;
   std::vector<uint8_t> div_vec;
@@ -254,13 +254,15 @@ void Imu::setDmpRate(uint16_t rate)
   div_vec.push_back(static_cast<uint8_t>(div >> 8));
   div_vec.push_back(static_cast<uint8_t>(div & 0xFF));
 
-  if (!writeDataToDmp(MPU6050_DMP_SAMPLE_RATE_BANK, MPU6050_DMP_SAMPLE_RATE_ADDRESS, div_vec)) {
+  if (!writeDataToDmp(
+      imuHandle, MPU6050_DMP_SAMPLE_RATE_BANK, MPU6050_DMP_SAMPLE_RATE_ADDRESS, div_vec))
+  {
     RCLCPP_ERROR(get_logger(), "Failed to write DMP sample rate.");
     return;
   }
 
   if (!writeDataToDmp(
-      MPU6050_DMP_DIVISER_BANK, MPU6050_DMP_DIVISER_ADDRESS,
+      imuHandle, MPU6050_DMP_DIVISER_BANK, MPU6050_DMP_DIVISER_ADDRESS,
       dmpRegisterDiviserData))
   {
     RCLCPP_ERROR(get_logger(), "Failed to write DMP diviser data.");
@@ -270,7 +272,7 @@ void Imu::setDmpRate(uint16_t rate)
   RCLCPP_INFO(get_logger(), "Successfully set DMP sample rate.");
 }
 
-void Imu::resetFifo()
+void Imu::resetFifo(int32_t imuHandle)
 {
   if (!writeBitInRegister(
       i2cReadByteDataSyncClient, i2cWriteByteDataSyncClient, imuHandle,
@@ -282,7 +284,7 @@ void Imu::resetFifo()
   }
 }
 
-void Imu::setAccelerometerOffsets(void)
+void Imu::setAccelerometerOffsets(int32_t imuHandle)
 {
   SensorBias accelerometerXBias{'X', IMU_ACCELEROMETER_X_OFFSET,
     MPU6050_ACCELEROMETER_X_OFFSET_MSB_REGISTER, MPU6050_ACCELEROMETER_X_OFFSET_LSB_REGISTER};
@@ -294,14 +296,14 @@ void Imu::setAccelerometerOffsets(void)
   const std::vector<SensorBias> accelerometerBiases{accelerometerXBias, accelerometerYBias,
     accelerometerZBias};
 
-  if (!writeSensorBiases(accelerometerBiases)) {
+  if (!writeSensorBiases(imuHandle, accelerometerBiases)) {
     RCLCPP_ERROR(get_logger(), "Failed to set accelerometer offsets.");
   } else {
     RCLCPP_INFO(get_logger(), "Successfully set accelerometer offsets.");
   }
 }
 
-void Imu::setGyroscopeOffsets(void)
+void Imu::setGyroscopeOffsets(int32_t imuHandle)
 {
   SensorBias gyroscopeXBias{'X', IMU_GYROSCOPE_X_OFFSET, MPU6050_GYROSCOPE_X_OFFSET_MSB_REGISTER,
     MPU6050_GYROSCOPE_X_OFFSET_LSB_REGISTER};
@@ -312,14 +314,14 @@ void Imu::setGyroscopeOffsets(void)
 
   const std::vector<SensorBias> gyroscopeBiases{gyroscopeXBias, gyroscopeYBias, gyroscopeZBias};
 
-  if (!writeSensorBiases(gyroscopeBiases)) {
+  if (!writeSensorBiases(imuHandle, gyroscopeBiases)) {
     RCLCPP_ERROR(get_logger(), "Failed to set gyroscope offsets.");
   } else {
     RCLCPP_INFO(get_logger(), "Successfully set gyroscope offsets.");
   }
 }
 
-bool Imu::writeSensorBiases(const std::vector<SensorBias> sensorBiases)
+bool Imu::writeSensorBiases(int32_t imuHandle, const std::vector<SensorBias> sensorBiases)
 {
   for (auto sensorBias : sensorBiases) {
     uint8_t sensorBiasMsb = static_cast<uint8_t>((sensorBias.bias >> 8) & 0xFF);
@@ -345,7 +347,7 @@ bool Imu::writeSensorBiases(const std::vector<SensorBias> sensorBiases)
   return true;
 }
 
-void Imu::configureDmpFeatures(void)
+void Imu::configureDmpFeatures(int32_t imuHandle)
 {
   std::vector<uint8_t> dmpNoSensorData(MPU6050_DMP_FEATURE_SEND_SENSOR_DATA_SIZE, 0xA3);
   std::vector<uint8_t> dmpNoGestureData{0xD8};
@@ -357,7 +359,7 @@ void Imu::configureDmpFeatures(void)
   std::vector<uint8_t> dmp6AxisQuaternionEnabled{0x20, 0x28, 0x30, 0x38};
 
   if (!writeDataToDmp(
-      MPU6050_DMP_FEATURE_SEND_SENSOR_DATA_BANK,
+      imuHandle, MPU6050_DMP_FEATURE_SEND_SENSOR_DATA_BANK,
       MPU6050_DMP_FEATURE_SEND_SENSOR_DATA_ADDRESS, dmpNoSensorData))
   {
     RCLCPP_ERROR(get_logger(), "Failed to configure DMP features (sensor data disabled)!");
@@ -365,7 +367,7 @@ void Imu::configureDmpFeatures(void)
   }
 
   if (!writeDataToDmp(
-      MPU6050_DMP_FEATURE_SEND_GESTURE_DATA_BANK,
+      imuHandle, MPU6050_DMP_FEATURE_SEND_GESTURE_DATA_BANK,
       MPU6050_DMP_FEATURE_SEND_GESTURE_DATA_ADDRESS, dmpNoGestureData))
   {
     RCLCPP_ERROR(get_logger(), "Failed to configure DMP features (gesture data disabled)!");
@@ -373,7 +375,7 @@ void Imu::configureDmpFeatures(void)
   }
 
   if (!writeDataToDmp(
-      MPU6050_CFG_MOTION_BIAS_BANK, MPU6050_CFG_MOTION_BIAS_ADDRESS,
+      imuHandle, MPU6050_CFG_MOTION_BIAS_BANK, MPU6050_CFG_MOTION_BIAS_ADDRESS,
       gyroscopeCalibrationDisabled))
   {
     RCLCPP_ERROR(
@@ -383,7 +385,7 @@ void Imu::configureDmpFeatures(void)
   }
 
   if (!writeDataToDmp(
-      MPU6050_DMP_FEATURE_SEND_TAP_DATA_BANK,
+      imuHandle, MPU6050_DMP_FEATURE_SEND_TAP_DATA_BANK,
       MPU6050_DMP_FEATURE_SEND_TAP_DATA_ADDRESS, dmpNoTapData))
   {
     RCLCPP_ERROR(get_logger(), "Failed to configure DMP features (tap data disabled)!");
@@ -391,7 +393,7 @@ void Imu::configureDmpFeatures(void)
   }
 
   if (!writeDataToDmp(
-      MPU6050_DMP_FEATURE_SEND_ANDROID_ORIENTATION_BANK,
+      imuHandle, MPU6050_DMP_FEATURE_SEND_ANDROID_ORIENTATION_BANK,
       MPU6050_DMP_FEATURE_SEND_ANDROID_ORIENTATION_ADDRESS, dmpNoAndroidOrientation))
   {
     RCLCPP_ERROR(get_logger(), "Failed to configure DMP features (android orientation disbaled)!");
@@ -399,7 +401,7 @@ void Imu::configureDmpFeatures(void)
   }
 
   if (!writeDataToDmp(
-      MPU6050_DMP_FEATURE_QUATERNION_BANK, MPU6050_DMP_FEATURE_QUATERNION_ADDRESS,
+      imuHandle, MPU6050_DMP_FEATURE_QUATERNION_BANK, MPU6050_DMP_FEATURE_QUATERNION_ADDRESS,
       dmpQuaternionDisabled))
   {
     RCLCPP_ERROR(
@@ -409,7 +411,7 @@ void Imu::configureDmpFeatures(void)
   }
 
   if (!writeDataToDmp(
-      MPU6050_DMP_FEATURE_6X_LP_QUAT_BANK, MPU6050_DMP_FEATURE_6X_LP_QUAT_ADDRESS,
+      imuHandle, MPU6050_DMP_FEATURE_6X_LP_QUAT_BANK, MPU6050_DMP_FEATURE_6X_LP_QUAT_ADDRESS,
       dmp6AxisQuaternionEnabled))
   {
     RCLCPP_ERROR(
@@ -417,12 +419,12 @@ void Imu::configureDmpFeatures(void)
     return;
   }
 
-  resetFifo();
+  resetFifo(imuHandle);
 
   RCLCPP_INFO(get_logger(), "Successfully configured DMP features.");
 }
 
-void Imu::enableDmpAndStartReading(void)
+void Imu::enableDmpAndStartReading(int32_t imuHandle)
 {
   /* Enable DMP and FIFO */
   if (!writeByteInRegister(
@@ -433,14 +435,15 @@ void Imu::enableDmpAndStartReading(void)
     return;
   }
 
-  resetFifo();
+  resetFifo(imuHandle);
 
   startImuReading();
 
   RCLCPP_INFO(get_logger(), "Successfully enabled DMP.");
 }
 
-bool Imu::writeDataToDmp(uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data)
+bool Imu::writeDataToDmp(
+  int32_t imuHandle, uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data)
 {
   if (!writeByteInRegister(
       i2cWriteByteDataSyncClient, imuHandle, MPU6050_BANK_SELECTION_REGISTER,
