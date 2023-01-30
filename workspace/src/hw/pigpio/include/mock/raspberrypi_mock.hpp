@@ -21,6 +21,7 @@
 #include <vector>
 #include <tuple>
 #include <algorithm>
+#include <mutex>
 
 #include "gpioDefinitions.hpp"
 
@@ -31,6 +32,8 @@
 #define MPU6050_FIFO_COUNT_L_REGISTER 0x73
 #define MPU6050_FIFO_REGISTER 0x74
 #define MPU6050_INTERRUPT_STATUS_REGISTER 0x3A
+#define MPU6050_POWER_MANAGEMENT_1_REGISTER 0x6B
+#define MPU6050_SIGNAL_PATH_RESET_REGISTER 0x68
 #define MAX_I2C_BUS_ID 1
 
 enum gpioType
@@ -104,6 +107,7 @@ private:
   std::map<uint8_t, gpio> gpios;
   std::vector<i2cHandle_t> i2cHandles;
   std::vector<i2cRegister_t> i2cRegisters;
+  std::mutex mutex;
 
 public:
   RaspberryPi();

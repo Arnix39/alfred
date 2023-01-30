@@ -23,7 +23,9 @@ RaspberryPi::RaspberryPi()
       {MPU6050_I2C_ADDRESS_HIGH, MPU6050_FIFO_COUNT_H_REGISTER, 1, {}},
       {MPU6050_I2C_ADDRESS_HIGH, MPU6050_FIFO_COUNT_L_REGISTER, 1, {}},
       {MPU6050_I2C_ADDRESS_HIGH, MPU6050_INTERRUPT_STATUS_REGISTER, 1, {}},
-      {MPU6050_I2C_ADDRESS_HIGH, MPU6050_FIFO_REGISTER, 16, {}}})
+      {MPU6050_I2C_ADDRESS_HIGH, MPU6050_FIFO_REGISTER, 16, {}},
+      {MPU6050_I2C_ADDRESS_HIGH, MPU6050_POWER_MANAGEMENT_1_REGISTER, 1, {}},
+      {MPU6050_I2C_ADDRESS_HIGH, MPU6050_SIGNAL_PATH_RESET_REGISTER, 1, {}}})
 {
 }
 
@@ -44,7 +46,9 @@ void RaspberryPi::reset(void)
     {MPU6050_I2C_ADDRESS_HIGH, MPU6050_FIFO_COUNT_H_REGISTER, 1, {}},
     {MPU6050_I2C_ADDRESS_HIGH, MPU6050_FIFO_COUNT_L_REGISTER, 1, {}},
     {MPU6050_I2C_ADDRESS_HIGH, MPU6050_INTERRUPT_STATUS_REGISTER, 1, {}},
-    {MPU6050_I2C_ADDRESS_HIGH, MPU6050_FIFO_REGISTER, 16, {}}};
+    {MPU6050_I2C_ADDRESS_HIGH, MPU6050_FIFO_REGISTER, 16, {}},
+    {MPU6050_I2C_ADDRESS_HIGH, MPU6050_POWER_MANAGEMENT_1_REGISTER, 1, {}},
+    {MPU6050_I2C_ADDRESS_HIGH, MPU6050_SIGNAL_PATH_RESET_REGISTER, 1, {}}};
 }
 
 void RaspberryPi::addGpio(gpioId gpioId)
@@ -53,6 +57,7 @@ void RaspberryPi::addGpio(gpioId gpioId)
   gpioCallback gpioCallback({false, 0, neitherEdge});
   gpio newGpio({gpioType::input, gpioResistor::off, gpioLevel::low, gpioPwm, gpioCallback});
 
+  std::lock_guard<std::mutex> guard(mutex);
   gpios.insert({gpioId, newGpio});
 }
 
@@ -64,7 +69,9 @@ uint32_t RaspberryPi::addI2cHandle(uint8_t bus, uint8_t device)
     newHandle = i2cHandles.back().handle + 1;
   }
 
+  std::lock_guard<std::mutex> guard(mutex);
   i2cHandles.push_back({static_cast<uint32_t>(newHandle), bus, device});
+
   return newHandle;
 }
 
@@ -94,6 +101,7 @@ bool RaspberryPi::i2cHandleExists(uint32_t handle)
 
 bool RaspberryPi::removeI2cHandle(uint32_t handle)
 {
+  std::lock_guard<std::mutex> guard(mutex);
   for (int index = 0; index < i2cHandles.size(); ++index) {
     if (i2cHandles.at(index).handle == handle) {
       i2cHandles.erase(i2cHandles.begin() + index);
@@ -164,6 +172,7 @@ bool RaspberryPi::writeRegister(uint32_t i2cHandle, uint32_t address, std::vecto
       });
 
     if (index != i2cRegisters.end()) {
+      std::lock_guard<std::mutex> guard(mutex);
       i2cRegister_t & deviceRegister = i2cRegisters.at(index - i2cRegisters.begin());
 
       if (bytes.size() <= deviceRegister.size) {
@@ -181,6 +190,7 @@ int RaspberryPi::setGpioType(gpioId gpioId, gpioType type)
 {
   auto gpio = gpios.find(gpioId);
   if (gpio != gpios.end()) {
+    std::lock_guard<std::mutex> guard(mutex);
     gpio->second.type = type;
     return 0;
   }
@@ -191,6 +201,7 @@ int RaspberryPi::setGpioResistor(gpioId gpioId, gpioResistor resistorConfigurati
 {
   auto gpio = gpios.find(gpioId);
   if (gpio != gpios.end()) {
+    std::lock_guard<std::mutex> guard(mutex);
     gpio->second.resistorConfiguration = resistorConfiguration;
     return 0;
   }
@@ -201,6 +212,7 @@ int RaspberryPi::setGpioLevel(gpioId gpioId, gpioLevel level)
 {
   auto gpio = gpios.find(gpioId);
   if (gpio != gpios.end()) {
+    std::lock_guard<std::mutex> guard(mutex);
     gpio->second.level = level;
 
     if (std::get<1>(getGpioType(gpioId)) == output) {
@@ -216,6 +228,7 @@ int RaspberryPi::setGpioPwm(gpioId gpioId, gpioPwm pwm)
 {
   auto gpio = gpios.find(gpioId);
   if (gpio != gpios.end() && std::get<1>(getGpioType(gpioId)) == output) {
+    std::lock_guard<std::mutex> guard(mutex);
     gpio->second.pwm = pwm;
     return 0;
   }
@@ -226,6 +239,7 @@ int RaspberryPi::setGpioCallback(gpioId gpioId, gpioCallback callback)
 {
   auto gpio = gpios.find(gpioId);
   if (gpio != gpios.end()) {
+    std::lock_guard<std::mutex> guard(mutex);
     gpio->second.callback = callback;
     return gpio->second.callback.id;
   }
