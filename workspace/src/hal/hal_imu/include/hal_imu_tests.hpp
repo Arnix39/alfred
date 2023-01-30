@@ -15,7 +15,12 @@
 #ifndef HAL_IMU_TESTS_HPP_
 #define HAL_IMU_TESTS_HPP_
 
+#define BIAS_VALUE 0x1516
+#define SENSOR_BIAS_MSB_REGISTER 0x11
+#define SENSOR_BIAS_LSB_REGISTER 0x12
+
 #include <memory>
+#include <vector>
 
 #include "gtest/gtest.h"
 
@@ -33,15 +38,17 @@ public:
 
   rclcpp::Client<lifecycle_msgs::srv::ChangeState>::SharedPtr changeStateClient;
   i2cReadByteDataSyncClientNode_t i2cReadByteDataDummy;
+  i2cReadBlockDataSyncClientNode_t i2cReadBlockDataDummy;
   i2cWriteByteDataSyncClientNode_t i2cWriteByteDataDummy;
-  imuGetHandleSyncClientNode_t imuGetHandleDummy;
   i2cWriteBlockDataSyncClientNode_t i2cWriteBlockDataDummy;
+  imuGetHandleSyncClientNode_t imuGetHandleDummy;
 
   int32_t imuHandle;
 
   void changeImuNodeToState(std::uint8_t transition);
   void writeByte(uint8_t imuRegister, uint8_t value);
   int16_t readByte(uint8_t imuRegister);
+  std::vector<uint8_t> readBlock(uint8_t imuRegister, uint8_t bytesToRead);
 };
 
 /* Test fixture */

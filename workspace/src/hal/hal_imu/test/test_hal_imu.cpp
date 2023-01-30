@@ -19,6 +19,7 @@ ImuCheckerNode::ImuCheckerNode()
   changeStateClient(this->create_client<lifecycle_msgs::srv::ChangeState>(
       "hal_imu_node/change_state")),
   i2cReadByteDataDummy("DummyReadByteData"),
+  i2cReadBlockDataDummy("DummyReadBlockData"),
   i2cWriteByteDataDummy("DummyWriteByteData"),
   i2cWriteBlockDataDummy("DummyWriteBlockData"),
   imuGetHandleDummy("DummyGetHandle")
@@ -40,6 +41,11 @@ void ImuCheckerNode::writeByte(uint8_t imuRegister, uint8_t value)
 int16_t ImuCheckerNode::readByte(uint8_t imuRegister)
 {
   return readByteFromRegister(i2cReadByteDataDummy, imuHandle, imuRegister);
+}
+
+std::vector<uint8_t> ImuCheckerNode::readBlock(uint8_t imuRegister, uint8_t bytesToRead)
+{
+  return readBlockFromRegister(i2cReadBlockDataDummy, imuHandle, imuRegister, bytesToRead);
 }
 
 TEST_F(ImuTest, resetImu)
@@ -112,6 +118,32 @@ TEST_F(ImuTest, setGyroscopeSensitivity)
   ASSERT_EQ(
     imuChecker->readByte(MPU6050_GYROSCOPE_CONFIGURATION_REGISTER),
     MPU6050_GYROSCOPE_FULL_SENSITIVITY);
+}
+
+TEST_F(ImuTest, writeDataToDmp)
+{
+  uint8_t bankToWrite = 0x1;
+  uint8_t addressInBank = 0x2;
+  std::vector<uint8_t> data = {0x3, 0x4, 0x5, 0x6, 0x7};
+
+  imu->writeDataToDmp(imuChecker->imuHandle, bankToWrite, addressInBank, data);
+
+  ASSERT_EQ(imuChecker->readByte(MPU6050_BANK_SELECTION_REGISTER), bankToWrite);
+  ASSERT_EQ(imuChecker->readByte(MPU6050_ADDRESS_IN_BANK_REGISTER), addressInBank);
+  ASSERT_EQ(imuChecker->readBlock(MPU6050_READ_WRITE_REGISTER, data.size()), data);
+}
+
+TEST_F(ImuTest, writeSensorBiases)
+{
+  uint8_t biasValueMsb = 0x15;
+  uint8_t biasValueLsb = 0x16;
+  SensorBias bias = {'X', BIAS_VALUE, SENSOR_BIAS_MSB_REGISTER, SENSOR_BIAS_LSB_REGISTER};
+  const std::vector<SensorBias> sensorBiases = {bias};
+
+  imu->writeSensorBiases(imuChecker->imuHandle, sensorBiases);
+
+  ASSERT_EQ(imuChecker->readByte(SENSOR_BIAS_MSB_REGISTER), biasValueMsb);
+  ASSERT_EQ(imuChecker->readByte(SENSOR_BIAS_LSB_REGISTER), biasValueLsb);
 }
 
 int main(int argc, char ** argv)
