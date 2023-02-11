@@ -15,8 +15,8 @@
 #include "hal_pigpio.hpp"
 
 void Pigpio::readGpio(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioReadGpio::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioReadGpio::Response> response)
+  const std::shared_ptr<HalPigpioReadGpio_t::Request> request,
+  std::shared_ptr<HalPigpioReadGpio_t::Response> response)
 {
   response->level = gpio_read(pigpioHandle, request->gpio_id);
   if (response->level != PI_BAD_GPIO) {
@@ -33,7 +33,7 @@ void Pigpio::gpioEdgeChangeCallback(
 {
   (void)handle;
 
-  auto edgeChange = hal_pigpio_interfaces::msg::HalPigpioEdgeChange();
+  auto edgeChange = HalPigpioEdgeChangeMsg_t();
 
   edgeChange.gpio_id = gpioId;
   edgeChange.edge_change_type = edgeChangeType;
@@ -53,8 +53,8 @@ void Pigpio::c_gpioEdgeChangeCallback(
 }
 
 void Pigpio::setCallback(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetCallback::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetCallback::Response> response)
+  const std::shared_ptr<HalPigpioSetCallback_t::Request> request,
+  std::shared_ptr<HalPigpioSetCallback_t::Response> response)
 {
   response->callback_id = callback_ex(
     pigpioHandle, request->gpio_id, request->edge_change_type,
@@ -71,7 +71,7 @@ void Pigpio::setCallback(
 
 void Pigpio::publishEncoderCount(void)
 {
-  auto encoderCount = hal_pigpio_interfaces::msg::HalPigpioEncoderCount();
+  auto encoderCount = HalPigpioEncoderCountMsg_t();
 
   if (motors.size() != 0) {
     for (Motor & motor : motors) {
@@ -112,8 +112,8 @@ void Pigpio::c_gpioEncoderEdgeChangeCallback(
 }
 
 void Pigpio::setEncoderCallback(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback::Response> response)
+  const std::shared_ptr<HalPigpioSetEncoderCallback_t::Request> request,
+  std::shared_ptr<HalPigpioSetEncoderCallback_t::Response> response)
 {
   response->callback_id = callback_ex(
     pigpioHandle, request->gpio_id, request->edge_change_type,
@@ -142,8 +142,8 @@ void Pigpio::setEncoderCallback(
 }
 
 void Pigpio::setMotorDirection(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection::Response> response)
+  const std::shared_ptr<HalPigpioSetMotorDirection_t::Request> request,
+  std::shared_ptr<HalPigpioSetMotorDirection_t::Response> response)
 {
   auto motorIndex = find_if(
     motors.begin(), motors.end(), [request](Motor motor) {

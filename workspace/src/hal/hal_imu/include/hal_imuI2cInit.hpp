@@ -27,18 +27,21 @@
 
 #define IMU_I2C_BUS 0x1
 
-using I2cOpenFuture_t = rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cOpen>::SharedFuture;
-using I2cCloseFuture_t =
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cClose>::SharedFuture;
+using HalPigpioI2cOpen_t = hal_pigpio_interfaces::srv::HalPigpioI2cOpen;
+using HalPigpioI2cClose_t = hal_pigpio_interfaces::srv::HalPigpioI2cClose;
+using HalImuGetHandle_t = hal_imu_interfaces::srv::HalImuGetHandle;
+
+using I2cOpenFuture_t = rclcpp::Client<HalPigpioI2cOpen_t>::SharedFuture;
+using I2cCloseFuture_t = rclcpp::Client<HalPigpioI2cClose_t>::SharedFuture;
 
 class ImuI2cInit : public rclcpp_lifecycle::LifecycleNode
 {
 private:
   int32_t imuHandle;
 
-  rclcpp::Service<hal_imu_interfaces::srv::HalImuGetHandle>::SharedPtr getHandleService;
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cOpen>::SharedPtr i2cOpenClient;
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioI2cClose>::SharedPtr i2cCloseClient;
+  rclcpp::Service<HalImuGetHandle_t>::SharedPtr getHandleService;
+  rclcpp::Client<HalPigpioI2cOpen_t>::SharedPtr i2cOpenClient;
+  rclcpp::Client<HalPigpioI2cClose_t>::SharedPtr i2cCloseClient;
 
 public:
   ImuI2cInit();
@@ -52,8 +55,8 @@ public:
   LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
 
   void getHandle(
-    const std::shared_ptr<hal_imu_interfaces::srv::HalImuGetHandle::Request> request,
-    std::shared_ptr<hal_imu_interfaces::srv::HalImuGetHandle::Response> response);
+    const std::shared_ptr<HalImuGetHandle_t::Request> request,
+    std::shared_ptr<HalImuGetHandle_t::Response> response);
   void initI2cCommunication(void);
 };
 

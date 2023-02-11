@@ -65,34 +65,6 @@ bool hal_pigpioGpioSet(
 
 class PigioCheckerNode : public rclcpp::Node
 {
-  using HalPigpioSetInputMode_t = hal_pigpio_interfaces::srv::HalPigpioSetInputMode;
-  using HalPigpioSetOutputMode_t = hal_pigpio_interfaces::srv::HalPigpioSetOutputMode;
-  using HalPigpioGetMode_t = hal_pigpio_interfaces::srv::HalPigpioGetMode;
-  using HalPigpioSetPullUp_t = hal_pigpio_interfaces::srv::HalPigpioSetPullUp;
-  using HalPigpioSetPullDown_t = hal_pigpio_interfaces::srv::HalPigpioSetPullDown;
-  using HalPigpioClearResistor_t = hal_pigpio_interfaces::srv::HalPigpioClearResistor;
-  using HalPigpioSetPwmDutycycle_t = hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle;
-  using HalPigpioSetPwmFrequency_t = hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency;
-  using HalPigpioSetGpioHigh_t = hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh;
-  using HalPigpioSetGpioLow_t = hal_pigpio_interfaces::srv::HalPigpioSetGpioLow;
-  using HalPigpioSendTriggerPulse_t = hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse;
-  using HalPigpioReadGpio_t = hal_pigpio_interfaces::srv::HalPigpioReadGpio;
-  using HalPigpioSetCallback_t = hal_pigpio_interfaces::srv::HalPigpioSetCallback;
-  using HalPigpioSetEncoderCallback_t = hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback;
-  using HalPigpioSetMotorDirection_t = hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection;
-  using HalPigpioEdgeChangeMsg_t = hal_pigpio_interfaces::msg::HalPigpioEdgeChange;
-  using HalPigpioEncoderCountMsg_t = hal_pigpio_interfaces::msg::HalPigpioEncoderCount;
-  using HalPigpioI2cOpen_t = hal_pigpio_interfaces::srv::HalPigpioI2cOpen;
-  using HalPigpioI2cClose_t = hal_pigpio_interfaces::srv::HalPigpioI2cClose;
-  using HalPigpioI2cReadByteData_t = hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData;
-  using HalPigpioI2cReadWordData_t = hal_pigpio_interfaces::srv::HalPigpioI2cReadWordData;
-  using HalPigpioI2cReadBlockData_t = hal_pigpio_interfaces::srv::HalPigpioI2cReadBlockData;
-  using HalPigpioI2cWriteByteData_t = hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData;
-  using HalPigpioI2cWriteWordData_t = hal_pigpio_interfaces::srv::HalPigpioI2cWriteWordData;
-  using HalPigpioI2cWriteBlockData_t = hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData;
-  using HalPigpioI2cImuReading_t = hal_pigpio_interfaces::srv::HalPigpioI2cImuReading;
-  using HalPigpioAnglesMsg_t = hal_pigpio_interfaces::msg::HalPigpioAngles;
-
 public:
   PigioCheckerNode();
   ~PigioCheckerNode() = default;

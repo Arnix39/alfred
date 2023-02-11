@@ -25,10 +25,6 @@
 #include "hal_imuI2cInit.hpp"
 #include "pigpiod_if2.h" // NOLINT
 
-using HalPigpioI2cOpen_t = hal_pigpio_interfaces::srv::HalPigpioI2cOpen;
-using HalPigpioI2cClose_t = hal_pigpio_interfaces::srv::HalPigpioI2cClose;
-using HalImuGetHandle_t = hal_imu_interfaces::srv::HalImuGetHandle;
-
 class PigpioDummyNode : public rclcpp::Node
 {
 public:

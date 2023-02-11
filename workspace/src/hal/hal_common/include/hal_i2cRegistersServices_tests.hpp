@@ -42,11 +42,6 @@
 #define DATA_BLOCK_SIZE 5
 
 using HalPigpioI2cOpen_t = hal_pigpio_interfaces::srv::HalPigpioI2cOpen;
-using HalImuGetHandle_t = hal_imu_interfaces::srv::HalImuGetHandle;
-using HalPigpioI2cReadByteData_t = hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData;
-using HalPigpioI2cReadBlockData_t = hal_pigpio_interfaces::srv::HalPigpioI2cReadBlockData;
-using HalPigpioI2cWriteByteData_t = hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData;
-using HalPigpioI2cWriteBlockData_t = hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData;
 
 class HalDummyNode : public rclcpp::Node
 {

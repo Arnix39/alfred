@@ -29,8 +29,7 @@ Imu::Imu()
 
 LifecycleCallbackReturn_t Imu::on_configure(const rclcpp_lifecycle::State & previous_state)
 {
-  i2cImuReadingClient = this->create_client<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading>(
-    "hal_pigpioI2cImuReading");
+  i2cImuReadingClient = this->create_client<HalPigpioI2cImuReading_t>("hal_pigpioI2cImuReading");
   imuDmpWritingClient = rclcpp_action::create_client<HalImuWriteDmpAction>(this, "hal_imuWriteDmp");
   imuGetHandleSyncClient.init("hal_imuGetHandle");
   i2cReadByteDataSyncClient.init("hal_pigpioI2cReadByteData");
@@ -471,8 +470,7 @@ bool Imu::writeDataToDmp(
 
 void Imu::startImuReading()
 {
-  auto i2cImuReadingRequest =
-    std::make_shared<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading::Request>();
+  auto i2cImuReadingRequest = std::make_shared<HalPigpioI2cImuReading_t::Request>();
 
   i2cImuReadingRequest->imu_handle = imuHandle;
   i2cImuReadingRequest->is_imu_ready = true;
@@ -482,8 +480,7 @@ void Imu::startImuReading()
 
 void Imu::stopImuReading()
 {
-  auto i2cImuReadingRequest =
-    std::make_shared<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading::Request>();
+  auto i2cImuReadingRequest = std::make_shared<HalPigpioI2cImuReading_t::Request>();
 
   i2cImuReadingRequest->imu_handle = imuHandle;
   i2cImuReadingRequest->is_imu_ready = false;

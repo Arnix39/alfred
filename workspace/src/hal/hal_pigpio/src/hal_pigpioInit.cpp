@@ -15,8 +15,8 @@
 #include "hal_pigpio.hpp"
 
 void Pigpio::getMode(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioGetMode::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioGetMode::Response> response)
+  const std::shared_ptr<HalPigpioGetMode_t::Request> request,
+  std::shared_ptr<HalPigpioGetMode_t::Response> response)
 {
   response->mode = get_mode(pigpioHandle, request->gpio_id);
   if (response->mode >= 0) {
@@ -28,8 +28,8 @@ void Pigpio::getMode(
 }
 
 void Pigpio::setInputMode(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetInputMode::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetInputMode::Response> response)
+  const std::shared_ptr<HalPigpioSetInputMode_t::Request> request,
+  std::shared_ptr<HalPigpioSetInputMode_t::Response> response)
 {
   if (set_mode(pigpioHandle, request->gpio_id, PI_INPUT) == 0) {
     response->has_succeeded = true;
@@ -41,8 +41,8 @@ void Pigpio::setInputMode(
 }
 
 void Pigpio::setOutputMode(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode::Response> response)
+  const std::shared_ptr<HalPigpioSetOutputMode_t::Request> request,
+  std::shared_ptr<HalPigpioSetOutputMode_t::Response> response)
 {
   if (set_mode(pigpioHandle, request->gpio_id, PI_OUTPUT) == 0) {
     response->has_succeeded = true;
@@ -54,8 +54,8 @@ void Pigpio::setOutputMode(
 }
 
 void Pigpio::setPullUp(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetPullUp::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetPullUp::Response> response)
+  const std::shared_ptr<HalPigpioSetPullUp_t::Request> request,
+  std::shared_ptr<HalPigpioSetPullUp_t::Response> response)
 {
   if (set_pull_up_down(pigpioHandle, request->gpio_id, PI_PUD_UP) == 0) {
     response->has_succeeded = true;
@@ -67,8 +67,8 @@ void Pigpio::setPullUp(
 }
 
 void Pigpio::setPullDown(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetPullDown::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetPullDown::Response> response)
+  const std::shared_ptr<HalPigpioSetPullDown_t::Request> request,
+  std::shared_ptr<HalPigpioSetPullDown_t::Response> response)
 {
   if (set_pull_up_down(pigpioHandle, request->gpio_id, PI_PUD_DOWN) == 0) {
     response->has_succeeded = true;
@@ -80,8 +80,8 @@ void Pigpio::setPullDown(
 }
 
 void Pigpio::clearResistor(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioClearResistor::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioClearResistor::Response> response)
+  const std::shared_ptr<HalPigpioClearResistor_t::Request> request,
+  std::shared_ptr<HalPigpioClearResistor_t::Response> response)
 {
   if (set_pull_up_down(pigpioHandle, request->gpio_id, PI_PUD_OFF) == 0) {
     response->has_succeeded = true;

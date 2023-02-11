@@ -126,7 +126,7 @@ void Pigpio::computeQuaternions(char (& data)[MPU6050_DMP_FIFO_QUAT_SIZE])
 
 void Pigpio::publishAngles(void)
 {
-  auto message = hal_pigpio_interfaces::msg::HalPigpioAngles();
+  auto message = HalPigpioAnglesMsg_t();
 
   message.phi = angles.phi;
   message.theta = angles.theta;
@@ -161,8 +161,8 @@ void Pigpio::readQuaternionsAndPublishAngles()
 }
 
 void Pigpio::i2cImuReading(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading::Response> response)
+  const std::shared_ptr<HalPigpioI2cImuReading_t::Request> request,
+  std::shared_ptr<HalPigpioI2cImuReading_t::Response> response)
 {
   (void)response;
 

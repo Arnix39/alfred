@@ -15,8 +15,8 @@
 #include "hal_pigpio.hpp"
 
 void Pigpio::i2cOpen(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cOpen::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cOpen::Response> response)
+  const std::shared_ptr<HalPigpioI2cOpen_t::Request> request,
+  std::shared_ptr<HalPigpioI2cOpen_t::Response> response)
 {
   response->handle = i2c_open(pigpioHandle, request->bus, request->address, 0);
   if (response->handle >= 0) {
@@ -33,8 +33,8 @@ void Pigpio::i2cOpen(
 }
 
 void Pigpio::i2cClose(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cClose::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cClose::Response> response)
+  const std::shared_ptr<HalPigpioI2cClose_t::Request> request,
+  std::shared_ptr<HalPigpioI2cClose_t::Response> response)
 {
   if (i2c_close(pigpioHandle, request->handle) == 0) {
     response->has_succeeded = true;
@@ -46,8 +46,8 @@ void Pigpio::i2cClose(
 }
 
 void Pigpio::i2cReadByteData(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData::Response> response)
+  const std::shared_ptr<HalPigpioI2cReadByteData_t::Request> request,
+  std::shared_ptr<HalPigpioI2cReadByteData_t::Response> response)
 {
   int result = i2c_read_byte_data(pigpioHandle, request->handle, request->device_register);
   if (result >= 0) {
@@ -63,8 +63,8 @@ void Pigpio::i2cReadByteData(
 }
 
 void Pigpio::i2cReadWordData(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cReadWordData::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cReadWordData::Response> response)
+  const std::shared_ptr<HalPigpioI2cReadWordData_t::Request> request,
+  std::shared_ptr<HalPigpioI2cReadWordData_t::Response> response)
 {
   int result = i2c_read_word_data(pigpioHandle, request->handle, request->device_register);
   if (result >= 0) {
@@ -80,8 +80,8 @@ void Pigpio::i2cReadWordData(
 }
 
 void Pigpio::i2cReadBlockData(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cReadBlockData::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cReadBlockData::Response> response)
+  const std::shared_ptr<HalPigpioI2cReadBlockData_t::Request> request,
+  std::shared_ptr<HalPigpioI2cReadBlockData_t::Response> response)
 {
   char buffer[I2C_BUFFER_MAX_BYTES];
   int result = i2c_read_i2c_block_data(
@@ -105,8 +105,8 @@ void Pigpio::i2cReadBlockData(
 }
 
 void Pigpio::i2cWriteByteData(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData::Response> response)
+  const std::shared_ptr<HalPigpioI2cWriteByteData_t::Request> request,
+  std::shared_ptr<HalPigpioI2cWriteByteData_t::Response> response)
 {
   if (i2c_write_byte_data(
       pigpioHandle, request->handle, request->device_register, request->value) == 0)
@@ -121,8 +121,8 @@ void Pigpio::i2cWriteByteData(
 }
 
 void Pigpio::i2cWriteWordData(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cWriteWordData::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cWriteWordData::Response> response)
+  const std::shared_ptr<HalPigpioI2cWriteWordData_t::Request> request,
+  std::shared_ptr<HalPigpioI2cWriteWordData_t::Response> response)
 {
   if (i2c_write_word_data(
       pigpioHandle, request->handle, request->device_register, request->value) == 0)
@@ -137,8 +137,8 @@ void Pigpio::i2cWriteWordData(
 }
 
 void Pigpio::i2cWriteBlockData(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData::Response> response)
+  const std::shared_ptr<HalPigpioI2cWriteBlockData_t::Request> request,
+  std::shared_ptr<HalPigpioI2cWriteBlockData_t::Response> response)
 {
   char dataBlock[I2C_BUFFER_MAX_BYTES];
 

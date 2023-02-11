@@ -25,12 +25,10 @@ ImuI2cInit::ImuI2cInit()
 
 LifecycleCallbackReturn_t ImuI2cInit::on_configure(const rclcpp_lifecycle::State & previous_state)
 {
-  i2cOpenClient = this->create_client<hal_pigpio_interfaces::srv::HalPigpioI2cOpen>(
-    "hal_pigpioI2cOpen");
-  i2cCloseClient = this->create_client<hal_pigpio_interfaces::srv::HalPigpioI2cClose>(
-    "hal_pigpioI2cClose");
+  i2cOpenClient = this->create_client<HalPigpioI2cOpen_t>("hal_pigpioI2cOpen");
+  i2cCloseClient = this->create_client<HalPigpioI2cClose_t>("hal_pigpioI2cClose");
 
-  getHandleService = this->create_service<hal_imu_interfaces::srv::HalImuGetHandle>(
+  getHandleService = this->create_service<HalImuGetHandle_t>(
     "hal_imuGetHandle", std::bind(&ImuI2cInit::getHandle, this, _1, _2));
 
   RCLCPP_INFO(get_logger(), "hal_imuI2cInit node configured!");
@@ -49,7 +47,7 @@ LifecycleCallbackReturn_t ImuI2cInit::on_activate(const rclcpp_lifecycle::State 
 
 LifecycleCallbackReturn_t ImuI2cInit::on_deactivate(const rclcpp_lifecycle::State & previous_state)
 {
-  auto i2cCloseRequest = std::make_shared<hal_pigpio_interfaces::srv::HalPigpioI2cClose::Request>();
+  auto i2cCloseRequest = std::make_shared<HalPigpioI2cClose_t::Request>();
 
   i2cCloseRequest->handle = imuHandle;
 
@@ -78,8 +76,7 @@ LifecycleCallbackReturn_t ImuI2cInit::on_cleanup(const rclcpp_lifecycle::State &
 LifecycleCallbackReturn_t ImuI2cInit::on_shutdown(const rclcpp_lifecycle::State & previous_state)
 {
   if (previous_state.label().c_str() == "Active") {
-    auto i2cCloseRequest =
-      std::make_shared<hal_pigpio_interfaces::srv::HalPigpioI2cClose::Request>();
+    auto i2cCloseRequest = std::make_shared<HalPigpioI2cClose_t::Request>();
 
     i2cCloseRequest->handle = imuHandle;
 
@@ -105,8 +102,8 @@ LifecycleCallbackReturn_t ImuI2cInit::on_error(const rclcpp_lifecycle::State & p
 }
 
 void ImuI2cInit::getHandle(
-  const std::shared_ptr<hal_imu_interfaces::srv::HalImuGetHandle::Request> request,
-  std::shared_ptr<hal_imu_interfaces::srv::HalImuGetHandle::Response> response)
+  const std::shared_ptr<HalImuGetHandle_t::Request> request,
+  std::shared_ptr<HalImuGetHandle_t::Response> response)
 {
   (void)request;
 
@@ -115,7 +112,7 @@ void ImuI2cInit::getHandle(
 
 void ImuI2cInit::initI2cCommunication(void)
 {
-  auto i2cOpenRequest = std::make_shared<hal_pigpio_interfaces::srv::HalPigpioI2cOpen::Request>();
+  auto i2cOpenRequest = std::make_shared<HalPigpioI2cOpen_t::Request>();
 
   i2cOpenRequest->bus = IMU_I2C_BUS;
   i2cOpenRequest->address = MPU6050_I2C_ADDRESS;

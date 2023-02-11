@@ -17,8 +17,8 @@
 using namespace std::placeholders;
 
 void Pigpio::setPwmDutycycle(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle::Response> response)
+  const std::shared_ptr<HalPigpioSetPwmDutycycle_t::Request> request,
+  std::shared_ptr<HalPigpioSetPwmDutycycle_t::Response> response)
 {
   if (set_PWM_dutycycle(pigpioHandle, request->gpio_id, request->dutycycle) == 0) {
     response->has_succeeded = true;
@@ -29,8 +29,8 @@ void Pigpio::setPwmDutycycle(
 }
 
 void Pigpio::setPwmFrequency(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency::Response> response)
+  const std::shared_ptr<HalPigpioSetPwmFrequency_t::Request> request,
+  std::shared_ptr<HalPigpioSetPwmFrequency_t::Response> response)
 {
   int pwmSettingResult = set_PWM_frequency(pigpioHandle, request->gpio_id, request->frequency);
 
@@ -45,8 +45,8 @@ void Pigpio::setPwmFrequency(
 }
 
 void Pigpio::setGpioHigh(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh::Response> response)
+  const std::shared_ptr<HalPigpioSetGpioHigh_t::Request> request,
+  std::shared_ptr<HalPigpioSetGpioHigh_t::Response> response)
 {
   if (gpio_write(pigpioHandle, request->gpio_id, PI_HIGH) == 0) {
     response->has_succeeded = true;
@@ -57,8 +57,8 @@ void Pigpio::setGpioHigh(
 }
 
 void Pigpio::setGpioLow(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetGpioLow::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetGpioLow::Response> response)
+  const std::shared_ptr<HalPigpioSetGpioLow_t::Request> request,
+  std::shared_ptr<HalPigpioSetGpioLow_t::Response> response)
 {
   if (gpio_write(pigpioHandle, request->gpio_id, PI_LOW) == 0) {
     response->has_succeeded = true;
@@ -69,8 +69,8 @@ void Pigpio::setGpioLow(
 }
 
 void Pigpio::sendTriggerPulse(
-  const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse::Request> request,
-  std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse::Response> response)
+  const std::shared_ptr<HalPigpioSendTriggerPulse_t::Request> request,
+  std::shared_ptr<HalPigpioSendTriggerPulse_t::Response> response)
 {
   if (gpio_trigger(pigpioHandle, request->gpio_id, request->pulse_length_in_us, PI_HIGH) == 0) {
     response->has_succeeded = true;

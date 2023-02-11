@@ -16,7 +16,7 @@
 
 int32_t getI2cHandle(imuGetHandleSyncClientNode_t imuGetHandleSyncClient)
 {
-  auto imuGetHandleRequest = std::make_shared<hal_imu_interfaces::srv::HalImuGetHandle::Request>();
+  auto imuGetHandleRequest = std::make_shared<HalImuGetHandle_t::Request>();
 
   return imuGetHandleSyncClient.sendRequest(imuGetHandleRequest)->handle;
 }
@@ -27,8 +27,7 @@ int16_t readByteFromRegister(
 {
   int16_t byteRead = -1;
 
-  auto i2cReadByteDataRequest =
-    std::make_shared<hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData::Request>();
+  auto i2cReadByteDataRequest = std::make_shared<HalPigpioI2cReadByteData_t::Request>();
 
   i2cReadByteDataRequest->handle = imuHandle;
   i2cReadByteDataRequest->device_register = registerToRead;
@@ -49,7 +48,7 @@ std::vector<uint8_t> readBlockFromRegister(
   std::vector<uint8_t> dataRead;
 
   auto i2cReadBlockDataRequest =
-    std::make_shared<hal_pigpio_interfaces::srv::HalPigpioI2cReadBlockData::Request>();
+    std::make_shared<HalPigpioI2cReadBlockData_t::Request>();
 
   i2cReadBlockDataRequest->handle = imuHandle;
   i2cReadBlockDataRequest->device_register = registerToRead;
@@ -98,7 +97,7 @@ bool writeByteInRegister(
   uint8_t registerToWrite, uint8_t value)
 {
   auto i2cWriteByteDataRequest =
-    std::make_shared<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData::Request>();
+    std::make_shared<HalPigpioI2cWriteByteData_t::Request>();
 
   i2cWriteByteDataRequest->handle = imuHandle;
   i2cWriteByteDataRequest->device_register = registerToWrite;
@@ -112,7 +111,7 @@ bool writeDataBlock(
   uint8_t registerToWrite, std::vector<uint8_t> data)
 {
   auto i2cWriteBlockDataRequest =
-    std::make_shared<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData::Request>();
+    std::make_shared<HalPigpioI2cWriteBlockData_t::Request>();
 
   i2cWriteBlockDataRequest->handle = imuHandle;
   i2cWriteBlockDataRequest->device_register = registerToWrite;

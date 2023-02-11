@@ -30,6 +30,12 @@
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_write_block_data.hpp"
 #include "hal_imu_interfaces/srv/hal_imu_get_handle.hpp"
 
+using HalImuGetHandle_t = hal_imu_interfaces::srv::HalImuGetHandle;
+using HalPigpioI2cReadByteData_t = hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData;
+using HalPigpioI2cReadBlockData_t = hal_pigpio_interfaces::srv::HalPigpioI2cReadBlockData;
+using HalPigpioI2cWriteByteData_t = hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData;
+using HalPigpioI2cWriteBlockData_t = hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData;
+
 template<class ServiceT>
 class ServiceNodeSync
 {
@@ -76,16 +82,12 @@ protected:
   typename rclcpp::Client<ServiceT>::SharedPtr client;
 };
 
-using i2cReadByteDataSyncClientNode_t =
-  ServiceNodeSync<hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData>;
-using i2cReadBlockDataSyncClientNode_t =
-  ServiceNodeSync<hal_pigpio_interfaces::srv::HalPigpioI2cReadBlockData>;
-using i2cWriteByteDataSyncClientNode_t =
-  ServiceNodeSync<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData>;
-using i2cWriteBlockDataSyncClientNode_t =
-  ServiceNodeSync<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData>;
+using i2cReadByteDataSyncClientNode_t = ServiceNodeSync<HalPigpioI2cReadByteData_t>;
+using i2cReadBlockDataSyncClientNode_t = ServiceNodeSync<HalPigpioI2cReadBlockData_t>;
+using i2cWriteByteDataSyncClientNode_t = ServiceNodeSync<HalPigpioI2cWriteByteData_t>;
+using i2cWriteBlockDataSyncClientNode_t = ServiceNodeSync<HalPigpioI2cWriteBlockData_t>;
 
-using imuGetHandleSyncClientNode_t = ServiceNodeSync<hal_imu_interfaces::srv::HalImuGetHandle>;
+using imuGetHandleSyncClientNode_t = ServiceNodeSync<HalImuGetHandle_t>;
 
 int32_t getI2cHandle(imuGetHandleSyncClientNode_t imuGetHandleSyncClientNode);
 

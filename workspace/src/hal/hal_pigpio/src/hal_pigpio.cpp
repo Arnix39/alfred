@@ -39,72 +39,71 @@ LifecycleCallbackReturn_t Pigpio::on_configure(const rclcpp_lifecycle::State & p
 
   RCLCPP_INFO(get_logger(), "Pigpio handle: %d.", pigpioHandle);
 
-  i2cOpenService = this->create_service<hal_pigpio_interfaces::srv::HalPigpioI2cOpen>(
+  i2cOpenService = this->create_service<HalPigpioI2cOpen_t>(
     "hal_pigpioI2cOpen", std::bind(&Pigpio::i2cOpen, this, _1, _2));
-  i2cCloseService = this->create_service<hal_pigpio_interfaces::srv::HalPigpioI2cClose>(
+  i2cCloseService = this->create_service<HalPigpioI2cClose_t>(
     "hal_pigpioI2cClose", std::bind(&Pigpio::i2cClose, this, _1, _2));
   i2cReadByteDataService =
-    this->create_service<hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData>(
+    this->create_service<HalPigpioI2cReadByteData_t>(
     "hal_pigpioI2cReadByteData", std::bind(&Pigpio::i2cReadByteData, this, _1, _2));
   i2cReadWordDataService =
-    this->create_service<hal_pigpio_interfaces::srv::HalPigpioI2cReadWordData>(
+    this->create_service<HalPigpioI2cReadWordData_t>(
     "hal_pigpioI2cReadWordData", std::bind(&Pigpio::i2cReadWordData, this, _1, _2));
   i2cReadBlockDataService =
-    this->create_service<hal_pigpio_interfaces::srv::HalPigpioI2cReadBlockData>(
+    this->create_service<HalPigpioI2cReadBlockData_t>(
     "hal_pigpioI2cReadBlockData", std::bind(&Pigpio::i2cReadBlockData, this, _1, _2));
   i2cWriteByteDataService =
-    this->create_service<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData>(
+    this->create_service<HalPigpioI2cWriteByteData_t>(
     "hal_pigpioI2cWriteByteData", std::bind(&Pigpio::i2cWriteByteData, this, _1, _2));
   i2cWriteWordDataService =
-    this->create_service<hal_pigpio_interfaces::srv::HalPigpioI2cWriteWordData>(
+    this->create_service<HalPigpioI2cWriteWordData_t>(
     "hal_pigpioI2cWriteWordData", std::bind(&Pigpio::i2cWriteWordData, this, _1, _2));
   i2cWriteBlockDataService =
-    this->create_service<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData>(
+    this->create_service<HalPigpioI2cWriteBlockData_t>(
     "hal_pigpioI2cWriteBlockData", std::bind(&Pigpio::i2cWriteBlockData, this, _1, _2));
-  imuReadingService = this->create_service<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading>(
+  imuReadingService = this->create_service<HalPigpioI2cImuReading_t>(
     "hal_pigpioI2cImuReading", std::bind(&Pigpio::i2cImuReading, this, _1, _2));
-  setInputModeService = this->create_service<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>(
+  setInputModeService = this->create_service<HalPigpioSetInputMode_t>(
     "hal_pigpioSetInputMode", std::bind(&Pigpio::setInputMode, this, _1, _2));
-  setOutputModeService = this->create_service<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>(
+  setOutputModeService = this->create_service<HalPigpioSetOutputMode_t>(
     "hal_pigpioSetOutputMode", std::bind(&Pigpio::setOutputMode, this, _1, _2));
-  setPullUpService = this->create_service<hal_pigpio_interfaces::srv::HalPigpioSetPullUp>(
+  setPullUpService = this->create_service<HalPigpioSetPullUp_t>(
     "hal_pigpioSetPullUp", std::bind(&Pigpio::setPullUp, this, _1, _2));
-  setPullDownService = this->create_service<hal_pigpio_interfaces::srv::HalPigpioSetPullDown>(
+  setPullDownService = this->create_service<HalPigpioSetPullDown_t>(
     "hal_pigpioSetPullDown", std::bind(&Pigpio::setPullDown, this, _1, _2));
-  clearResistorService = this->create_service<hal_pigpio_interfaces::srv::HalPigpioClearResistor>(
+  clearResistorService = this->create_service<HalPigpioClearResistor_t>(
     "hal_pigpioClearResistor", std::bind(&Pigpio::clearResistor, this, _1, _2));
-  getModeService = this->create_service<hal_pigpio_interfaces::srv::HalPigpioGetMode>(
+  getModeService = this->create_service<HalPigpioGetMode_t>(
     "hal_pigpioGetMode", std::bind(&Pigpio::getMode, this, _1, _2));
-  readGpioService = this->create_service<hal_pigpio_interfaces::srv::HalPigpioReadGpio>(
+  readGpioService = this->create_service<HalPigpioReadGpio_t>(
     "hal_pigpioReadGpio", std::bind(&Pigpio::readGpio, this, _1, _2));
-  setCallbackService = this->create_service<hal_pigpio_interfaces::srv::HalPigpioSetCallback>(
+  setCallbackService = this->create_service<HalPigpioSetCallback_t>(
     "hal_pigpioSetCallback", std::bind(&Pigpio::setCallback, this, _1, _2));
   setEncoderCallbackService =
-    this->create_service<hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback>(
+    this->create_service<HalPigpioSetEncoderCallback_t>(
     "hal_pigpioSetEncoderCallback", std::bind(&Pigpio::setEncoderCallback, this, _1, _2));
   setMotorDirectionService =
-    this->create_service<hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection>(
+    this->create_service<HalPigpioSetMotorDirection_t>(
     "hal_pigpioSetMotorDirection", std::bind(&Pigpio::setMotorDirection, this, _1, _2));
   setPwmDutycycleService =
-    this->create_service<hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle>(
+    this->create_service<HalPigpioSetPwmDutycycle_t>(
     "hal_pigpioSetPwmDutycycle", std::bind(&Pigpio::setPwmDutycycle, this, _1, _2));
   setPwmFrequencyService =
-    this->create_service<hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency>(
+    this->create_service<HalPigpioSetPwmFrequency_t>(
     "hal_pigpioSetPwmFrequency", std::bind(&Pigpio::setPwmFrequency, this, _1, _2));
-  setGpioHighService = this->create_service<hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh>(
+  setGpioHighService = this->create_service<HalPigpioSetGpioHigh_t>(
     "hal_pigpioSetGpioHigh", std::bind(&Pigpio::setGpioHigh, this, _1, _2));
-  setGpioLowService = this->create_service<hal_pigpio_interfaces::srv::HalPigpioSetGpioLow>(
+  setGpioLowService = this->create_service<HalPigpioSetGpioLow_t>(
     "hal_pigpioSetGpioLow", std::bind(&Pigpio::setGpioLow, this, _1, _2));
   sendTriggerPulseService =
-    this->create_service<hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse>(
+    this->create_service<HalPigpioSendTriggerPulse_t>(
     "hal_pigpioSendTriggerPulse", std::bind(&Pigpio::sendTriggerPulse, this, _1, _2));
 
-  gpioEdgeChangePub = this->create_publisher<hal_pigpio_interfaces::msg::HalPigpioEdgeChange>(
+  gpioEdgeChangePub = this->create_publisher<HalPigpioEdgeChangeMsg_t>(
     "gpioEdgeChange", 1000);
-  gpioEncoderCountPub = this->create_publisher<hal_pigpio_interfaces::msg::HalPigpioEncoderCount>(
+  gpioEncoderCountPub = this->create_publisher<HalPigpioEncoderCountMsg_t>(
     "hal_pigpioEncoderCount", 1000);
-  anglesPublisher = this->create_publisher<hal_pigpio_interfaces::msg::HalPigpioAngles>(
-    "hal_pigpioAngles", 1000);
+  anglesPublisher = this->create_publisher<HalPigpioAnglesMsg_t>("hal_pigpioAngles", 1000);
 
   readQuaternionsAndPublishAnglesTimer =
     create_wall_timer(10ms, std::bind(&Pigpio::readQuaternionsAndPublishAngles, this));

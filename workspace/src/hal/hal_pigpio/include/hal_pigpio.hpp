@@ -29,6 +29,34 @@
 #include "hal_pigpioInput.hpp"
 #include "hal_pigpioOutput.hpp"
 
+using HalPigpioSetInputMode_t = hal_pigpio_interfaces::srv::HalPigpioSetInputMode;
+using HalPigpioSetOutputMode_t = hal_pigpio_interfaces::srv::HalPigpioSetOutputMode;
+using HalPigpioGetMode_t = hal_pigpio_interfaces::srv::HalPigpioGetMode;
+using HalPigpioSetPullUp_t = hal_pigpio_interfaces::srv::HalPigpioSetPullUp;
+using HalPigpioSetPullDown_t = hal_pigpio_interfaces::srv::HalPigpioSetPullDown;
+using HalPigpioClearResistor_t = hal_pigpio_interfaces::srv::HalPigpioClearResistor;
+using HalPigpioSetPwmDutycycle_t = hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle;
+using HalPigpioSetPwmFrequency_t = hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency;
+using HalPigpioSetGpioHigh_t = hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh;
+using HalPigpioSetGpioLow_t = hal_pigpio_interfaces::srv::HalPigpioSetGpioLow;
+using HalPigpioSendTriggerPulse_t = hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse;
+using HalPigpioReadGpio_t = hal_pigpio_interfaces::srv::HalPigpioReadGpio;
+using HalPigpioSetCallback_t = hal_pigpio_interfaces::srv::HalPigpioSetCallback;
+using HalPigpioSetEncoderCallback_t = hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback;
+using HalPigpioSetMotorDirection_t = hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection;
+using HalPigpioEdgeChangeMsg_t = hal_pigpio_interfaces::msg::HalPigpioEdgeChange;
+using HalPigpioEncoderCountMsg_t = hal_pigpio_interfaces::msg::HalPigpioEncoderCount;
+using HalPigpioI2cOpen_t = hal_pigpio_interfaces::srv::HalPigpioI2cOpen;
+using HalPigpioI2cClose_t = hal_pigpio_interfaces::srv::HalPigpioI2cClose;
+using HalPigpioI2cReadByteData_t = hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData;
+using HalPigpioI2cReadWordData_t = hal_pigpio_interfaces::srv::HalPigpioI2cReadWordData;
+using HalPigpioI2cReadBlockData_t = hal_pigpio_interfaces::srv::HalPigpioI2cReadBlockData;
+using HalPigpioI2cWriteByteData_t = hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData;
+using HalPigpioI2cWriteWordData_t = hal_pigpio_interfaces::srv::HalPigpioI2cWriteWordData;
+using HalPigpioI2cWriteBlockData_t = hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData;
+using HalPigpioI2cImuReading_t = hal_pigpio_interfaces::srv::HalPigpioI2cImuReading;
+using HalPigpioAnglesMsg_t = hal_pigpio_interfaces::msg::HalPigpioAngles;
+
 class Pigpio : public rclcpp_lifecycle::LifecycleNode
 {
 private:
@@ -40,50 +68,34 @@ private:
   std::vector<uint> callbackList;
   std::vector<Motor> motors;
 
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioI2cOpen>::SharedPtr i2cOpenService;
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioI2cClose>::SharedPtr i2cCloseService;
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData>::SharedPtr
-    i2cReadByteDataService;
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioI2cReadWordData>::SharedPtr
-    i2cReadWordDataService;
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioI2cReadBlockData>::SharedPtr
-    i2cReadBlockDataService;
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData>::SharedPtr
-    i2cWriteByteDataService;
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioI2cWriteWordData>::SharedPtr
-    i2cWriteWordDataService;
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData>::SharedPtr
-    i2cWriteBlockDataService;
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading>::SharedPtr imuReadingService;
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>::SharedPtr setInputModeService;
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>::SharedPtr
-    setOutputModeService;
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioSetPullUp>::SharedPtr setPullUpService;
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioSetPullDown>::SharedPtr setPullDownService;
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioClearResistor>::SharedPtr
-    clearResistorService;
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioGetMode>::SharedPtr getModeService;
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioReadGpio>::SharedPtr readGpioService;
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioSetCallback>::SharedPtr setCallbackService;
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback>::SharedPtr
-    setEncoderCallbackService;
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection>::SharedPtr
-    setMotorDirectionService;
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle>::SharedPtr
-    setPwmDutycycleService;
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency>::SharedPtr
-    setPwmFrequencyService;
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh>::SharedPtr setGpioHighService;
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioSetGpioLow>::SharedPtr setGpioLowService;
-  rclcpp::Service<hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse>::SharedPtr
-    sendTriggerPulseService;
+  rclcpp::Service<HalPigpioI2cOpen_t>::SharedPtr i2cOpenService;
+  rclcpp::Service<HalPigpioI2cClose_t>::SharedPtr i2cCloseService;
+  rclcpp::Service<HalPigpioI2cReadByteData_t>::SharedPtr i2cReadByteDataService;
+  rclcpp::Service<HalPigpioI2cReadWordData_t>::SharedPtr i2cReadWordDataService;
+  rclcpp::Service<HalPigpioI2cReadBlockData_t>::SharedPtr i2cReadBlockDataService;
+  rclcpp::Service<HalPigpioI2cWriteByteData_t>::SharedPtr i2cWriteByteDataService;
+  rclcpp::Service<HalPigpioI2cWriteWordData_t>::SharedPtr i2cWriteWordDataService;
+  rclcpp::Service<HalPigpioI2cWriteBlockData_t>::SharedPtr i2cWriteBlockDataService;
+  rclcpp::Service<HalPigpioI2cImuReading_t>::SharedPtr imuReadingService;
+  rclcpp::Service<HalPigpioSetInputMode_t>::SharedPtr setInputModeService;
+  rclcpp::Service<HalPigpioSetOutputMode_t>::SharedPtr setOutputModeService;
+  rclcpp::Service<HalPigpioSetPullUp_t>::SharedPtr setPullUpService;
+  rclcpp::Service<HalPigpioSetPullDown_t>::SharedPtr setPullDownService;
+  rclcpp::Service<HalPigpioClearResistor_t>::SharedPtr clearResistorService;
+  rclcpp::Service<HalPigpioGetMode_t>::SharedPtr getModeService;
+  rclcpp::Service<HalPigpioReadGpio_t>::SharedPtr readGpioService;
+  rclcpp::Service<HalPigpioSetCallback_t>::SharedPtr setCallbackService;
+  rclcpp::Service<HalPigpioSetEncoderCallback_t>::SharedPtr setEncoderCallbackService;
+  rclcpp::Service<HalPigpioSetMotorDirection_t>::SharedPtr setMotorDirectionService;
+  rclcpp::Service<HalPigpioSetPwmDutycycle_t>::SharedPtr setPwmDutycycleService;
+  rclcpp::Service<HalPigpioSetPwmFrequency_t>::SharedPtr setPwmFrequencyService;
+  rclcpp::Service<HalPigpioSetGpioHigh_t>::SharedPtr setGpioHighService;
+  rclcpp::Service<HalPigpioSetGpioLow_t>::SharedPtr setGpioLowService;
+  rclcpp::Service<HalPigpioSendTriggerPulse_t>::SharedPtr sendTriggerPulseService;
 
-  rclcpp_lifecycle::LifecyclePublisher<hal_pigpio_interfaces::msg::HalPigpioEdgeChange>::SharedPtr
-    gpioEdgeChangePub;
-  rclcpp_lifecycle::LifecyclePublisher<hal_pigpio_interfaces::msg::HalPigpioEncoderCount>::SharedPtr
-    gpioEncoderCountPub;
-  rclcpp_lifecycle::LifecyclePublisher<hal_pigpio_interfaces::msg::HalPigpioAngles>::SharedPtr
-    anglesPublisher;
+  rclcpp_lifecycle::LifecyclePublisher<HalPigpioEdgeChangeMsg_t>::SharedPtr gpioEdgeChangePub;
+  rclcpp_lifecycle::LifecyclePublisher<HalPigpioEncoderCountMsg_t>::SharedPtr gpioEncoderCountPub;
+  rclcpp_lifecycle::LifecyclePublisher<HalPigpioAnglesMsg_t>::SharedPtr anglesPublisher;
 
   rclcpp::TimerBase::SharedPtr readQuaternionsAndPublishAnglesTimer;
   rclcpp::TimerBase::SharedPtr encoderCountTimer;
@@ -122,77 +134,77 @@ public:
     int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us);
 
   void i2cOpen(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cOpen::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cOpen::Response> response);
+    const std::shared_ptr<HalPigpioI2cOpen_t::Request> request,
+    std::shared_ptr<HalPigpioI2cOpen_t::Response> response);
   void i2cClose(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cClose::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cClose::Response> response);
+    const std::shared_ptr<HalPigpioI2cClose_t::Request> request,
+    std::shared_ptr<HalPigpioI2cClose_t::Response> response);
   void i2cReadByteData(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cReadByteData::Response> response);
+    const std::shared_ptr<HalPigpioI2cReadByteData_t::Request> request,
+    std::shared_ptr<HalPigpioI2cReadByteData_t::Response> response);
   void i2cReadWordData(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cReadWordData::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cReadWordData::Response> response);
+    const std::shared_ptr<HalPigpioI2cReadWordData_t::Request> request,
+    std::shared_ptr<HalPigpioI2cReadWordData_t::Response> response);
   void i2cReadBlockData(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cReadBlockData::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cReadBlockData::Response> response);
+    const std::shared_ptr<HalPigpioI2cReadBlockData_t::Request> request,
+    std::shared_ptr<HalPigpioI2cReadBlockData_t::Response> response);
   void i2cWriteByteData(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cWriteByteData::Response> response);
+    const std::shared_ptr<HalPigpioI2cWriteByteData_t::Request> request,
+    std::shared_ptr<HalPigpioI2cWriteByteData_t::Response> response);
   void i2cWriteWordData(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cWriteWordData::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cWriteWordData::Response> response);
+    const std::shared_ptr<HalPigpioI2cWriteWordData_t::Request> request,
+    std::shared_ptr<HalPigpioI2cWriteWordData_t::Response> response);
   void i2cWriteBlockData(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData::Response> response);
+    const std::shared_ptr<HalPigpioI2cWriteBlockData_t::Request> request,
+    std::shared_ptr<HalPigpioI2cWriteBlockData_t::Response> response);
   void i2cImuReading(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioI2cImuReading::Response> response);
+    const std::shared_ptr<HalPigpioI2cImuReading_t::Request> request,
+    std::shared_ptr<HalPigpioI2cImuReading_t::Response> response);
   void getMode(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioGetMode::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioGetMode::Response> response);
+    const std::shared_ptr<HalPigpioGetMode_t::Request> request,
+    std::shared_ptr<HalPigpioGetMode_t::Response> response);
   void setInputMode(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetInputMode::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetInputMode::Response> response);
+    const std::shared_ptr<HalPigpioSetInputMode_t::Request> request,
+    std::shared_ptr<HalPigpioSetInputMode_t::Response> response);
   void setOutputMode(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode::Response> response);
+    const std::shared_ptr<HalPigpioSetOutputMode_t::Request> request,
+    std::shared_ptr<HalPigpioSetOutputMode_t::Response> response);
   void setPullUp(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetPullUp::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetPullUp::Response> response);
+    const std::shared_ptr<HalPigpioSetPullUp_t::Request> request,
+    std::shared_ptr<HalPigpioSetPullUp_t::Response> response);
   void setPullDown(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetPullDown::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetPullDown::Response> response);
+    const std::shared_ptr<HalPigpioSetPullDown_t::Request> request,
+    std::shared_ptr<HalPigpioSetPullDown_t::Response> response);
   void clearResistor(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioClearResistor::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioClearResistor::Response> response);
+    const std::shared_ptr<HalPigpioClearResistor_t::Request> request,
+    std::shared_ptr<HalPigpioClearResistor_t::Response> response);
   void readGpio(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioReadGpio::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioReadGpio::Response> response);
+    const std::shared_ptr<HalPigpioReadGpio_t::Request> request,
+    std::shared_ptr<HalPigpioReadGpio_t::Response> response);
   void setCallback(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetCallback::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetCallback::Response> response);
+    const std::shared_ptr<HalPigpioSetCallback_t::Request> request,
+    std::shared_ptr<HalPigpioSetCallback_t::Response> response);
   void setEncoderCallback(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback::Response> response);
+    const std::shared_ptr<HalPigpioSetEncoderCallback_t::Request> request,
+    std::shared_ptr<HalPigpioSetEncoderCallback_t::Response> response);
   void setMotorDirection(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection::Response> response);
+    const std::shared_ptr<HalPigpioSetMotorDirection_t::Request> request,
+    std::shared_ptr<HalPigpioSetMotorDirection_t::Response> response);
   void setPwmDutycycle(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle::Response> response);
+    const std::shared_ptr<HalPigpioSetPwmDutycycle_t::Request> request,
+    std::shared_ptr<HalPigpioSetPwmDutycycle_t::Response> response);
   void setPwmFrequency(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency::Response> response);
+    const std::shared_ptr<HalPigpioSetPwmFrequency_t::Request> request,
+    std::shared_ptr<HalPigpioSetPwmFrequency_t::Response> response);
   void setGpioHigh(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetGpioHigh::Response> response);
+    const std::shared_ptr<HalPigpioSetGpioHigh_t::Request> request,
+    std::shared_ptr<HalPigpioSetGpioHigh_t::Response> response);
   void setGpioLow(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetGpioLow::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSetGpioLow::Response> response);
+    const std::shared_ptr<HalPigpioSetGpioLow_t::Request> request,
+    std::shared_ptr<HalPigpioSetGpioLow_t::Response> response);
   void sendTriggerPulse(
-    const std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse::Request> request,
-    std::shared_ptr<hal_pigpio_interfaces::srv::HalPigpioSendTriggerPulse::Response> response);
+    const std::shared_ptr<HalPigpioSendTriggerPulse_t::Request> request,
+    std::shared_ptr<HalPigpioSendTriggerPulse_t::Response> response);
 };
 
 #endif  // HAL_PIGPIO_HPP_
