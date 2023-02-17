@@ -39,10 +39,11 @@ ament_target_dependencies(${PROJECT_NAME}_node ${dependencies})
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   find_package(ament_cmake_gtest REQUIRED)
+  find_package(pigpio REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
   ament_add_gtest(${PROJECT_NAME}_motor_lib_test test/test_hal_motor.cpp)
-  ament_target_dependencies(${PROJECT_NAME}_motor_lib_test ${dependencies})
+  ament_target_dependencies(${PROJECT_NAME}_motor_lib_test ${dependencies} pigpio)
   target_link_libraries(${PROJECT_NAME}_motor_lib_test ${PROJECT_NAME}_motor_lib)
 
   ament_add_gtest(${PROJECT_NAME}_test test/test_hal_motor_control.cpp)

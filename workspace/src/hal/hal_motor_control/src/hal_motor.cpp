@@ -28,31 +28,19 @@ Motor::Motor(
 }
 
 void Motor::configureGpios(
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>::SharedPtr
-  gpioSetOutputModeClient,
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>::SharedPtr
-  gpioSetInputModeClient,
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback>::SharedPtr
-  gpioSetEncoderCallbackClient,
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency>::SharedPtr
-  gpioSetPwmFrequencyClient)
+  rclcpp::Client<HalPigpioSetOutputMode_t>::SharedPtr gpioSetOutputModeClient,
+  rclcpp::Client<HalPigpioSetInputMode_t>::SharedPtr gpioSetInputModeClient,
+  rclcpp::Client<HalPigpioSetEncoderCallback_t>::SharedPtr gpioSetEncoderCallbackClient,
+  rclcpp::Client<HalPigpioSetPwmFrequency_t>::SharedPtr gpioSetPwmFrequencyClient)
 {
-  auto setInputModeEncoderChARequest =
-    std::make_shared<hal_pigpio_interfaces::srv::HalPigpioSetInputMode::Request>();
-  auto setInputModeEncoderChBRequest =
-    std::make_shared<hal_pigpio_interfaces::srv::HalPigpioSetInputMode::Request>();
-  auto setEncoderCallbackChARequest =
-    std::make_shared<hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback::Request>();
-  auto setEncoderCallbackChBRequest =
-    std::make_shared<hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback::Request>();
-  auto setOutputModePwmChARequest =
-    std::make_shared<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode::Request>();
-  auto setOutputModePwmChBRequest =
-    std::make_shared<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode::Request>();
-  auto setPwmFrequencyPwmChARequest =
-    std::make_shared<hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency::Request>();
-  auto setPwmFrequencyPwmChBRequest =
-    std::make_shared<hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency::Request>();
+  auto setInputModeEncoderChARequest = std::make_shared<HalPigpioSetInputMode_t::Request>();
+  auto setInputModeEncoderChBRequest = std::make_shared<HalPigpioSetInputMode_t::Request>();
+  auto setEncoderCallbackChARequest = std::make_shared<HalPigpioSetEncoderCallback_t::Request>();
+  auto setEncoderCallbackChBRequest = std::make_shared<HalPigpioSetEncoderCallback_t::Request>();
+  auto setOutputModePwmChARequest = std::make_shared<HalPigpioSetOutputMode_t::Request>();
+  auto setOutputModePwmChBRequest = std::make_shared<HalPigpioSetOutputMode_t::Request>();
+  auto setPwmFrequencyPwmChARequest = std::make_shared<HalPigpioSetPwmFrequency_t::Request>();
+  auto setPwmFrequencyPwmChBRequest = std::make_shared<HalPigpioSetPwmFrequency_t::Request>();
 
   auto setInputModeCallback = [this](SetInputModeFuture_t future)
     {
@@ -137,19 +125,14 @@ void Motor::setEncoderCount(uint32_t count)
 }
 
 void Motor::setPwmDutyCycleAndDirection(
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle>::SharedPtr
-  gpioSetPwmDutycycleClient,
+  rclcpp::Client<HalPigpioSetPwmDutycycle_t>::SharedPtr gpioSetPwmDutycycleClient,
   uint16_t dutycycle,
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection>::SharedPtr
-  gpioSetMotorDirectionClient,
+  rclcpp::Client<HalPigpioSetMotorDirection_t>::SharedPtr gpioSetMotorDirectionClient,
   bool isDirectionForward)
 {
-  auto setPwmDutycyclePwmChARequest =
-    std::make_shared<hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle::Request>();
-  auto setPwmDutycyclePwmChBRequest =
-    std::make_shared<hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle::Request>();
-  auto setMotorDirectionRequest =
-    std::make_shared<hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection::Request>();
+  auto setPwmDutycyclePwmChARequest = std::make_shared<HalPigpioSetPwmDutycycle_t::Request>();
+  auto setPwmDutycyclePwmChBRequest = std::make_shared<HalPigpioSetPwmDutycycle_t::Request>();
+  auto setMotorDirectionRequest = std::make_shared<HalPigpioSetMotorDirection_t::Request>();
 
   auto setPwmDutycycleCallback = [this](SetPwmDutycycleFuture_t future)
     {

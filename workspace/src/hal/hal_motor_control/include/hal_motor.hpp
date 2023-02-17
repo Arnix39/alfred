@@ -53,21 +53,15 @@ public:
   uint32_t getEncoderCount(void);
   void setEncoderCount(uint32_t count);
   void setPwmDutyCycleAndDirection(
-    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle>::SharedPtr
-    gpioSetPwmDutycycleClient,
+    rclcpp::Client<HalPigpioSetPwmDutycycle_t>::SharedPtr gpioSetPwmDutycycleClient,
     uint16_t dutycycle,
-    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection>::SharedPtr
-    gpioSetMotorDirectionClient,
+    rclcpp::Client<HalPigpioSetMotorDirection_t>::SharedPtr gpioSetMotorDirectionClient,
     bool isDirectionForward);
   void configureGpios(
-    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>::SharedPtr
-    gpioSetOutputModeClient,
-    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>::SharedPtr
-    gpioSetInputModeClient,
-    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback>::SharedPtr
-    gpioSetEncoderCallbackClient,
-    rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency>::SharedPtr
-    gpioSetPwmFrequencyClient);
+    rclcpp::Client<HalPigpioSetOutputMode_t>::SharedPtr gpioSetOutputModeClient,
+    rclcpp::Client<HalPigpioSetInputMode_t>::SharedPtr gpioSetInputModeClient,
+    rclcpp::Client<HalPigpioSetEncoderCallback_t>::SharedPtr gpioSetEncoderCallbackClient,
+    rclcpp::Client<HalPigpioSetPwmFrequency_t>::SharedPtr gpioSetPwmFrequencyClient);
   uint8_t getId(void);
 };
 

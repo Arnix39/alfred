@@ -24,22 +24,16 @@ private:
   Motor motorLeft;
   Motor motorRight;
 
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>::SharedPtr gpioSetInputClient;
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>::SharedPtr gpioSetOutputClient;
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback>::SharedPtr
-    gpioSetEncoderCallbackClient;
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency>::SharedPtr
-    gpioSetPwmFrequencyClient;
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle>::SharedPtr
-    gpioSetPwmDutycycleClient;
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection>::SharedPtr
-    gpioSetMotorDirectionClient;
+  rclcpp::Client<HalPigpioSetInputMode_t>::SharedPtr gpioSetInputClient;
+  rclcpp::Client<HalPigpioSetOutputMode_t>::SharedPtr gpioSetOutputClient;
+  rclcpp::Client<HalPigpioSetEncoderCallback_t>::SharedPtr gpioSetEncoderCallbackClient;
+  rclcpp::Client<HalPigpioSetPwmFrequency_t>::SharedPtr gpioSetPwmFrequencyClient;
+  rclcpp::Client<HalPigpioSetPwmDutycycle_t>::SharedPtr gpioSetPwmDutycycleClient;
+  rclcpp::Client<HalPigpioSetMotorDirection_t>::SharedPtr gpioSetMotorDirectionClient;
 
-  rclcpp_lifecycle::LifecyclePublisher<hal_motor_control_interfaces::msg::HalMotorControl>::
-  SharedPtr motorControlPub;
+  rclcpp_lifecycle::LifecyclePublisher<HalMotorControlMsg_t>::SharedPtr motorControlPub;
 
-  rclcpp::Subscription<hal_pigpio_interfaces::msg::HalPigpioEncoderCount>::SharedPtr
-    motorControlECSub;
+  rclcpp::Subscription<HalPigpioEncoderCountMsg_t>::SharedPtr motorControlECSub;
 
   rclcpp::TimerBase::SharedPtr encoderCountsTimer;
 
@@ -56,7 +50,7 @@ public:
 
   void configureMotor(void);
   void publishMessage(void);
-  void pigpioEncoderCountCallback(const hal_pigpio_interfaces::msg::HalPigpioEncoderCount & msg);
+  void pigpioEncoderCountCallback(const HalPigpioEncoderCountMsg_t & msg);
   void setPwmLeft(uint16_t dutycycle, bool direction);
   void setPwmRight(uint16_t dutycycle, bool direction);
 };

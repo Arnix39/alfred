@@ -18,14 +18,14 @@
 #include "common.hpp"
 
 // Services and messages headers (generated)
+#include "hal_motor_control_interfaces/msg/hal_motor_control.hpp"
+#include "hal_pigpio_interfaces/msg/hal_pigpio_encoder_count.hpp"
 #include "hal_pigpio_interfaces/srv/hal_pigpio_set_input_mode.hpp"
 #include "hal_pigpio_interfaces/srv/hal_pigpio_set_output_mode.hpp"
 #include "hal_pigpio_interfaces/srv/hal_pigpio_set_encoder_callback.hpp"
 #include "hal_pigpio_interfaces/srv/hal_pigpio_set_pwm_frequency.hpp"
 #include "hal_pigpio_interfaces/srv/hal_pigpio_set_pwm_dutycycle.hpp"
 #include "hal_pigpio_interfaces/srv/hal_pigpio_set_motor_direction.hpp"
-#include "hal_pigpio_interfaces/msg/hal_pigpio_encoder_count.hpp"
-#include "hal_motor_control_interfaces/msg/hal_motor_control.hpp"
 
 #define MOTOR_LEFT 0
 #define MOTOR_LEFT_PWM_A_GPIO GPIO19
@@ -41,17 +41,21 @@
 
 #define MOTOR_PWM_FREQUENCY 1000
 
-using SetInputModeFuture_t =
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>::SharedFuture;
-using SetOutputModeFuture_t =
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>::SharedFuture;
-using SetEncoderCallbackFuture_t =
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback>::SharedFuture;
-using SetPwmFrequencyFuture_t =
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency>::SharedFuture;
-using SetPwmDutycycleFuture_t =
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle>::SharedFuture;
-using SetMotorDirectionFuture_t =
-  rclcpp::Client<hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection>::SharedFuture;
+using HalMotorControlMsg_t = hal_motor_control_interfaces::msg::HalMotorControl;
+using HalPigpioEncoderCountMsg_t = hal_pigpio_interfaces::msg::HalPigpioEncoderCount;
+
+using HalPigpioSetInputMode_t = hal_pigpio_interfaces::srv::HalPigpioSetInputMode;
+using HalPigpioSetOutputMode_t = hal_pigpio_interfaces::srv::HalPigpioSetOutputMode;
+using HalPigpioSetEncoderCallback_t = hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback;
+using HalPigpioSetPwmFrequency_t = hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency;
+using HalPigpioSetPwmDutycycle_t = hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle;
+using HalPigpioSetMotorDirection_t = hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection;
+
+using SetInputModeFuture_t = rclcpp::Client<HalPigpioSetInputMode_t>::SharedFuture;
+using SetOutputModeFuture_t = rclcpp::Client<HalPigpioSetOutputMode_t>::SharedFuture;
+using SetEncoderCallbackFuture_t = rclcpp::Client<HalPigpioSetEncoderCallback_t>::SharedFuture;
+using SetPwmFrequencyFuture_t = rclcpp::Client<HalPigpioSetPwmFrequency_t>::SharedFuture;
+using SetPwmDutycycleFuture_t = rclcpp::Client<HalPigpioSetPwmDutycycle_t>::SharedFuture;
+using SetMotorDirectionFuture_t = rclcpp::Client<HalPigpioSetMotorDirection_t>::SharedFuture;
 
 #endif  // HAL_MOTOR_CONTROL_COMMONDEFINITIONS_HPP_

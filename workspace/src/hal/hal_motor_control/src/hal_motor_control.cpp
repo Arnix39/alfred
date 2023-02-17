@@ -30,27 +30,21 @@ MotorControl::MotorControl()
 
 LifecycleCallbackReturn_t MotorControl::on_configure(const rclcpp_lifecycle::State & previous_state)
 {
-  gpioSetInputClient = this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetInputMode>(
-    "hal_pigpioSetInputMode");
-  gpioSetOutputClient = this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetOutputMode>(
-    "hal_pigpioSetOutputMode");
+  gpioSetInputClient = this->create_client<HalPigpioSetInputMode_t>("hal_pigpioSetInputMode");
+  gpioSetOutputClient = this->create_client<HalPigpioSetOutputMode_t>("hal_pigpioSetOutputMode");
   gpioSetEncoderCallbackClient =
-    this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback>(
-    "hal_pigpioSetEncoderCallback");
+    this->create_client<HalPigpioSetEncoderCallback_t>("hal_pigpioSetEncoderCallback");
   gpioSetPwmFrequencyClient =
-    this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetPwmFrequency>(
-    "hal_pigpioSetPwmFrequency");
+    this->create_client<HalPigpioSetPwmFrequency_t>("hal_pigpioSetPwmFrequency");
   gpioSetPwmDutycycleClient =
-    this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetPwmDutycycle>(
-    "hal_pigpioSetPwmDutycycle");
+    this->create_client<HalPigpioSetPwmDutycycle_t>("hal_pigpioSetPwmDutycycle");
   gpioSetMotorDirectionClient =
-    this->create_client<hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection>(
-    "hal_pigpioSetMotorDirection");
+    this->create_client<HalPigpioSetMotorDirection_t>("hal_pigpioSetMotorDirection");
 
-  motorControlPub = this->create_publisher<hal_motor_control_interfaces::msg::HalMotorControl>(
+  motorControlPub = this->create_publisher<HalMotorControlMsg_t>(
     "motorsEncoderCountValue", 1000);
 
-  motorControlECSub = this->create_subscription<hal_pigpio_interfaces::msg::HalPigpioEncoderCount>(
+  motorControlECSub = this->create_subscription<HalPigpioEncoderCountMsg_t>(
     "hal_pigpioEncoderCount", 1000, std::bind(&MotorControl::pigpioEncoderCountCallback, this, _1));
 
   encoderCountsTimer = create_wall_timer(10ms, std::bind(&MotorControl::publishMessage, this));
@@ -118,7 +112,7 @@ void MotorControl::configureMotor(void)
 }
 
 void MotorControl::pigpioEncoderCountCallback(
-  const hal_pigpio_interfaces::msg::HalPigpioEncoderCount & msg)
+  const HalPigpioEncoderCountMsg_t & msg)
 {
   for (uint8_t index = 0; index < msg.motor_id.size(); ++index) {
     if (msg.motor_id[index] == MOTOR_LEFT) {
@@ -133,7 +127,7 @@ void MotorControl::pigpioEncoderCountCallback(
 
 void MotorControl::publishMessage(void)
 {
-  auto encoderCounts = hal_motor_control_interfaces::msg::HalMotorControl();
+  auto encoderCounts = HalMotorControlMsg_t();
 
   encoderCounts.motor_left_encoder_count = motorLeft.getEncoderCount();
   encoderCounts.motor_right_encoder_count = motorRight.getEncoderCount();
