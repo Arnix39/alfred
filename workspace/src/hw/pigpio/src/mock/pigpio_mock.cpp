@@ -198,6 +198,17 @@ int gpio_read(int pi, unsigned gpio)
   return -3;
 }
 
+int callback(int pi, unsigned user_gpio, unsigned edge, CBFunc_t f)
+{
+  gpioCallback callback =
+  {false, static_cast<gpioId>(user_gpio), static_cast<gpioEdgeChangeType>(edge)};
+
+  if (std::get<1>(raspberryPi.getGpioType(static_cast<gpioId>(user_gpio))) == gpioType::input) {
+    return raspberryPi.setGpioCallback(static_cast<gpioId>(user_gpio), callback);
+  }
+  return -1;
+}
+
 int callback_ex(int pi, unsigned user_gpio, unsigned edge, CBFuncEx_t f, void * userdata)
 {
   gpioCallback callback =
