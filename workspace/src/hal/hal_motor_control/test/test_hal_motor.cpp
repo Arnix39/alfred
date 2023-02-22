@@ -179,8 +179,8 @@ TEST_F(MotorTest, ConfigureGpios)
     ASSERT_EQ(get_mode(pigpioDummy->piHandle, GPIO_ENCODER_CHANNEL_B_M1), INPUT);
     ASSERT_EQ(get_mode(pigpioDummy->piHandle, GPIO_PWM_CHANNEL_A_M1), OUTPUT);
     ASSERT_EQ(get_mode(pigpioDummy->piHandle, GPIO_PWM_CHANNEL_B_M1), OUTPUT);
-    ASSERT_EQ(getPwmFrequency(GPIO_PWM_CHANNEL_A_M1), MOTOR_PWM_FREQUENCY);
-    ASSERT_EQ(getPwmFrequency(GPIO_PWM_CHANNEL_B_M1), MOTOR_PWM_FREQUENCY);
+    ASSERT_EQ(get_PWM_frequency(pigpioDummy->piHandle, GPIO_PWM_CHANNEL_A_M1), MOTOR_PWM_FREQUENCY);
+    ASSERT_EQ(get_PWM_frequency(pigpioDummy->piHandle, GPIO_PWM_CHANNEL_B_M1), MOTOR_PWM_FREQUENCY);
   } else {
     FAIL();
   }
@@ -218,8 +218,8 @@ TEST_F(MotorTest, SetPwmDutyCycleAndDirectionForward)
   executor.spin_some();
   executor.spin_some();
 
-  ASSERT_EQ(getPwmDutycycle(GPIO_PWM_CHANNEL_A_M1), 20);
-  ASSERT_EQ(getPwmDutycycle(GPIO_PWM_CHANNEL_B_M1), 20);
+  ASSERT_EQ(get_PWM_dutycycle(pigpioDummy->piHandle, GPIO_PWM_CHANNEL_A_M1), 20);
+  ASSERT_EQ(get_PWM_dutycycle(pigpioDummy->piHandle, GPIO_PWM_CHANNEL_B_M1), 20);
 }
 
 TEST_F(MotorTest, SetPwmDutyCycleAndDirectionBackward)
@@ -254,8 +254,8 @@ TEST_F(MotorTest, SetPwmDutyCycleAndDirectionBackward)
   executor.spin_some();
   executor.spin_some();
 
-  ASSERT_EQ(getPwmDutycycle(GPIO_PWM_CHANNEL_A_M1), 0);
-  ASSERT_EQ(getPwmDutycycle(GPIO_PWM_CHANNEL_B_M1), 20);
+  ASSERT_EQ(get_PWM_dutycycle(pigpioDummy->piHandle, GPIO_PWM_CHANNEL_A_M1), 0);
+  ASSERT_EQ(get_PWM_dutycycle(pigpioDummy->piHandle, GPIO_PWM_CHANNEL_B_M1), 20);
 }
 
 int main(int argc, char ** argv)

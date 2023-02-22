@@ -15,7 +15,6 @@
 #include "pigpiod_if2.h" // NOLINT
 
 #include "mock/raspberrypi_mock.hpp"
-#include "mock/raspberrypi_mock_utilities.hpp"
 
 static RaspberryPi raspberryPi;
 
@@ -257,6 +256,19 @@ int set_PWM_dutycycle(int pi, unsigned user_gpio, unsigned dutycycle)
   }
 }
 
+int get_PWM_dutycycle(int pi, unsigned user_gpio)
+{
+  if (std::get<0>(raspberryPi.getGpioPwm(static_cast<gpioId>(user_gpio)))) {
+    if (std::get<1>(raspberryPi.getGpioPwm(static_cast<gpioId>(user_gpio))).isEnabled) {
+      return std::get<1>(raspberryPi.getGpioPwm(static_cast<gpioId>(user_gpio))).dutycycle;
+    } else {
+      return PI_NOT_PWM_GPIO;
+    }
+  } else {
+    return PI_BAD_USER_GPIO;
+  }
+}
+
 int set_PWM_frequency(int pi, unsigned user_gpio, unsigned frequency)
 {
   gpioPwm pwm;
@@ -268,6 +280,19 @@ int set_PWM_frequency(int pi, unsigned user_gpio, unsigned frequency)
     } else {
       pwm = {true, 0, static_cast<uint16_t>(frequency)};
       return raspberryPi.setGpioPwm(static_cast<gpioId>(user_gpio), pwm);
+    }
+  } else {
+    return PI_BAD_USER_GPIO;
+  }
+}
+
+int get_PWM_frequency(int pi, unsigned user_gpio)
+{
+  if (std::get<0>(raspberryPi.getGpioPwm(static_cast<gpioId>(user_gpio)))) {
+    if (std::get<1>(raspberryPi.getGpioPwm(static_cast<gpioId>(user_gpio))).isEnabled) {
+      return std::get<1>(raspberryPi.getGpioPwm(static_cast<gpioId>(user_gpio))).frequency;
+    } else {
+      return PI_NOT_PWM_GPIO;
     }
   } else {
     return PI_BAD_USER_GPIO;
@@ -296,32 +321,5 @@ int gpio_trigger(int pi, unsigned user_gpio, unsigned pulseLen, unsigned level)
     return PI_NOT_PERMITTED;
   } else {
     return PI_BAD_GPIO;
-  }
-}
-
-/* Utilities */
-int32_t getPwmFrequency(unsigned gpio)
-{
-  if (std::get<0>(raspberryPi.getGpioPwm(static_cast<gpioId>(gpio)))) {
-    if (std::get<1>(raspberryPi.getGpioPwm(static_cast<gpioId>(gpio))).isEnabled) {
-      return std::get<1>(raspberryPi.getGpioPwm(static_cast<gpioId>(gpio))).frequency;
-    } else {
-      return PI_NOT_PWM_GPIO;
-    }
-  } else {
-    return PI_BAD_USER_GPIO;
-  }
-}
-
-int32_t getPwmDutycycle(unsigned gpio)
-{
-  if (std::get<0>(raspberryPi.getGpioPwm(static_cast<gpioId>(gpio)))) {
-    if (std::get<1>(raspberryPi.getGpioPwm(static_cast<gpioId>(gpio))).isEnabled) {
-      return std::get<1>(raspberryPi.getGpioPwm(static_cast<gpioId>(gpio))).dutycycle;
-    } else {
-      return PI_NOT_PWM_GPIO;
-    }
-  } else {
-    return PI_BAD_USER_GPIO;
   }
 }

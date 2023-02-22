@@ -26,7 +26,6 @@
 #include "hal_motor_control_commonDefinitions.hpp"
 #include "hal_motor.hpp"
 #include "pigpiod_if2.h" // NOLINT
-#include "mock/raspberrypi_mock_utilities.hpp"
 
 // Services and messages headers (generated)
 #include "hal_pigpio_interfaces/srv/hal_pigpio_set_input_mode.hpp"
@@ -35,10 +34,10 @@
 #include "hal_pigpio_interfaces/srv/hal_pigpio_set_encoder_callback.hpp"
 
 #define MOTOR_ID_1 0
-#define GPIO_PWM_CHANNEL_A_M1 3
-#define GPIO_PWM_CHANNEL_B_M1 4
-#define GPIO_ENCODER_CHANNEL_A_M1 5
-#define GPIO_ENCODER_CHANNEL_B_M1 6
+#define GPIO_PWM_CHANNEL_A_M1 GPIO3
+#define GPIO_PWM_CHANNEL_B_M1 GPIO4
+#define GPIO_ENCODER_CHANNEL_A_M1 GPIO5
+#define GPIO_ENCODER_CHANNEL_B_M1 GPIO6
 #define INPUT 0
 #define OUTPUT 1
 
