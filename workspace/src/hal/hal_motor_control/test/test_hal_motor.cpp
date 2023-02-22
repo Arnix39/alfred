@@ -109,7 +109,7 @@ TEST_F(MotorTest, SetPwmDutyCycleAndDirectionForward)
     motorChecker->setPwmDutycycleClient,
     20,
     motorChecker->setMotorDirectionClient,
-    true);
+    FORWARD);
 
   executor.spin_some();
   executor.spin_some();
@@ -145,7 +145,7 @@ TEST_F(MotorTest, SetPwmDutyCycleAndDirectionBackward)
     motorChecker->setPwmDutycycleClient,
     20,
     motorChecker->setMotorDirectionClient,
-    false);
+    BACKWARD);
 
   executor.spin_some();
   executor.spin_some();

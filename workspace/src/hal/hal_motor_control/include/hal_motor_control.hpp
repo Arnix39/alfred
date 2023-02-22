@@ -54,6 +54,7 @@ public:
   LifecycleCallbackReturn_t on_shutdown(const rclcpp_lifecycle::State & previous_state);
   LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
 
+  void activatePublisher(void);
   void configureMotor(void);
   void publishMessage(void);
   void pigpioEncoderCountCallback(const HalPigpioEncoderCountMsg_t & msg);

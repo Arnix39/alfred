@@ -51,11 +51,14 @@ if(BUILD_TESTING)
     ${PROJECT_NAME}_motor_lib
     ${PROJECT_NAME}_tests_helpers_lib)
 
-  ament_add_gtest(${PROJECT_NAME}_test test/test_hal_motor_control.cpp)
-  ament_target_dependencies(${PROJECT_NAME}_test ${dependencies})
+  ament_add_gtest(${PROJECT_NAME}_test
+    test/test_hal_motor_control.cpp
+    $<TARGET_OBJECTS:${PROJECT_NAME}_tests_helpers_lib>)
+  ament_target_dependencies(${PROJECT_NAME}_test ${dependencies} pigpio)
   target_link_libraries(${PROJECT_NAME}_test
     ${PROJECT_NAME}
-    ${PROJECT_NAME}_motor_lib)
+    ${PROJECT_NAME}_motor_lib
+    ${PROJECT_NAME}_tests_helpers_lib)
 endif()
 
 #############

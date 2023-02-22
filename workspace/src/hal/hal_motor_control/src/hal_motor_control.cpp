@@ -59,8 +59,7 @@ LifecycleCallbackReturn_t MotorControl::on_configure(const rclcpp_lifecycle::Sta
 
 LifecycleCallbackReturn_t MotorControl::on_activate(const rclcpp_lifecycle::State & previous_state)
 {
-  motorControlPub->on_activate();
-
+  activatePublisher();
   configureMotor();
 
   RCLCPP_INFO(get_logger(), "hal_motor_control node activated!");
@@ -103,6 +102,10 @@ LifecycleCallbackReturn_t MotorControl::on_error(const rclcpp_lifecycle::State &
   return LifecycleCallbackReturn_t::FAILURE;
 }
 
+void MotorControl::activatePublisher(void)
+{
+  motorControlPub->on_activate();
+}
 
 void MotorControl::configureMotor(void)
 {
@@ -118,9 +121,9 @@ void MotorControl::pigpioEncoderCountCallback(
   const HalPigpioEncoderCountMsg_t & msg)
 {
   for (uint8_t index = 0; index < msg.motor_id.size(); ++index) {
-    if (msg.motor_id[index] == MOTOR_LEFT) {
+    if (msg.motor_id.at(index) == MOTOR_LEFT) {
       motorLeft.setEncoderCount(msg.encoder_count[index]);
-    } else if (msg.motor_id[index] == MOTOR_RIGHT) {
+    } else if (msg.motor_id.at(index) == MOTOR_RIGHT) {
       motorRight.setEncoderCount(msg.encoder_count[index]);
     } else {
       RCLCPP_ERROR(get_logger(), "Encoder count message received for unknown motor!");

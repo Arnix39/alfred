@@ -26,8 +26,6 @@
 #define GPIO_PWM_CHANNEL_B_M1 GPIO4
 #define GPIO_ENCODER_CHANNEL_A_M1 GPIO5
 #define GPIO_ENCODER_CHANNEL_B_M1 GPIO6
-#define INPUT 0
-#define OUTPUT 1
 
 class MotorNode : public rclcpp::Node
 {

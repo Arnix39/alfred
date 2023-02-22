@@ -26,6 +26,11 @@
 
 #include "pigpiod_if2.h" // NOLINT
 
+#define INPUT 0
+#define OUTPUT 1
+#define FORWARD true
+#define BACKWARD false
+
 class HalPigpioDummyNode : public rclcpp::Node
 {
 public:
