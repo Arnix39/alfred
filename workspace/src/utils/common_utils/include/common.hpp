@@ -35,4 +35,51 @@
 using LifecycleCallbackReturn_t =
   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
+template<class ServiceT>
+class ServiceNodeSync
+{
+  typedef typename ServiceT::Request RequestT;
+  typedef typename ServiceT::Response ResponseT;
+
+public:
+  explicit ServiceNodeSync(std::string name)
+  : node(std::make_shared<rclcpp::Node>(name)) {}
+
+  ~ServiceNodeSync()
+  {
+    node.reset();
+    client.reset();
+  }
+
+  void init(std::string service)
+  {
+    client = node->create_client<ServiceT>(service);
+    client->wait_for_service();
+  }
+
+  ResponseT sendRequest(const RequestT & req)
+  {
+    return sendRequest(std::make_shared<RequestT>(req));
+  }
+
+  std::shared_ptr<ResponseT> sendRequest(const std::shared_ptr<RequestT> & req_ptr)
+  {
+    std::shared_ptr<ResponseT> response;
+    auto result = client->async_send_request(req_ptr);
+    auto status = rclcpp::spin_until_future_complete(
+      node, result, std::chrono::duration<int64_t, std::milli>(1000));
+
+    if (status == rclcpp::FutureReturnCode::SUCCESS) {
+      response = result.get();
+    }
+
+    return response;
+  }
+
+protected:
+  rclcpp::Node::SharedPtr node;
+  typename rclcpp::Client<ServiceT>::SharedPtr client;
+};
+
+
 #endif  // COMMON_HPP_
