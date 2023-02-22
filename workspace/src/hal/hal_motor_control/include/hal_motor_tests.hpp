@@ -16,22 +16,10 @@
 #define HAL_MOTOR_TESTS_HPP_
 
 #include <memory>
-#include <thread>
+#include <future>
 
-#include "gtest/gtest.h"
-
-#include "rclcpp/rclcpp.hpp"
-#include "lifecycle_msgs/srv/change_state.hpp"
-
-#include "hal_motor_control_commonDefinitions.hpp"
+#include "hal_motor_control_tests_helpers.hpp"
 #include "hal_motor.hpp"
-#include "pigpiod_if2.h" // NOLINT
-
-// Services and messages headers (generated)
-#include "hal_pigpio_interfaces/srv/hal_pigpio_set_input_mode.hpp"
-#include "hal_pigpio_interfaces/srv/hal_pigpio_set_output_mode.hpp"
-#include "hal_pigpio_interfaces/srv/hal_pigpio_set_pwm_frequency.hpp"
-#include "hal_pigpio_interfaces/srv/hal_pigpio_set_encoder_callback.hpp"
 
 #define MOTOR_ID_1 0
 #define GPIO_PWM_CHANNEL_A_M1 GPIO3
@@ -40,42 +28,6 @@
 #define GPIO_ENCODER_CHANNEL_B_M1 GPIO6
 #define INPUT 0
 #define OUTPUT 1
-
-class HalPigpioDummyNode : public rclcpp::Node
-{
-public:
-  HalPigpioDummyNode();
-  ~HalPigpioDummyNode();
-
-  int piHandle;
-  int32_t callbackId;
-
-  rclcpp::Service<HalPigpioSetInputMode_t>::SharedPtr setInputModeService;
-  rclcpp::Service<HalPigpioSetOutputMode_t>::SharedPtr setOutputModeService;
-  rclcpp::Service<HalPigpioSetPwmDutycycle_t>::SharedPtr setPwmDutycycleService;
-  rclcpp::Service<HalPigpioSetPwmFrequency_t>::SharedPtr setPwmFrequencyService;
-  rclcpp::Service<HalPigpioSetEncoderCallback_t>::SharedPtr setEncoderCallbackService;
-  rclcpp::Service<HalPigpioSetMotorDirection_t>::SharedPtr setMotorDirectionService;
-
-  void setInputMode(
-    const std::shared_ptr<HalPigpioSetInputMode_t::Request> request,
-    std::shared_ptr<HalPigpioSetInputMode_t::Response> response);
-  void setOutputMode(
-    const std::shared_ptr<HalPigpioSetOutputMode_t::Request> request,
-    std::shared_ptr<HalPigpioSetOutputMode_t::Response> response);
-  void setPwmDutycycle(
-    const std::shared_ptr<HalPigpioSetPwmDutycycle_t::Request> request,
-    std::shared_ptr<HalPigpioSetPwmDutycycle_t::Response> response);
-  void setPwmFrequency(
-    const std::shared_ptr<HalPigpioSetPwmFrequency_t::Request> request,
-    std::shared_ptr<HalPigpioSetPwmFrequency_t::Response> response);
-  void setEncoderCallback(
-    const std::shared_ptr<HalPigpioSetEncoderCallback_t::Request> request,
-    std::shared_ptr<HalPigpioSetEncoderCallback_t::Response> response);
-  void setMotorDirection(
-    const std::shared_ptr<HalPigpioSetMotorDirection_t::Request> request,
-    std::shared_ptr<HalPigpioSetMotorDirection_t::Response> response);
-};
 
 class MotorNode : public rclcpp::Node
 {
