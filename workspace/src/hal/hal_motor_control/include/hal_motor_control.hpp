@@ -18,16 +18,22 @@
 #include "hal_motor_control_commonDefinitions.hpp"
 #include "hal_motor.hpp"
 
+using setInputModeSyncClientNode_t = ServiceNodeSync<HalPigpioSetInputMode_t>;
+using setOutputModeSyncClientNode_t = ServiceNodeSync<HalPigpioSetOutputMode_t>;
+using setEncoderCallbackSyncClientNode_t = ServiceNodeSync<HalPigpioSetEncoderCallback_t>;
+using setPwmFrequencySyncClientNode_t = ServiceNodeSync<HalPigpioSetPwmFrequency_t>;
+
 class MotorControl : public rclcpp_lifecycle::LifecycleNode
 {
 private:
   Motor motorLeft;
   Motor motorRight;
 
-  rclcpp::Client<HalPigpioSetInputMode_t>::SharedPtr gpioSetInputClient;
-  rclcpp::Client<HalPigpioSetOutputMode_t>::SharedPtr gpioSetOutputClient;
-  rclcpp::Client<HalPigpioSetEncoderCallback_t>::SharedPtr gpioSetEncoderCallbackClient;
-  rclcpp::Client<HalPigpioSetPwmFrequency_t>::SharedPtr gpioSetPwmFrequencyClient;
+  setInputModeSyncClientNode_t setInputModeSyncClient;
+  setOutputModeSyncClientNode_t setOutputModeSyncClient;
+  setEncoderCallbackSyncClientNode_t setEncoderCallbackSyncClient;
+  setPwmFrequencySyncClientNode_t setPwmFrequencySyncClient;
+
   rclcpp::Client<HalPigpioSetPwmDutycycle_t>::SharedPtr gpioSetPwmDutycycleClient;
   rclcpp::Client<HalPigpioSetMotorDirection_t>::SharedPtr gpioSetMotorDirectionClient;
 

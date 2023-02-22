@@ -16,6 +16,7 @@
 #define HAL_MOTOR_TESTS_HPP_
 
 #include <memory>
+#include <thread>
 
 #include "gtest/gtest.h"
 
@@ -25,6 +26,7 @@
 #include "hal_motor_control_commonDefinitions.hpp"
 #include "hal_motor.hpp"
 #include "pigpiod_if2.h" // NOLINT
+#include "mock/raspberrypi_mock_utilities.hpp"
 
 // Services and messages headers (generated)
 #include "hal_pigpio_interfaces/srv/hal_pigpio_set_input_mode.hpp"
@@ -37,6 +39,8 @@
 #define GPIO_PWM_CHANNEL_B_M1 4
 #define GPIO_ENCODER_CHANNEL_A_M1 5
 #define GPIO_ENCODER_CHANNEL_B_M1 6
+#define INPUT 0
+#define OUTPUT 1
 
 class HalPigpioDummyNode : public rclcpp::Node
 {
@@ -74,17 +78,26 @@ public:
     std::shared_ptr<HalPigpioSetMotorDirection_t::Response> response);
 };
 
+class MotorNode : public rclcpp::Node
+{
+public:
+  MotorNode();
+
+  Motor motorOk;
+};
+
 class MotorCheckerNode : public rclcpp::Node
 {
 public:
   MotorCheckerNode();
   ~MotorCheckerNode() = default;
 
-  rclcpp::Client<HalPigpioSetInputMode_t>::SharedPtr setInputModeClient;
-  rclcpp::Client<HalPigpioSetOutputMode_t>::SharedPtr setOutputModeClient;
+  setOutputModeSyncClientNode_t setOutputModeClient;
+  setInputModeSyncClientNode_t setInputModeClient;
+  setEncoderCallbackSyncClientNode_t setEncoderCallbackClient;
+  setPwmFrequencySyncClientNode_t setPwmFrequencyClient;
+
   rclcpp::Client<HalPigpioSetPwmDutycycle_t>::SharedPtr setPwmDutycycleClient;
-  rclcpp::Client<HalPigpioSetPwmFrequency_t>::SharedPtr setPwmFrequencyClient;
-  rclcpp::Client<HalPigpioSetEncoderCallback_t>::SharedPtr setEncoderCallbackClient;
   rclcpp::Client<HalPigpioSetMotorDirection_t>::SharedPtr setMotorDirectionClient;
 };
 
@@ -92,32 +105,38 @@ public:
 class MotorTest : public testing::Test
 {
 protected:
-  std::shared_ptr<Motor> motorOk;
   std::shared_ptr<HalPigpioDummyNode> pigpioDummy;
+  std::shared_ptr<MotorNode> motor;
   std::shared_ptr<MotorCheckerNode> motorChecker;
   rclcpp::executors::SingleThreadedExecutor executor;
 
   void SetUp()
   {
-    motorOk = std::make_shared<Motor>(
-      GPIO_PWM_CHANNEL_A_M1, GPIO_PWM_CHANNEL_B_M1,
-      GPIO_ENCODER_CHANNEL_A_M1, GPIO_ENCODER_CHANNEL_B_M1,
-      MOTOR_ID_1);
     pigpioDummy = std::make_shared<HalPigpioDummyNode>();
     motorChecker = std::make_shared<MotorCheckerNode>();
+    motor = std::make_shared<MotorNode>();
 
-    executor.add_node(pigpioDummy);
+    executor.add_node(motor);
     executor.add_node(motorChecker);
+    executor.add_node(pigpioDummy);
+
+    motorChecker->setInputModeClient.init("hal_pigpioSetInputMode");
+    motorChecker->setOutputModeClient.init("hal_pigpioSetOutputMode");
+    motorChecker->setEncoderCallbackClient.init("hal_pigpioSetEncoderCallback");
+    motorChecker->setPwmFrequencyClient.init("hal_pigpioSetPwmFrequency");
+
+    executor.spin_some();
   }
 
   void TearDown()
   {
     executor.cancel();
-    executor.remove_node(pigpioDummy);
+    executor.remove_node(motor);
     executor.remove_node(motorChecker);
+    executor.remove_node(pigpioDummy);
     pigpioDummy.reset();
     motorChecker.reset();
-    motorOk.reset();
+    motor.reset();
   }
 };
 

@@ -28,10 +28,10 @@ Motor::Motor(
 }
 
 void Motor::configureGpios(
-  rclcpp::Client<HalPigpioSetOutputMode_t>::SharedPtr gpioSetOutputModeClient,
-  rclcpp::Client<HalPigpioSetInputMode_t>::SharedPtr gpioSetInputModeClient,
-  rclcpp::Client<HalPigpioSetEncoderCallback_t>::SharedPtr gpioSetEncoderCallbackClient,
-  rclcpp::Client<HalPigpioSetPwmFrequency_t>::SharedPtr gpioSetPwmFrequencyClient)
+  setOutputModeSyncClientNode_t gpioSetOutputModeClient,
+  setInputModeSyncClientNode_t gpioSetInputModeClient,
+  setEncoderCallbackSyncClientNode_t gpioSetEncoderCallbackClient,
+  setPwmFrequencySyncClientNode_t gpioSetPwmFrequencyClient)
 {
   auto setInputModeEncoderChARequest = std::make_shared<HalPigpioSetInputMode_t::Request>();
   auto setInputModeEncoderChBRequest = std::make_shared<HalPigpioSetInputMode_t::Request>();
@@ -42,76 +42,55 @@ void Motor::configureGpios(
   auto setPwmFrequencyPwmChARequest = std::make_shared<HalPigpioSetPwmFrequency_t::Request>();
   auto setPwmFrequencyPwmChBRequest = std::make_shared<HalPigpioSetPwmFrequency_t::Request>();
 
-  auto setInputModeCallback = [this](SetInputModeFuture_t future)
-    {
-      if (!future.get()->has_succeeded) {
-        RCLCPP_ERROR(rclcpp::get_logger("Motors"), "Failed to call service setInputMode");
-      }
-    };
-
-  auto setEncoderCallbackCallback = [this](SetEncoderCallbackFuture_t future)
-    {
-      if (!future.get()->has_succeeded) {
-        RCLCPP_ERROR(rclcpp::get_logger("Motors"), "Failed to call service setEncoderCallback");
-      }
-    };
-
-  auto setOutputModeCallback = [this](SetOutputModeFuture_t future)
-    {
-      if (!future.get()->has_succeeded) {
-        RCLCPP_ERROR(rclcpp::get_logger("Motors"), "Failed to call service setOutputMode");
-      }
-    };
-
-  auto setPwmFrequencyCallback = [this](SetPwmFrequencyFuture_t future)
-    {
-      if (!future.get()->has_succeeded) {
-        RCLCPP_ERROR(rclcpp::get_logger("Motors"), "Failed to call service setPwmFrequency");
-      }
-    };
-
   /* Encoder channel A */
   setInputModeEncoderChARequest->gpio_id = encoder.channelA.gpio;
-  auto setInputModeEncoderChAFuture = gpioSetInputModeClient->async_send_request(
-    setInputModeEncoderChARequest, setInputModeCallback);
+  if (!gpioSetInputModeClient.sendRequest(setInputModeEncoderChARequest)->has_succeeded) {
+    RCLCPP_ERROR(rclcpp::get_logger("Motors"), "Failed to call service setInputMode");
+  }
 
   setEncoderCallbackChARequest->gpio_id = encoder.channelA.gpio;
   setEncoderCallbackChARequest->edge_change_type = AS_EITHER_EDGE;
   setEncoderCallbackChARequest->motor_id = id;
-  auto setEncoderCallbackChAFuture = gpioSetEncoderCallbackClient->async_send_request(
-    setEncoderCallbackChARequest, setEncoderCallbackCallback);
+  if (!gpioSetEncoderCallbackClient.sendRequest(setEncoderCallbackChARequest)->has_succeeded) {
+    RCLCPP_ERROR(rclcpp::get_logger("Motors"), "Failed to call service setEncoderCallback");
+  }
 
   /* Encoder channel B */
   setInputModeEncoderChBRequest->gpio_id = encoder.channelB.gpio;
-  auto setInputModeEncoderChBFuture = gpioSetInputModeClient->async_send_request(
-    setInputModeEncoderChBRequest, setInputModeCallback);
+  if (!gpioSetInputModeClient.sendRequest(setInputModeEncoderChBRequest)->has_succeeded) {
+    RCLCPP_ERROR(rclcpp::get_logger("Motors"), "Failed to call service setInputMode");
+  }
 
   setEncoderCallbackChBRequest->gpio_id = encoder.channelB.gpio;
   setEncoderCallbackChBRequest->edge_change_type = AS_EITHER_EDGE;
   setEncoderCallbackChBRequest->motor_id = id;
-  auto setEncoderCallbackChBFuture = gpioSetEncoderCallbackClient->async_send_request(
-    setEncoderCallbackChBRequest, setEncoderCallbackCallback);
+  if (!gpioSetEncoderCallbackClient.sendRequest(setEncoderCallbackChBRequest)->has_succeeded) {
+    RCLCPP_ERROR(rclcpp::get_logger("Motors"), "Failed to call service setEncoderCallback");
+  }
 
   /* PWM channel A */
   setOutputModePwmChARequest->gpio_id = pwmA.gpio;
-  auto setOutputModePwmChAFuture = gpioSetOutputModeClient->async_send_request(
-    setOutputModePwmChARequest, setOutputModeCallback);
+  if (!gpioSetOutputModeClient.sendRequest(setOutputModePwmChARequest)->has_succeeded) {
+    RCLCPP_ERROR(rclcpp::get_logger("Motors"), "Failed to call service setOutputMode");
+  }
 
   setPwmFrequencyPwmChARequest->gpio_id = pwmA.gpio;
   setPwmFrequencyPwmChARequest->frequency = MOTOR_PWM_FREQUENCY;
-  auto setPwmFrequencyPwmChAFuture = gpioSetPwmFrequencyClient->async_send_request(
-    setPwmFrequencyPwmChARequest, setPwmFrequencyCallback);
-
+  if (!gpioSetPwmFrequencyClient.sendRequest(setPwmFrequencyPwmChARequest)->has_succeeded) {
+    RCLCPP_ERROR(rclcpp::get_logger("Motors"), "Failed to call service setPwmFrequency");
+  }
 
   /* PWM channel B */
   setOutputModePwmChBRequest->gpio_id = pwmB.gpio;
-  auto setOutputModePwmChBFuture = gpioSetOutputModeClient->async_send_request(
-    setOutputModePwmChBRequest, setOutputModeCallback);
+  if (!gpioSetOutputModeClient.sendRequest(setOutputModePwmChBRequest)->has_succeeded) {
+    RCLCPP_ERROR(rclcpp::get_logger("Motors"), "Failed to call service setOutputMode");
+  }
 
   setPwmFrequencyPwmChBRequest->gpio_id = pwmB.gpio;
   setPwmFrequencyPwmChBRequest->frequency = MOTOR_PWM_FREQUENCY;
-  auto setPwmFrequencyPwmChBFuture = gpioSetPwmFrequencyClient->async_send_request(
-    setPwmFrequencyPwmChBRequest, setPwmFrequencyCallback);
+  if (!gpioSetPwmFrequencyClient.sendRequest(setPwmFrequencyPwmChBRequest)->has_succeeded) {
+    RCLCPP_ERROR(rclcpp::get_logger("Motors"), "Failed to call service setPwmFrequency");
+  }
 }
 
 uint32_t Motor::getEncoderCount(void)

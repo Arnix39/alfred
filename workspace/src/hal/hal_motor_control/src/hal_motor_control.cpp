@@ -24,18 +24,21 @@ MotorControl::MotorControl()
     MOTOR_LEFT),
   motorRight(MOTOR_RIGHT_PWM_A_GPIO, MOTOR_RIGHT_PWM_B_GPIO,
     MOTOR_RIGHT_ENCODER_CH_A_GPIO, MOTOR_RIGHT_ENCODER_CH_B_GPIO,
-    MOTOR_RIGHT)
+    MOTOR_RIGHT),
+  setInputModeSyncClient("setInputModeSyncClientMotor_node"),
+  setOutputModeSyncClient("setOutputModeSyncClientMotor_node"),
+  setEncoderCallbackSyncClient("setEncoderCallbackSyncClientMotor_node"),
+  setPwmFrequencySyncClient("setPwmFrequencySyncClientMotor_node")
 {
 }
 
 LifecycleCallbackReturn_t MotorControl::on_configure(const rclcpp_lifecycle::State & previous_state)
 {
-  gpioSetInputClient = this->create_client<HalPigpioSetInputMode_t>("hal_pigpioSetInputMode");
-  gpioSetOutputClient = this->create_client<HalPigpioSetOutputMode_t>("hal_pigpioSetOutputMode");
-  gpioSetEncoderCallbackClient =
-    this->create_client<HalPigpioSetEncoderCallback_t>("hal_pigpioSetEncoderCallback");
-  gpioSetPwmFrequencyClient =
-    this->create_client<HalPigpioSetPwmFrequency_t>("hal_pigpioSetPwmFrequency");
+  setInputModeSyncClient.init("hal_pigpioSetInputMode");
+  setOutputModeSyncClient.init("hal_pigpioSetOutputMode");
+  setEncoderCallbackSyncClient.init("hal_pigpioSetEncoderCallback");
+  setPwmFrequencySyncClient.init("hal_pigpioSetPwmFrequency");
+
   gpioSetPwmDutycycleClient =
     this->create_client<HalPigpioSetPwmDutycycle_t>("hal_pigpioSetPwmDutycycle");
   gpioSetMotorDirectionClient =
@@ -104,11 +107,11 @@ LifecycleCallbackReturn_t MotorControl::on_error(const rclcpp_lifecycle::State &
 void MotorControl::configureMotor(void)
 {
   motorLeft.configureGpios(
-    gpioSetOutputClient, gpioSetInputClient, gpioSetEncoderCallbackClient,
-    gpioSetPwmFrequencyClient);
+    setOutputModeSyncClient, setInputModeSyncClient, setEncoderCallbackSyncClient,
+    setPwmFrequencySyncClient);
   motorRight.configureGpios(
-    gpioSetOutputClient, gpioSetInputClient, gpioSetEncoderCallbackClient,
-    gpioSetPwmFrequencyClient);
+    setOutputModeSyncClient, setInputModeSyncClient, setEncoderCallbackSyncClient,
+    setPwmFrequencySyncClient);
 }
 
 void MotorControl::pigpioEncoderCountCallback(

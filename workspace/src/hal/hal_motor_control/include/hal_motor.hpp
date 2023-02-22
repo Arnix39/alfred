@@ -17,6 +17,11 @@
 
 #include "hal_motor_control_commonDefinitions.hpp"
 
+using setInputModeSyncClientNode_t = ServiceNodeSync<HalPigpioSetInputMode_t>;
+using setOutputModeSyncClientNode_t = ServiceNodeSync<HalPigpioSetOutputMode_t>;
+using setEncoderCallbackSyncClientNode_t = ServiceNodeSync<HalPigpioSetEncoderCallback_t>;
+using setPwmFrequencySyncClientNode_t = ServiceNodeSync<HalPigpioSetPwmFrequency_t>;
+
 struct EncoderChannel
 {
   uint8_t gpio;
@@ -58,10 +63,10 @@ public:
     rclcpp::Client<HalPigpioSetMotorDirection_t>::SharedPtr gpioSetMotorDirectionClient,
     bool isDirectionForward);
   void configureGpios(
-    rclcpp::Client<HalPigpioSetOutputMode_t>::SharedPtr gpioSetOutputModeClient,
-    rclcpp::Client<HalPigpioSetInputMode_t>::SharedPtr gpioSetInputModeClient,
-    rclcpp::Client<HalPigpioSetEncoderCallback_t>::SharedPtr gpioSetEncoderCallbackClient,
-    rclcpp::Client<HalPigpioSetPwmFrequency_t>::SharedPtr gpioSetPwmFrequencyClient);
+    setOutputModeSyncClientNode_t gpioSetOutputModeClient,
+    setInputModeSyncClientNode_t gpioSetInputModeClient,
+    setEncoderCallbackSyncClientNode_t gpioSetEncoderCallbackClient,
+    setPwmFrequencySyncClientNode_t gpioSetPwmFrequencyClient);
   uint8_t getId(void);
 };
 
