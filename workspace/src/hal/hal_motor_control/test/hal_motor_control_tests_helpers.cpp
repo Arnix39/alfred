@@ -30,10 +30,7 @@ HalPigpioDummyNode::HalPigpioDummyNode()
       "hal_pigpioSetPwmFrequency", std::bind(&HalPigpioDummyNode::setPwmFrequency, this, _1, _2))),
   setEncoderCallbackService(this->create_service<HalPigpioSetEncoderCallback_t>(
       "hal_pigpioSetEncoderCallback",
-      std::bind(&HalPigpioDummyNode::setEncoderCallback, this, _1, _2))),
-  setMotorDirectionService(this->create_service<HalPigpioSetMotorDirection_t>(
-      "hal_pigpioSetMotorDirection",
-      std::bind(&HalPigpioDummyNode::setMotorDirection, this, _1, _2)))
+      std::bind(&HalPigpioDummyNode::setEncoderCallback, this, _1, _2)))
 {
 }
 
@@ -111,11 +108,4 @@ void HalPigpioDummyNode::setEncoderCallback(
   } else {
     response->has_succeeded = false;
   }
-}
-
-void HalPigpioDummyNode::setMotorDirection(
-  const std::shared_ptr<HalPigpioSetMotorDirection_t::Request> request,
-  std::shared_ptr<HalPigpioSetMotorDirection_t::Response> response)
-{
-  response->has_succeeded = true;
 }

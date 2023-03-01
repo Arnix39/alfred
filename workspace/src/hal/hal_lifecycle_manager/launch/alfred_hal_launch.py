@@ -90,8 +90,8 @@ def generate_launch_description():
                 target_lifecycle_node=hal_pigpio_node, goal_state='active',
                 entities=[
                     launch.actions.LogInfo(
-                        msg="hal_pigpio_node active, activating hal_proxsens_node, \
-                            hal_imuI2cInit_node and hal_motor_control_node."),
+                        msg="hal_pigpio_node active, activating hal_proxsens_node, " +
+                            "hal_imuI2cInit_node and hal_motor_control_node."),
                     launch.actions.EmitEvent(event=launch_ros.events.lifecycle.ChangeState(
                         lifecycle_node_matcher=launch.events.matches_action(hal_proxsens_node),
                         transition_id=lifecycle_msgs.msg.Transition.TRANSITION_ACTIVATE,
@@ -115,8 +115,8 @@ def generate_launch_description():
                 target_lifecycle_node=hal_imuI2cInit_node, goal_state='active',
                 entities=[
                     launch.actions.LogInfo(
-                        msg="hal_imuI2cInit_node active, \
-                            activating hal_imuDmpWritingServer_node."),
+                        msg="hal_imuI2cInit_node active, " +
+                            "activating hal_imuDmpWritingServer_node."),
                     launch.actions.EmitEvent(event=launch_ros.events.lifecycle.ChangeState(
                         lifecycle_node_matcher=launch.events.matches_action(
                             hal_imuDmpWritingServer_node),

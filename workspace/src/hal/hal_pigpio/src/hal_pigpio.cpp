@@ -82,9 +82,6 @@ LifecycleCallbackReturn_t Pigpio::on_configure(const rclcpp_lifecycle::State & p
   setEncoderCallbackService =
     this->create_service<HalPigpioSetEncoderCallback_t>(
     "hal_pigpioSetEncoderCallback", std::bind(&Pigpio::setEncoderCallback, this, _1, _2));
-  setMotorDirectionService =
-    this->create_service<HalPigpioSetMotorDirection_t>(
-    "hal_pigpioSetMotorDirection", std::bind(&Pigpio::setMotorDirection, this, _1, _2));
   setPwmDutycycleService =
     this->create_service<HalPigpioSetPwmDutycycle_t>(
     "hal_pigpioSetPwmDutycycle", std::bind(&Pigpio::setPwmDutycycle, this, _1, _2));

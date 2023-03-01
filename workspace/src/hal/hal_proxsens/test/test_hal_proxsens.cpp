@@ -27,13 +27,13 @@ using namespace std::chrono_literals;
 
 const hal_proxsens::pigpio_msg::HalPigpioEdgeChange & edgeChangeMessage(
   uint8_t gpioId,
-  uint8_t edgeChangeType,
+  EdgeChangeType edgeChangeType,
   uint32_t timeSinceBoot_us)
 {
   auto message = hal_proxsens::pigpio_msg::HalPigpioEdgeChange();
 
   message.gpio_id = gpioId;
-  message.edge_change_type = edgeChangeType;
+  message.edge_change_type = static_cast<uint8_t>(edgeChangeType);
   message.time_since_boot_us = timeSinceBoot_us;
   const hal_proxsens::pigpio_msg::HalPigpioEdgeChange & messageToSend = message;
 
@@ -129,11 +129,11 @@ TEST_F(ProxsensTest, sensorDistance10cm)
 
   proxsens->edgeChangeCallback(
     edgeChangeMessage(
-      PROXSENS_ECHO_GPIO, RISING_EDGE,
+      PROXSENS_ECHO_GPIO, EdgeChangeType::rising,
       timestampRisingEdge));
   proxsens->edgeChangeCallback(
     edgeChangeMessage(
-      PROXSENS_ECHO_GPIO, FALLING_EDGE,
+      PROXSENS_ECHO_GPIO, EdgeChangeType::falling,
       timestampFallingEdge));
   proxsens->publishDistance();
   ASSERT_EQ(executor.spin_until_future_complete(future, 1s), rclcpp::FutureReturnCode::SUCCESS);
@@ -149,11 +149,11 @@ TEST_F(ProxsensTest, sensorDistanceTwoFallingEdges)
 
   proxsens->edgeChangeCallback(
     edgeChangeMessage(
-      PROXSENS_ECHO_GPIO, FALLING_EDGE,
+      PROXSENS_ECHO_GPIO, EdgeChangeType::falling,
       timestampFirstFallingEdge));
   proxsens->edgeChangeCallback(
     edgeChangeMessage(
-      PROXSENS_ECHO_GPIO, FALLING_EDGE,
+      PROXSENS_ECHO_GPIO, EdgeChangeType::falling,
       timestampSecondFallingEdge));
   proxsens->publishDistance();
   ASSERT_EQ(executor.spin_until_future_complete(future, 1s), rclcpp::FutureReturnCode::SUCCESS);
@@ -168,11 +168,11 @@ TEST_F(ProxsensTest, sensorDistance10cmWithTimestampRollout)
 
   proxsens->edgeChangeCallback(
     edgeChangeMessage(
-      PROXSENS_ECHO_GPIO, RISING_EDGE,
+      PROXSENS_ECHO_GPIO, EdgeChangeType::rising,
       timestampRisingEdge));
   proxsens->edgeChangeCallback(
     edgeChangeMessage(
-      PROXSENS_ECHO_GPIO, FALLING_EDGE,
+      PROXSENS_ECHO_GPIO, EdgeChangeType::falling,
       timestampFallingEdge));
   proxsens->publishDistance();
   ASSERT_EQ(executor.spin_until_future_complete(future, 1s), rclcpp::FutureReturnCode::SUCCESS);
@@ -189,15 +189,15 @@ TEST_F(ProxsensTest, sensorDistanceFallingEdgeFirstWithRisingEdge)
 
   proxsens->edgeChangeCallback(
     edgeChangeMessage(
-      PROXSENS_ECHO_GPIO, FALLING_EDGE,
+      PROXSENS_ECHO_GPIO, EdgeChangeType::falling,
       timestampFirstFallingEdge));
   proxsens->edgeChangeCallback(
     edgeChangeMessage(
-      PROXSENS_ECHO_GPIO, RISING_EDGE,
+      PROXSENS_ECHO_GPIO, EdgeChangeType::rising,
       timestampRisingEdge));
   proxsens->edgeChangeCallback(
     edgeChangeMessage(
-      PROXSENS_ECHO_GPIO, FALLING_EDGE,
+      PROXSENS_ECHO_GPIO, EdgeChangeType::falling,
       timestampSecondFallingEdge));
   proxsens->publishDistance();
   ASSERT_EQ(executor.spin_until_future_complete(future, 1s), rclcpp::FutureReturnCode::SUCCESS);
@@ -214,15 +214,15 @@ TEST_F(ProxsensTest, sensorDistanceTwoRisingEdges)
 
   proxsens->edgeChangeCallback(
     edgeChangeMessage(
-      PROXSENS_ECHO_GPIO, RISING_EDGE,
+      PROXSENS_ECHO_GPIO, EdgeChangeType::rising,
       timestampFirstRisingEdge));
   proxsens->edgeChangeCallback(
     edgeChangeMessage(
-      PROXSENS_ECHO_GPIO, RISING_EDGE,
+      PROXSENS_ECHO_GPIO, EdgeChangeType::rising,
       timestampSecondRisingEdge));
   proxsens->edgeChangeCallback(
     edgeChangeMessage(
-      PROXSENS_ECHO_GPIO, FALLING_EDGE,
+      PROXSENS_ECHO_GPIO, EdgeChangeType::falling,
       timestampFallingEdge));
   proxsens->publishDistance();
   ASSERT_EQ(executor.spin_until_future_complete(future, 1s), rclcpp::FutureReturnCode::SUCCESS);

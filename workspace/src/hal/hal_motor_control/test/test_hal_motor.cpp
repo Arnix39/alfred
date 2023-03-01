@@ -29,8 +29,6 @@ MotorCheckerNode::MotorCheckerNode()
 : rclcpp::Node("hal_motor_checker_node"),
   setPwmDutycycleClient(
     this->create_client<HalPigpioSetPwmDutycycle_t>("hal_pigpioSetPwmDutycycle")),
-  setMotorDirectionClient(
-    this->create_client<HalPigpioSetMotorDirection_t>("hal_pigpioSetMotorDirection")),
   setInputModeClient("setInputModeSyncClientMotorChecker_node"),
   setOutputModeClient("setOutputModeSyncClientMotorChecker_node"),
   setEncoderCallbackClient("setEncoderCallbackSyncClientMotorChecker_node"),
@@ -105,11 +103,7 @@ TEST_F(MotorTest, SetPwmDutyCycleAndDirectionForward)
     FAIL();
   }
 
-  motor->motorOk.setPwmDutyCycleAndDirection(
-    motorChecker->setPwmDutycycleClient,
-    20,
-    motorChecker->setMotorDirectionClient,
-    FORWARD);
+  motor->motorOk.setPwmDutyCycleAndDirection(motorChecker->setPwmDutycycleClient, 20, FORWARD);
 
   executor.spin_some();
   executor.spin_some();
@@ -141,11 +135,7 @@ TEST_F(MotorTest, SetPwmDutyCycleAndDirectionBackward)
     FAIL();
   }
 
-  motor->motorOk.setPwmDutyCycleAndDirection(
-    motorChecker->setPwmDutycycleClient,
-    20,
-    motorChecker->setMotorDirectionClient,
-    BACKWARD);
+  motor->motorOk.setPwmDutyCycleAndDirection(motorChecker->setPwmDutycycleClient, 20, BACKWARD);
 
   executor.spin_some();
   executor.spin_some();

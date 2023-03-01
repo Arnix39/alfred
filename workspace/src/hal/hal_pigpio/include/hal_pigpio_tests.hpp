@@ -26,7 +26,10 @@
 #include "hal_pigpio.hpp"
 
 #define GOOD_GPIO GPIO2
-#define GOOD_GPIO_2 GPIO3
+#define CHANNEL_A_MOTOR_1 GPIO3
+#define CHANNEL_B_MOTOR_1 GPIO4
+#define CHANNEL_A_MOTOR_2 GPIO5
+#define CHANNEL_B_MOTOR_2 GPIO6
 #define BAD_GPIO GPIO1
 #define MOTOR_ID_1 0
 #define MOTOR_ID_2 1
@@ -84,7 +87,6 @@ public:
   rclcpp::Client<HalPigpioReadGpio_t>::SharedPtr readGpioClient;
   rclcpp::Client<HalPigpioSetCallback_t>::SharedPtr setCallbackClient;
   rclcpp::Client<HalPigpioSetEncoderCallback_t>::SharedPtr setEncoderCallbackClient;
-  rclcpp::Client<HalPigpioSetMotorDirection_t>::SharedPtr setMotorDirectionClient;
   rclcpp::Subscription<HalPigpioEdgeChangeMsg_t>::SharedPtr pigpioEdgeChangeSub;
   rclcpp::Subscription<HalPigpioEncoderCountMsg_t>::SharedPtr pigpioEncoderCountSub;
   rclcpp::Client<HalPigpioI2cOpen_t>::SharedPtr i2cOpenClient;
@@ -99,7 +101,7 @@ public:
   rclcpp::Subscription<HalPigpioAnglesMsg_t>::SharedPtr anglesSubscriber;
 
   uint8_t edgeChangeMsg_gpioId;
-  uint8_t edgeChangeMsg_edgeChangeType;
+  EdgeChangeType edgeChangeMsg_edgeChangeType;
   uint32_t edgeChangeMsg_timeSinceBoot_us;
 
   std::map<uint8_t, int32_t> motorsEC;
@@ -127,16 +129,13 @@ public:
     rclcpp::executors::SingleThreadedExecutor * executor);
   bool setCallback(
     uint16_t gpio_id,
-    uint8_t edge_change_type,
+    EdgeChangeConfiguration edge_change_type,
     rclcpp::executors::SingleThreadedExecutor * executor);
   bool setEncoderCallback(
     uint16_t gpio_id,
-    uint8_t edge_change_type,
+    EdgeChangeConfiguration edge_change_type,
     uint8_t motor_id,
-    rclcpp::executors::SingleThreadedExecutor * executor);
-  bool setMotorDirection(
-    bool is_direction_forward,
-    uint8_t motor_id,
+    EncoderChannel channel,
     rclcpp::executors::SingleThreadedExecutor * executor);
   void edgeChangeCallback(const HalPigpioEdgeChangeMsg_t & msg);
   void encoderCountCallback(const HalPigpioEncoderCountMsg_t & msg);

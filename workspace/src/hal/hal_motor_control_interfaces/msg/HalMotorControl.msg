@@ -1,2 +1,2 @@
-uint32 motor_left_encoder_count
-uint32 motor_right_encoder_count
+int32 motor_left_encoder_count
+int32 motor_right_encoder_count

@@ -38,8 +38,6 @@ PigioCheckerNode::PigioCheckerNode()
   setCallbackClient(this->create_client<HalPigpioSetCallback_t>("hal_pigpioSetCallback")),
   setEncoderCallbackClient(this->create_client<HalPigpioSetEncoderCallback_t>(
       "hal_pigpioSetEncoderCallback")),
-  setMotorDirectionClient(this->create_client<HalPigpioSetMotorDirection_t>(
-      "hal_pigpioSetMotorDirection")),
   pigpioEdgeChangeSub(this->create_subscription<HalPigpioEdgeChangeMsg_t>(
       "gpioEdgeChange",
       1000,
@@ -69,7 +67,7 @@ PigioCheckerNode::PigioCheckerNode()
       1000,
       std::bind(&PigioCheckerNode::getAngles, this, _1))),
   edgeChangeMsg_gpioId(0),
-  edgeChangeMsg_edgeChangeType(0),
+  edgeChangeMsg_edgeChangeType(EdgeChangeType::undefined),
   edgeChangeMsg_timeSinceBoot_us(0),
   motorsEC({})
 {
@@ -156,13 +154,13 @@ bool PigioCheckerNode::readGpioAndCheckLevel(
 
 bool PigioCheckerNode::setCallback(
   uint16_t gpio_id,
-  uint8_t edge_change_type,
+  EdgeChangeConfiguration edge_change_type,
   rclcpp::executors::SingleThreadedExecutor * executor)
 {
   auto request = std::make_shared<HalPigpioSetCallback_t::Request>();
 
   request->gpio_id = gpio_id;
-  request->edge_change_type = edge_change_type;
+  request->edge_change_type = static_cast<uint8_t>(edge_change_type);
 
   auto future = setCallbackClient->async_send_request(request);
 
@@ -173,34 +171,19 @@ bool PigioCheckerNode::setCallback(
 
 bool PigioCheckerNode::setEncoderCallback(
   uint16_t gpio_id,
-  uint8_t edge_change_type,
+  EdgeChangeConfiguration edge_change_type,
   uint8_t motor_id,
+  EncoderChannel channel,
   rclcpp::executors::SingleThreadedExecutor * executor)
 {
   auto request = std::make_shared<HalPigpioSetEncoderCallback_t::Request>();
 
   request->gpio_id = gpio_id;
-  request->edge_change_type = edge_change_type;
+  request->edge_change_type = static_cast<uint8_t>(edge_change_type);
   request->motor_id = motor_id;
+  request->channel = static_cast<uint8_t>(channel);
 
   auto future = setEncoderCallbackClient->async_send_request(request);
-
-  executor->spin_until_future_complete(future);
-
-  return future.get()->has_succeeded;
-}
-
-bool PigioCheckerNode::setMotorDirection(
-  bool is_direction_forward,
-  uint8_t motor_id,
-  rclcpp::executors::SingleThreadedExecutor * executor)
-{
-  auto request = std::make_shared<HalPigpioSetMotorDirection_t::Request>();
-
-  request->is_direction_forward = is_direction_forward;
-  request->motor_id = motor_id;
-
-  auto future = setMotorDirectionClient->async_send_request(request);
 
   executor->spin_until_future_complete(future);
 
@@ -210,7 +193,7 @@ bool PigioCheckerNode::setMotorDirection(
 void PigioCheckerNode::edgeChangeCallback(const HalPigpioEdgeChangeMsg_t & msg)
 {
   edgeChangeMsg_gpioId = msg.gpio_id;
-  edgeChangeMsg_edgeChangeType = msg.edge_change_type;
+  edgeChangeMsg_edgeChangeType = static_cast<EdgeChangeType>(msg.edge_change_type);
   edgeChangeMsg_timeSinceBoot_us = msg.time_since_boot_us;
 }
 

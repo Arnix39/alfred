@@ -43,7 +43,6 @@ using HalPigpioSendTriggerPulse_t = hal_pigpio_interfaces::srv::HalPigpioSendTri
 using HalPigpioReadGpio_t = hal_pigpio_interfaces::srv::HalPigpioReadGpio;
 using HalPigpioSetCallback_t = hal_pigpio_interfaces::srv::HalPigpioSetCallback;
 using HalPigpioSetEncoderCallback_t = hal_pigpio_interfaces::srv::HalPigpioSetEncoderCallback;
-using HalPigpioSetMotorDirection_t = hal_pigpio_interfaces::srv::HalPigpioSetMotorDirection;
 using HalPigpioEdgeChangeMsg_t = hal_pigpio_interfaces::msg::HalPigpioEdgeChange;
 using HalPigpioEncoderCountMsg_t = hal_pigpio_interfaces::msg::HalPigpioEncoderCount;
 using HalPigpioI2cOpen_t = hal_pigpio_interfaces::srv::HalPigpioI2cOpen;
@@ -86,7 +85,6 @@ private:
   rclcpp::Service<HalPigpioReadGpio_t>::SharedPtr readGpioService;
   rclcpp::Service<HalPigpioSetCallback_t>::SharedPtr setCallbackService;
   rclcpp::Service<HalPigpioSetEncoderCallback_t>::SharedPtr setEncoderCallbackService;
-  rclcpp::Service<HalPigpioSetMotorDirection_t>::SharedPtr setMotorDirectionService;
   rclcpp::Service<HalPigpioSetPwmDutycycle_t>::SharedPtr setPwmDutycycleService;
   rclcpp::Service<HalPigpioSetPwmFrequency_t>::SharedPtr setPwmFrequencyService;
   rclcpp::Service<HalPigpioSetGpioHigh_t>::SharedPtr setGpioHighService;
@@ -132,6 +130,10 @@ public:
     int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us);
   void gpioEncoderEdgeChangeCallback(
     int handle, unsigned gpioId, unsigned edgeChangeType, uint32_t timeSinceBoot_us);
+
+  MotorDirection computeDirection(
+    const EncoderChannel & previousChannel, const EncoderChannel & channel,
+    const EdgeChangeType & previousEdgeChange, const EdgeChangeType & edgeChange);
 
   void i2cOpen(
     const std::shared_ptr<HalPigpioI2cOpen_t::Request> request,
@@ -187,9 +189,6 @@ public:
   void setEncoderCallback(
     const std::shared_ptr<HalPigpioSetEncoderCallback_t::Request> request,
     std::shared_ptr<HalPigpioSetEncoderCallback_t::Response> response);
-  void setMotorDirection(
-    const std::shared_ptr<HalPigpioSetMotorDirection_t::Request> request,
-    std::shared_ptr<HalPigpioSetMotorDirection_t::Response> response);
   void setPwmDutycycle(
     const std::shared_ptr<HalPigpioSetPwmDutycycle_t::Request> request,
     std::shared_ptr<HalPigpioSetPwmDutycycle_t::Response> response);

@@ -45,7 +45,6 @@ public:
   rclcpp::Service<HalPigpioSetPwmDutycycle_t>::SharedPtr setPwmDutycycleService;
   rclcpp::Service<HalPigpioSetPwmFrequency_t>::SharedPtr setPwmFrequencyService;
   rclcpp::Service<HalPigpioSetEncoderCallback_t>::SharedPtr setEncoderCallbackService;
-  rclcpp::Service<HalPigpioSetMotorDirection_t>::SharedPtr setMotorDirectionService;
 
   void setInputMode(
     const std::shared_ptr<HalPigpioSetInputMode_t::Request> request,
@@ -62,9 +61,6 @@ public:
   void setEncoderCallback(
     const std::shared_ptr<HalPigpioSetEncoderCallback_t::Request> request,
     std::shared_ptr<HalPigpioSetEncoderCallback_t::Response> response);
-  void setMotorDirection(
-    const std::shared_ptr<HalPigpioSetMotorDirection_t::Request> request,
-    std::shared_ptr<HalPigpioSetMotorDirection_t::Response> response);
 };
 
 #endif  // HAL_MOTOR_CONTROL_TESTS_HELPERS_HPP_

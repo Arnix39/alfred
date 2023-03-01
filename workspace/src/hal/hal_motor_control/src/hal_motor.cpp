@@ -49,8 +49,10 @@ void Motor::configureGpios(
   }
 
   setEncoderCallbackChARequest->gpio_id = encoder.channelA.gpio;
-  setEncoderCallbackChARequest->edge_change_type = AS_EITHER_EDGE;
+  setEncoderCallbackChARequest->edge_change_type =
+    static_cast<uint8_t>(EdgeChangeConfiguration::asEitherEdge);
   setEncoderCallbackChARequest->motor_id = id;
+  setEncoderCallbackChARequest->channel = static_cast<uint8_t>(EncoderChannel::channelA);
   if (!gpioSetEncoderCallbackClient.sendRequest(setEncoderCallbackChARequest)->has_succeeded) {
     RCLCPP_ERROR(rclcpp::get_logger("Motors"), "Failed to call service setEncoderCallback");
   }
@@ -62,8 +64,10 @@ void Motor::configureGpios(
   }
 
   setEncoderCallbackChBRequest->gpio_id = encoder.channelB.gpio;
-  setEncoderCallbackChBRequest->edge_change_type = AS_EITHER_EDGE;
+  setEncoderCallbackChBRequest->edge_change_type =
+    static_cast<uint8_t>(EdgeChangeConfiguration::asEitherEdge);
   setEncoderCallbackChBRequest->motor_id = id;
+  setEncoderCallbackChBRequest->channel = static_cast<uint8_t>(EncoderChannel::channelB);
   if (!gpioSetEncoderCallbackClient.sendRequest(setEncoderCallbackChBRequest)->has_succeeded) {
     RCLCPP_ERROR(rclcpp::get_logger("Motors"), "Failed to call service setEncoderCallback");
   }
@@ -106,12 +110,10 @@ void Motor::setEncoderCount(uint32_t count)
 void Motor::setPwmDutyCycleAndDirection(
   rclcpp::Client<HalPigpioSetPwmDutycycle_t>::SharedPtr gpioSetPwmDutycycleClient,
   uint16_t dutycycle,
-  rclcpp::Client<HalPigpioSetMotorDirection_t>::SharedPtr gpioSetMotorDirectionClient,
   bool isDirectionForward)
 {
   auto setPwmDutycyclePwmChARequest = std::make_shared<HalPigpioSetPwmDutycycle_t::Request>();
   auto setPwmDutycyclePwmChBRequest = std::make_shared<HalPigpioSetPwmDutycycle_t::Request>();
-  auto setMotorDirectionRequest = std::make_shared<HalPigpioSetMotorDirection_t::Request>();
 
   auto setPwmDutycycleCallback = [this](SetPwmDutycycleFuture_t future)
     {
@@ -119,19 +121,6 @@ void Motor::setPwmDutyCycleAndDirection(
         RCLCPP_ERROR(rclcpp::get_logger("Motors"), "Failed to call service setPwmDutycycle");
       }
     };
-
-  auto setMotorDirectionCallback = [this](SetMotorDirectionFuture_t future)
-    {
-      if (!future.get()->has_succeeded) {
-        RCLCPP_ERROR(rclcpp::get_logger("Motors"), "Failed to call service setMotorDirection");
-      }
-    };
-
-
-  setMotorDirectionRequest->is_direction_forward = isDirectionForward;
-  setMotorDirectionRequest->motor_id = id;
-  auto setMotorDirectionFuture = gpioSetMotorDirectionClient->async_send_request(
-    setMotorDirectionRequest, setMotorDirectionCallback);
 
   pwmB.dutycycle = dutycycle;
   pwmA.dutycycle = dutycycle;

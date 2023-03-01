@@ -37,7 +37,6 @@ set(srv_files
   srv/HalPigpioSetCallback.srv
   srv/HalPigpioI2cImuReading.srv
   srv/HalPigpioSetEncoderCallback.srv
-  srv/HalPigpioSetMotorDirection.srv
 )
 
 #################################################

@@ -82,21 +82,62 @@ void Pigpio::publishEncoderCount(void)
   }
 }
 
+MotorDirection Pigpio::computeDirection(
+  const EncoderChannel & previousChannel, const EncoderChannel & channel,
+  const EdgeChangeType & previousEdgeChange, const EdgeChangeType & edgeChange)
+{
+  if ((previousChannel != channel) && (previousChannel != EncoderChannel::undefined)) {
+    switch (channel) {
+      case EncoderChannel::channelA:
+        if (previousEdgeChange == edgeChange) {
+          return MotorDirection::backward;
+        } else {
+          return MotorDirection::forward;
+        }
+      case EncoderChannel::channelB:
+        if (previousEdgeChange == edgeChange) {
+          return MotorDirection::forward;
+        } else {
+          return MotorDirection::backward;
+        }
+      default:
+        return MotorDirection::undefined;
+    }
+  } else {
+    return MotorDirection::undefined;
+  }
+}
+
 void Pigpio::gpioEncoderEdgeChangeCallback(
   int handle, unsigned gpioId, unsigned edgeChangeType,
   uint32_t timeSinceBoot_us)
 {
   (void)handle;
-  (void)edgeChangeType;
   (void)timeSinceBoot_us;
 
+  EncoderChannel channel;
+  MotorDirection direction;
+
   for (Motor & motor : motors) {
-    if (find(motor.gpios.begin(), motor.gpios.end(), gpioId) != motor.gpios.end()) {
-      if (motor.isDirectionForward) {
+    auto iterator = find(motor.gpios.begin(), motor.gpios.end(), gpioId);
+    if (iterator != motor.gpios.end()) {
+      channel = static_cast<EncoderChannel>(iterator - motor.gpios.begin());
+
+      direction = computeDirection(
+        motor.previousChannel, channel,
+        motor.previousEdgeChangeType, static_cast<EdgeChangeType>(edgeChangeType));
+
+      if (direction == MotorDirection::forward) {
         ++motor.encoderCount;
-      } else {
+      } else if (direction == MotorDirection::backward) {
         --motor.encoderCount;
+      } else {
+        // direction is undefined, not changing encoder count
       }
+      motor.previousChannel = channel;
+      motor.previousEdgeChangeType = static_cast<EdgeChangeType>(edgeChangeType);
+    } else {
+      // Nothing to do
     }
   }
 }
@@ -119,15 +160,31 @@ void Pigpio::setEncoderCallback(
     pigpioHandle, request->gpio_id, request->edge_change_type,
     c_gpioEncoderEdgeChangeCallback,
     reinterpret_cast<void *>(this));
+
   if (response->callback_id >= 0) {
     auto motorIndex = find_if(
       motors.begin(), motors.end(), [request](Motor motor) {
         return motor.id == request->motor_id;
       });
+
     if (motorIndex != motors.end()) {
-      motors.at(motorIndex - motors.begin()).gpios.push_back(request->gpio_id);
+      motors.at(motorIndex - motors.begin()).gpios.at(request->channel) = request->gpio_id;
     } else {
-      motors.push_back({request->motor_id, {request->gpio_id}, 0, true});
+      if (static_cast<EncoderChannel>(request->channel) == EncoderChannel::channelA) {
+        motors.push_back(
+          {request->motor_id,
+            {request->gpio_id, 0},
+            EncoderChannel::undefined,
+            EdgeChangeType::undefined,
+            0});
+      } else {
+        motors.push_back(
+          {request->motor_id,
+            {0, request->gpio_id},
+            EncoderChannel::undefined,
+            EdgeChangeType::undefined,
+            0});
+      }
     }
 
     response->has_succeeded = true;
@@ -138,22 +195,5 @@ void Pigpio::setEncoderCallback(
     RCLCPP_ERROR(
       get_logger(), "Failed to configure encoder callback for GPIO %u!",
       request->gpio_id);
-  }
-}
-
-void Pigpio::setMotorDirection(
-  const std::shared_ptr<HalPigpioSetMotorDirection_t::Request> request,
-  std::shared_ptr<HalPigpioSetMotorDirection_t::Response> response)
-{
-  auto motorIndex = find_if(
-    motors.begin(), motors.end(), [request](Motor motor) {
-      return motor.id == request->motor_id;
-    });
-  if (motorIndex != motors.end()) {
-    motors.at(motorIndex - motors.begin()).isDirectionForward = request->is_direction_forward;
-    response->has_succeeded = true;
-  } else {
-    response->has_succeeded = false;
-    RCLCPP_ERROR(get_logger(), "Failed to set motor direction for motor %u!", request->motor_id);
   }
 }

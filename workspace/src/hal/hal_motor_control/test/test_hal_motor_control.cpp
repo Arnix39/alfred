@@ -185,7 +185,7 @@ TEST_F(MotorControlTest, encoderCountCallbackAndPublishMessageSuccess)
   motorControl->publishMessage();
   executor.spin_some();
 
-  ASSERT_EQ(motorControlChecker->encoderCounts.at(0), -10);
+  ASSERT_EQ(motorControlChecker->encoderCounts.at(0), 10);
   ASSERT_EQ(motorControlChecker->encoderCounts.at(1), 10);
 }
 
@@ -209,7 +209,7 @@ TEST_F(MotorControlTest, encoderCountCallbackAndPublishMessageFailure)
   motorControl->publishMessage();
   executor.spin_some();
 
-  ASSERT_EQ(motorControlChecker->encoderCounts.at(0), -10);
+  ASSERT_EQ(motorControlChecker->encoderCounts.at(0), 10);
   ASSERT_EQ(motorControlChecker->encoderCounts.at(1), 0);
 }
 

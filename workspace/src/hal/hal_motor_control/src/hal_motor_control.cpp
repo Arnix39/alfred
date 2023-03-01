@@ -41,8 +41,6 @@ LifecycleCallbackReturn_t MotorControl::on_configure(const rclcpp_lifecycle::Sta
 
   gpioSetPwmDutycycleClient =
     this->create_client<HalPigpioSetPwmDutycycle_t>("hal_pigpioSetPwmDutycycle");
-  gpioSetMotorDirectionClient =
-    this->create_client<HalPigpioSetMotorDirection_t>("hal_pigpioSetMotorDirection");
 
   motorControlPub = this->create_publisher<HalMotorControlMsg_t>(
     "motorsEncoderCountValue", 1000);
@@ -135,21 +133,17 @@ void MotorControl::publishMessage(void)
 {
   auto encoderCounts = HalMotorControlMsg_t();
 
-  encoderCounts.motor_left_encoder_count = motorLeft.getEncoderCount();
+  encoderCounts.motor_left_encoder_count = -motorLeft.getEncoderCount();
   encoderCounts.motor_right_encoder_count = motorRight.getEncoderCount();
   motorControlPub->publish(encoderCounts);
 }
 
 void MotorControl::setPwmLeft(uint16_t dutycycle, bool direction)
 {
-  motorLeft.setPwmDutyCycleAndDirection(
-    gpioSetPwmDutycycleClient, dutycycle,
-    gpioSetMotorDirectionClient, direction);
+  motorLeft.setPwmDutyCycleAndDirection(gpioSetPwmDutycycleClient, dutycycle, direction);
 }
 
 void MotorControl::setPwmRight(uint16_t dutycycle, bool direction)
 {
-  motorRight.setPwmDutyCycleAndDirection(
-    gpioSetPwmDutycycleClient, dutycycle,
-    gpioSetMotorDirectionClient, direction);
+  motorRight.setPwmDutyCycleAndDirection(gpioSetPwmDutycycleClient, dutycycle, direction);
 }

@@ -35,7 +35,6 @@ private:
   setPwmFrequencySyncClientNode_t setPwmFrequencySyncClient;
 
   rclcpp::Client<HalPigpioSetPwmDutycycle_t>::SharedPtr gpioSetPwmDutycycleClient;
-  rclcpp::Client<HalPigpioSetMotorDirection_t>::SharedPtr gpioSetMotorDirectionClient;
 
   rclcpp_lifecycle::LifecyclePublisher<HalMotorControlMsg_t>::SharedPtr motorControlPub;
 

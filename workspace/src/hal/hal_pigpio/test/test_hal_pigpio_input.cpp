@@ -29,20 +29,26 @@ TEST_F(PigpioTest, ReadGpioFailure)
 TEST_F(PigpioTest, SetCallbackSuccess)
 {
   hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setInputModeClient, &executor);
-  ASSERT_EQ(pigpioChecker->setCallback(GOOD_GPIO, AS_EITHER_EDGE, &executor), true);
+  ASSERT_EQ(
+    pigpioChecker->setCallback(GOOD_GPIO, EdgeChangeConfiguration::asEitherEdge, &executor),
+    true);
 }
 
 TEST_F(PigpioTest, SetCallbackFailure)
 {
   hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setOutputModeClient, &executor);
-  ASSERT_EQ(pigpioChecker->setCallback(GOOD_GPIO, AS_EITHER_EDGE, &executor), false);
+  ASSERT_EQ(
+    pigpioChecker->setCallback(GOOD_GPIO, EdgeChangeConfiguration::asEitherEdge, &executor),
+    false);
 }
 
 TEST_F(PigpioTest, SetEncoderCallbackSuccess)
 {
   hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setInputModeClient, &executor);
   ASSERT_EQ(
-    pigpioChecker->setEncoderCallback(GOOD_GPIO, AS_EITHER_EDGE, MOTOR_ID_1, &executor),
+    pigpioChecker->setEncoderCallback(
+      GOOD_GPIO, EdgeChangeConfiguration::asEitherEdge, MOTOR_ID_1, EncoderChannel::channelA,
+      &executor),
     true);
 }
 
@@ -50,52 +56,125 @@ TEST_F(PigpioTest, SetEncoderCallbackFailure)
 {
   hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setOutputModeClient, &executor);
   ASSERT_EQ(
-    pigpioChecker->setEncoderCallback(GOOD_GPIO, AS_EITHER_EDGE, MOTOR_ID_1, &executor),
+    pigpioChecker->setEncoderCallback(
+      GOOD_GPIO, EdgeChangeConfiguration::asEitherEdge, MOTOR_ID_1, EncoderChannel::channelA,
+      &executor),
     false);
-}
-
-TEST_F(PigpioTest, SetMotorDirectionSuccess)
-{
-  hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setInputModeClient, &executor);
-  pigpioChecker->setEncoderCallback(GOOD_GPIO, AS_EITHER_EDGE, MOTOR_ID_1, &executor);
-  ASSERT_EQ(pigpioChecker->setMotorDirection(FORWARD, MOTOR_ID_1, &executor), true);
-}
-
-TEST_F(PigpioTest, SetMotorDirectionFailure)
-{
-  hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setOutputModeClient, &executor);
-  pigpioChecker->setEncoderCallback(GOOD_GPIO, AS_EITHER_EDGE, MOTOR_ID_1, &executor);
-  ASSERT_EQ(pigpioChecker->setMotorDirection(FORWARD, MOTOR_ID_2, &executor), false);
 }
 
 TEST_F(PigpioTest, PublishRisingEdgeChangeMessage)
 {
-  pigpio->gpioEdgeChangeCallback(0, GOOD_GPIO, RISING_EDGE, 1000);
+  pigpio->gpioEdgeChangeCallback(
+    0, GOOD_GPIO, static_cast<unsigned>(EdgeChangeType::rising), 1000);
 
   executor.spin_some();
 
   ASSERT_EQ(pigpioChecker->edgeChangeMsg_gpioId, GOOD_GPIO);
-  ASSERT_EQ(pigpioChecker->edgeChangeMsg_edgeChangeType, RISING_EDGE);
+  ASSERT_EQ(pigpioChecker->edgeChangeMsg_edgeChangeType, EdgeChangeType::rising);
   ASSERT_EQ(pigpioChecker->edgeChangeMsg_timeSinceBoot_us, 1000);
 }
 
 TEST_F(PigpioTest, PublishFallingEdgeChangeMessage)
 {
-  pigpio->gpioEdgeChangeCallback(0, GOOD_GPIO, FALLING_EDGE, 1000);
+  pigpio->gpioEdgeChangeCallback(
+    0, GOOD_GPIO, static_cast<unsigned>(EdgeChangeType::falling), 1000);
 
   executor.spin_some();
 
   ASSERT_EQ(pigpioChecker->edgeChangeMsg_gpioId, GOOD_GPIO);
-  ASSERT_EQ(pigpioChecker->edgeChangeMsg_edgeChangeType, FALLING_EDGE);
+  ASSERT_EQ(pigpioChecker->edgeChangeMsg_edgeChangeType, EdgeChangeType::falling);
   ASSERT_EQ(pigpioChecker->edgeChangeMsg_timeSinceBoot_us, 1000);
+}
+
+TEST_F(PigpioTest, ConputeDirectionForward)
+{
+  ASSERT_EQ(
+    pigpio->computeDirection(
+      EncoderChannel::channelA, EncoderChannel::channelB,
+      EdgeChangeType::rising, EdgeChangeType::rising),
+    MotorDirection::forward);
+  ASSERT_EQ(
+    pigpio->computeDirection(
+      EncoderChannel::channelA, EncoderChannel::channelB,
+      EdgeChangeType::falling, EdgeChangeType::falling),
+    MotorDirection::forward);
+  ASSERT_EQ(
+    pigpio->computeDirection(
+      EncoderChannel::channelB, EncoderChannel::channelA,
+      EdgeChangeType::falling, EdgeChangeType::rising),
+    MotorDirection::forward);
+  ASSERT_EQ(
+    pigpio->computeDirection(
+      EncoderChannel::channelB, EncoderChannel::channelA,
+      EdgeChangeType::rising, EdgeChangeType::falling),
+    MotorDirection::forward);
+}
+
+TEST_F(PigpioTest, ConputeDirectionBackward)
+{
+  ASSERT_EQ(
+    pigpio->computeDirection(
+      EncoderChannel::channelB, EncoderChannel::channelA,
+      EdgeChangeType::rising, EdgeChangeType::rising),
+    MotorDirection::backward);
+  ASSERT_EQ(
+    pigpio->computeDirection(
+      EncoderChannel::channelB, EncoderChannel::channelA,
+      EdgeChangeType::falling, EdgeChangeType::falling),
+    MotorDirection::backward);
+  ASSERT_EQ(
+    pigpio->computeDirection(
+      EncoderChannel::channelA, EncoderChannel::channelB,
+      EdgeChangeType::falling, EdgeChangeType::rising),
+    MotorDirection::backward);
+  ASSERT_EQ(
+    pigpio->computeDirection(
+      EncoderChannel::channelA, EncoderChannel::channelB,
+      EdgeChangeType::falling, EdgeChangeType::rising),
+    MotorDirection::backward);
+}
+
+TEST_F(PigpioTest, ConputeDirectionUndefined)
+{
+  ASSERT_EQ(
+    pigpio->computeDirection(
+      EncoderChannel::channelA, EncoderChannel::channelA,
+      EdgeChangeType::rising, EdgeChangeType::rising),
+    MotorDirection::undefined);
+  ASSERT_EQ(
+    pigpio->computeDirection(
+      EncoderChannel::channelB, EncoderChannel::channelB,
+      EdgeChangeType::rising, EdgeChangeType::rising),
+    MotorDirection::undefined);
+  ASSERT_EQ(
+    pigpio->computeDirection(
+      EncoderChannel::undefined, EncoderChannel::channelB,
+      EdgeChangeType::rising, EdgeChangeType::rising),
+    MotorDirection::undefined);
+  ASSERT_EQ(
+    pigpio->computeDirection(
+      EncoderChannel::undefined, EncoderChannel::channelA,
+      EdgeChangeType::rising, EdgeChangeType::rising),
+    MotorDirection::undefined);
 }
 
 TEST_F(PigpioTest, PublishPositiveEncoderCountMessage)
 {
-  hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setInputModeClient, &executor);
-  pigpioChecker->setEncoderCallback(GOOD_GPIO, AS_EITHER_EDGE, MOTOR_ID_1, &executor);
-  pigpioChecker->setMotorDirection(FORWARD, MOTOR_ID_1, &executor);
-  pigpio->gpioEncoderEdgeChangeCallback(0, GOOD_GPIO, RISING_EDGE, 1000);
+  hal_pigpioGpioSet(CHANNEL_A_MOTOR_1, pigpioChecker->setInputModeClient, &executor);
+  hal_pigpioGpioSet(CHANNEL_B_MOTOR_1, pigpioChecker->setInputModeClient, &executor);
+
+  pigpioChecker->setEncoderCallback(
+    CHANNEL_A_MOTOR_1, EdgeChangeConfiguration::asEitherEdge, MOTOR_ID_1, EncoderChannel::channelA,
+    &executor);
+  pigpioChecker->setEncoderCallback(
+    CHANNEL_B_MOTOR_1, EdgeChangeConfiguration::asEitherEdge, MOTOR_ID_1, EncoderChannel::channelB,
+    &executor);
+
+  /* Channel A rising first then channel B */
+  pigpio->gpioEncoderEdgeChangeCallback(
+    0, CHANNEL_A_MOTOR_1, static_cast<unsigned>(EdgeChangeType::rising), 1000);
+  pigpio->gpioEncoderEdgeChangeCallback(
+    0, CHANNEL_B_MOTOR_1, static_cast<unsigned>(EdgeChangeType::rising), 2000);
   pigpio->publishEncoderCount();
   executor.spin_some();
 
@@ -106,10 +185,21 @@ TEST_F(PigpioTest, PublishPositiveEncoderCountMessage)
 
 TEST_F(PigpioTest, PublishPositiveEncoderCountMessageTwice)
 {
-  hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setInputModeClient, &executor);
-  pigpioChecker->setEncoderCallback(GOOD_GPIO, AS_EITHER_EDGE, MOTOR_ID_1, &executor);
-  pigpioChecker->setMotorDirection(FORWARD, MOTOR_ID_1, &executor);
-  pigpio->gpioEncoderEdgeChangeCallback(0, GOOD_GPIO, RISING_EDGE, 1000);
+  hal_pigpioGpioSet(CHANNEL_A_MOTOR_1, pigpioChecker->setInputModeClient, &executor);
+  hal_pigpioGpioSet(CHANNEL_B_MOTOR_1, pigpioChecker->setInputModeClient, &executor);
+
+  pigpioChecker->setEncoderCallback(
+    CHANNEL_A_MOTOR_1, EdgeChangeConfiguration::asEitherEdge, MOTOR_ID_1, EncoderChannel::channelA,
+    &executor);
+  pigpioChecker->setEncoderCallback(
+    CHANNEL_B_MOTOR_1, EdgeChangeConfiguration::asEitherEdge, MOTOR_ID_1, EncoderChannel::channelB,
+    &executor);
+
+  /* Channel A rising first then channel B */
+  pigpio->gpioEncoderEdgeChangeCallback(
+    0, CHANNEL_A_MOTOR_1, static_cast<unsigned>(EdgeChangeType::rising), 1000);
+  pigpio->gpioEncoderEdgeChangeCallback(
+    0, CHANNEL_B_MOTOR_1, static_cast<unsigned>(EdgeChangeType::rising), 2000);
   pigpio->publishEncoderCount();
   executor.spin_some();
 
@@ -117,7 +207,9 @@ TEST_F(PigpioTest, PublishPositiveEncoderCountMessageTwice)
   ASSERT_EQ((motorIndex != pigpioChecker->motorsEC.end()), true);
   ASSERT_EQ(motorIndex->second, 1);
 
-  pigpio->gpioEncoderEdgeChangeCallback(0, GOOD_GPIO, RISING_EDGE, 1000);
+  /* Channel A falling */
+  pigpio->gpioEncoderEdgeChangeCallback(
+    0, CHANNEL_A_MOTOR_1, static_cast<unsigned>(EdgeChangeType::falling), 3000);
   pigpio->publishEncoderCount();
   executor.spin_some();
 
@@ -128,10 +220,21 @@ TEST_F(PigpioTest, PublishPositiveEncoderCountMessageTwice)
 
 TEST_F(PigpioTest, PublishNegativeEncoderCountMessage)
 {
-  hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setInputModeClient, &executor);
-  pigpioChecker->setEncoderCallback(GOOD_GPIO, AS_EITHER_EDGE, MOTOR_ID_2, &executor);
-  pigpioChecker->setMotorDirection(BACKWARD, MOTOR_ID_2, &executor);
-  pigpio->gpioEncoderEdgeChangeCallback(0, GOOD_GPIO, RISING_EDGE, 1000);
+  hal_pigpioGpioSet(CHANNEL_A_MOTOR_2, pigpioChecker->setInputModeClient, &executor);
+  hal_pigpioGpioSet(CHANNEL_B_MOTOR_2, pigpioChecker->setInputModeClient, &executor);
+
+  pigpioChecker->setEncoderCallback(
+    CHANNEL_A_MOTOR_2, EdgeChangeConfiguration::asEitherEdge, MOTOR_ID_2, EncoderChannel::channelA,
+    &executor);
+  pigpioChecker->setEncoderCallback(
+    CHANNEL_B_MOTOR_2, EdgeChangeConfiguration::asEitherEdge, MOTOR_ID_2, EncoderChannel::channelB,
+    &executor);
+
+  /* Channel B rising first then channel A */
+  pigpio->gpioEncoderEdgeChangeCallback(
+    0, CHANNEL_B_MOTOR_2, static_cast<unsigned>(EdgeChangeType::rising), 1000);
+  pigpio->gpioEncoderEdgeChangeCallback(
+    0, CHANNEL_A_MOTOR_2, static_cast<unsigned>(EdgeChangeType::rising), 2000);
   pigpio->publishEncoderCount();
   executor.spin_some();
 
@@ -142,10 +245,21 @@ TEST_F(PigpioTest, PublishNegativeEncoderCountMessage)
 
 TEST_F(PigpioTest, PublishNegativeEncoderCountMessageTwice)
 {
-  hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setInputModeClient, &executor);
-  pigpioChecker->setEncoderCallback(GOOD_GPIO, AS_EITHER_EDGE, MOTOR_ID_2, &executor);
-  pigpioChecker->setMotorDirection(BACKWARD, MOTOR_ID_2, &executor);
-  pigpio->gpioEncoderEdgeChangeCallback(0, GOOD_GPIO, RISING_EDGE, 1000);
+  hal_pigpioGpioSet(CHANNEL_A_MOTOR_2, pigpioChecker->setInputModeClient, &executor);
+  hal_pigpioGpioSet(CHANNEL_B_MOTOR_2, pigpioChecker->setInputModeClient, &executor);
+
+  pigpioChecker->setEncoderCallback(
+    CHANNEL_A_MOTOR_2, EdgeChangeConfiguration::asEitherEdge, MOTOR_ID_2, EncoderChannel::channelA,
+    &executor);
+  pigpioChecker->setEncoderCallback(
+    CHANNEL_B_MOTOR_2, EdgeChangeConfiguration::asEitherEdge, MOTOR_ID_2, EncoderChannel::channelB,
+    &executor);
+
+  /* Channel B rising first then channel A */
+  pigpio->gpioEncoderEdgeChangeCallback(
+    0, CHANNEL_B_MOTOR_2, static_cast<unsigned>(EdgeChangeType::rising), 1000);
+  pigpio->gpioEncoderEdgeChangeCallback(
+    0, CHANNEL_A_MOTOR_2, static_cast<unsigned>(EdgeChangeType::rising), 2000);
   pigpio->publishEncoderCount();
   executor.spin_some();
 
@@ -153,7 +267,9 @@ TEST_F(PigpioTest, PublishNegativeEncoderCountMessageTwice)
   ASSERT_EQ((motorIndex != pigpioChecker->motorsEC.end()), true);
   ASSERT_EQ(motorIndex->second, -1);
 
-  pigpio->gpioEncoderEdgeChangeCallback(0, GOOD_GPIO, RISING_EDGE, 1000);
+  /* Channel B falling */
+  pigpio->gpioEncoderEdgeChangeCallback(
+    0, CHANNEL_B_MOTOR_2, static_cast<unsigned>(EdgeChangeType::falling), 3000);
   pigpio->publishEncoderCount();
   executor.spin_some();
 
@@ -164,14 +280,36 @@ TEST_F(PigpioTest, PublishNegativeEncoderCountMessageTwice)
 
 TEST_F(PigpioTest, PublishEncoderCountMessageTwoMotors)
 {
-  hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setInputModeClient, &executor);
-  hal_pigpioGpioSet(GOOD_GPIO_2, pigpioChecker->setInputModeClient, &executor);
+  hal_pigpioGpioSet(CHANNEL_A_MOTOR_1, pigpioChecker->setInputModeClient, &executor);
+  hal_pigpioGpioSet(CHANNEL_B_MOTOR_1, pigpioChecker->setInputModeClient, &executor);
+  hal_pigpioGpioSet(CHANNEL_A_MOTOR_2, pigpioChecker->setInputModeClient, &executor);
+  hal_pigpioGpioSet(CHANNEL_B_MOTOR_2, pigpioChecker->setInputModeClient, &executor);
 
-  pigpioChecker->setEncoderCallback(GOOD_GPIO, AS_EITHER_EDGE, MOTOR_ID_1, &executor);
-  pigpioChecker->setEncoderCallback(GOOD_GPIO_2, AS_EITHER_EDGE, MOTOR_ID_2, &executor);
-  pigpioChecker->setMotorDirection(FORWARD, MOTOR_ID_1, &executor);
-  pigpioChecker->setMotorDirection(BACKWARD, MOTOR_ID_2, &executor);
-  pigpio->gpioEncoderEdgeChangeCallback(0, GOOD_GPIO_2, RISING_EDGE, 1000);
+  pigpioChecker->setEncoderCallback(
+    CHANNEL_A_MOTOR_1, EdgeChangeConfiguration::asEitherEdge, MOTOR_ID_1, EncoderChannel::channelA,
+    &executor);
+  pigpioChecker->setEncoderCallback(
+    CHANNEL_B_MOTOR_1, EdgeChangeConfiguration::asEitherEdge, MOTOR_ID_1, EncoderChannel::channelB,
+    &executor);
+  pigpioChecker->setEncoderCallback(
+    CHANNEL_A_MOTOR_2, EdgeChangeConfiguration::asEitherEdge, MOTOR_ID_2, EncoderChannel::channelA,
+    &executor);
+  pigpioChecker->setEncoderCallback(
+    CHANNEL_B_MOTOR_2, EdgeChangeConfiguration::asEitherEdge, MOTOR_ID_2, EncoderChannel::channelB,
+    &executor);
+
+  /* Channel A rising first then channel B for motor 1*/
+  pigpio->gpioEncoderEdgeChangeCallback(
+    0, CHANNEL_A_MOTOR_1, static_cast<unsigned>(EdgeChangeType::rising), 1000);
+  pigpio->gpioEncoderEdgeChangeCallback(
+    0, CHANNEL_B_MOTOR_1, static_cast<unsigned>(EdgeChangeType::rising), 2000);
+
+  /* Channel B rising first then channel A for motor 2 */
+  pigpio->gpioEncoderEdgeChangeCallback(
+    0, CHANNEL_B_MOTOR_2, static_cast<unsigned>(EdgeChangeType::rising), 3000);
+  pigpio->gpioEncoderEdgeChangeCallback(
+    0, CHANNEL_A_MOTOR_2, static_cast<unsigned>(EdgeChangeType::rising), 4000);
+
   pigpio->publishEncoderCount();
   executor.spin_some();
 
@@ -181,25 +319,7 @@ TEST_F(PigpioTest, PublishEncoderCountMessageTwoMotors)
 
   motorIndex = pigpioChecker->motorsEC.find(MOTOR_ID_1);
   ASSERT_EQ((motorIndex != pigpioChecker->motorsEC.end()), true);
-  ASSERT_EQ(motorIndex->second, 0);
-}
-
-TEST_F(PigpioTest, PublishEncoderCountMessageOneMotorTwoGpios)
-{
-  hal_pigpioGpioSet(GOOD_GPIO, pigpioChecker->setInputModeClient, &executor);
-  hal_pigpioGpioSet(GOOD_GPIO_2, pigpioChecker->setInputModeClient, &executor);
-
-  pigpioChecker->setEncoderCallback(GOOD_GPIO, AS_EITHER_EDGE, MOTOR_ID_2, &executor);
-  pigpioChecker->setEncoderCallback(GOOD_GPIO_2, AS_EITHER_EDGE, MOTOR_ID_2, &executor);
-  pigpioChecker->setMotorDirection(FORWARD, MOTOR_ID_2, &executor);
-  pigpio->gpioEncoderEdgeChangeCallback(0, GOOD_GPIO, RISING_EDGE, 1000);
-  pigpio->gpioEncoderEdgeChangeCallback(0, GOOD_GPIO_2, RISING_EDGE, 1000);
-  pigpio->publishEncoderCount();
-  executor.spin_some();
-
-  auto motorIndex = pigpioChecker->motorsEC.find(MOTOR_ID_2);
-  ASSERT_EQ((motorIndex != pigpioChecker->motorsEC.end()), true);
-  ASSERT_EQ(motorIndex->second, 2);
+  ASSERT_EQ(motorIndex->second, 1);
 }
 
 int main(int argc, char ** argv)

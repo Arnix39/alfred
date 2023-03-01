@@ -48,7 +48,7 @@ using SetGpioHighFuture_t = rclcpp::Client<pigpio_srv::HalPigpioSetGpioHigh>::Sh
 class Proxsens : public rclcpp_lifecycle::LifecycleNode
 {
 private:
-  uint8_t edgeChangeType;
+  EdgeChangeType edgeChangeType;
   uint32_t timestamp;
   uint32_t echoCallbackId;
   uint16_t distanceInCm;

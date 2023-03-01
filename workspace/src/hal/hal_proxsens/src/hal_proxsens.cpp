@@ -22,7 +22,7 @@ namespace hal_proxsens
 
 Proxsens::Proxsens()
 : rclcpp_lifecycle::LifecycleNode("hal_proxsens_node"),
-  edgeChangeType(NO_CHANGE),
+  edgeChangeType(EdgeChangeType::no_change),
   timestamp(0),
   echoCallbackId(0),
   distanceInCm(UINT16_MAX)
@@ -74,7 +74,7 @@ LifecycleCallbackReturn_t Proxsens::on_deactivate(const rclcpp_lifecycle::State 
 {
   proxsensDistancePub->on_deactivate();
 
-  edgeChangeType = NO_CHANGE;
+  edgeChangeType = EdgeChangeType::no_change;
   timestamp = 0;
   echoCallbackId = 0;
   distanceInCm = UINT16_MAX;
@@ -111,16 +111,18 @@ LifecycleCallbackReturn_t Proxsens::on_error(const rclcpp_lifecycle::State & pre
 
 void Proxsens::edgeChangeCallback(const pigpio_msg::HalPigpioEdgeChange & msg)
 {
-  static uint8_t lastEdgeChangeType = NO_CHANGE;
+  static EdgeChangeType lastEdgeChangeType = EdgeChangeType::no_change;
   static uint32_t lastTimestamp = 0;
 
   uint32_t edgeLength = 0;
 
   if (msg.gpio_id == PROXSENS_ECHO_GPIO) {
-    edgeChangeType = msg.edge_change_type;
+    edgeChangeType = static_cast<EdgeChangeType>(msg.edge_change_type);
     timestamp = msg.time_since_boot_us;
 
-    if ((edgeChangeType == FALLING_EDGE) && (lastEdgeChangeType == RISING_EDGE)) {
+    if ((edgeChangeType == EdgeChangeType::falling) &&
+      (lastEdgeChangeType == EdgeChangeType::rising))
+    {
       if (timestamp < lastTimestamp) {
         edgeLength = UINT32_MAX - lastTimestamp + timestamp;
       } else {
@@ -130,11 +132,11 @@ void Proxsens::edgeChangeCallback(const pigpio_msg::HalPigpioEdgeChange & msg)
 
       lastEdgeChangeType = edgeChangeType;
       lastTimestamp = timestamp;
-    } else if (edgeChangeType == RISING_EDGE) {
+    } else if (edgeChangeType == EdgeChangeType::rising) {
       lastEdgeChangeType = edgeChangeType;
       lastTimestamp = timestamp;
     } else {
-      lastEdgeChangeType = FALLING_EDGE;
+      lastEdgeChangeType = EdgeChangeType::falling;
       lastTimestamp = timestamp;
     }
   }
@@ -168,7 +170,8 @@ void Proxsens::configureGpios(void)
     gpioSetInputClient->async_send_request(setInputModeRequest, setInputModeCallback);
 
   setCallbackRequest->gpio_id = PROXSENS_ECHO_GPIO;
-  setCallbackRequest->edge_change_type = AS_EITHER_EDGE;
+  setCallbackRequest->edge_change_type =
+    static_cast<uint8_t>(EdgeChangeConfiguration::asEitherEdge);
   auto setCallbackCallback = [this](SetCallbackFuture_t future)
     {
       if (future.get()->has_succeeded) {

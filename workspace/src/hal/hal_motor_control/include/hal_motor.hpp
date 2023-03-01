@@ -22,15 +22,15 @@ using setOutputModeSyncClientNode_t = ServiceNodeSync<HalPigpioSetOutputMode_t>;
 using setEncoderCallbackSyncClientNode_t = ServiceNodeSync<HalPigpioSetEncoderCallback_t>;
 using setPwmFrequencySyncClientNode_t = ServiceNodeSync<HalPigpioSetPwmFrequency_t>;
 
-struct EncoderChannel
+struct EncoderChannel_t
 {
   uint8_t gpio;
 };
 
-struct Encoder
+struct Encoder_t
 {
-  EncoderChannel channelA;
-  EncoderChannel channelB;
+  EncoderChannel_t channelA;
+  EncoderChannel_t channelB;
   uint32_t encoderCount;
 };
 
@@ -43,7 +43,7 @@ struct Pwm
 class Motor
 {
 private:
-  Encoder encoder;
+  Encoder_t encoder;
   Pwm pwmA;
   Pwm pwmB;
   uint8_t id;
@@ -60,7 +60,6 @@ public:
   void setPwmDutyCycleAndDirection(
     rclcpp::Client<HalPigpioSetPwmDutycycle_t>::SharedPtr gpioSetPwmDutycycleClient,
     uint16_t dutycycle,
-    rclcpp::Client<HalPigpioSetMotorDirection_t>::SharedPtr gpioSetMotorDirectionClient,
     bool isDirectionForward);
   void configureGpios(
     setOutputModeSyncClientNode_t gpioSetOutputModeClient,

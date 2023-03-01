@@ -47,7 +47,6 @@ public:
   setPwmFrequencySyncClientNode_t setPwmFrequencyClient;
 
   rclcpp::Client<HalPigpioSetPwmDutycycle_t>::SharedPtr setPwmDutycycleClient;
-  rclcpp::Client<HalPigpioSetMotorDirection_t>::SharedPtr setMotorDirectionClient;
 };
 
 /* Test fixture */
