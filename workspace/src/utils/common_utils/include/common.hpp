@@ -24,10 +24,6 @@
 
 #include "gpioDefinitions.hpp"
 
-/* #define AS_RISING_EDGE 0
-#define AS_FALLING_EDGE 1
-#define AS_EITHER_EDGE 2 */
-
 enum class EdgeChangeConfiguration
 {
   asRisingEdge,
@@ -69,7 +65,7 @@ class ServiceNodeSync
 
 public:
   explicit ServiceNodeSync(std::string name)
-  : node(std::make_shared<rclcpp::Node>(name)) {}
+  : node(std::make_shared<rclcpp::Node>(name, rclcpp::NodeOptions().use_global_arguments(false))) {}
 
   ~ServiceNodeSync()
   {
@@ -83,15 +79,15 @@ public:
     client->wait_for_service();
   }
 
-  ResponseT sendRequest(const RequestT & req)
+  ResponseT sendRequest(const RequestT & request)
   {
-    return sendRequest(std::make_shared<RequestT>(req));
+    return sendRequest(std::make_shared<RequestT>(request));
   }
 
-  std::shared_ptr<ResponseT> sendRequest(const std::shared_ptr<RequestT> & req_ptr)
+  std::shared_ptr<ResponseT> sendRequest(const std::shared_ptr<RequestT> & request_ptr)
   {
     std::shared_ptr<ResponseT> response;
-    auto result = client->async_send_request(req_ptr);
+    auto result = client->async_send_request(request_ptr);
     auto status = rclcpp::spin_until_future_complete(
       node, result, std::chrono::duration<int64_t, std::milli>(1000));
 

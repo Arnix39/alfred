@@ -32,7 +32,7 @@ void Pigpio::setPwmFrequency(
   const std::shared_ptr<HalPigpioSetPwmFrequency_t::Request> request,
   std::shared_ptr<HalPigpioSetPwmFrequency_t::Response> response)
 {
-  if (set_PWM_frequency(pigpioHandle, request->gpio_id, request->frequency) == 0) {
+  if (set_PWM_frequency(pigpioHandle, request->gpio_id, request->frequency) >= 0) {
     response->has_succeeded = true;
     RCLCPP_INFO(
       get_logger(), "Set PWM frequency of %u for GPIO %u.", request->frequency, request->gpio_id);

@@ -161,6 +161,26 @@
             "problemMatcher": "$gcc"
         },
         {
+            "label": "ROS2: Copy src on target",
+            "detail": "Copy source files on Raspberry Pi 3B+.",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "command": "rsync",
+            "args": [
+                "--delete",
+                "--copy-links",
+                "-av",
+                "${workspaceFolder}/src/",
+                "arnix@alfred:/home/arnix/Alfred/src"
+            ],
+            "group": {
+                "kind": "build"
+            },
+            "problemMatcher": "$gcc"
+        },
+        {
             "label": "Workspace: Clean target files",
             "detail": "Clean workspace for target build files.",
             "type": "shell",
