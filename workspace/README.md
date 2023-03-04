@@ -1,3 +1,3 @@
 # Description
 
-This directory contains the ROS2 workspace for Alfred.
+This directory contains the ROS 2 workspace for Alfred.

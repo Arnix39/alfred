@@ -7,9 +7,10 @@ mkdir workspace
 
 cp /usr/bin/qemu-*-static qemu-user-static
 cp -r ../src workspace
+rm -r workspace/src/sim
 
-docker build -t arm_ros2:latest -f ./Dockerfile/Dockerfile_ubuntu_arm .
-docker run --name arm_sysroot arm_ros2:latest
+docker build -t arm_ros2:humble -f ./Dockerfile/Dockerfile_ubuntu_arm .
+docker run --name arm_sysroot arm_ros2:humble
 
 docker container export -o sysroot.tar arm_sysroot
 mkdir sysroot
