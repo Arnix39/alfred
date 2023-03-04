@@ -1,0 +1,4 @@
+[submodule "workspace/src/sim/ros_gz"]
+	path = workspace/src/sim/ros_gz
+	url = https://github.com/gazebosim/ros_gz.git
+	branch = ros2

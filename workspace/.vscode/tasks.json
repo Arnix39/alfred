@@ -15,6 +15,8 @@
                 "build/host",
                 "--install-base",
                 "install/host",
+                "--packages-skip-regex",
+                "ros_gz",
                 "--symlink-install",
                 "--cmake-args",
                 "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
@@ -40,7 +42,9 @@
                 "--build-base",
                 "build/host",
                 "--install-base",
-                "install/host"
+                "install/host",
+                "--packages-skip-regex",
+                "ros_gz"
             ],
             "group": {
                 "kind": "test"
@@ -79,11 +83,25 @@
             }
         },
         {
+            "label": "ROS2: Gazebo simulation",
+            "detail": "Build workspace for simulation in Gazebo.",
+            "type": "shell",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "ROS2: Build workspace",
+                "ROS2: Gazebo bridge"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
             "label": "Workspace: Clean host files",
             "detail": "Clean workspace for host build files.",
             "type": "shell",
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}",
             },
             "command": "colcon",
             "args": [
@@ -92,6 +110,8 @@
                 "build/host",
                 "--install-base",
                 "install/host",
+                "--packages-skip-regex",
+                "ros_gz",
                 "--cmake-target",
                 "clean"
             ]
@@ -129,6 +149,8 @@
                 "build/target",
                 "--install-base",
                 "install/target",
+                "--packages-skip-regex",
+                "ros_gz",
                 "--symlink-install",
                 "--cmake-args",
                 "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON",
@@ -169,6 +191,8 @@
             },
             "command": "rsync",
             "args": [
+                "--exclude",
+                "${workspaceFolder}/src/sim",
                 "--delete",
                 "--copy-links",
                 "-av",
@@ -204,10 +228,39 @@
                 "build/target",
                 "--install-base",
                 "install/target",
+                "--packages-skip-regex",
+                "ros_gz",
                 "--cmake-target",
                 "clean"
             ],
             "problemMatcher": []
+        },
+        {
+            "label": "ROS2: Gazebo bridge",
+            "detail": "Build ros_gz package.",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "GZ_VERSION": "garden"
+                }
+            },
+            "command": "colcon",
+            "args": [
+                "build",
+                "--build-base",
+                "build/host",
+                "--install-base",
+                "install/host",
+                "--packages-up-to",
+                "ros_gz",
+                "--symlink-install"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": "$gcc"
         },
         {
             "label": "Workspace: Purge",
