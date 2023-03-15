@@ -1,0 +1,151 @@
+<?xml version="1.0"?>
+<robot name="Alfred" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <material name="blue">
+    <color rgba="0 0 0.8 1"/>
+  </material>
+
+  <material name="black">
+    <color rgba="0 0 0 1"/>
+  </material>
+
+<!-- #################### -->
+<!-- Physical definitions -->
+<!-- #################### -->
+  <xacro:property name="bodyLength" value="0.15" />
+  <xacro:property name="bodyHeight" value="0.11" />
+  <xacro:property name="bodyDepth" value="0.09" />
+  <xacro:property name="bodyMass" value="0.72" />
+  <xacro:property name="wheelRadius" value="0.0375" />
+  <xacro:property name="wheelWidth" value="0.035" />
+  <xacro:property name="wheelMass" value="0.05" />
+  <xacro:property name="rightWheelXPos" value="-0.09375" />
+  <xacro:property name="leftWheelXPos" value="0.09375" />
+  <xacro:property name="wheelZPos" value="-0.04" />
+
+<!-- ################# -->
+<!-- Macros definition -->
+<!-- ################# -->
+  <!-- Body -->
+  <xacro:macro name="body_shape">
+    <geometry>
+      <box size="${bodyLength} ${bodyDepth} ${bodyHeight}" />
+    </geometry>
+  </xacro:macro>
+
+  <!-- Wheel -->
+  <xacro:macro name="wheel_shape">
+    <geometry>
+      <cylinder length="${wheelWidth}" radius="${wheelRadius}"/>
+    </geometry>
+    <origin rpy="0 ${pi/2} 0" xyz="0 0 0"/>
+  </xacro:macro>
+
+  <!-- Cylinder inertia matrix -->
+  <xacro:macro name="cylinder_inertia" params="radius height mass">
+    <mass value="${mass}"/>
+    <inertia ixx="${1/12*mass*(3*radius*radius+height*height)}" ixy="0.0" ixz="0.0" iyy="${1/12*mass*(3*radius*radius+height*height)}" iyz="0.0" izz="${1/2*mass*radius*radius}"/>
+  </xacro:macro>
+
+  <!-- Box inertia matrix -->
+  <xacro:macro name="box_inertia" params="width height depth mass">
+    <mass value="${mass}"/>
+    <inertia ixx="${1/12*mass*(height*height+depth*depth)}" ixy="0.0" ixz="0.0" iyy="${1/12*mass*(width*width+depth*depth)}" iyz="0.0" izz="${1/12*mass*(width*width+height*height)}"/>
+  </xacro:macro>
+
+  <!-- Wheel link-->
+  <xacro:macro name="wheel_link" params="side">
+    <link name="${side}_wheel">
+      <visual>
+        <xacro:wheel_shape />
+        <material name="blue"/>
+      </visual>
+      <collision>
+        <xacro:wheel_shape />
+      </collision>
+      <inertial>
+        <xacro:cylinder_inertia radius="${wheelRadius}" height="${wheelWidth}" mass="${wheelMass}" />
+      </inertial>
+    </link>
+  </xacro:macro>
+
+  <!-- Wheel transmission-->
+  <xacro:macro name="wheel_transmission" params="side">
+    <transmission name="${side}_wheel_rotation">
+      <type>transmission_interface/SimpleTransmission</type>
+      <actuator name="${side}_wheel_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+      <joint name="body_to_${side}_wheel">
+        <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+      </joint>
+    </transmission>
+  </xacro:macro>
+
+  <!-- Wheel joint-->
+  <xacro:macro name="wheel_joint" params="side">
+    <joint name="body_to_${side}_wheel" type="continuous">
+      <parent link="body"/>
+      <child link="${side}_wheel"/>
+      <xacro:if value="${side == 'right'}" >
+        <origin xyz="${rightWheelXPos} 0 ${wheelZPos}"/>
+      </xacro:if>
+      <xacro:if value="${side == 'left'}" >
+        <origin xyz="${leftWheelXPos} 0 ${wheelZPos}"/>
+      </xacro:if>
+      <axis xyz="1 0 0"/>
+    </joint>
+  </xacro:macro>
+
+<!-- ################ -->
+<!-- Links definition -->
+<!-- ################ -->
+  <link name="body">
+    <visual>
+      <xacro:body_shape />
+      <material name="black"/>
+    </visual>
+    <collision>
+      <xacro:body_shape />
+    </collision>
+    <inertial>
+      <xacro:box_inertia width="${bodyLength}" height="${bodyHeight}" depth ="${bodyDepth}" mass="${bodyMass}" />
+    </inertial>
+    <sensor name="imu_sensor" type="imu">
+      <always_on>1</always_on>
+      <update_rate>1</update_rate>
+      <visualize>true</visualize>
+      <topic>imu</topic>
+    </sensor>
+  </link>
+
+  <xacro:wheel_link side="right" />
+  <xacro:wheel_link side="left" />
+
+<!-- ################# --> 
+<!-- Joints definition -->
+<!-- ################# --> 
+  <xacro:wheel_joint side="right" />
+  <xacro:wheel_joint side="left" />
+
+<!-- ############################## -->
+<!-- Wheels transmission definition -->
+<!-- ############################## -->
+  <xacro:wheel_transmission side="right" />
+  <xacro:wheel_transmission side="left" />
+
+<!-- ################# -->
+<!-- Diff drive plugin -->
+<!-- ################# -->
+  <plugin
+      filename="gz-sim-diff-drive-system"
+      name="gz::sim::systems::DiffDrive">
+      <left_joint>left_wheel_joint</left_joint>
+      <right_joint>right_wheel_joint</right_joint>
+      <wheel_separation>1.2</wheel_separation>
+      <wheel_radius>0.4</wheel_radius>
+      <odom_publish_frequency>1</odom_publish_frequency>
+      <topic>cmd_vel</topic>
+  </plugin>
+
+</robot>
