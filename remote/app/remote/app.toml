@@ -1,0 +1,78 @@
+name = "remote"
+target = "thumbv7em-none-eabihf"
+board = "stm32f3-discovery"
+chip = "../../chips/stm32f3"
+stacksize = 896
+
+[kernel]
+name = "remote"
+requires = {flash = 20000, ram = 3072}
+features = ["stm32f3"]
+
+[tasks.jefe]
+name = "task-jefe"
+priority = 0
+max-sizes = {flash = 8192, ram = 2048}
+start = true
+features = ["itm"]
+stacksize = 1536
+notifications = ["fault", "timer"]
+
+[tasks.rcc_driver]
+name = "drv-stm32fx-rcc"
+features = ["f3"]
+priority = 1
+max-sizes = {flash = 8192, ram = 1024}
+uses = ["rcc"]
+start = true
+
+[tasks.usart_driver]
+name = "drv-stm32fx-usart"
+features = ["stm32f3"]
+priority = 2
+max-sizes = {flash = 8192, ram = 1024}
+uses = ["usart2", "gpioa"]
+start = true
+notifications = ["usart-irq"]
+interrupts = {"usart2.irq" = "usart-irq"}
+task-slots = ["rcc_driver"]
+
+[tasks.user_leds]
+name = "drv-user-leds"
+features = ["stm32f3"]
+priority = 2
+max-sizes = {flash = 8192, ram = 1024}
+uses = ["gpioe"]
+start = true
+task-slots = ["rcc_driver"]
+
+[tasks.ping]
+name = "task-ping"
+features = ["uart"]
+priority = 4
+max-sizes = {flash = 8192, ram = 1024}
+stacksize = 512
+start = true
+task-slots = [{peer = "pong"}, "usart_driver"]
+
+[tasks.pong]
+name = "task-pong"
+priority = 3
+max-sizes = {flash = 8192, ram = 1024}
+start = true
+task-slots = ["user_leds"]
+notifications = ["timer"]
+
+[tasks.hiffy]
+name = "task-hiffy"
+priority = 3
+max-sizes = {flash = 16384, ram = 16384 }
+stacksize = 2048
+start = true
+
+[tasks.idle]
+name = "task-idle"
+priority = 5
+max-sizes = {flash = 128, ram = 256}
+stacksize = 256
+start = true

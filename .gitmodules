@@ -5,3 +5,4 @@
 [submodule "remote/hubris"]
 	path = remote/hubris
 	url = https://github.com/oxidecomputer/hubris.git
+	ignore = all
