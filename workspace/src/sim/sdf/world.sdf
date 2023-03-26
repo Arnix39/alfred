@@ -20,6 +20,11 @@
     <plugin filename="gz-sim-imu-system"
       name="gz::sim::systems::Imu">
     </plugin>
+    <plugin
+      filename="gz-sim-sensors-system"
+      name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
 
     <!-- Light -->
     <light type="directional" name="sun">
@@ -223,7 +228,7 @@
       <!-- Entity tree -->
       <plugin filename="EntityTree" name="Entity tree">
         <gz-gui>
-          <property type="string" key="state">docked_collapsed</property>
+          <property type="string" key="state">docked</property>
         </gz-gui>
       </plugin>
 
@@ -252,7 +257,7 @@
             <match field="data">16777235</match>
         </input>
         <output type="gz.msgs.Twist" topic="/cmd_vel">
-            linear: {x: 0.5}, angular: {z: 0.0}
+            linear: {x: 0.1}, angular: {z: 0.0}
         </output>
     </plugin>
     <!-- Moving Right-->
@@ -272,7 +277,7 @@
             <match field="data">16777237</match>
         </input>
         <output type="gz.msgs.Twist" topic="/cmd_vel">
-            linear: {x: -0.5}, angular: {z: 0.0}
+            linear: {x: -0.1}, angular: {z: 0.0}
         </output>
     </plugin>
 
@@ -287,7 +292,7 @@
     <include>
       <name>Alfred</name>
       <pose>0 0 0.0775 0 0 0</pose>
-      <uri>../urdf/alfred.urdf</uri>
+      <uri>alfred.sdf</uri>
     </include>
 
   </world>

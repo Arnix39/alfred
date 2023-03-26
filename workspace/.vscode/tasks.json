@@ -93,8 +93,33 @@
             ],
             "group": {
                 "kind": "build",
-                "isDefault": true
             }
+        },
+        {
+            "label": "Gazebo: Launch simulation",
+            "detail": "Launch simulation in Gazebo.",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/src/sim/sdf",
+                "env": {
+                    "GZ_SIM_RESOURCE_PATH": "${workspaceFolder}/src/sim/sdf"
+                }
+            },
+            "command": "gz",
+            "args": [
+                "sim",
+                "world.sdf"
+            ]
+        },
+        {
+            "label": "Gazebo: Run simulation",
+            "detail": "Run simulation in Gazebo.",
+            "type": "shell",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "ROS2: Gazebo simulation",
+                "Gazebo: Launch simulation"
+            ]
         },
         {
             "label": "Workspace: Clean host files",

@@ -111,9 +111,10 @@
     <inertial>
       <xacro:box_inertia width="${bodyLength}" height="${bodyHeight}" depth ="${bodyDepth}" mass="${bodyMass}" />
     </inertial>
+    <!-- Imu sensor -->
     <sensor name="imu_sensor" type="imu">
       <always_on>1</always_on>
-      <update_rate>1</update_rate>
+      <update_rate>2</update_rate>
       <visualize>true</visualize>
       <topic>imu</topic>
     </sensor>
@@ -128,22 +129,16 @@
   <xacro:wheel_joint side="right" />
   <xacro:wheel_joint side="left" />
 
-<!-- ############################## -->
-<!-- Wheels transmission definition -->
-<!-- ############################## -->
-  <xacro:wheel_transmission side="right" />
-  <xacro:wheel_transmission side="left" />
-
 <!-- ################# -->
 <!-- Diff drive plugin -->
 <!-- ################# -->
   <plugin
       filename="gz-sim-diff-drive-system"
       name="gz::sim::systems::DiffDrive">
-      <left_joint>left_wheel_joint</left_joint>
-      <right_joint>right_wheel_joint</right_joint>
-      <wheel_separation>1.2</wheel_separation>
-      <wheel_radius>0.4</wheel_radius>
+      <left_joint>body_to_left_wheel</left_joint>
+      <right_joint>body_to_right_wheel</right_joint>
+      <wheel_separation>${bodyLength}</wheel_separation>
+      <wheel_radius>${wheelRadius}</wheel_radius>
       <odom_publish_frequency>1</odom_publish_frequency>
       <topic>cmd_vel</topic>
   </plugin>
