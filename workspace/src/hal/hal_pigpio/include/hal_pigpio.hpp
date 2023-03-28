@@ -54,15 +54,18 @@ using HalPigpioI2cWriteByteData_t = hal_pigpio_interfaces::srv::HalPigpioI2cWrit
 using HalPigpioI2cWriteWordData_t = hal_pigpio_interfaces::srv::HalPigpioI2cWriteWordData;
 using HalPigpioI2cWriteBlockData_t = hal_pigpio_interfaces::srv::HalPigpioI2cWriteBlockData;
 using HalPigpioI2cImuReading_t = hal_pigpio_interfaces::srv::HalPigpioI2cImuReading;
-using HalPigpioAnglesMsg_t = hal_pigpio_interfaces::msg::HalPigpioAngles;
+using HalPigpioImuMsg_t = sensor_msgs::msg::Imu;
+using QuaternionMsg_t = geometry_msgs::msg::Quaternion;
+using Vector3Msg_t = geometry_msgs::msg::Vector3;
 
 class Pigpio : public rclcpp_lifecycle::LifecycleNode
 {
 private:
   int pigpioHandle;
   int32_t i2cHandle;
-  Quaternions quaternions;
-  Angles angles;
+  Quaternions quaternions_;
+  Vector3 angularVelocity_;
+  Vector3 linearAcceleration_;
   bool isImuReady;
   std::vector<uint> callbackList;
   std::vector<Motor> motors;
@@ -93,9 +96,9 @@ private:
 
   rclcpp_lifecycle::LifecyclePublisher<HalPigpioEdgeChangeMsg_t>::SharedPtr gpioEdgeChangePub;
   rclcpp_lifecycle::LifecyclePublisher<HalPigpioEncoderCountMsg_t>::SharedPtr gpioEncoderCountPub;
-  rclcpp_lifecycle::LifecyclePublisher<HalPigpioAnglesMsg_t>::SharedPtr anglesPublisher;
+  rclcpp_lifecycle::LifecyclePublisher<HalPigpioImuMsg_t>::SharedPtr imuPublisher;
 
-  rclcpp::TimerBase::SharedPtr readQuaternionsAndPublishAnglesTimer;
+  rclcpp::TimerBase::SharedPtr readImuDataAndPublishMessageTimer;
   rclcpp::TimerBase::SharedPtr encoderCountTimer;
 
   static void c_gpioEdgeChangeCallback(
@@ -116,11 +119,13 @@ public:
   LifecycleCallbackReturn_t on_shutdown(const rclcpp_lifecycle::State & previous_state);
   LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
 
-  void readQuaternions(void);
+  void readQuaternionData(void);
+  void readAccelerometerData(void);
+  void readGyroscopeData(void);
   void computeQuaternions(char (& data)[MPU6050_DMP_FIFO_QUAT_SIZE]);
-  void publishAngles(void);
-  void computeAngles(void);
-  void readQuaternionsAndPublishAngles(void);
+  Vector3 computeImuData(char (& data)[MPU6050_DATA_SIZE]);
+  void publishImuMessage(void);
+  void readImuDataAndPublishMessage(void);
   void resetFifo(void);
   uint16_t readFifoCount(void);
   bool isFifoOverflowed(void);

@@ -17,6 +17,10 @@
 
 #include <vector>
 #include <memory>
+/* TODO(Arnix) To be moved with computeAngularVelAndLinearAcc()
+#define _USE_MATH_DEFINES
+#include <cmath>
+*/
 
 #include "rclcpp_action/rclcpp_action.hpp"
 
@@ -29,7 +33,6 @@
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_write_byte_data.hpp"
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_write_block_data.hpp"
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_imu_reading.hpp"
-#include "hal_imu_interfaces/msg/hal_imu.hpp"
 #include "hal_imu_interfaces/action/hal_imu_write_dmp.hpp"
 #include "hal_imu_interfaces/srv/hal_imu_get_handle.hpp"
 

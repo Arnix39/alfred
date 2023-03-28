@@ -61,11 +61,6 @@ PigioCheckerNode::PigioCheckerNode()
   i2cWriteBlockDataClient(
     this->create_client<HalPigpioI2cWriteBlockData_t>("hal_pigpioI2cWriteBlockData")),
   i2cImuReadingClient(this->create_client<HalPigpioI2cImuReading_t>("hal_pigpioI2cImuReading")),
-  anglesSubscriber(
-    this->create_subscription<HalPigpioAnglesMsg_t>(
-      "hal_pigpioAngles",
-      1000,
-      std::bind(&PigioCheckerNode::getAngles, this, _1))),
   edgeChangeMsg_gpioId(0),
   edgeChangeMsg_edgeChangeType(EdgeChangeType::undefined),
   edgeChangeMsg_timeSinceBoot_us(0),
@@ -379,11 +374,4 @@ void PigioCheckerNode::i2cStopImuReading(
   auto future = i2cImuReadingClient->async_send_request(request);
 
   executor->spin_until_future_complete(future);
-}
-
-void PigioCheckerNode::getAngles(const HalPigpioAnglesMsg_t & message)
-{
-  imuAnglePhi.set_value(message.phi);
-  imuAngleTheta.set_value(message.theta);
-  imuAnglePsi.set_value(message.psi);
 }

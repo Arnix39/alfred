@@ -50,7 +50,7 @@ LifecycleCallbackReturn_t Imu::on_activate(const rclcpp_lifecycle::State & previ
   setAccelerometerSensitivity(imuHandle);
   setGyroscopeSensitivity(imuHandle);
   setConfiguration(imuHandle);
-  setMpuRate(imuHandle, MPU6050_DMP_SAMPLE_RATE);
+  setMpuRate(imuHandle, MPU6050_DMP_RATE_100HZ);
   dmpInit();
 
   RCLCPP_INFO(get_logger(), "hal_imu node activated!");
@@ -101,7 +101,7 @@ void Imu::result_callback(const HalImuWriteDmpGoal::WrappedResult & result)
 {
   if (result.code == rclcpp_action::ResultCode::SUCCEEDED) {
     RCLCPP_INFO(get_logger(), "DMP code written successfully.");
-    setDmpRate(imuHandle, MPU6050_DMP_SAMPLE_RATE);
+    setDmpRate(imuHandle, MPU6050_DMP_RATE_100HZ);
     setAccelerometerOffsets(imuHandle);
     setGyroscopeOffsets(imuHandle);
     configureDmpFeatures(imuHandle);
@@ -487,3 +487,22 @@ void Imu::stopImuReading()
 
   auto i2cImuReadingFuture = i2cImuReadingClient->async_send_request(i2cImuReadingRequest);
 }
+
+/* TODO(Arnix) To be moved in an app package
+void Imu::computeAngularVelAndLinearAcc()
+{
+  // phi (sensor's x-axis rotation)
+  float tanPhi = 2 * (quaternions.y * quaternions.z - quaternions.w * quaternions.x);
+  float quadrantPhi = 2 * (quaternions.w * quaternions.w + quaternions.z * quaternions.z) - 1;
+  angles.phi = std::atan2(tanPhi, quadrantPhi) * 180 / M_PI;
+
+  // theta (sensor's y-axis rotation)
+  float sinTheta = 2 * (quaternions.x * quaternions.z + quaternions.w * quaternions.y);
+  angles.theta = -std::asin(sinTheta) * 180 / M_PI;
+
+  // psi (sensor's z-axis rotation)
+  float tanPsi = 2 * (quaternions.x * quaternions.y - quaternions.w * quaternions.z);
+  float quadrantPsi = 2 * (quaternions.w * quaternions.w + quaternions.x * quaternions.x) - 1;
+  angles.psi = std::atan2(tanPsi, quadrantPsi) * 180 / M_PI;
+}
+*/

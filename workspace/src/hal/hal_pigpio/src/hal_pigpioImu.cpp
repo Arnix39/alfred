@@ -68,7 +68,7 @@ bool Pigpio::isFifoOverflowed(void)
   return false;
 }
 
-void Pigpio::readQuaternions(void)
+void Pigpio::readQuaternionData(void)
 {
   uint16_t fifoCount = 0;
   char fifoData[MPU6050_DMP_FIFO_QUAT_SIZE];
@@ -102,61 +102,110 @@ void Pigpio::readQuaternions(void)
 
 void Pigpio::computeQuaternions(char (& data)[MPU6050_DMP_FIFO_QUAT_SIZE])
 {
-  quaternions.w =
-    static_cast<float>((static_cast<int32_t>(data[0]) <<
+  quaternions_.w =
+    static_cast<double>((static_cast<int32_t>(data[0]) <<
     24) |
     (static_cast<int32_t>(data[1]) <<
     16) | (static_cast<int32_t>(data[2]) << 8) | data[3]) / MPU6050_QUATERNION_SCALE;
-  quaternions.x =
-    static_cast<float>((static_cast<int32_t>(data[4]) <<
+  quaternions_.x =
+    static_cast<double>((static_cast<int32_t>(data[4]) <<
     24) |
     (static_cast<int32_t>(data[5]) <<
     16) | (static_cast<int32_t>(data[6]) << 8) | data[7]) / MPU6050_QUATERNION_SCALE;
-  quaternions.y =
-    static_cast<float>((static_cast<int32_t>(data[8]) <<
+  quaternions_.y =
+    static_cast<double>((static_cast<int32_t>(data[8]) <<
     24) |
     (static_cast<int32_t>(data[9]) <<
     16) | (static_cast<int32_t>(data[10]) << 8) | data[11]) / MPU6050_QUATERNION_SCALE;
-  quaternions.z =
-    static_cast<float>((static_cast<int32_t>(data[12]) <<
+  quaternions_.z =
+    static_cast<double>((static_cast<int32_t>(data[12]) <<
     24) |
     (static_cast<int32_t>(data[13]) <<
     16) | (static_cast<int32_t>(data[14]) << 8) | data[15]) / MPU6050_QUATERNION_SCALE;
 }
 
-void Pigpio::publishAngles(void)
+void Pigpio::readAccelerometerData()
 {
-  auto message = HalPigpioAnglesMsg_t();
+  char accelerometerData[MPU6050_DATA_SIZE];
 
-  message.phi = angles.phi;
-  message.theta = angles.theta;
-  message.psi = angles.psi;
-  anglesPublisher->publish(message);
+  if (i2c_read_i2c_block_data(
+      pigpioHandle, i2cHandle, MPU6050_ACCELEROMETER_X_OFFSET_MSB_REGISTER, accelerometerData,
+      MPU6050_DATA_SIZE) == MPU6050_DATA_SIZE)
+  {
+    linearAcceleration_ = computeImuData(accelerometerData);
+  } else {
+    RCLCPP_ERROR(get_logger(), "Failed to read accelerometer data!");
+    return;
+  }
 }
 
-void Pigpio::computeAngles()
+void Pigpio::readGyroscopeData()
 {
-  // phi (x-axis rotation)
-  float tanPhi = 2 * (quaternions.y * quaternions.z - quaternions.w * quaternions.x);
-  float quadrantPhi = 2 * (quaternions.w * quaternions.w + quaternions.z * quaternions.z) - 1;
-  angles.phi = std::atan2(tanPhi, quadrantPhi) * 180 / M_PI;
+  char gyroscopeData[MPU6050_DATA_SIZE];
 
-  // theta (y-axis rotation)
-  float sinTheta = 2 * (quaternions.x * quaternions.z + quaternions.w * quaternions.y);
-  angles.theta = -std::asin(sinTheta) * 180 / M_PI;
-
-  // psi (z-axis rotation)
-  float tanPsi = 2 * (quaternions.x * quaternions.y - quaternions.w * quaternions.z);
-  float quadrantPsi = 2 * (quaternions.w * quaternions.w + quaternions.x * quaternions.x) - 1;
-  angles.psi = std::atan2(tanPsi, quadrantPsi) * 180 / M_PI;
+  if (i2c_read_i2c_block_data(
+      pigpioHandle, i2cHandle, MPU6050_GYROSCOPE_X_OFFSET_MSB_REGISTER, gyroscopeData,
+      MPU6050_DATA_SIZE) == MPU6050_DATA_SIZE)
+  {
+    angularVelocity_ = computeImuData(gyroscopeData);
+  } else {
+    RCLCPP_ERROR(get_logger(), "Failed to read gyroscope data!");
+    return;
+  }
 }
 
-void Pigpio::readQuaternionsAndPublishAngles()
+Vector3 Pigpio::computeImuData(char (& data)[MPU6050_DATA_SIZE])
+{
+  Vector3 values;
+
+  values.x = static_cast<uint16_t>((data[0] << 8) | data[1]);
+  values.y = static_cast<uint16_t>((data[2] << 8) | data[3]);
+  values.z = static_cast<uint16_t>((data[4] << 8) | data[5]);
+
+  return values;
+}
+
+void Pigpio::publishImuMessage()
+{
+  auto message = HalPigpioImuMsg_t();
+  auto quaternions = QuaternionMsg_t();
+  auto angularVelocity = Vector3Msg_t();
+  auto linearAcceleration = Vector3Msg_t();
+
+  std::array<double, 9> covariance_zero = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+  quaternions.x = quaternions_.x;
+  quaternions.y = quaternions_.y;
+  quaternions.z = quaternions_.z;
+  quaternions.z = quaternions_.z;
+
+  message.orientation = quaternions;
+  message.orientation_covariance = covariance_zero;
+
+  angularVelocity.x = angularVelocity_.x;
+  angularVelocity.y = angularVelocity_.y;
+  angularVelocity.z = angularVelocity_.z;
+
+  message.angular_velocity = angularVelocity;
+  message.angular_velocity_covariance = covariance_zero;
+
+  linearAcceleration.x = linearAcceleration_.x;
+  linearAcceleration.y = linearAcceleration_.y;
+  linearAcceleration.z = linearAcceleration_.z;
+
+  message.linear_acceleration = linearAcceleration;
+  message.linear_acceleration_covariance = covariance_zero;
+
+  imuPublisher->publish(message);
+}
+
+void Pigpio::readImuDataAndPublishMessage()
 {
   if (isImuReady) {
-    readQuaternions();
-    computeAngles();
-    publishAngles();
+    readQuaternionData();
+    readAccelerometerData();
+    readGyroscopeData();
+    publishImuMessage();
   }
 }
 

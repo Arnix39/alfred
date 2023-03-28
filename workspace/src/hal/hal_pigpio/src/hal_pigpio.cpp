@@ -21,8 +21,9 @@ Pigpio::Pigpio()
 : rclcpp_lifecycle::LifecycleNode("hal_pigpio_node"),
   pigpioHandle(PI_NO_HANDLE),
   i2cHandle(PI_NO_HANDLE),
-  quaternions({0.0, 0.0, 0.0, 0.0}),
-  angles({0.0, 0.0, 0.0}),
+  quaternions_({0.0, 0.0, 0.0, 0.0}),
+  angularVelocity_({0.0, 0.0, 0.0}),
+  linearAcceleration_({0.0, 0.0, 0.0}),
   isImuReady(false),
   callbackList({}),
   motors({})
@@ -100,10 +101,10 @@ LifecycleCallbackReturn_t Pigpio::on_configure(const rclcpp_lifecycle::State & p
     "gpioEdgeChange", 1000);
   gpioEncoderCountPub = this->create_publisher<HalPigpioEncoderCountMsg_t>(
     "hal_pigpioEncoderCount", 1000);
-  anglesPublisher = this->create_publisher<HalPigpioAnglesMsg_t>("hal_pigpioAngles", 1000);
+  imuPublisher = this->create_publisher<HalPigpioImuMsg_t>("hal_pigpioImu", 1000);
 
-  readQuaternionsAndPublishAnglesTimer =
-    create_wall_timer(10ms, std::bind(&Pigpio::readQuaternionsAndPublishAngles, this));
+  readImuDataAndPublishMessageTimer =
+    create_wall_timer(10ms, std::bind(&Pigpio::readImuDataAndPublishMessage, this));
   encoderCountTimer = create_wall_timer(10ms, std::bind(&Pigpio::publishEncoderCount, this));
 
   RCLCPP_INFO(get_logger(), "hal_pigpio node configured!");
@@ -115,7 +116,7 @@ LifecycleCallbackReturn_t Pigpio::on_activate(const rclcpp_lifecycle::State & pr
 {
   gpioEdgeChangePub->on_activate();
   gpioEncoderCountPub->on_activate();
-  anglesPublisher->on_activate();
+  imuPublisher->on_activate();
 
   RCLCPP_INFO(get_logger(), "hal_pigpio node activated!");
 
@@ -126,11 +127,12 @@ LifecycleCallbackReturn_t Pigpio::on_deactivate(const rclcpp_lifecycle::State & 
 {
   gpioEdgeChangePub->on_deactivate();
   gpioEncoderCountPub->on_deactivate();
-  anglesPublisher->on_deactivate();
+  imuPublisher->on_deactivate();
 
   isImuReady = false;
-  quaternions = {0.0, 0.0, 0.0, 0.0};
-  angles = {0.0, 0.0, 0.0};
+  quaternions_ = {0.0, 0.0, 0.0, 0.0};
+  angularVelocity_ = {0.0, 0.0, 0.0};
+  linearAcceleration_ = {0.0, 0.0, 0.0};
 
   i2cHandle = PI_NO_HANDLE;
 
@@ -150,9 +152,9 @@ LifecycleCallbackReturn_t Pigpio::on_cleanup(const rclcpp_lifecycle::State & pre
 
   gpioEdgeChangePub.reset();
   gpioEncoderCountPub.reset();
-  anglesPublisher.reset();
+  imuPublisher.reset();
 
-  readQuaternionsAndPublishAnglesTimer.reset();
+  readImuDataAndPublishMessageTimer.reset();
   encoderCountTimer.reset();
 
   if (pigpioHandle >= 0) {
@@ -177,9 +179,9 @@ LifecycleCallbackReturn_t Pigpio::on_shutdown(const rclcpp_lifecycle::State & pr
 
   gpioEdgeChangePub.reset();
   gpioEncoderCountPub.reset();
-  anglesPublisher.reset();
+  imuPublisher.reset();
 
-  readQuaternionsAndPublishAnglesTimer.reset();
+  readImuDataAndPublishMessageTimer.reset();
   encoderCountTimer.reset();
 
   if (pigpioHandle >= 0) {

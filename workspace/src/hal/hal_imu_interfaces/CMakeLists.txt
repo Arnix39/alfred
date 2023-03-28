@@ -8,7 +8,6 @@ find_package(rosidl_default_generators REQUIRED)
 ## Generate ROS messages, services and actions ##
 #################################################
 rosidl_generate_interfaces(${PROJECT_NAME}
-  msg/HalImu.msg
   srv/HalImuGetHandle.srv
   action/HalImuWriteDmp.action
 )

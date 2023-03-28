@@ -98,17 +98,12 @@ public:
   rclcpp::Client<HalPigpioI2cWriteWordData_t>::SharedPtr i2cWriteWordDataClient;
   rclcpp::Client<HalPigpioI2cWriteBlockData_t>::SharedPtr i2cWriteBlockDataClient;
   rclcpp::Client<HalPigpioI2cImuReading_t>::SharedPtr i2cImuReadingClient;
-  rclcpp::Subscription<HalPigpioAnglesMsg_t>::SharedPtr anglesSubscriber;
 
   uint8_t edgeChangeMsg_gpioId;
   EdgeChangeType edgeChangeMsg_edgeChangeType;
   uint32_t edgeChangeMsg_timeSinceBoot_us;
 
   std::map<uint8_t, int32_t> motorsEC;
-
-  std::promise<float> imuAnglePhi;
-  std::promise<float> imuAngleTheta;
-  std::promise<float> imuAnglePsi;
 
   void changePigpioNodeToState(std::uint8_t transition);
   bool setPwmDutycycle(
@@ -177,7 +172,6 @@ public:
     rclcpp::executors::SingleThreadedExecutor * executor);
   void i2cStartImuReading(int32_t i2cHandle, rclcpp::executors::SingleThreadedExecutor * executor);
   void i2cStopImuReading(int32_t i2cHandle, rclcpp::executors::SingleThreadedExecutor * executor);
-  void getAngles(const HalPigpioAnglesMsg_t & message);
 };
 
 /* Test fixture */

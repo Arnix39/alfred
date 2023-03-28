@@ -24,6 +24,21 @@
 
 #include "gpioDefinitions.hpp"
 
+struct Quaternions
+{
+  double w;
+  double x;
+  double y;
+  double z;
+};
+
+struct Vector3
+{
+  double x;
+  double y;
+  double z;
+};
+
 enum class EdgeChangeConfiguration
 {
   asRisingEdge,
