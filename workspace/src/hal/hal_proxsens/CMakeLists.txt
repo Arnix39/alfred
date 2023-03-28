@@ -5,7 +5,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(hal_pigpio_interfaces REQUIRED)
-find_package(hal_proxsens_interfaces REQUIRED)
+find_package(sensor_msgs REQUIRED)
 find_package(common_utils REQUIRED)
 
 ###########
@@ -18,7 +18,7 @@ set(dependencies
   rclcpp
   rclcpp_lifecycle
   hal_pigpio_interfaces
-  hal_proxsens_interfaces
+  sensor_msgs
   common_utils)
 
 add_library(${PROJECT_NAME} OBJECT src/hal_proxsens.cpp)

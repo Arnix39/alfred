@@ -24,19 +24,22 @@
 #include "hal_pigpio_interfaces/srv/hal_pigpio_send_trigger_pulse.hpp"
 #include "hal_pigpio_interfaces/srv/hal_pigpio_set_callback.hpp"
 #include "hal_pigpio_interfaces/msg/hal_pigpio_edge_change.hpp"
-#include "hal_proxsens_interfaces/msg/hal_proxsens.hpp"
+#include "sensor_msgs/msg/range.hpp"
 
 #define PROXSENS_TRIGGER_GPIO GPIO5
 #define PROXSENS_ECHO_GPIO GPIO6
 #define PROXSENS_LEVEL_SHIFTER_OE_GPIO GPIO10
 #define PROXSENS_TRIGGER_LENGTH_US 20
+#define PROXSENS_MIN_RANGE 0.002
+#define PROXSENS_MAX_RANGE 4.0
+#define PROXSENS_FOV 15
 
 namespace hal_proxsens
 {
 
 namespace pigpio_srv = hal_pigpio_interfaces::srv;
 namespace pigpio_msg = hal_pigpio_interfaces::msg;
-namespace proxsens_msg = hal_proxsens_interfaces::msg;
+namespace proxsens_msg = sensor_msgs::msg;
 
 using SetInputModeFuture_t = rclcpp::Client<pigpio_srv::HalPigpioSetInputMode>::SharedFuture;
 using SetCallbackFuture_t = rclcpp::Client<pigpio_srv::HalPigpioSetCallback>::SharedFuture;
@@ -59,7 +62,7 @@ private:
   rclcpp::Client<pigpio_srv::HalPigpioSendTriggerPulse>::SharedPtr gpioSendTriggerPulseClient;
   rclcpp::Client<pigpio_srv::HalPigpioSetGpioHigh>::SharedPtr gpioSetGpioHighClient;
 
-  rclcpp_lifecycle::LifecyclePublisher<proxsens_msg::HalProxsens>::SharedPtr proxsensDistancePub;
+  rclcpp_lifecycle::LifecyclePublisher<proxsens_msg::Range>::SharedPtr proxsensDistancePub;
   rclcpp::TimerBase::SharedPtr proxsensDistancePubTimer;
 
   rclcpp::Subscription<pigpio_msg::HalPigpioEdgeChange>::SharedPtr proxsensEdgeChangeSub;

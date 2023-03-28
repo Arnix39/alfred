@@ -43,7 +43,7 @@ LifecycleCallbackReturn_t Proxsens::on_configure(const rclcpp_lifecycle::State &
     this->create_client<pigpio_srv::HalPigpioSetGpioHigh>("hal_pigpioSetGpioHigh");
 
   proxsensDistancePub =
-    this->create_publisher<proxsens_msg::HalProxsens>("proxSensorValue", 1000);
+    this->create_publisher<proxsens_msg::Range>("proxSensorValue", 1000);
 
   proxsensDistancePubTimer =
     create_wall_timer(100ms, std::bind(&Proxsens::publishAndGetDistance, this));
@@ -144,9 +144,13 @@ void Proxsens::edgeChangeCallback(const pigpio_msg::HalPigpioEdgeChange & msg)
 
 void Proxsens::publishDistance(void)
 {
-  auto distance = proxsens_msg::HalProxsens();
+  auto distance = proxsens_msg::Range();
 
-  distance.distance_in_cm = distanceInCm;
+  distance.range = distanceInCm / 100.0;
+  distance.min_range = PROXSENS_MIN_RANGE;
+  distance.max_range = PROXSENS_MAX_RANGE;
+  distance.radiation_type = distance.ULTRASOUND;
+  distance.field_of_view = PROXSENS_FOV;
   proxsensDistancePub->publish(distance);
 }
 
