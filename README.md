@@ -8,7 +8,7 @@ This project's main goal is for me to learn (or consolidate) and apply new skill
 
 ## Hardware
 Alfred is composed of the following components:
-- 2 motors [GA25-371](https://www.seeedstudio.com/JGA25-371-Geared-Motor-with-Encoder-p-4125.html) (with quadrature encoders)
+- 2 motors [GA25-371](https://gitlab.com/arnixroboticslab/alfred/-/blob/master/Datasheets/JGA25-371.pdf) (with quadrature encoders)
 - [MDD3A drive](https://gitlab.com/arnixroboticslab/alfred/-/blob/master/Datasheets/mdd3a.pdf)
 - [MPU6050](https://gitlab.com/arnixroboticslab/alfred/-/blob/master/Datasheets/MPU-6000-Datasheet1.pdf) accelerometer + gyroscope
 - [HC-SR04](https://gitlab.com/arnixroboticslab/alfred/-/blob/master/Datasheets/HCSR04.pdf) ultrasonic sensor
