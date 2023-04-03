@@ -5,7 +5,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(hal_pigpio_interfaces REQUIRED)
-find_package(hal_motor_control_interfaces REQUIRED)
+find_package(geometry_msgs REQUIRED)
 find_package(common_utils REQUIRED)
 
 ###########
@@ -17,8 +17,8 @@ include_directories(
 set(dependencies
   rclcpp
   rclcpp_lifecycle
+  geometry_msgs
   hal_pigpio_interfaces
-  hal_motor_control_interfaces
   common_utils)
 
 add_library(${PROJECT_NAME}_motor_lib OBJECT src/hal_motor.cpp)

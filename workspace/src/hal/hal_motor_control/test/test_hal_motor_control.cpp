@@ -20,10 +20,10 @@ MotorControlCheckerNode::MotorControlCheckerNode()
 : rclcpp::Node("hal_motor_control_checker_node"),
   changeStateClient(this->create_client<lifecycle_msgs::srv::ChangeState>(
       "hal_motorControl_node/change_state")),
-  encoderCountSubscriber(this->create_subscription<HalMotorControlMsg_t>(
-      "motorsEncoderCountValue", 1000,
-      std::bind(&MotorControlCheckerNode::encoderCountCallback, this, _1))),
-  encoderCounts({0, 0})
+  positionSubscriber(this->create_subscription<PositionMsg_t>(
+      "position", 1000, std::bind(&MotorControlCheckerNode::positionCallback, this, _1))),
+  xPosition(0.0),
+  yPosition(0.0)
 {
 }
 
@@ -34,10 +34,10 @@ void MotorControlCheckerNode::changeMotorControlNodeToState(std::uint8_t transit
   auto result = changeStateClient->async_send_request(request);
 }
 
-void MotorControlCheckerNode::encoderCountCallback(const HalMotorControlMsg_t & msg)
+void MotorControlCheckerNode::positionCallback(const PositionMsg_t & msg)
 {
-  encoderCounts.at(0) = msg.motor_left_encoder_count;
-  encoderCounts.at(1) = msg.motor_right_encoder_count;
+  xPosition = msg.x;
+  yPosition = msg.y;
 }
 
 TEST_F(MotorControlTest, configureMotor)
@@ -168,7 +168,7 @@ TEST_F(MotorControlTest, setPwmRightBackward)
 TEST_F(MotorControlTest, encoderCountCallbackAndPublishMessageSuccess)
 {
   std::vector<uint8_t> motors{MOTOR_LEFT, MOTOR_RIGHT};
-  std::vector<int32_t> encodersCounts{-10, 10};
+  std::vector<int32_t> encodersCounts{-52, 52};
 
   auto message = HalPigpioEncoderCountMsg_t();
 
@@ -182,17 +182,16 @@ TEST_F(MotorControlTest, encoderCountCallbackAndPublishMessageSuccess)
   motorControl->activatePublisher();
   executor.spin_some();
 
-  motorControl->publishMessage();
+  motorControl->computeAndPublishPosition();
   executor.spin_some();
 
-  ASSERT_EQ(motorControlChecker->encoderCounts.at(0), 10);
-  ASSERT_EQ(motorControlChecker->encoderCounts.at(1), 10);
+  ASSERT_DOUBLE_EQ(motorControlChecker->xPosition, -0.001);
 }
 
 TEST_F(MotorControlTest, encoderCountCallbackAndPublishMessageFailure)
 {
-  std::vector<uint8_t> motors{MOTOR_LEFT, BAD_MOTOR_ID};
-  std::vector<int32_t> encodersCounts{-10, 10};
+  std::vector<uint8_t> motors{BAD_MOTOR_ID, MOTOR_RIGHT};
+  std::vector<int32_t> encodersCounts{52, 52};
 
   auto message = HalPigpioEncoderCountMsg_t();
 
@@ -206,11 +205,10 @@ TEST_F(MotorControlTest, encoderCountCallbackAndPublishMessageFailure)
   motorControl->activatePublisher();
   executor.spin_some();
 
-  motorControl->publishMessage();
+  motorControl->computeAndPublishPosition();
   executor.spin_some();
 
-  ASSERT_EQ(motorControlChecker->encoderCounts.at(0), 10);
-  ASSERT_EQ(motorControlChecker->encoderCounts.at(1), 0);
+  ASSERT_DOUBLE_EQ(motorControlChecker->xPosition, 0.0);
 }
 
 int main(int argc, char ** argv)

@@ -13,7 +13,7 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
   
   <depend>hal_pigpio_interfaces</depend>
-  <depend>hal_motor_control_interfaces</depend>
+  <depend>geometry_msgs</depend>
   <depend>common_utils</depend>
 
   <build_depend>rclcpp_lifecycle</build_depend>

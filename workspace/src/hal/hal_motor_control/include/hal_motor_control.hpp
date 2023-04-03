@@ -36,11 +36,11 @@ private:
 
   rclcpp::Client<HalPigpioSetPwmDutycycle_t>::SharedPtr gpioSetPwmDutycycleClient;
 
-  rclcpp_lifecycle::LifecyclePublisher<HalMotorControlMsg_t>::SharedPtr motorControlPub;
+  rclcpp_lifecycle::LifecyclePublisher<PositionMsg_t>::SharedPtr positionPublisher;
 
   rclcpp::Subscription<HalPigpioEncoderCountMsg_t>::SharedPtr motorControlECSub;
 
-  rclcpp::TimerBase::SharedPtr encoderCountsTimer;
+  rclcpp::TimerBase::SharedPtr positionMessageTimer;
 
 public:
   MotorControl();
@@ -55,10 +55,13 @@ public:
 
   void activatePublisher(void);
   void configureMotor(void);
-  void publishMessage(void);
+  void computeAndPublishPosition(void);
   void pigpioEncoderCountCallback(const HalPigpioEncoderCountMsg_t & msg);
   void setPwmLeft(uint16_t dutycycle, bool direction);
   void setPwmRight(uint16_t dutycycle, bool direction);
+  double computeAbsolutePositionOnX(int32_t encoderCountLeft, int32_t encoderCountRight);
+  double computeAbsolutePositionOnY(int32_t encoderCountLeft, int32_t encoderCountRight);
+  double computeAbsolutePositionOnZ(int32_t encoderCountLeft, int32_t encoderCountRight);
 };
 
 #endif  // HAL_MOTOR_CONTROL_HPP_
