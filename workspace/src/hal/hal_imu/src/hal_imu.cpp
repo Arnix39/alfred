@@ -36,6 +36,10 @@ LifecycleCallbackReturn_t Imu::on_configure(const rclcpp_lifecycle::State & prev
   i2cWriteByteDataSyncClient.init("hal_pigpioI2cWriteByteData");
   i2cWriteBlockDataSyncClient.init("hal_pigpioI2cWriteBlockData");
 
+  imuSubscriber = this->create_subscription<ImuDataMsg_t>(
+    "hal_pigpioImu", 1000, std::bind(&Imu::imuForwarder, this, _1));
+  imuDataPublisher = this->create_publisher<ImuDataMsg_t>("imuData", 1000);
+
   RCLCPP_INFO(get_logger(), "hal_imu node configured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
@@ -53,6 +57,8 @@ LifecycleCallbackReturn_t Imu::on_activate(const rclcpp_lifecycle::State & previ
   setMpuRate(imuHandle, MPU6050_DMP_RATE_100HZ);
   dmpInit();
 
+  imuDataPublisher->on_activate();
+
   RCLCPP_INFO(get_logger(), "hal_imu node activated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
@@ -60,6 +66,7 @@ LifecycleCallbackReturn_t Imu::on_activate(const rclcpp_lifecycle::State & previ
 
 LifecycleCallbackReturn_t Imu::on_deactivate(const rclcpp_lifecycle::State & previous_state)
 {
+  imuDataPublisher->on_deactivate();
   stopImuReading();
 
   RCLCPP_INFO(get_logger(), "hal_imu node deactivated!");
@@ -69,6 +76,7 @@ LifecycleCallbackReturn_t Imu::on_deactivate(const rclcpp_lifecycle::State & pre
 
 LifecycleCallbackReturn_t Imu::on_cleanup(const rclcpp_lifecycle::State & previous_state)
 {
+  imuDataPublisher.reset();
   stopImuReading();
 
   RCLCPP_INFO(get_logger(), "hal_imu node unconfigured!");
@@ -78,6 +86,7 @@ LifecycleCallbackReturn_t Imu::on_cleanup(const rclcpp_lifecycle::State & previo
 
 LifecycleCallbackReturn_t Imu::on_shutdown(const rclcpp_lifecycle::State & previous_state)
 {
+  imuDataPublisher.reset();
   stopImuReading();
 
   RCLCPP_INFO(get_logger(), "hal_imu node shutdown!");
@@ -486,6 +495,13 @@ void Imu::stopImuReading()
   i2cImuReadingRequest->is_imu_ready = false;
 
   auto i2cImuReadingFuture = i2cImuReadingClient->async_send_request(i2cImuReadingRequest);
+}
+
+void Imu::imuForwarder(const ImuDataMsg_t & msg)
+{
+  auto imuData = ImuDataMsg_t(msg);
+
+  imuDataPublisher->publish(imuData);
 }
 
 /* TODO(Arnix) To be moved in an app package

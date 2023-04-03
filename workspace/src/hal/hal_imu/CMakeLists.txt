@@ -7,6 +7,7 @@ find_package(rclcpp_action REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(hal_pigpio_interfaces REQUIRED)
 find_package(hal_imu_interfaces REQUIRED)
+find_package(sensor_msgs REQUIRED)
 find_package(hal_common REQUIRED)
 find_package(common_utils REQUIRED)
 
@@ -22,6 +23,7 @@ set(dependencies
   rclcpp_lifecycle
   hal_pigpio_interfaces
   hal_imu_interfaces
+  sensor_msgs
   hal_common
   common_utils)
 

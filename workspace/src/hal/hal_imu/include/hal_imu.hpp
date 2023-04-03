@@ -35,6 +35,7 @@
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_imu_reading.hpp"
 #include "hal_imu_interfaces/action/hal_imu_write_dmp.hpp"
 #include "hal_imu_interfaces/srv/hal_imu_get_handle.hpp"
+#include "sensor_msgs/msg/imu.hpp"
 
 #define IMU_GYROSCOPE_X_OFFSET 0
 #define IMU_GYROSCOPE_Y_OFFSET -34
@@ -57,6 +58,8 @@ using HalPigpioI2cImuReading_t = hal_pigpio_interfaces::srv::HalPigpioI2cImuRead
 using HalImuWriteDmpAction = hal_imu_interfaces::action::HalImuWriteDmp;
 using HalImuWriteDmpGoal = rclcpp_action::ClientGoalHandle<HalImuWriteDmpAction>;
 
+using ImuDataMsg_t = sensor_msgs::msg::Imu;
+
 class Imu : public rclcpp_lifecycle::LifecycleNode
 {
 private:
@@ -75,6 +78,9 @@ private:
     HalImuWriteDmpGoal::SharedPtr,
     const std::shared_ptr<const HalImuWriteDmpAction::Feedback> feedback);
   void result_callback(const HalImuWriteDmpGoal::WrappedResult & result);
+
+  rclcpp::Subscription<ImuDataMsg_t>::SharedPtr imuSubscriber;
+  rclcpp_lifecycle::LifecyclePublisher<ImuDataMsg_t>::SharedPtr imuDataPublisher;
 
 public:
   Imu();
@@ -105,6 +111,8 @@ public:
   void setAccelerometerOffsets(int32_t imuHandle);
   void setGyroscopeOffsets(int32_t imuHandle);
   bool writeSensorBiases(int32_t imuHandle, const std::vector<SensorBias> sensorBiases);
+
+  void imuForwarder(const ImuDataMsg_t & msg);
 };
 
 #endif  // HAL_IMU_HPP_

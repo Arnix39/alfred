@@ -47,7 +47,7 @@ public:
   : rclcpp::Node("hal_proxsens_checker_node"),
     proxsensSub(this->create_subscription
       <hal_proxsens::proxsens_msg::Range>(
-        "proxSensorValue",
+        "proximitySensor",
         1000,
         std::bind(&ProxsensCheckerNode::getProxsensDistance, this, _1))),
     changeStateClient(this->create_client<lifecycle_msgs::srv::ChangeState>(
