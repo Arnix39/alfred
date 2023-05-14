@@ -54,7 +54,7 @@ LifecycleCallbackReturn_t Imu::on_activate(const rclcpp_lifecycle::State & previ
   setAccelerometerSensitivity(imuHandle);
   setGyroscopeSensitivity(imuHandle);
   setConfiguration(imuHandle);
-  setMpuRate(imuHandle, MPU6050_DMP_RATE_100HZ);
+  setMpuRate(imuHandle, MPU6050_DMP_SAMPLE_RATE);
   dmpInit();
 
   imuDataPublisher->on_activate();
