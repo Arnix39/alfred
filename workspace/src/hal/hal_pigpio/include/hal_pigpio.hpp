@@ -57,6 +57,7 @@ using HalPigpioI2cImuReading_t = hal_pigpio_interfaces::srv::HalPigpioI2cImuRead
 using HalPigpioImuMsg_t = sensor_msgs::msg::Imu;
 using QuaternionMsg_t = geometry_msgs::msg::Quaternion;
 using Vector3Msg_t = geometry_msgs::msg::Vector3;
+using HeaderMsg_t = std_msgs::msg::Header;
 
 class Pigpio : public rclcpp_lifecycle::LifecycleNode
 {

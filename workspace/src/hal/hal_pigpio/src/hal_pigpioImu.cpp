@@ -158,6 +158,8 @@ Vector3 Pigpio::computeImuData(char (& data)[MPU6050_DATA_SIZE])
 {
   Vector3 values;
 
+  /* TODO Arnix: review computation of raw data */
+
   values.x = static_cast<uint16_t>((data[0] << 8) | data[1]);
   values.y = static_cast<uint16_t>((data[2] << 8) | data[3]);
   values.z = static_cast<uint16_t>((data[4] << 8) | data[5]);
@@ -171,6 +173,11 @@ void Pigpio::publishImuMessage()
   auto quaternions = QuaternionMsg_t();
   auto angularVelocity = Vector3Msg_t();
   auto linearAcceleration = Vector3Msg_t();
+  auto header = HeaderMsg_t();
+
+  header.frame_id = "Body";
+  header.stamp = rclcpp::Clock().now();
+  message.header = header;
 
   std::array<double, 9> covariance_zero = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 

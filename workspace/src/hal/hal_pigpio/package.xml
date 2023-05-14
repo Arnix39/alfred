@@ -14,6 +14,7 @@
 
   <depend>hal_pigpio_interfaces</depend>
   <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
   <depend>common_utils</depend>
   <depend>pigpio</depend>
   
