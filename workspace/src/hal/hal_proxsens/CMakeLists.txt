@@ -6,6 +6,7 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(hal_pigpio_interfaces REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
 find_package(common_utils REQUIRED)
 
 ###########
@@ -19,6 +20,7 @@ set(dependencies
   rclcpp_lifecycle
   hal_pigpio_interfaces
   sensor_msgs
+  std_msgs
   common_utils)
 
 add_library(${PROJECT_NAME} OBJECT src/hal_proxsens.cpp)

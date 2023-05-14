@@ -39,7 +39,6 @@ namespace hal_proxsens
 
 namespace pigpio_srv = hal_pigpio_interfaces::srv;
 namespace pigpio_msg = hal_pigpio_interfaces::msg;
-namespace proxsens_msg = sensor_msgs::msg;
 
 using SetInputModeFuture_t = rclcpp::Client<pigpio_srv::HalPigpioSetInputMode>::SharedFuture;
 using SetCallbackFuture_t = rclcpp::Client<pigpio_srv::HalPigpioSetCallback>::SharedFuture;
@@ -47,6 +46,8 @@ using SetOutputModeFuture_t = rclcpp::Client<pigpio_srv::HalPigpioSetOutputMode>
 using SendTriggerPulseFuture_t =
   rclcpp::Client<pigpio_srv::HalPigpioSendTriggerPulse>::SharedFuture;
 using SetGpioHighFuture_t = rclcpp::Client<pigpio_srv::HalPigpioSetGpioHigh>::SharedFuture;
+using ProxsensMsg_t = sensor_msgs::msg::Range;
+using HeaderMsg_t = std_msgs::msg::Header;
 
 class Proxsens : public rclcpp_lifecycle::LifecycleNode
 {
@@ -62,7 +63,7 @@ private:
   rclcpp::Client<pigpio_srv::HalPigpioSendTriggerPulse>::SharedPtr gpioSendTriggerPulseClient;
   rclcpp::Client<pigpio_srv::HalPigpioSetGpioHigh>::SharedPtr gpioSetGpioHighClient;
 
-  rclcpp_lifecycle::LifecyclePublisher<proxsens_msg::Range>::SharedPtr proxsensDistancePub;
+  rclcpp_lifecycle::LifecyclePublisher<ProxsensMsg_t>::SharedPtr proxsensDistancePub;
   rclcpp::TimerBase::SharedPtr proxsensDistancePubTimer;
 
   rclcpp::Subscription<pigpio_msg::HalPigpioEdgeChange>::SharedPtr proxsensEdgeChangeSub;
