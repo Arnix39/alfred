@@ -97,12 +97,12 @@ void Motor::configureGpios(
   }
 }
 
-int32_t Motor::getEncoderCount(void)
+uint32_t Motor::getEncoderCount(void)
 {
   return encoder.encoderCount;
 }
 
-void Motor::setEncoderCount(int32_t count)
+void Motor::setEncoderCount(uint32_t count)
 {
   encoder.encoderCount = count;
 }

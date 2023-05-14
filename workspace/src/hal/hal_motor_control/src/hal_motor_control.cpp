@@ -42,13 +42,13 @@ LifecycleCallbackReturn_t MotorControl::on_configure(const rclcpp_lifecycle::Sta
   gpioSetPwmDutycycleClient =
     this->create_client<HalPigpioSetPwmDutycycle_t>("hal_pigpioSetPwmDutycycle");
 
-  positionPublisher = this->create_publisher<PositionMsg_t>("position", 1000);
+  motorControlPub = this->create_publisher<HalMotorControlMsg_t>(
+    "motorsEncoderCountValue", 1000);
 
   motorControlECSub = this->create_subscription<HalPigpioEncoderCountMsg_t>(
     "hal_pigpioEncoderCount", 1000, std::bind(&MotorControl::pigpioEncoderCountCallback, this, _1));
 
-  positionMessageTimer =
-    create_wall_timer(10ms, std::bind(&MotorControl::computeAndPublishPosition, this));
+  encoderCountsTimer = create_wall_timer(10ms, std::bind(&MotorControl::publishMessage, this));
 
   RCLCPP_INFO(get_logger(), "hal_motor_control node configured!");
 
@@ -68,7 +68,7 @@ LifecycleCallbackReturn_t MotorControl::on_activate(const rclcpp_lifecycle::Stat
 LifecycleCallbackReturn_t MotorControl::on_deactivate(
   const rclcpp_lifecycle::State & previous_state)
 {
-  positionPublisher->on_deactivate();
+  motorControlPub->on_deactivate();
 
   RCLCPP_INFO(get_logger(), "hal_motor_control node deactivated!");
 
@@ -77,8 +77,8 @@ LifecycleCallbackReturn_t MotorControl::on_deactivate(
 
 LifecycleCallbackReturn_t MotorControl::on_cleanup(const rclcpp_lifecycle::State & previous_state)
 {
-  positionPublisher.reset();
-  positionMessageTimer.reset();
+  motorControlPub.reset();
+  encoderCountsTimer.reset();
 
   RCLCPP_INFO(get_logger(), "hal_motor_control node unconfigured!");
 
@@ -87,8 +87,8 @@ LifecycleCallbackReturn_t MotorControl::on_cleanup(const rclcpp_lifecycle::State
 
 LifecycleCallbackReturn_t MotorControl::on_shutdown(const rclcpp_lifecycle::State & previous_state)
 {
-  positionPublisher.reset();
-  positionMessageTimer.reset();
+  motorControlPub.reset();
+  encoderCountsTimer.reset();
 
   RCLCPP_INFO(get_logger(), "hal_motor_control node shutdown!");
 
@@ -102,7 +102,7 @@ LifecycleCallbackReturn_t MotorControl::on_error(const rclcpp_lifecycle::State &
 
 void MotorControl::activatePublisher(void)
 {
-  positionPublisher->on_activate();
+  motorControlPub->on_activate();
 }
 
 void MotorControl::configureMotor(void)
@@ -129,18 +129,13 @@ void MotorControl::pigpioEncoderCountCallback(
   }
 }
 
-void MotorControl::computeAndPublishPosition(void)
+void MotorControl::publishMessage(void)
 {
-  auto position = PositionMsg_t();
+  auto encoderCounts = HalMotorControlMsg_t();
 
-  auto encoderCountLeft = motorLeft.getEncoderCount();
-  auto encoderCountRight = motorRight.getEncoderCount();
-
-  position.x = computeAbsolutePositionOnX(encoderCountLeft, encoderCountRight);
-  position.y = computeAbsolutePositionOnY(encoderCountLeft, encoderCountRight);
-  position.z = computeAbsolutePositionOnZ(encoderCountLeft, encoderCountRight);
-
-  positionPublisher->publish(position);
+  encoderCounts.motor_left_encoder_count = -motorLeft.getEncoderCount();
+  encoderCounts.motor_right_encoder_count = motorRight.getEncoderCount();
+  motorControlPub->publish(encoderCounts);
 }
 
 void MotorControl::setPwmLeft(uint16_t dutycycle, bool direction)
@@ -151,19 +146,4 @@ void MotorControl::setPwmLeft(uint16_t dutycycle, bool direction)
 void MotorControl::setPwmRight(uint16_t dutycycle, bool direction)
 {
   motorRight.setPwmDutyCycleAndDirection(gpioSetPwmDutycycleClient, dutycycle, direction);
-}
-
-double MotorControl::computeAbsolutePositionOnX(int32_t encoderCountLeft, int32_t encoderCountRight)
-{
-  return encoderCountLeft / 52000.0;
-}
-
-double MotorControl::computeAbsolutePositionOnY(int32_t encoderCountLeft, int32_t encoderCountRight)
-{
-  return 0.0;
-}
-
-double MotorControl::computeAbsolutePositionOnZ(int32_t encoderCountLeft, int32_t encoderCountRight)
-{
-  return 0.0;
 }
