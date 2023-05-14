@@ -158,7 +158,7 @@ Vector3 Pigpio::computeImuData(char (& data)[MPU6050_DATA_SIZE])
 {
   Vector3 values;
 
-  /* TODO Arnix: review computation of raw data */
+  /* TODO(Arnix) review computation of raw data */
 
   values.x = static_cast<uint16_t>((data[0] << 8) | data[1]);
   values.y = static_cast<uint16_t>((data[2] << 8) | data[3]);

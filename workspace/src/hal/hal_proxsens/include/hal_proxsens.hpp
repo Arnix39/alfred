@@ -25,6 +25,7 @@
 #include "hal_pigpio_interfaces/srv/hal_pigpio_set_callback.hpp"
 #include "hal_pigpio_interfaces/msg/hal_pigpio_edge_change.hpp"
 #include "sensor_msgs/msg/range.hpp"
+#include "std_msgs/msg/header.hpp"
 
 #define PROXSENS_TRIGGER_GPIO GPIO5
 #define PROXSENS_ECHO_GPIO GPIO6

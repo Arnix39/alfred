@@ -26,5 +26,6 @@
 #include "sensor_msgs/msg/imu.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
 #include "geometry_msgs/msg/vector3.hpp"
+#include "std_msgs/msg/header.hpp"
 
 #endif  // HAL_PIGPIOIMU_HPP_
