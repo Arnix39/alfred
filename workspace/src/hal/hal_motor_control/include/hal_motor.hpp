@@ -31,7 +31,7 @@ struct Encoder_t
 {
   EncoderChannel_t channelA;
   EncoderChannel_t channelB;
-  uint32_t encoderCount;
+  int32_t encoderCount;
 };
 
 struct Pwm
@@ -55,8 +55,8 @@ public:
     uint8_t motorId);
   ~Motor() = default;
 
-  uint32_t getEncoderCount(void);
-  void setEncoderCount(uint32_t count);
+  int32_t getEncoderCount(void);
+  void setEncoderCount(int32_t count);
   void setPwmDutyCycleAndDirection(
     rclcpp::Client<HalPigpioSetPwmDutycycle_t>::SharedPtr gpioSetPwmDutycycleClient,
     uint16_t dutycycle,

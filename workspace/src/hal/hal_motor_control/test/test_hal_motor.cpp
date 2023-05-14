@@ -38,7 +38,7 @@ MotorCheckerNode::MotorCheckerNode()
 
 TEST_F(MotorTest, EncoderCountUtils)
 {
-  const uint32_t encoderCount = 1024;
+  const int32_t encoderCount = 1024;
   motor->motorOk.setEncoderCount(encoderCount);
 
   ASSERT_EQ(motor->motorOk.getEncoderCount(), encoderCount);
