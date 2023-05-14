@@ -212,16 +212,16 @@
             "detail": "Copy source files on Raspberry Pi 3B+.",
             "type": "shell",
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}/src/"
             },
             "command": "rsync",
             "args": [
                 "--exclude",
-                "${workspaceFolder}/src/sim",
+                "sim",
                 "--delete",
                 "--copy-links",
                 "-av",
-                "${workspaceFolder}/src/",
+                ".",
                 "arnix@alfred:/home/arnix/Alfred/src"
             ],
             "group": {
