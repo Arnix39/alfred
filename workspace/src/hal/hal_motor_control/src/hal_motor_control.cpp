@@ -132,9 +132,15 @@ void MotorControl::pigpioEncoderCountCallback(
 void MotorControl::publishMessage(void)
 {
   auto encoderCounts = HalMotorControlMsg_t();
+  auto header = HeaderMsg_t();
+
+  header.stamp = rclcpp::Clock().now();
+  header.frame_id = "Wheels";
+  encoderCounts.header = header;
 
   encoderCounts.motor_left_encoder_count = -motorLeft.getEncoderCount();
   encoderCounts.motor_right_encoder_count = motorRight.getEncoderCount();
+
   motorControlPub->publish(encoderCounts);
 }
 

@@ -42,6 +42,7 @@
 
 using HalMotorControlMsg_t = hal_motor_control_interfaces::msg::HalMotorControl;
 using HalPigpioEncoderCountMsg_t = hal_pigpio_interfaces::msg::HalPigpioEncoderCount;
+using HeaderMsg_t = std_msgs::msg::Header;
 
 using HalPigpioSetInputMode_t = hal_pigpio_interfaces::srv::HalPigpioSetInputMode;
 using HalPigpioSetOutputMode_t = hal_pigpio_interfaces::srv::HalPigpioSetOutputMode;

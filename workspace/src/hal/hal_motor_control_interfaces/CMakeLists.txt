@@ -3,12 +3,14 @@ project(hal_motor_control_interfaces)
 
 find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(std_msgs REQUIRED)
 
 #################################################
 ## Generate ROS messages, services and actions ##
 #################################################
 rosidl_generate_interfaces(${PROJECT_NAME}
   msg/HalMotorControl.msg
+  DEPENDENCIES std_msgs
 )
 
 ament_export_dependencies(rosidl_default_runtime)
