@@ -14,14 +14,27 @@
 
 #include "hal_pose_manager.hpp"
 
+using namespace std::placeholders;
+
 HalPoseManager::HalPoseManager()
-: rclcpp_lifecycle::LifecycleNode("hal_pose_manager_node")
+: rclcpp_lifecycle::LifecycleNode("hal_pose_manager_node"),
+  encodersCount{.rightCurrrent = 0, .rightPrevious = 0,
+    .leftCurrrent = 0, .leftPrevious = 0,
+    .timestampNs = 0},
+  wheelsVelocity{.right = 0, .left = 0}
 {
 }
 
 LifecycleCallbackReturn_t HalPoseManager::on_configure(
   const rclcpp_lifecycle::State & previous_state)
 {
+  odometryPublisher = this->create_publisher<OdometryMsg_t>("odometry", 1000);
+  twistSubscriber = this->create_subscription<TwistMsg_t>(
+    "cmd_velocity", 1000, std::bind(&HalPoseManager::wheelsVelocityCommand, this, _1));
+  motorsECSubscriber = this->create_subscription<HalMotorControlMsg_t>(
+    "motorsEncoderCountValue", 1000,
+    std::bind(&HalPoseManager::wheelsVelocityComputation, this, _1));
+
   RCLCPP_INFO(get_logger(), "hal_pose_manager node configured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
@@ -30,6 +43,8 @@ LifecycleCallbackReturn_t HalPoseManager::on_configure(
 LifecycleCallbackReturn_t HalPoseManager::on_activate(
   const rclcpp_lifecycle::State & previous_state)
 {
+  odometryPublisher->on_activate();
+
   RCLCPP_INFO(get_logger(), "hal_pose_manager node activated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
@@ -38,6 +53,8 @@ LifecycleCallbackReturn_t HalPoseManager::on_activate(
 LifecycleCallbackReturn_t HalPoseManager::on_deactivate(
   const rclcpp_lifecycle::State & previous_state)
 {
+  odometryPublisher->on_deactivate();
+
   RCLCPP_INFO(get_logger(), "hal_pose_manager node deactivated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
@@ -45,6 +62,8 @@ LifecycleCallbackReturn_t HalPoseManager::on_deactivate(
 
 LifecycleCallbackReturn_t HalPoseManager::on_cleanup(const rclcpp_lifecycle::State & previous_state)
 {
+  odometryPublisher.reset();
+
   RCLCPP_INFO(get_logger(), "hal_pose_manager node unconfigured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
@@ -53,6 +72,8 @@ LifecycleCallbackReturn_t HalPoseManager::on_cleanup(const rclcpp_lifecycle::Sta
 LifecycleCallbackReturn_t HalPoseManager::on_shutdown(
   const rclcpp_lifecycle::State & previous_state)
 {
+  odometryPublisher.reset();
+
   RCLCPP_INFO(get_logger(), "hal_pose_manager node shutdown!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
@@ -61,4 +82,29 @@ LifecycleCallbackReturn_t HalPoseManager::on_shutdown(
 LifecycleCallbackReturn_t HalPoseManager::on_error(const rclcpp_lifecycle::State & previous_state)
 {
   return LifecycleCallbackReturn_t::FAILURE;
+}
+
+void HalPoseManager::wheelsVelocityCommand(const TwistMsg_t & msg) {}
+
+void HalPoseManager::wheelsVelocityComputation(const HalMotorControlMsg_t & msg)
+{
+  int32_t encoderCountDelta = 0;
+  int32_t timeDelta = msg.header.stamp.nanosec - encodersCount.timestampNs;
+
+  auto computeVelocity = [](int32_t encoderCountDelta, int32_t timeDelta) {
+      return static_cast<int32_t>(round(
+               static_cast<double>(encoderCountDelta) / timeDelta * MS_TO_NS));
+    };
+
+  encodersCount.leftPrevious = encodersCount.leftCurrrent;
+  encodersCount.leftCurrrent = msg.motor_left_encoder_count;
+
+  encoderCountDelta = encodersCount.leftCurrrent - encodersCount.leftPrevious;
+  wheelsVelocity.left = computeVelocity(encoderCountDelta, timeDelta);
+
+  encodersCount.rightPrevious = encodersCount.rightCurrrent;
+  encodersCount.rightCurrrent = msg.motor_right_encoder_count;
+
+  encoderCountDelta = encodersCount.rightCurrrent - encodersCount.rightPrevious;
+  wheelsVelocity.right = computeVelocity(encoderCountDelta, timeDelta);
 }

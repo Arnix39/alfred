@@ -15,10 +15,48 @@
 #ifndef HAL_POSE_MANAGER_HPP_
 #define HAL_POSE_MANAGER_HPP_
 
+#include <cmath>
+
 #include "common.hpp"
+
+// Services and messages headers (generated)
+#include "nav_msgs/msg/odometry.hpp"
+#include "geometry_msgs/msg/twist_with_covariance.hpp"
+#include "std_msgs/msg/header.hpp"
+#include "hal_motor_control_interfaces/msg/hal_motor_control.hpp"
+
+#define MS_TO_NS 1000000
+
+using OdometryMsg_t = nav_msgs::msg::Odometry;
+using TwistMsg_t = geometry_msgs::msg::TwistWithCovariance;
+using HeaderMsg_t = std_msgs::msg::Header;
+using HalMotorControlMsg_t = hal_motor_control_interfaces::msg::HalMotorControl;
+
+struct EncodersCount
+{
+  int32_t rightCurrrent;
+  int32_t rightPrevious;
+  int32_t leftCurrrent;
+  int32_t leftPrevious;
+  uint32_t timestampNs;
+};
+
+struct WheelsVelocity
+{
+  int32_t right;
+  int32_t left;
+};
 
 class HalPoseManager : public rclcpp_lifecycle::LifecycleNode
 {
+private:
+  rclcpp_lifecycle::LifecyclePublisher<OdometryMsg_t>::SharedPtr odometryPublisher;
+  rclcpp::Subscription<TwistMsg_t>::SharedPtr twistSubscriber;
+  rclcpp::Subscription<HalMotorControlMsg_t>::SharedPtr motorsECSubscriber;
+
+  EncodersCount encodersCount;
+  WheelsVelocity wheelsVelocity;
+
 public:
   HalPoseManager();
   ~HalPoseManager() = default;
@@ -29,6 +67,9 @@ public:
   LifecycleCallbackReturn_t on_cleanup(const rclcpp_lifecycle::State & previous_state);
   LifecycleCallbackReturn_t on_shutdown(const rclcpp_lifecycle::State & previous_state);
   LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
+
+  void wheelsVelocityCommand(const TwistMsg_t & msg);
+  void wheelsVelocityComputation(const HalMotorControlMsg_t & msg);
 };
 
 #endif  // HAL_POSE_MANAGER_HPP_

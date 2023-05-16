@@ -5,6 +5,9 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(nav_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(hal_motor_control_interfaces REQUIRED)
 find_package(common_utils REQUIRED)
 
 ###########
@@ -18,6 +21,9 @@ set(dependencies
   rclcpp
   rclcpp_lifecycle
   nav_msgs
+  geometry_msgs
+  std_msgs
+  hal_motor_control_interfaces
   common_utils)
 
 add_library(${PROJECT_NAME} OBJECT src/hal_pose_manager.cpp)
