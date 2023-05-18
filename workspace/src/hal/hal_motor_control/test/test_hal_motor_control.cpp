@@ -17,13 +17,13 @@
 using namespace std::placeholders;
 
 MotorControlCheckerNode::MotorControlCheckerNode()
-: rclcpp::Node("hal_motor_control_checker_node"),
-  changeStateClient(this->create_client<lifecycle_msgs::srv::ChangeState>(
-      "hal_motorControl_node/change_state")),
-  encoderCountSubscriber(this->create_subscription<HalMotorControlMsg_t>(
+: rclcpp::Node{"hal_motor_control_checker_node"},
+  changeStateClient{this->create_client<lifecycle_msgs::srv::ChangeState>(
+      "hal_motorControl_node/change_state")},
+  encoderCountSubscriber{this->create_subscription<HalMotorControlMsg_t>(
       "motorsEncoderCountValue", 1000,
-      std::bind(&MotorControlCheckerNode::encoderCountCallback, this, _1))),
-  encoderCounts({0, 0})
+      std::bind(&MotorControlCheckerNode::encoderCountCallback, this, _1))},
+  encoderCounts{0, 0}
 {
 }
 

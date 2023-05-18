@@ -18,8 +18,8 @@ using namespace std::placeholders;
 using namespace std::chrono_literals;
 
 ImuI2cInit::ImuI2cInit()
-: rclcpp_lifecycle::LifecycleNode("hal_imuI2cInit_node"),
-  imuHandle(MPU6050_I2C_NO_HANDLE)
+: rclcpp_lifecycle::LifecycleNode{"hal_imuI2cInit_node"},
+  imuHandle{MPU6050_I2C_NO_HANDLE}
 {
 }
 

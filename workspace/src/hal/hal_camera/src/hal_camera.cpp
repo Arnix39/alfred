@@ -17,7 +17,7 @@
 using namespace std::chrono_literals;
 
 Camera::Camera()
-: rclcpp_lifecycle::LifecycleNode("hal_camera_node")
+: rclcpp_lifecycle::LifecycleNode{"hal_camera_node"}
 {
 }
 

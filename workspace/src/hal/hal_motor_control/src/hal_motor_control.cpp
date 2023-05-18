@@ -18,17 +18,17 @@ using namespace std::placeholders;
 using namespace std::chrono_literals;
 
 MotorControl::MotorControl()
-: rclcpp_lifecycle::LifecycleNode("hal_motorControl_node"),
-  motorLeft(MOTOR_LEFT_PWM_A_GPIO, MOTOR_LEFT_PWM_B_GPIO,
+: rclcpp_lifecycle::LifecycleNode{"hal_motorControl_node"},
+  motorLeft{MOTOR_LEFT_PWM_A_GPIO, MOTOR_LEFT_PWM_B_GPIO,
     MOTOR_LEFT_ENCODER_CH_A_GPIO, MOTOR_LEFT_ENCODER_CH_B_GPIO,
-    MOTOR_LEFT),
-  motorRight(MOTOR_RIGHT_PWM_A_GPIO, MOTOR_RIGHT_PWM_B_GPIO,
+    MOTOR_LEFT},
+  motorRight{MOTOR_RIGHT_PWM_A_GPIO, MOTOR_RIGHT_PWM_B_GPIO,
     MOTOR_RIGHT_ENCODER_CH_A_GPIO, MOTOR_RIGHT_ENCODER_CH_B_GPIO,
-    MOTOR_RIGHT),
-  setInputModeSyncClient("setInputModeSyncClientMotor_node"),
-  setOutputModeSyncClient("setOutputModeSyncClientMotor_node"),
-  setEncoderCallbackSyncClient("setEncoderCallbackSyncClientMotor_node"),
-  setPwmFrequencySyncClient("setPwmFrequencySyncClientMotor_node")
+    MOTOR_RIGHT},
+  setInputModeSyncClient{"setInputModeSyncClientMotor_node"},
+  setOutputModeSyncClient{"setOutputModeSyncClientMotor_node"},
+  setEncoderCallbackSyncClient{"setEncoderCallbackSyncClientMotor_node"},
+  setPwmFrequencySyncClient{"setPwmFrequencySyncClientMotor_node"}
 {
 }
 

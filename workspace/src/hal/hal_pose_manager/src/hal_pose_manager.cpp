@@ -17,7 +17,7 @@
 using namespace std::placeholders;
 
 HalPoseManager::HalPoseManager()
-: rclcpp_lifecycle::LifecycleNode("hal_pose_manager_node"),
+: rclcpp_lifecycle::LifecycleNode{"hal_pose_manager_node"},
   encodersCount{.rightCurrrent = 0, .rightPrevious = 0,
     .leftCurrrent = 0, .leftPrevious = 0,
     .timestampNs = 0},

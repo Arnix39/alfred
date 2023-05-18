@@ -15,7 +15,7 @@
 #include "package_template.hpp"
 
 PackageTemplate::PackageTemplate()
-: rclcpp_lifecycle::LifecycleNode("package_template_node")
+: rclcpp_lifecycle::LifecycleNode{"package_template_node"}
 {
 }
 

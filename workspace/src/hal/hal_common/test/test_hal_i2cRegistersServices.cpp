@@ -18,32 +18,32 @@ using namespace std::placeholders;
 using namespace std::chrono_literals;
 
 I2cRegistersServicesCheckerNode::I2cRegistersServicesCheckerNode()
-: rclcpp::Node("hal_i2cRegistersServices_checker_node"),
-  imuGetHandleSyncClient("getHandleSyncClientImu_node"),
-  i2cReadByteDataSyncClient("readByteDataSyncClientImu_node"),
-  i2cReadBlockDataSyncClient("readBlockDataSyncClientImu_node"),
-  i2cWriteByteDataSyncClient("writeByteDataSyncClientImu_node"),
-  i2cWriteBlockDataSyncClient("writeBlockDataSyncClientImu_node")
+: rclcpp::Node{"hal_i2cRegistersServices_checker_node"},
+  imuGetHandleSyncClient{"getHandleSyncClientImu_node"},
+  i2cReadByteDataSyncClient{"readByteDataSyncClientImu_node"},
+  i2cReadBlockDataSyncClient{"readBlockDataSyncClientImu_node"},
+  i2cWriteByteDataSyncClient{"writeByteDataSyncClientImu_node"},
+  i2cWriteBlockDataSyncClient{"writeBlockDataSyncClientImu_node"}
 {}
 
 HalDummyNode::HalDummyNode()
-: rclcpp::Node("hal_dummy_node"),
-  piHandle(pigpio_start(NULL, NULL)),
-  imuGetHandleService(this->create_service<HalImuGetHandle_t>(
+: rclcpp::Node{"hal_dummy_node"},
+  piHandle{pigpio_start(NULL, NULL)},
+  imuGetHandleService{this->create_service<HalImuGetHandle_t>(
       "hal_imuGetHandle",
-      std::bind(&HalDummyNode::getHandle, this, _1, _2))),
-  i2cReadByteDataService(this->create_service<HalPigpioI2cReadByteData_t>(
+      std::bind(&HalDummyNode::getHandle, this, _1, _2))},
+  i2cReadByteDataService{this->create_service<HalPigpioI2cReadByteData_t>(
       "hal_pigpioI2cReadByteData",
-      std::bind(&HalDummyNode::i2cReadByteData, this, _1, _2))),
-  i2cReadBlockDataService(this->create_service<HalPigpioI2cReadBlockData_t>(
+      std::bind(&HalDummyNode::i2cReadByteData, this, _1, _2))},
+  i2cReadBlockDataService{this->create_service<HalPigpioI2cReadBlockData_t>(
       "hal_pigpioI2cReadBlockData",
-      std::bind(&HalDummyNode::i2cReadBlockData, this, _1, _2))),
-  i2cWriteByteDataService(this->create_service<HalPigpioI2cWriteByteData_t>(
+      std::bind(&HalDummyNode::i2cReadBlockData, this, _1, _2))},
+  i2cWriteByteDataService{this->create_service<HalPigpioI2cWriteByteData_t>(
       "hal_pigpioI2cWriteByteData",
-      std::bind(&HalDummyNode::i2cWriteByteData, this, _1, _2))),
-  i2cWriteBlockDataService(this->create_service<HalPigpioI2cWriteBlockData_t>(
+      std::bind(&HalDummyNode::i2cWriteByteData, this, _1, _2))},
+  i2cWriteBlockDataService{this->create_service<HalPigpioI2cWriteBlockData_t>(
       "hal_pigpioI2cWriteBlockData",
-      std::bind(&HalDummyNode::i2cWriteBlockData, this, _1, _2)))
+      std::bind(&HalDummyNode::i2cWriteBlockData, this, _1, _2))}
 {}
 
 HalDummyNode::~HalDummyNode()

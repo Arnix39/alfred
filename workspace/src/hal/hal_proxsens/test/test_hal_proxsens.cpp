@@ -44,14 +44,14 @@ class ProxsensCheckerNode : public rclcpp::Node
 {
 public:
   ProxsensCheckerNode()
-  : rclcpp::Node("hal_proxsens_checker_node"),
-    proxsensSub(this->create_subscription
+  : rclcpp::Node{"hal_proxsens_checker_node"},
+    proxsensSub{this->create_subscription
       <hal_proxsens::ProxsensMsg_t>(
         "proximitySensor",
         1000,
-        std::bind(&ProxsensCheckerNode::getProxsensDistance, this, _1))),
-    changeStateClient(this->create_client<lifecycle_msgs::srv::ChangeState>(
-        "hal_proxsens_node/change_state"))
+        std::bind(&ProxsensCheckerNode::getProxsensDistance, this, _1))},
+    changeStateClient{this->create_client<lifecycle_msgs::srv::ChangeState>(
+        "hal_proxsens_node/change_state")}
   {
   }
   ~ProxsensCheckerNode() = default;

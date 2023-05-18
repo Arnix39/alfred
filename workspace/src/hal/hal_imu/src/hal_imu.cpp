@@ -18,12 +18,12 @@ using namespace std::chrono_literals;
 using namespace std::placeholders;
 
 Imu::Imu()
-: rclcpp_lifecycle::LifecycleNode("hal_imuI2cInit_node"),
-  imuHandle(MPU6050_I2C_NO_HANDLE),
-  imuGetHandleSyncClient("getHandleSyncClientImu_node"),
-  i2cReadByteDataSyncClient("readByteDataSyncClientImu_node"),
-  i2cWriteByteDataSyncClient("writeByteDataSyncClientImu_node"),
-  i2cWriteBlockDataSyncClient("writeBlockDataSyncClientImu_node")
+: rclcpp_lifecycle::LifecycleNode{"hal_imuI2cInit_node"},
+  imuHandle{MPU6050_I2C_NO_HANDLE},
+  imuGetHandleSyncClient{"getHandleSyncClientImu_node"},
+  i2cReadByteDataSyncClient{"readByteDataSyncClientImu_node"},
+  i2cWriteByteDataSyncClient{"writeByteDataSyncClientImu_node"},
+  i2cWriteBlockDataSyncClient{"writeBlockDataSyncClientImu_node"}
 {
 }
 

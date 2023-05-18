@@ -15,14 +15,14 @@
 #include "hal_imu_tests.hpp"
 
 ImuCheckerNode::ImuCheckerNode()
-: rclcpp::Node("hal_imu_checker_node"),
-  changeStateClient(this->create_client<lifecycle_msgs::srv::ChangeState>(
-      "hal_imu_node/change_state")),
-  i2cReadByteDataDummy("DummyReadByteData"),
-  i2cReadBlockDataDummy("DummyReadBlockData"),
-  i2cWriteByteDataDummy("DummyWriteByteData"),
-  i2cWriteBlockDataDummy("DummyWriteBlockData"),
-  imuGetHandleDummy("DummyGetHandle")
+: rclcpp::Node{"hal_imu_checker_node"},
+  changeStateClient{this->create_client<lifecycle_msgs::srv::ChangeState>(
+      "hal_imu_node/change_state")},
+  i2cReadByteDataDummy{"DummyReadByteData"},
+  i2cReadBlockDataDummy{"DummyReadBlockData"},
+  i2cWriteByteDataDummy{"DummyWriteByteData"},
+  i2cWriteBlockDataDummy{"DummyWriteBlockData"},
+  imuGetHandleDummy{"DummyGetHandle"}
 {
 }
 

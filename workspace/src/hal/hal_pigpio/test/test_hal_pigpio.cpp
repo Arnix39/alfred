@@ -17,54 +17,54 @@
 using namespace std::placeholders;
 
 PigioCheckerNode::PigioCheckerNode()
-: rclcpp::Node("hal_pigpio_checker_node"),
-  changeStateClient(this->create_client<lifecycle_msgs::srv::ChangeState>(
-      "hal_pigpio_node/change_state")),
-  setInputModeClient(this->create_client<HalPigpioSetInputMode_t>("hal_pigpioSetInputMode")),
-  setOutputModeClient(this->create_client<HalPigpioSetOutputMode_t>("hal_pigpioSetOutputMode")),
-  getModeClient(this->create_client<HalPigpioGetMode_t>("hal_pigpioGetMode")),
-  setPullUpClient(this->create_client<HalPigpioSetPullUp_t>("hal_pigpioSetPullUp")),
-  setPullDownClient(this->create_client<HalPigpioSetPullDown_t>("hal_pigpioSetPullDown")),
-  clearResistorClient(this->create_client<HalPigpioClearResistor_t>("hal_pigpioClearResistor")),
-  setPwmDutycycleClient(this->create_client<HalPigpioSetPwmDutycycle_t>(
-      "hal_pigpioSetPwmDutycycle")),
-  setPwmFrequencyClient(this->create_client<HalPigpioSetPwmFrequency_t>(
-      "hal_pigpioSetPwmFrequency")),
-  setGpioHighClient(this->create_client<HalPigpioSetGpioHigh_t>("hal_pigpioSetGpioHigh")),
-  setGpioLowClient(this->create_client<HalPigpioSetGpioLow_t>("hal_pigpioSetGpioLow")),
-  sendTriggerPulseClient(this->create_client<HalPigpioSendTriggerPulse_t>(
-      "hal_pigpioSendTriggerPulse")),
-  readGpioClient(this->create_client<HalPigpioReadGpio_t>("hal_pigpioReadGpio")),
-  setCallbackClient(this->create_client<HalPigpioSetCallback_t>("hal_pigpioSetCallback")),
-  setEncoderCallbackClient(this->create_client<HalPigpioSetEncoderCallback_t>(
-      "hal_pigpioSetEncoderCallback")),
-  pigpioEdgeChangeSub(this->create_subscription<HalPigpioEdgeChangeMsg_t>(
+: rclcpp::Node{"hal_pigpio_checker_node"},
+  changeStateClient{this->create_client<lifecycle_msgs::srv::ChangeState>(
+      "hal_pigpio_node/change_state")},
+  setInputModeClient{this->create_client<HalPigpioSetInputMode_t>("hal_pigpioSetInputMode")},
+  setOutputModeClient{this->create_client<HalPigpioSetOutputMode_t>("hal_pigpioSetOutputMode")},
+  getModeClient{this->create_client<HalPigpioGetMode_t>("hal_pigpioGetMode")},
+  setPullUpClient{this->create_client<HalPigpioSetPullUp_t>("hal_pigpioSetPullUp")},
+  setPullDownClient{this->create_client<HalPigpioSetPullDown_t>("hal_pigpioSetPullDown")},
+  clearResistorClient{this->create_client<HalPigpioClearResistor_t>("hal_pigpioClearResistor")},
+  setPwmDutycycleClient{this->create_client<HalPigpioSetPwmDutycycle_t>(
+      "hal_pigpioSetPwmDutycycle")},
+  setPwmFrequencyClient{this->create_client<HalPigpioSetPwmFrequency_t>(
+      "hal_pigpioSetPwmFrequency")},
+  setGpioHighClient{this->create_client<HalPigpioSetGpioHigh_t>("hal_pigpioSetGpioHigh")},
+  setGpioLowClient{this->create_client<HalPigpioSetGpioLow_t>("hal_pigpioSetGpioLow")},
+  sendTriggerPulseClient{this->create_client<HalPigpioSendTriggerPulse_t>(
+      "hal_pigpioSendTriggerPulse")},
+  readGpioClient{this->create_client<HalPigpioReadGpio_t>("hal_pigpioReadGpio")},
+  setCallbackClient{this->create_client<HalPigpioSetCallback_t>("hal_pigpioSetCallback")},
+  setEncoderCallbackClient{this->create_client<HalPigpioSetEncoderCallback_t>(
+      "hal_pigpioSetEncoderCallback")},
+  pigpioEdgeChangeSub{this->create_subscription<HalPigpioEdgeChangeMsg_t>(
       "gpioEdgeChange",
       1000,
-      std::bind(&PigioCheckerNode::edgeChangeCallback, this, std::placeholders::_1))),
-  pigpioEncoderCountSub(this->create_subscription<HalPigpioEncoderCountMsg_t>(
+      std::bind(&PigioCheckerNode::edgeChangeCallback, this, std::placeholders::_1))},
+  pigpioEncoderCountSub{this->create_subscription<HalPigpioEncoderCountMsg_t>(
       "hal_pigpioEncoderCount",
       1000,
-      std::bind(&PigioCheckerNode::encoderCountCallback, this, std::placeholders::_1))),
-  i2cOpenClient(this->create_client<HalPigpioI2cOpen_t>("hal_pigpioI2cOpen")),
-  i2cCloseClient(this->create_client<HalPigpioI2cClose_t>("hal_pigpioI2cClose")),
-  i2cReadByteDataClient(
-    this->create_client<HalPigpioI2cReadByteData_t>("hal_pigpioI2cReadByteData")),
-  i2cReadWordDataClient(
-    this->create_client<HalPigpioI2cReadWordData_t>("hal_pigpioI2cReadWordData")),
-  i2cReadBlockDataClient(
-    this->create_client<HalPigpioI2cReadBlockData_t>("hal_pigpioI2cReadBlockData")),
-  i2cWriteByteDataClient(
-    this->create_client<HalPigpioI2cWriteByteData_t>("hal_pigpioI2cWriteByteData")),
-  i2cWriteWordDataClient(
-    this->create_client<HalPigpioI2cWriteWordData_t>("hal_pigpioI2cWriteWordData")),
-  i2cWriteBlockDataClient(
-    this->create_client<HalPigpioI2cWriteBlockData_t>("hal_pigpioI2cWriteBlockData")),
-  i2cImuReadingClient(this->create_client<HalPigpioI2cImuReading_t>("hal_pigpioI2cImuReading")),
-  edgeChangeMsg_gpioId(0),
-  edgeChangeMsg_edgeChangeType(EdgeChangeType::undefined),
-  edgeChangeMsg_timeSinceBoot_us(0),
-  motorsEC({})
+      std::bind(&PigioCheckerNode::encoderCountCallback, this, std::placeholders::_1))},
+  i2cOpenClient{this->create_client<HalPigpioI2cOpen_t>("hal_pigpioI2cOpen")},
+  i2cCloseClient{this->create_client<HalPigpioI2cClose_t>("hal_pigpioI2cClose")},
+  i2cReadByteDataClient{
+    this->create_client<HalPigpioI2cReadByteData_t>("hal_pigpioI2cReadByteData")},
+  i2cReadWordDataClient{
+    this->create_client<HalPigpioI2cReadWordData_t>("hal_pigpioI2cReadWordData")},
+  i2cReadBlockDataClient{
+    this->create_client<HalPigpioI2cReadBlockData_t>("hal_pigpioI2cReadBlockData")},
+  i2cWriteByteDataClient{
+    this->create_client<HalPigpioI2cWriteByteData_t>("hal_pigpioI2cWriteByteData")},
+  i2cWriteWordDataClient{
+    this->create_client<HalPigpioI2cWriteWordData_t>("hal_pigpioI2cWriteWordData")},
+  i2cWriteBlockDataClient{
+    this->create_client<HalPigpioI2cWriteBlockData_t>("hal_pigpioI2cWriteBlockData")},
+  i2cImuReadingClient{this->create_client<HalPigpioI2cImuReading_t>("hal_pigpioI2cImuReading")},
+  edgeChangeMsg_gpioId{0},
+  edgeChangeMsg_edgeChangeType{EdgeChangeType::undefined},
+  edgeChangeMsg_timeSinceBoot_us{0},
+  motorsEC{}
 {
 }
 

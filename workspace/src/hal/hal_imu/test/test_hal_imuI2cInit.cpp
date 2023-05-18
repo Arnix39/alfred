@@ -17,12 +17,12 @@
 using namespace std::placeholders;
 
 PigpioDummyNode::PigpioDummyNode()
-: rclcpp::Node("hal_pigpioDummy_node"),
-  piHandle(pigpio_start(NULL, NULL)),
-  i2cOpenService(this->create_service<HalPigpioI2cOpen_t>(
-      "hal_pigpioI2cOpen", std::bind(&PigpioDummyNode::i2cOpen, this, _1, _2))),
-  i2cCloseService(this->create_service<HalPigpioI2cClose_t>(
-      "hal_pigpioI2cClose", std::bind(&PigpioDummyNode::i2cClose, this, _1, _2)))
+: rclcpp::Node{"hal_pigpioDummy_node"},
+  piHandle{pigpio_start(NULL, NULL)},
+  i2cOpenService{this->create_service<HalPigpioI2cOpen_t>(
+      "hal_pigpioI2cOpen", std::bind(&PigpioDummyNode::i2cOpen, this, _1, _2))},
+  i2cCloseService{this->create_service<HalPigpioI2cClose_t>(
+      "hal_pigpioI2cClose", std::bind(&PigpioDummyNode::i2cClose, this, _1, _2))}
 {}
 
 PigpioDummyNode::~PigpioDummyNode()

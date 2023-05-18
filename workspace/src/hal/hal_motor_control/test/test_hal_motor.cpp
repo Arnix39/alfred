@@ -17,22 +17,22 @@
 using namespace std::placeholders;
 
 MotorNode::MotorNode()
-: rclcpp::Node("hal_motor_node"),
-  motorOk(
+: rclcpp::Node{"hal_motor_node"},
+  motorOk{
     GPIO_PWM_CHANNEL_A_M1, GPIO_PWM_CHANNEL_B_M1,
     GPIO_ENCODER_CHANNEL_A_M1, GPIO_ENCODER_CHANNEL_B_M1,
-    MOTOR_ID_1)
+    MOTOR_ID_1}
 {
 }
 
 MotorCheckerNode::MotorCheckerNode()
-: rclcpp::Node("hal_motor_checker_node"),
-  setPwmDutycycleClient(
-    this->create_client<HalPigpioSetPwmDutycycle_t>("hal_pigpioSetPwmDutycycle")),
-  setInputModeClient("setInputModeSyncClientMotorChecker_node"),
-  setOutputModeClient("setOutputModeSyncClientMotorChecker_node"),
-  setEncoderCallbackClient("setEncoderCallbackSyncClientMotorChecker_node"),
-  setPwmFrequencyClient("setPwmFrequencySyncClientMotorChecker_node")
+: rclcpp::Node{"hal_motor_checker_node"},
+  setPwmDutycycleClient{
+    this->create_client<HalPigpioSetPwmDutycycle_t>("hal_pigpioSetPwmDutycycle")},
+  setInputModeClient{"setInputModeSyncClientMotorChecker_node"},
+  setOutputModeClient{"setOutputModeSyncClientMotorChecker_node"},
+  setEncoderCallbackClient{"setEncoderCallbackSyncClientMotorChecker_node"},
+  setPwmFrequencyClient{"setPwmFrequencySyncClientMotorChecker_node"}
 {
 }
 

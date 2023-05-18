@@ -23,7 +23,7 @@ Motor::Motor(
     .encoderCount = 0},
   pwmA{.gpio = gpioPwmChannelA, .dutycycle = 0},
   pwmB{.gpio = gpioPwmChannelB, .dutycycle = 0},
-  id(motorId)
+  id{motorId}
 {
 }
 

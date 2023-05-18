@@ -17,20 +17,20 @@
 using namespace std::placeholders;
 
 HalPigpioDummyNode::HalPigpioDummyNode()
-: rclcpp::Node("hal_pigpio_dummy_node"),
-  piHandle(pigpio_start(NULL, NULL)),
-  callbackId(pigif_bad_callback),
-  setInputModeService(this->create_service<HalPigpioSetInputMode_t>(
-      "hal_pigpioSetInputMode", std::bind(&HalPigpioDummyNode::setInputMode, this, _1, _2))),
-  setOutputModeService(this->create_service<HalPigpioSetOutputMode_t>(
-      "hal_pigpioSetOutputMode", std::bind(&HalPigpioDummyNode::setOutputMode, this, _1, _2))),
-  setPwmDutycycleService(this->create_service<HalPigpioSetPwmDutycycle_t>(
-      "hal_pigpioSetPwmDutycycle", std::bind(&HalPigpioDummyNode::setPwmDutycycle, this, _1, _2))),
-  setPwmFrequencyService(this->create_service<HalPigpioSetPwmFrequency_t>(
-      "hal_pigpioSetPwmFrequency", std::bind(&HalPigpioDummyNode::setPwmFrequency, this, _1, _2))),
-  setEncoderCallbackService(this->create_service<HalPigpioSetEncoderCallback_t>(
+: rclcpp::Node{"hal_pigpio_dummy_node"},
+  piHandle{pigpio_start(NULL, NULL)},
+  callbackId{pigif_bad_callback},
+  setInputModeService{this->create_service<HalPigpioSetInputMode_t>(
+      "hal_pigpioSetInputMode", std::bind(&HalPigpioDummyNode::setInputMode, this, _1, _2))},
+  setOutputModeService{this->create_service<HalPigpioSetOutputMode_t>(
+      "hal_pigpioSetOutputMode", std::bind(&HalPigpioDummyNode::setOutputMode, this, _1, _2))},
+  setPwmDutycycleService{this->create_service<HalPigpioSetPwmDutycycle_t>(
+      "hal_pigpioSetPwmDutycycle", std::bind(&HalPigpioDummyNode::setPwmDutycycle, this, _1, _2))},
+  setPwmFrequencyService{this->create_service<HalPigpioSetPwmFrequency_t>(
+      "hal_pigpioSetPwmFrequency", std::bind(&HalPigpioDummyNode::setPwmFrequency, this, _1, _2))},
+  setEncoderCallbackService{this->create_service<HalPigpioSetEncoderCallback_t>(
       "hal_pigpioSetEncoderCallback",
-      std::bind(&HalPigpioDummyNode::setEncoderCallback, this, _1, _2)))
+      std::bind(&HalPigpioDummyNode::setEncoderCallback, this, _1, _2))}
 {
 }
 

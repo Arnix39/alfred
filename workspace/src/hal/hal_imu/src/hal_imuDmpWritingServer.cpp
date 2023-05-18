@@ -17,11 +17,11 @@
 using namespace std::placeholders;
 
 ImuDmpWritingServer::ImuDmpWritingServer()
-: rclcpp_lifecycle::LifecycleNode("hal_imuDmpWritingServer_node"),
-  imuHandle(MPU6050_I2C_NO_HANDLE),
-  imuGetHandleSyncClient("getHandleSyncClientDmp_node"),
-  i2cWriteByteDataSyncClient("writeByteDataSyncClientDmp_node"),
-  i2cWriteBlockDataSyncClient("writeBlockDataSyncClientDmp_node")
+: rclcpp_lifecycle::LifecycleNode{"hal_imuDmpWritingServer_node"},
+  imuHandle{MPU6050_I2C_NO_HANDLE},
+  imuGetHandleSyncClient{"getHandleSyncClientDmp_node"},
+  i2cWriteByteDataSyncClient{"writeByteDataSyncClientDmp_node"},
+  i2cWriteBlockDataSyncClient{"writeBlockDataSyncClientDmp_node"}
 {
 }
 

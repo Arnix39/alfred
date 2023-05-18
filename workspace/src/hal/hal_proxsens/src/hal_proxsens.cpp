@@ -21,11 +21,11 @@ namespace hal_proxsens
 {
 
 Proxsens::Proxsens()
-: rclcpp_lifecycle::LifecycleNode("hal_proxsens_node"),
-  edgeChangeType(EdgeChangeType::no_change),
-  timestamp(0),
-  echoCallbackId(0),
-  distanceInCm(UINT16_MAX)
+: rclcpp_lifecycle::LifecycleNode{"hal_proxsens_node"},
+  edgeChangeType{EdgeChangeType::no_change},
+  timestamp{0},
+  echoCallbackId{0},
+  distanceInCm{UINT16_MAX}
 {
 }
 
