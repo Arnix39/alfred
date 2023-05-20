@@ -12,12 +12,11 @@
   <!-- Dependencies -->
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <depend>common_utils</depend>
+
+  <build_depend>rclcpp_lifecycle</build_depend>
+  <exec_depend>rclcpp_lifecycle</exec_depend>
   <exec_depend>ros2launch</exec_depend>
-  <exec_depend>hal_camera</exec_depend>
-  <exec_depend>hal_imu</exec_depend>
-  <exec_depend>hal_motor_control</exec_depend>
-  <exec_depend>hal_pigpio</exec_depend>
-  <exec_depend>hal_proxsens</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
