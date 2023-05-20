@@ -15,9 +15,17 @@
 #ifndef HAL_LIFECYCLE_MANAGER_HPP_
 #define HAL_LIFECYCLE_MANAGER_HPP_
 
+#include <map>
+#include <string>
+#include <vector>
+
+#include "lifecycle_msgs/srv/change_state.hpp"
+
 #include "common.hpp"
 
 // Services and messages headers (generated)
+
+using ChangeStatePtr = rclcpp::Client<lifecycle_msgs::srv::ChangeState>::SharedPtr;
 
 class LifecycleManager : public rclcpp_lifecycle::LifecycleNode
 {
@@ -31,6 +39,13 @@ public:
   LifecycleCallbackReturn_t on_cleanup(const rclcpp_lifecycle::State & previous_state);
   LifecycleCallbackReturn_t on_shutdown(const rclcpp_lifecycle::State & previous_state);
   LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
+
+  void createChangeStateClients(std::vector<std::string> nodeList);
+  void changeNodeToState(std::string node, std::uint8_t transition);
+
+private:
+  std::map<std::string, ChangeStatePtr> changeStateClients;
+  std::vector<std::string> nodeList;
 };
 
 #endif  // HAL_LIFECYCLE_MANAGER_HPP_

@@ -46,4 +46,9 @@ install(DIRECTORY
   DESTINATION share/${PROJECT_NAME}/
 )
 
+install(
+  TARGETS ${PROJECT_NAME}_node
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_package()
