@@ -54,6 +54,7 @@ LifecycleCallbackReturn_t ImuDmpWritingServer::on_activate(
 LifecycleCallbackReturn_t ImuDmpWritingServer::on_deactivate(
   const rclcpp_lifecycle::State & previous_state)
 {
+  imuHandle = MPU6050_I2C_NO_HANDLE;
   RCLCPP_INFO(get_logger(), "hal_imuDmpWritingServer node deactivated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;

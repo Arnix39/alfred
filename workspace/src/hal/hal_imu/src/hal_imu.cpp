@@ -66,6 +66,7 @@ LifecycleCallbackReturn_t Imu::on_activate(const rclcpp_lifecycle::State & previ
 
 LifecycleCallbackReturn_t Imu::on_deactivate(const rclcpp_lifecycle::State & previous_state)
 {
+  imuHandle = MPU6050_I2C_NO_HANDLE;
   imuDataPublisher->on_deactivate();
   stopImuReading();
 
@@ -77,7 +78,6 @@ LifecycleCallbackReturn_t Imu::on_deactivate(const rclcpp_lifecycle::State & pre
 LifecycleCallbackReturn_t Imu::on_cleanup(const rclcpp_lifecycle::State & previous_state)
 {
   imuDataPublisher.reset();
-  stopImuReading();
 
   RCLCPP_INFO(get_logger(), "hal_imu node unconfigured!");
 

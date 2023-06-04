@@ -76,6 +76,7 @@ LifecycleCallbackReturn_t Camera::on_shutdown(const rclcpp_lifecycle::State & pr
 {
   imagePublisher.reset();
   imagePublisherTimer.reset();
+  capture.release();
 
   RCLCPP_INFO(get_logger(), "hal_camera node shutdown!");
 
