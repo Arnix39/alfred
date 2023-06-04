@@ -40,11 +40,11 @@ PigioCheckerNode::PigioCheckerNode()
       "hal_pigpioSetEncoderCallback")},
   pigpioEdgeChangeSub{this->create_subscription<HalPigpioEdgeChangeMsg_t>(
       "gpioEdgeChange",
-      1000,
+      10,
       std::bind(&PigioCheckerNode::edgeChangeCallback, this, std::placeholders::_1))},
   pigpioEncoderCountSub{this->create_subscription<HalPigpioEncoderCountMsg_t>(
       "hal_pigpioEncoderCount",
-      1000,
+      10,
       std::bind(&PigioCheckerNode::encoderCountCallback, this, std::placeholders::_1))},
   i2cOpenClient{this->create_client<HalPigpioI2cOpen_t>("hal_pigpioI2cOpen")},
   i2cCloseClient{this->create_client<HalPigpioI2cClose_t>("hal_pigpioI2cClose")},

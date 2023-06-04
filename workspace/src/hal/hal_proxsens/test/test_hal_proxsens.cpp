@@ -48,7 +48,7 @@ public:
     proxsensSub{this->create_subscription
       <hal_proxsens::ProxsensMsg_t>(
         "proximitySensor",
-        1000,
+        10,
         std::bind(&ProxsensCheckerNode::getProxsensDistance, this, _1))},
     changeStateClient{this->create_client<lifecycle_msgs::srv::ChangeState>(
         "hal_proxsens_node/change_state")}

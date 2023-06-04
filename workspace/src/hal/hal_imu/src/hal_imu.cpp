@@ -37,7 +37,7 @@ LifecycleCallbackReturn_t Imu::on_configure(const rclcpp_lifecycle::State & prev
   i2cWriteBlockDataSyncClient.init("hal_pigpioI2cWriteBlockData");
 
   imuSubscriber = this->create_subscription<ImuDataMsg_t>(
-    "hal_pigpioImu", 1000, std::bind(&Imu::imuForwarder, this, _1));
+    "hal_pigpioImu", 10, std::bind(&Imu::imuForwarder, this, _1));
   imuDataPublisher = this->create_publisher<ImuDataMsg_t>("imuData", 1000);
 
   RCLCPP_INFO(get_logger(), "hal_imu node configured!");

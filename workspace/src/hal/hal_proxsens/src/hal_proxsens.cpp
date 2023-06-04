@@ -49,7 +49,7 @@ LifecycleCallbackReturn_t Proxsens::on_configure(const rclcpp_lifecycle::State &
 
   proxsensEdgeChangeSub =
     this->create_subscription<pigpio_msg::HalPigpioEdgeChange>(
-    "gpioEdgeChange", 1000,
+    "gpioEdgeChange", 10,
     std::bind(&Proxsens::edgeChangeCallback, this, _1));
 
   RCLCPP_INFO(get_logger(), "hal_proxsens node configured!");

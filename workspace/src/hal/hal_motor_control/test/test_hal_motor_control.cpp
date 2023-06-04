@@ -21,7 +21,7 @@ MotorControlCheckerNode::MotorControlCheckerNode()
   changeStateClient{this->create_client<lifecycle_msgs::srv::ChangeState>(
       "hal_motorControl_node/change_state")},
   encoderCountSubscriber{this->create_subscription<HalMotorControlMsg_t>(
-      "motorsEncoderCountValue", 1000,
+      "motorsEncoderCountValue", 10,
       std::bind(&MotorControlCheckerNode::encoderCountCallback, this, _1))},
   encoderCounts{0, 0}
 {

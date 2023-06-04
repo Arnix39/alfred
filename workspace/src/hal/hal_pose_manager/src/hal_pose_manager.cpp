@@ -30,9 +30,9 @@ LifecycleCallbackReturn_t HalPoseManager::on_configure(
 {
   odometryPublisher = this->create_publisher<OdometryMsg_t>("odometry", 1000);
   twistSubscriber = this->create_subscription<TwistMsg_t>(
-    "cmd_velocity", 1000, std::bind(&HalPoseManager::wheelsVelocityCommand, this, _1));
+    "cmd_velocity", 10, std::bind(&HalPoseManager::wheelsVelocityCommand, this, _1));
   motorsECSubscriber = this->create_subscription<HalMotorControlMsg_t>(
-    "motorsEncoderCountValue", 1000,
+    "motorsEncoderCountValue", 10,
     std::bind(&HalPoseManager::wheelsVelocityComputation, this, _1));
 
   RCLCPP_INFO(get_logger(), "hal_pose_manager node configured!");
