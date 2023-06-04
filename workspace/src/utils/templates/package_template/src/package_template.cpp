@@ -19,42 +19,48 @@ PackageTemplate::PackageTemplate()
 {
 }
 
-LifecycleCallbackReturn_t PackageTemplate::on_configure(const rclcpp_lifecycle::State & previous_state)
+LifecycleCallbackReturn_t PackageTemplate::on_configure(
+  const rclcpp_lifecycle::State & previous_state)
 {
   RCLCPP_INFO(get_logger(), "package_template node configured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
 
-LifecycleCallbackReturn_t PackageTemplate::on_activate(const rclcpp_lifecycle::State & previous_state)
+LifecycleCallbackReturn_t PackageTemplate::on_activate(
+  const rclcpp_lifecycle::State & previous_state)
 {
   RCLCPP_INFO(get_logger(), "package_template node activated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
 
-LifecycleCallbackReturn_t PackageTemplate::on_deactivate(const rclcpp_lifecycle::State & previous_state)
+LifecycleCallbackReturn_t PackageTemplate::on_deactivate(
+  const rclcpp_lifecycle::State & previous_state)
 {
   RCLCPP_INFO(get_logger(), "package_template node deactivated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
 
-LifecycleCallbackReturn_t PackageTemplate::on_cleanup(const rclcpp_lifecycle::State & previous_state)
+LifecycleCallbackReturn_t PackageTemplate::on_cleanup(
+  const rclcpp_lifecycle::State & previous_state)
 {
   RCLCPP_INFO(get_logger(), "package_template node unconfigured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
 
-LifecycleCallbackReturn_t PackageTemplate::on_shutdown(const rclcpp_lifecycle::State & previous_state)
+LifecycleCallbackReturn_t PackageTemplate::on_shutdown(
+  const rclcpp_lifecycle::State & previous_state)
 {
   RCLCPP_INFO(get_logger(), "package_template node shutdown!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
 
-LifecycleCallbackReturn_t PackageTemplate::on_error(const rclcpp_lifecycle::State & previous_state)
+LifecycleCallbackReturn_t PackageTemplate::on_error(
+  const rclcpp_lifecycle::State & previous_state)
 {
   return LifecycleCallbackReturn_t::FAILURE;
 }
