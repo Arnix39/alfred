@@ -107,7 +107,7 @@ LifecycleCallbackReturn_t Pigpio::on_configure(const rclcpp_lifecycle::State & p
     create_wall_timer(10ms, std::bind(&Pigpio::readImuDataAndPublishMessage, this));
   encoderCountTimer = create_wall_timer(10ms, std::bind(&Pigpio::publishEncoderCount, this));
 
-  RCLCPP_INFO(get_logger(), "hal_pigpio node configured!");
+  RCLCPP_INFO(get_logger(), "Node configured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -118,7 +118,7 @@ LifecycleCallbackReturn_t Pigpio::on_activate(const rclcpp_lifecycle::State & pr
   gpioEncoderCountPub->on_activate();
   imuPublisher->on_activate();
 
-  RCLCPP_INFO(get_logger(), "hal_pigpio node activated!");
+  RCLCPP_INFO(get_logger(), "Node activated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -136,7 +136,7 @@ LifecycleCallbackReturn_t Pigpio::on_deactivate(const rclcpp_lifecycle::State & 
 
   i2cHandle = PI_NO_HANDLE;
 
-  RCLCPP_INFO(get_logger(), "hal_pigpio node deactivated!");
+  RCLCPP_INFO(get_logger(), "Node deactivated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -163,7 +163,7 @@ LifecycleCallbackReturn_t Pigpio::on_cleanup(const rclcpp_lifecycle::State & pre
     pigpioHandle = PI_NO_HANDLE;
   }
 
-  RCLCPP_INFO(get_logger(), "hal_pigpio node unconfigured!");
+  RCLCPP_INFO(get_logger(), "Node unconfigured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -190,7 +190,7 @@ LifecycleCallbackReturn_t Pigpio::on_shutdown(const rclcpp_lifecycle::State & pr
     pigpioHandle = PI_NO_HANDLE;
   }
 
-  RCLCPP_INFO(get_logger(), "hal_pigpio node shutdown!");
+  RCLCPP_INFO(get_logger(), "Node shutdown!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }

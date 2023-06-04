@@ -40,7 +40,7 @@ LifecycleCallbackReturn_t Imu::on_configure(const rclcpp_lifecycle::State & prev
     "hal_pigpioImu", 10, std::bind(&Imu::imuForwarder, this, _1));
   imuDataPublisher = this->create_publisher<ImuDataMsg_t>("imuData", 1000);
 
-  RCLCPP_INFO(get_logger(), "hal_imu node configured!");
+  RCLCPP_INFO(get_logger(), "Node configured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -59,7 +59,7 @@ LifecycleCallbackReturn_t Imu::on_activate(const rclcpp_lifecycle::State & previ
 
   imuDataPublisher->on_activate();
 
-  RCLCPP_INFO(get_logger(), "hal_imu node activated!");
+  RCLCPP_INFO(get_logger(), "Node activated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -70,7 +70,7 @@ LifecycleCallbackReturn_t Imu::on_deactivate(const rclcpp_lifecycle::State & pre
   imuDataPublisher->on_deactivate();
   stopImuReading();
 
-  RCLCPP_INFO(get_logger(), "hal_imu node deactivated!");
+  RCLCPP_INFO(get_logger(), "Node deactivated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -79,7 +79,7 @@ LifecycleCallbackReturn_t Imu::on_cleanup(const rclcpp_lifecycle::State & previo
 {
   imuDataPublisher.reset();
 
-  RCLCPP_INFO(get_logger(), "hal_imu node unconfigured!");
+  RCLCPP_INFO(get_logger(), "Node unconfigured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -89,7 +89,7 @@ LifecycleCallbackReturn_t Imu::on_shutdown(const rclcpp_lifecycle::State & previ
   imuDataPublisher.reset();
   stopImuReading();
 
-  RCLCPP_INFO(get_logger(), "hal_imu node shutdown!");
+  RCLCPP_INFO(get_logger(), "Node shutdown!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }

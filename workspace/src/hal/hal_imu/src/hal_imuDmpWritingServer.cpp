@@ -38,7 +38,7 @@ LifecycleCallbackReturn_t ImuDmpWritingServer::on_configure(
   i2cWriteByteDataSyncClient.init("hal_pigpioI2cWriteByteData");
   i2cWriteBlockDataSyncClient.init("hal_pigpioI2cWriteBlockData");
 
-  RCLCPP_INFO(get_logger(), "hal_imuDmpWritingServer node configured!");
+  RCLCPP_INFO(get_logger(), "Node configured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -55,7 +55,7 @@ LifecycleCallbackReturn_t ImuDmpWritingServer::on_deactivate(
   const rclcpp_lifecycle::State & previous_state)
 {
   imuHandle = MPU6050_I2C_NO_HANDLE;
-  RCLCPP_INFO(get_logger(), "hal_imuDmpWritingServer node deactivated!");
+  RCLCPP_INFO(get_logger(), "Node deactivated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -63,7 +63,7 @@ LifecycleCallbackReturn_t ImuDmpWritingServer::on_deactivate(
 LifecycleCallbackReturn_t ImuDmpWritingServer::on_cleanup(
   const rclcpp_lifecycle::State & previous_state)
 {
-  RCLCPP_INFO(get_logger(), "hal_imuDmpWritingServer node unconfigured!");
+  RCLCPP_INFO(get_logger(), "Node unconfigured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -71,7 +71,7 @@ LifecycleCallbackReturn_t ImuDmpWritingServer::on_cleanup(
 LifecycleCallbackReturn_t ImuDmpWritingServer::on_shutdown(
   const rclcpp_lifecycle::State & previous_state)
 {
-  RCLCPP_INFO(get_logger(), "hal_imuDmpWritingServer node shutdown!");
+  RCLCPP_INFO(get_logger(), "Node shutdown!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }

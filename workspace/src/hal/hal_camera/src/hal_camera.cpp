@@ -34,11 +34,11 @@ LifecycleCallbackReturn_t Camera::on_configure(const rclcpp_lifecycle::State & p
   capture.set(cv::CAP_PROP_FRAME_HEIGHT, static_cast<double>(240));
 
   if (!capture.isOpened()) {
-    RCLCPP_ERROR(get_logger(), "hal_camera node not able to open camera!");
+    RCLCPP_ERROR(get_logger(), "Not able to open camera!");
     return LifecycleCallbackReturn_t::FAILURE;
   }
 
-  RCLCPP_INFO(get_logger(), "hal_camera node configured!");
+  RCLCPP_INFO(get_logger(), "Node configured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -47,7 +47,7 @@ LifecycleCallbackReturn_t Camera::on_activate(const rclcpp_lifecycle::State & pr
 {
   imagePublisher->on_activate();
 
-  RCLCPP_INFO(get_logger(), "hal_camera node activated!");
+  RCLCPP_INFO(get_logger(), "Node activated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -56,7 +56,7 @@ LifecycleCallbackReturn_t Camera::on_deactivate(const rclcpp_lifecycle::State & 
 {
   imagePublisher->on_deactivate();
 
-  RCLCPP_INFO(get_logger(), "hal_camera node deactivated!");
+  RCLCPP_INFO(get_logger(), "Node deactivated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -67,7 +67,7 @@ LifecycleCallbackReturn_t Camera::on_cleanup(const rclcpp_lifecycle::State & pre
   imagePublisherTimer.reset();
   capture.release();
 
-  RCLCPP_INFO(get_logger(), "hal_camera node unconfigured!");
+  RCLCPP_INFO(get_logger(), "Node unconfigured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -78,7 +78,7 @@ LifecycleCallbackReturn_t Camera::on_shutdown(const rclcpp_lifecycle::State & pr
   imagePublisherTimer.reset();
   capture.release();
 
-  RCLCPP_INFO(get_logger(), "hal_camera node shutdown!");
+  RCLCPP_INFO(get_logger(), "Node shutdown!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }

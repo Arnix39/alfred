@@ -50,7 +50,7 @@ LifecycleCallbackReturn_t MotorControl::on_configure(const rclcpp_lifecycle::Sta
 
   encoderCountsTimer = create_wall_timer(10ms, std::bind(&MotorControl::publishMessage, this));
 
-  RCLCPP_INFO(get_logger(), "hal_motor_control node configured!");
+  RCLCPP_INFO(get_logger(), "Node configured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -60,7 +60,7 @@ LifecycleCallbackReturn_t MotorControl::on_activate(const rclcpp_lifecycle::Stat
   activatePublisher();
   configureMotor();
 
-  RCLCPP_INFO(get_logger(), "hal_motor_control node activated!");
+  RCLCPP_INFO(get_logger(), "Node activated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -70,7 +70,7 @@ LifecycleCallbackReturn_t MotorControl::on_deactivate(
 {
   motorControlPub->on_deactivate();
 
-  RCLCPP_INFO(get_logger(), "hal_motor_control node deactivated!");
+  RCLCPP_INFO(get_logger(), "Node deactivated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -80,7 +80,7 @@ LifecycleCallbackReturn_t MotorControl::on_cleanup(const rclcpp_lifecycle::State
   motorControlPub.reset();
   encoderCountsTimer.reset();
 
-  RCLCPP_INFO(get_logger(), "hal_motor_control node unconfigured!");
+  RCLCPP_INFO(get_logger(), "Node unconfigured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -90,7 +90,7 @@ LifecycleCallbackReturn_t MotorControl::on_shutdown(const rclcpp_lifecycle::Stat
   motorControlPub.reset();
   encoderCountsTimer.reset();
 
-  RCLCPP_INFO(get_logger(), "hal_motor_control node shutdown!");
+  RCLCPP_INFO(get_logger(), "Node shutdown!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }

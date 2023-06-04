@@ -35,7 +35,7 @@ LifecycleCallbackReturn_t HalPoseManager::on_configure(
     "motorsEncoderCountValue", 10,
     std::bind(&HalPoseManager::wheelsVelocityComputation, this, _1));
 
-  RCLCPP_INFO(get_logger(), "hal_pose_manager node configured!");
+  RCLCPP_INFO(get_logger(), "Node configured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -45,7 +45,7 @@ LifecycleCallbackReturn_t HalPoseManager::on_activate(
 {
   odometryPublisher->on_activate();
 
-  RCLCPP_INFO(get_logger(), "hal_pose_manager node activated!");
+  RCLCPP_INFO(get_logger(), "Node activated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -55,7 +55,7 @@ LifecycleCallbackReturn_t HalPoseManager::on_deactivate(
 {
   odometryPublisher->on_deactivate();
 
-  RCLCPP_INFO(get_logger(), "hal_pose_manager node deactivated!");
+  RCLCPP_INFO(get_logger(), "Node deactivated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -64,7 +64,7 @@ LifecycleCallbackReturn_t HalPoseManager::on_cleanup(const rclcpp_lifecycle::Sta
 {
   odometryPublisher.reset();
 
-  RCLCPP_INFO(get_logger(), "hal_pose_manager node unconfigured!");
+  RCLCPP_INFO(get_logger(), "Node unconfigured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -74,7 +74,7 @@ LifecycleCallbackReturn_t HalPoseManager::on_shutdown(
 {
   odometryPublisher.reset();
 
-  RCLCPP_INFO(get_logger(), "hal_pose_manager node shutdown!");
+  RCLCPP_INFO(get_logger(), "Node shutdown!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }

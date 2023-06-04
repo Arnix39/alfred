@@ -31,7 +31,7 @@ LifecycleCallbackReturn_t ImuI2cInit::on_configure(const rclcpp_lifecycle::State
   getHandleService = this->create_service<HalImuGetHandle_t>(
     "hal_imuGetHandle", std::bind(&ImuI2cInit::getHandle, this, _1, _2));
 
-  RCLCPP_INFO(get_logger(), "hal_imuI2cInit node configured!");
+  RCLCPP_INFO(get_logger(), "Node configured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -40,7 +40,7 @@ LifecycleCallbackReturn_t ImuI2cInit::on_activate(const rclcpp_lifecycle::State 
 {
   initI2cCommunication();
 
-  RCLCPP_INFO(get_logger(), "hal_imuI2cInit node activated!");
+  RCLCPP_INFO(get_logger(), "Node activated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -61,14 +61,14 @@ LifecycleCallbackReturn_t ImuI2cInit::on_deactivate(const rclcpp_lifecycle::Stat
 
   imuHandle = MPU6050_I2C_NO_HANDLE;
 
-  RCLCPP_INFO(get_logger(), "hal_imuI2cInit node deactivated!");
+  RCLCPP_INFO(get_logger(), "Node deactivated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
 
 LifecycleCallbackReturn_t ImuI2cInit::on_cleanup(const rclcpp_lifecycle::State & previous_state)
 {
-  RCLCPP_INFO(get_logger(), "hal_imuI2cInit node unconfigured!");
+  RCLCPP_INFO(get_logger(), "Node unconfigured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -91,7 +91,7 @@ LifecycleCallbackReturn_t ImuI2cInit::on_shutdown(const rclcpp_lifecycle::State 
     imuHandle = MPU6050_I2C_NO_HANDLE;
   }
 
-  RCLCPP_INFO(get_logger(), "hal_imuI2cInit node shutdown!");
+  RCLCPP_INFO(get_logger(), "Node shutdown!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }

@@ -22,7 +22,7 @@ PackageTemplate::PackageTemplate()
 LifecycleCallbackReturn_t PackageTemplate::on_configure(
   const rclcpp_lifecycle::State & previous_state)
 {
-  RCLCPP_INFO(get_logger(), "package_template node configured!");
+  RCLCPP_INFO(get_logger(), "Node configured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -30,7 +30,7 @@ LifecycleCallbackReturn_t PackageTemplate::on_configure(
 LifecycleCallbackReturn_t PackageTemplate::on_activate(
   const rclcpp_lifecycle::State & previous_state)
 {
-  RCLCPP_INFO(get_logger(), "package_template node activated!");
+  RCLCPP_INFO(get_logger(), "Node activated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -38,7 +38,7 @@ LifecycleCallbackReturn_t PackageTemplate::on_activate(
 LifecycleCallbackReturn_t PackageTemplate::on_deactivate(
   const rclcpp_lifecycle::State & previous_state)
 {
-  RCLCPP_INFO(get_logger(), "package_template node deactivated!");
+  RCLCPP_INFO(get_logger(), "Node deactivated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -46,7 +46,7 @@ LifecycleCallbackReturn_t PackageTemplate::on_deactivate(
 LifecycleCallbackReturn_t PackageTemplate::on_cleanup(
   const rclcpp_lifecycle::State & previous_state)
 {
-  RCLCPP_INFO(get_logger(), "package_template node unconfigured!");
+  RCLCPP_INFO(get_logger(), "Node unconfigured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -54,7 +54,7 @@ LifecycleCallbackReturn_t PackageTemplate::on_cleanup(
 LifecycleCallbackReturn_t PackageTemplate::on_shutdown(
   const rclcpp_lifecycle::State & previous_state)
 {
-  RCLCPP_INFO(get_logger(), "package_template node shutdown!");
+  RCLCPP_INFO(get_logger(), "Node shutdown!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
