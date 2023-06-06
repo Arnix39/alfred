@@ -17,7 +17,9 @@ set(dependencies
   rclcpp_lifecycle
   common_utils)
 
-add_library(${PROJECT_NAME} OBJECT src/hal_lifecycle_manager.cpp)
+add_library(${PROJECT_NAME} OBJECT
+  src/hal_lifecycle_manager_callbacks.cpp
+  src/hal_lifecycle_manager.cpp)
 ament_target_dependencies(${PROJECT_NAME} ${dependencies})
 
 add_executable(${PROJECT_NAME}_node

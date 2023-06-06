@@ -18,15 +18,16 @@ LifecycleManager::LifecycleManager()
 : rclcpp_lifecycle::LifecycleNode{"hal_lifecycle_manager"},
   changeStateClients{}
 {
-  declare_parameter("node_list", rclcpp::PARAMETER_STRING_ARRAY);
-  nodeList = get_parameter("node_list").as_string_array();
+  // declare_parameter("node_list", rclcpp::PARAMETER_STRING_ARRAY);
+  // nodeList = get_parameter("node_list").as_string_array();
 }
 
 LifecycleCallbackReturn_t LifecycleManager::on_configure(
   const rclcpp_lifecycle::State & previous_state)
 {
   createChangeStateClients(nodeList);
-  RCLCPP_INFO(get_logger(), "hal_lifecycle_manager node configured!");
+  createChangeStateSubscriptions(nodeList);
+  RCLCPP_INFO(get_logger(), "Node configured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -34,7 +35,8 @@ LifecycleCallbackReturn_t LifecycleManager::on_configure(
 LifecycleCallbackReturn_t LifecycleManager::on_activate(
   const rclcpp_lifecycle::State & previous_state)
 {
-  RCLCPP_INFO(get_logger(), "hal_lifecycle_manager node activated!");
+  changeNodeToState("hal_pigpio", lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE);
+  RCLCPP_INFO(get_logger(), "Node activated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -42,8 +44,7 @@ LifecycleCallbackReturn_t LifecycleManager::on_activate(
 LifecycleCallbackReturn_t LifecycleManager::on_deactivate(
   const rclcpp_lifecycle::State & previous_state)
 {
-  changeStateClients.clear();
-  RCLCPP_INFO(get_logger(), "hal_lifecycle_manager node deactivated!");
+  RCLCPP_INFO(get_logger(), "Node deactivated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -51,7 +52,9 @@ LifecycleCallbackReturn_t LifecycleManager::on_deactivate(
 LifecycleCallbackReturn_t LifecycleManager::on_cleanup(
   const rclcpp_lifecycle::State & previous_state)
 {
-  RCLCPP_INFO(get_logger(), "hal_lifecycle_manager node unconfigured!");
+  changeStateClients.clear();
+  changeStateSubscriptions.clear();
+  RCLCPP_INFO(get_logger(), "Node unconfigured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -59,7 +62,9 @@ LifecycleCallbackReturn_t LifecycleManager::on_cleanup(
 LifecycleCallbackReturn_t LifecycleManager::on_shutdown(
   const rclcpp_lifecycle::State & previous_state)
 {
-  RCLCPP_INFO(get_logger(), "hal_lifecycle_manager node shutdown!");
+  changeStateClients.clear();
+  changeStateSubscriptions.clear();
+  RCLCPP_INFO(get_logger(), "Node shutdown!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
@@ -75,6 +80,19 @@ void LifecycleManager::createChangeStateClients(std::vector<std::string> nodeLis
     changeStateClients.emplace(
       std::make_pair(
         node, this->create_client<lifecycle_msgs::srv::ChangeState>(node + "/change_state")));
+  }
+}
+
+void LifecycleManager::createChangeStateSubscriptions(std::vector<std::string> nodeList)
+{
+  for (auto node : nodeList) {
+    changeStateSubscriptions.emplace(
+      std::make_pair(
+        node,
+        this->create_subscription<lifecycle_msgs::msg::TransitionEvent>(
+          node + "/transition_event",
+          10,
+          transitionCallbacks.find(node)->second)));
   }
 }
 

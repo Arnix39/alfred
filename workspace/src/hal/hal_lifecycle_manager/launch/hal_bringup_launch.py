@@ -24,20 +24,10 @@ import lifecycle_msgs.msg
 
 
 def generate_launch_description():
-    lifecycle_nodes = ['hal_pigpio_node',
-                       'hal_camera_node',
-                       'hal_proxsens_node',
-                       'hal_imuI2cInit_node',
-                       'hal_imuDmpWritingServer_node',
-                       'hal_imu_node',
-                       'hal_motor_control_node',
-                       'hal_pose_manager_node']
-
     hal_lifecycle_manager_node = launch_ros.actions.LifecycleNode(
                 name='hal_lifecycle_manager',
                 package='hal_lifecycle_manager',
                 executable='hal_lifecycle_manager_node',
-                parameters=[{'node_list': lifecycle_nodes}],
                 namespace='',
                 output='screen')
 
@@ -107,7 +97,7 @@ def generate_launch_description():
             hal_imuDmpWritingServer_node,
             hal_imu_node,
             hal_motor_control_node,
-            hal_pose_manager_node
+            hal_pose_manager_node,
         ]
     )
 
@@ -118,8 +108,23 @@ def generate_launch_description():
         )
     )
 
+    register_event_handler_for_lifecycle_manager_reaches_inactive_state = \
+        launch.actions.RegisterEventHandler(
+            launch_ros.event_handlers.OnStateTransition(
+                target_lifecycle_node=hal_lifecycle_manager_node, goal_state='inactive',
+                entities=[
+                    launch.actions.EmitEvent(event=launch_ros.events.lifecycle.ChangeState(
+                        lifecycle_node_matcher=launch.events.matches_action(
+                            hal_lifecycle_manager_node),
+                        transition_id=lifecycle_msgs.msg.Transition.TRANSITION_ACTIVATE,
+                    )),
+                ],
+            )
+        )
+
     ld = launch.LaunchDescription()
     ld.add_action(load_nodes)
     ld.add_action(emit_event_to_request_lifecycle_manager_configure_transition)
+    ld.add_action(register_event_handler_for_lifecycle_manager_reaches_inactive_state)
 
     return ld
