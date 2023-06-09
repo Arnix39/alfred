@@ -42,7 +42,7 @@ LifecycleCallbackReturn_t Proxsens::on_configure(const rclcpp_lifecycle::State &
   gpioSetGpioHighClient =
     this->create_client<pigpio_srv::HalPigpioSetGpioHigh>("hal_pigpioSetGpioHigh");
 
-  proxsensDistancePub = this->create_publisher<ProxsensMsg_t>("proximitySensor", 1000);
+  proxsensDistancePub = this->create_publisher<ProxsensMsg_t>("proximitySensor", 10);
 
   proxsensDistancePubTimer =
     create_wall_timer(100ms, std::bind(&Proxsens::publishAndGetDistance, this));

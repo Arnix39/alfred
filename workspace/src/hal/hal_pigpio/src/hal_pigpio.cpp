@@ -98,10 +98,10 @@ LifecycleCallbackReturn_t Pigpio::on_configure(const rclcpp_lifecycle::State & p
     "hal_pigpioSendTriggerPulse", std::bind(&Pigpio::sendTriggerPulse, this, _1, _2));
 
   gpioEdgeChangePub = this->create_publisher<HalPigpioEdgeChangeMsg_t>(
-    "gpioEdgeChange", 1000);
+    "gpioEdgeChange", 10);
   gpioEncoderCountPub = this->create_publisher<HalPigpioEncoderCountMsg_t>(
-    "hal_pigpioEncoderCount", 1000);
-  imuPublisher = this->create_publisher<HalPigpioImuMsg_t>("hal_pigpioImu", 1000);
+    "hal_pigpioEncoderCount", 10);
+  imuPublisher = this->create_publisher<HalPigpioImuMsg_t>("hal_pigpioImu", 10);
 
   readImuDataAndPublishMessageTimer =
     create_wall_timer(10ms, std::bind(&Pigpio::readImuDataAndPublishMessage, this));

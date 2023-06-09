@@ -28,7 +28,7 @@ HalPoseManager::HalPoseManager()
 LifecycleCallbackReturn_t HalPoseManager::on_configure(
   const rclcpp_lifecycle::State & previous_state)
 {
-  odometryPublisher = this->create_publisher<OdometryMsg_t>("odometry", 1000);
+  odometryPublisher = this->create_publisher<OdometryMsg_t>("odometry", 10);
   twistSubscriber = this->create_subscription<TwistMsg_t>(
     "cmd_velocity", 10, std::bind(&HalPoseManager::wheelsVelocityCommand, this, _1));
   motorsECSubscriber = this->create_subscription<HalMotorControlMsg_t>(

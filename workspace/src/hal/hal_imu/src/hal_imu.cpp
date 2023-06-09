@@ -38,7 +38,7 @@ LifecycleCallbackReturn_t Imu::on_configure(const rclcpp_lifecycle::State & prev
 
   imuSubscriber = this->create_subscription<ImuDataMsg_t>(
     "hal_pigpioImu", 10, std::bind(&Imu::imuForwarder, this, _1));
-  imuDataPublisher = this->create_publisher<ImuDataMsg_t>("imuData", 1000);
+  imuDataPublisher = this->create_publisher<ImuDataMsg_t>("imuData", 10);
 
   RCLCPP_INFO(get_logger(), "Node configured!");
 
