@@ -194,6 +194,9 @@
             "options": {
                 "cwd": "${workspaceFolder}"
             },
+            "dependsOn": [
+                "ROS2: Build workspace for target",
+            ],
             "command": "rsync",
             "args": [
                 "--delete",
