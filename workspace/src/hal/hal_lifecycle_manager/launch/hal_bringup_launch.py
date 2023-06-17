@@ -122,9 +122,168 @@ def generate_launch_description():
             )
         )
 
+    register_event_handler_for_lifecycle_manager_reaches_active_state = \
+        launch.actions.RegisterEventHandler(
+            launch_ros.event_handlers.OnStateTransition(
+                target_lifecycle_node=hal_lifecycle_manager_node, goal_state='active',
+                entities=[
+                    launch.actions.EmitEvent(event=launch_ros.events.lifecycle.ChangeState(
+                        lifecycle_node_matcher=launch.events.matches_action(
+                            hal_pigpio_node),
+                        transition_id=lifecycle_msgs.msg.Transition.TRANSITION_CONFIGURE,
+                    )),
+                    launch.actions.EmitEvent(event=launch_ros.events.lifecycle.ChangeState(
+                        lifecycle_node_matcher=launch.events.matches_action(
+                            hal_camera_node),
+                        transition_id=lifecycle_msgs.msg.Transition.TRANSITION_CONFIGURE,
+                    )),
+                    launch.actions.EmitEvent(event=launch_ros.events.lifecycle.ChangeState(
+                        lifecycle_node_matcher=launch.events.matches_action(
+                            hal_proxsens_node),
+                        transition_id=lifecycle_msgs.msg.Transition.TRANSITION_CONFIGURE,
+                    )),
+                    launch.actions.EmitEvent(event=launch_ros.events.lifecycle.ChangeState(
+                        lifecycle_node_matcher=launch.events.matches_action(
+                            hal_imuI2cInit_node),
+                        transition_id=lifecycle_msgs.msg.Transition.TRANSITION_CONFIGURE,
+                    )),
+                    launch.actions.EmitEvent(event=launch_ros.events.lifecycle.ChangeState(
+                        lifecycle_node_matcher=launch.events.matches_action(
+                            hal_imuDmpWritingServer_node),
+                        transition_id=lifecycle_msgs.msg.Transition.TRANSITION_CONFIGURE,
+                    )),
+                    launch.actions.EmitEvent(event=launch_ros.events.lifecycle.ChangeState(
+                        lifecycle_node_matcher=launch.events.matches_action(
+                            hal_imu_node),
+                        transition_id=lifecycle_msgs.msg.Transition.TRANSITION_CONFIGURE,
+                    )),
+                    launch.actions.EmitEvent(event=launch_ros.events.lifecycle.ChangeState(
+                        lifecycle_node_matcher=launch.events.matches_action(
+                            hal_motor_control_node),
+                        transition_id=lifecycle_msgs.msg.Transition.TRANSITION_CONFIGURE,
+                    )),
+                    launch.actions.EmitEvent(event=launch_ros.events.lifecycle.ChangeState(
+                        lifecycle_node_matcher=launch.events.matches_action(
+                            hal_pose_manager_node),
+                        transition_id=lifecycle_msgs.msg.Transition.TRANSITION_CONFIGURE,
+                    )),
+                ],
+            )
+        )
+
+    register_event_handler_for_hal_camera_reaches_inactive_state = \
+        launch.actions.RegisterEventHandler(
+            launch_ros.event_handlers.OnStateTransition(
+                target_lifecycle_node=hal_camera_node, goal_state='inactive',
+                entities=[
+                    launch.actions.LogInfo(
+                        msg="hal_camera_node inactive, activating."),
+                    launch.actions.EmitEvent(event=launch_ros.events.lifecycle.ChangeState(
+                        lifecycle_node_matcher=launch.events.matches_action(hal_camera_node),
+                        transition_id=lifecycle_msgs.msg.Transition.TRANSITION_ACTIVATE,
+                    )),
+                ],
+            )
+        )
+
+    register_event_handler_for_hal_pigpio_reaches_inactive_state = \
+        launch.actions.RegisterEventHandler(
+            launch_ros.event_handlers.OnStateTransition(
+                target_lifecycle_node=hal_pigpio_node, goal_state='inactive',
+                entities=[
+                    launch.actions.LogInfo(
+                        msg="hal_pigpio_node inactive, activating."),
+                    launch.actions.EmitEvent(event=launch_ros.events.lifecycle.ChangeState(
+                        lifecycle_node_matcher=launch.events.matches_action(hal_pigpio_node),
+                        transition_id=lifecycle_msgs.msg.Transition.TRANSITION_ACTIVATE,
+                    )),
+                ],
+            )
+        )
+
+    register_event_handler_for_hal_pigpio_reaches_active_state = \
+        launch.actions.RegisterEventHandler(
+            launch_ros.event_handlers.OnStateTransition(
+                target_lifecycle_node=hal_pigpio_node, goal_state='active',
+                entities=[
+                    launch.actions.LogInfo(
+                        msg="hal_pigpio_node active, activating hal_proxsens_node, " +
+                            "hal_imuI2cInit_node and hal_motor_control_node."),
+                    launch.actions.EmitEvent(event=launch_ros.events.lifecycle.ChangeState(
+                        lifecycle_node_matcher=launch.events.matches_action(hal_proxsens_node),
+                        transition_id=lifecycle_msgs.msg.Transition.TRANSITION_ACTIVATE,
+                    )),
+                    launch.actions.EmitEvent(event=launch_ros.events.lifecycle.ChangeState(
+                        lifecycle_node_matcher=launch.events.matches_action(hal_imuI2cInit_node),
+                        transition_id=lifecycle_msgs.msg.Transition.TRANSITION_ACTIVATE,
+                    )),
+                    launch.actions.EmitEvent(event=launch_ros.events.lifecycle.ChangeState(
+                        lifecycle_node_matcher=launch.events.matches_action(
+                            hal_motor_control_node),
+                        transition_id=lifecycle_msgs.msg.Transition.TRANSITION_ACTIVATE,
+                    ))
+                ],
+            )
+        )
+
+    register_event_handler_for_hal_imuI2cInit_reaches_active_state = \
+        launch.actions.RegisterEventHandler(
+            launch_ros.event_handlers.OnStateTransition(
+                target_lifecycle_node=hal_imuI2cInit_node, goal_state='active',
+                entities=[
+                    launch.actions.LogInfo(
+                        msg="hal_imuI2cInit_node active, " +
+                            "activating hal_imuDmpWritingServer_node."),
+                    launch.actions.EmitEvent(event=launch_ros.events.lifecycle.ChangeState(
+                        lifecycle_node_matcher=launch.events.matches_action(
+                            hal_imuDmpWritingServer_node),
+                        transition_id=lifecycle_msgs.msg.Transition.TRANSITION_ACTIVATE,
+                    )),
+                ],
+            )
+        )
+
+    register_event_handler_for_hal_imuDmpWritingServer_reaches_active_state = \
+        launch.actions.RegisterEventHandler(
+            launch_ros.event_handlers.OnStateTransition(
+                target_lifecycle_node=hal_imuDmpWritingServer_node, goal_state='active',
+                entities=[
+                    launch.actions.LogInfo(
+                        msg="hal_imuDmpWritingServer_node active, activating hal_imu_node."),
+                    launch.actions.EmitEvent(event=launch_ros.events.lifecycle.ChangeState(
+                        lifecycle_node_matcher=launch.events.matches_action(hal_imu_node),
+                        transition_id=lifecycle_msgs.msg.Transition.TRANSITION_ACTIVATE,
+                    )),
+                ],
+            )
+        )
+
+    register_event_handler_for_hal_imu_reaches_active_state = \
+        launch.actions.RegisterEventHandler(
+            launch_ros.event_handlers.OnStateTransition(
+                target_lifecycle_node=hal_imu_node, goal_state='active',
+                entities=[
+                    launch.actions.LogInfo(
+                        msg="hal_imu_node active, activating hal_pose_manager_node."),
+                    launch.actions.EmitEvent(event=launch_ros.events.lifecycle.ChangeState(
+                        lifecycle_node_matcher=launch.events.matches_action(hal_pose_manager_node),
+                        transition_id=lifecycle_msgs.msg.Transition.TRANSITION_ACTIVATE,
+                    )),
+                ],
+            )
+        )
+
     ld = launch.LaunchDescription()
     ld.add_action(load_nodes)
-    ld.add_action(emit_event_to_request_lifecycle_manager_configure_transition)
     ld.add_action(register_event_handler_for_lifecycle_manager_reaches_inactive_state)
+    ld.add_action(register_event_handler_for_lifecycle_manager_reaches_active_state)
+    ld.add_action(register_event_handler_for_hal_camera_reaches_inactive_state)
+    ld.add_action(register_event_handler_for_hal_pigpio_reaches_inactive_state)
+    ld.add_action(register_event_handler_for_hal_pigpio_reaches_active_state)
+    ld.add_action(register_event_handler_for_hal_imuI2cInit_reaches_active_state)
+    ld.add_action(register_event_handler_for_hal_imuDmpWritingServer_reaches_active_state)
+    ld.add_action(register_event_handler_for_hal_imu_reaches_active_state)
+
+    ld.add_action(emit_event_to_request_lifecycle_manager_configure_transition)
 
     return ld

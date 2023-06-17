@@ -5,3 +5,4 @@ workspace/log/
 workspace/cross_compile/qemu-user-static
 workspace/cross_compile/sysroot
 workspace/cross_compile/workspace
+workspace/src/hal/hal_lifecycle_manager/launch/hal_bringup_host_launch.py
