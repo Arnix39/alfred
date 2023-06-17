@@ -243,7 +243,7 @@ void Proxsens::enableOutputLevelShifter(void)
   auto setGpioHighCallback = [this](SetGpioHighFuture_t future)
     {
       if (!future.get()->has_succeeded) {
-        RCLCPP_ERROR(get_logger(), "Failed to call service sendTriggerPulse");
+        RCLCPP_ERROR(get_logger(), "Failed to call service setGpioHigh");
       }
     };
   auto setGpioHighResult =

@@ -129,7 +129,7 @@ void Pigpio::readAccelerometerData()
   char accelerometerData[MPU6050_DATA_SIZE];
 
   if (i2c_read_i2c_block_data(
-      pigpioHandle, i2cHandle, MPU6050_ACCELEROMETER_X_OFFSET_MSB_REGISTER, accelerometerData,
+      pigpioHandle, i2cHandle, MPU6050_ACCELEROMETER_X_OUT_MSB_REGISTER, accelerometerData,
       MPU6050_DATA_SIZE) == MPU6050_DATA_SIZE)
   {
     linearAcceleration_ = computeImuData(accelerometerData);
@@ -144,7 +144,7 @@ void Pigpio::readGyroscopeData()
   char gyroscopeData[MPU6050_DATA_SIZE];
 
   if (i2c_read_i2c_block_data(
-      pigpioHandle, i2cHandle, MPU6050_GYROSCOPE_X_OFFSET_MSB_REGISTER, gyroscopeData,
+      pigpioHandle, i2cHandle, MPU6050_GYROSCOPE_X_OUT_MSB_REGISTER, gyroscopeData,
       MPU6050_DATA_SIZE) == MPU6050_DATA_SIZE)
   {
     angularVelocity_ = computeImuData(gyroscopeData);
