@@ -23,14 +23,16 @@
 #include "nav_msgs/msg/odometry.hpp"
 #include "geometry_msgs/msg/twist_with_covariance.hpp"
 #include "std_msgs/msg/header.hpp"
-#include "hal_motor_control_interfaces/msg/hal_motor_control.hpp"
+#include "hal_motor_control_interfaces/msg/hal_motor_control_encoders.hpp"
+#include "hal_motor_control_interfaces/msg/hal_motor_control_command.hpp"
 
 #define MS_TO_NS 1000000
 
 using OdometryMsg_t = nav_msgs::msg::Odometry;
 using TwistMsg_t = geometry_msgs::msg::TwistWithCovariance;
 using HeaderMsg_t = std_msgs::msg::Header;
-using HalMotorControlMsg_t = hal_motor_control_interfaces::msg::HalMotorControl;
+using HalMotorControlEncodersMsg_t = hal_motor_control_interfaces::msg::HalMotorControlEncoders;
+using HalMotorControlCommandMsg_t = hal_motor_control_interfaces::msg::HalMotorControlCommand;
 
 struct EncodersCount
 {
@@ -52,7 +54,7 @@ class HalPoseManager : public rclcpp_lifecycle::LifecycleNode
 private:
   rclcpp_lifecycle::LifecyclePublisher<OdometryMsg_t>::SharedPtr odometryPublisher;
   rclcpp::Subscription<TwistMsg_t>::SharedPtr twistSubscriber;
-  rclcpp::Subscription<HalMotorControlMsg_t>::SharedPtr motorsECSubscriber;
+  rclcpp::Subscription<HalMotorControlEncodersMsg_t>::SharedPtr motorsECSubscriber;
 
   EncodersCount encodersCount;
   WheelsVelocity wheelsVelocity;
@@ -69,7 +71,7 @@ public:
   LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
 
   void wheelsVelocityCommand(const TwistMsg_t & msg);
-  void wheelsVelocityComputation(const HalMotorControlMsg_t & msg);
+  void wheelsVelocityComputation(const HalMotorControlEncodersMsg_t & msg);
 };
 
 #endif  // HAL_POSE_MANAGER_HPP_

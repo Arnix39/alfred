@@ -36,7 +36,7 @@ private:
 
   rclcpp::Client<HalPigpioSetPwmDutycycle_t>::SharedPtr gpioSetPwmDutycycleClient;
 
-  rclcpp_lifecycle::LifecyclePublisher<HalMotorControlMsg_t>::SharedPtr motorControlPub;
+  rclcpp_lifecycle::LifecyclePublisher<HalMotorControlEncodersMsg_t>::SharedPtr motorControlPub;
 
   rclcpp::Subscription<HalPigpioEncoderCountMsg_t>::SharedPtr motorControlECSub;
 

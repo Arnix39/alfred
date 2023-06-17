@@ -20,7 +20,7 @@ MotorControlCheckerNode::MotorControlCheckerNode()
 : rclcpp::Node{"hal_motor_control_checker_node"},
   changeStateClient{this->create_client<lifecycle_msgs::srv::ChangeState>(
       "hal_motorControl_node/change_state")},
-  encoderCountSubscriber{this->create_subscription<HalMotorControlMsg_t>(
+  encoderCountSubscriber{this->create_subscription<HalMotorControlEncodersMsg_t>(
       "motorsEncoderCountValue", 10,
       std::bind(&MotorControlCheckerNode::encoderCountCallback, this, _1))},
   encoderCounts{0, 0}
@@ -34,7 +34,7 @@ void MotorControlCheckerNode::changeMotorControlNodeToState(std::uint8_t transit
   auto result = changeStateClient->async_send_request(request);
 }
 
-void MotorControlCheckerNode::encoderCountCallback(const HalMotorControlMsg_t & msg)
+void MotorControlCheckerNode::encoderCountCallback(const HalMotorControlEncodersMsg_t & msg)
 {
   encoderCounts.at(0) = msg.motor_left_encoder_count;
   encoderCounts.at(1) = msg.motor_right_encoder_count;

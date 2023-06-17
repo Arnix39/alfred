@@ -31,7 +31,7 @@ LifecycleCallbackReturn_t HalPoseManager::on_configure(
   odometryPublisher = this->create_publisher<OdometryMsg_t>("odometry", 10);
   twistSubscriber = this->create_subscription<TwistMsg_t>(
     "cmd_velocity", 10, std::bind(&HalPoseManager::wheelsVelocityCommand, this, _1));
-  motorsECSubscriber = this->create_subscription<HalMotorControlMsg_t>(
+  motorsECSubscriber = this->create_subscription<HalMotorControlEncodersMsg_t>(
     "motorsEncoderCountValue", 10,
     std::bind(&HalPoseManager::wheelsVelocityComputation, this, _1));
 
@@ -86,7 +86,7 @@ LifecycleCallbackReturn_t HalPoseManager::on_error(const rclcpp_lifecycle::State
 
 void HalPoseManager::wheelsVelocityCommand(const TwistMsg_t & msg) {}
 
-void HalPoseManager::wheelsVelocityComputation(const HalMotorControlMsg_t & msg)
+void HalPoseManager::wheelsVelocityComputation(const HalMotorControlEncodersMsg_t & msg)
 {
   int32_t encoderCountDelta = 0;
   int32_t timeDelta = msg.header.stamp.nanosec - encodersCount.timestampNs;

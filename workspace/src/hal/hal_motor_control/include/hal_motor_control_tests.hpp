@@ -31,12 +31,12 @@ public:
   ~MotorControlCheckerNode() = default;
 
   rclcpp::Client<lifecycle_msgs::srv::ChangeState>::SharedPtr changeStateClient;
-  rclcpp::Subscription<HalMotorControlMsg_t>::SharedPtr encoderCountSubscriber;
+  rclcpp::Subscription<HalMotorControlEncodersMsg_t>::SharedPtr encoderCountSubscriber;
 
   std::vector<int32_t> encoderCounts;
 
   void changeMotorControlNodeToState(std::uint8_t transition);
-  void encoderCountCallback(const HalMotorControlMsg_t & msg);
+  void encoderCountCallback(const HalMotorControlEncodersMsg_t & msg);
 };
 
 /* Test fixture */

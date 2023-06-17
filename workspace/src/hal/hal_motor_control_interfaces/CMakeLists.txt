@@ -9,7 +9,8 @@ find_package(std_msgs REQUIRED)
 ## Generate ROS messages, services and actions ##
 #################################################
 rosidl_generate_interfaces(${PROJECT_NAME}
-  msg/HalMotorControl.msg
+  msg/HalMotorControlEncoders.msg
+  msg/HalMotorControlCommand.msg
   DEPENDENCIES std_msgs
 )
 

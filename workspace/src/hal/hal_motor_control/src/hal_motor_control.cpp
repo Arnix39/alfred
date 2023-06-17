@@ -42,7 +42,7 @@ LifecycleCallbackReturn_t MotorControl::on_configure(const rclcpp_lifecycle::Sta
   gpioSetPwmDutycycleClient =
     this->create_client<HalPigpioSetPwmDutycycle_t>("hal_pigpioSetPwmDutycycle");
 
-  motorControlPub = this->create_publisher<HalMotorControlMsg_t>(
+  motorControlPub = this->create_publisher<HalMotorControlEncodersMsg_t>(
     "motorsEncoderCountValue", 10);
 
   motorControlECSub = this->create_subscription<HalPigpioEncoderCountMsg_t>(
@@ -131,7 +131,7 @@ void MotorControl::pigpioEncoderCountCallback(
 
 void MotorControl::publishMessage(void)
 {
-  auto encoderCounts = HalMotorControlMsg_t();
+  auto encoderCounts = HalMotorControlEncodersMsg_t();
   auto header = HeaderMsg_t();
 
   header.stamp = rclcpp::Clock().now();

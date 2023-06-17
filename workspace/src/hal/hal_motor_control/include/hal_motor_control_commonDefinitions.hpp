@@ -18,7 +18,7 @@
 #include "common.hpp"
 
 // Services and messages headers (generated)
-#include "hal_motor_control_interfaces/msg/hal_motor_control.hpp"
+#include "hal_motor_control_interfaces/msg/hal_motor_control_encoders.hpp"
 #include "hal_pigpio_interfaces/msg/hal_pigpio_encoder_count.hpp"
 #include "hal_pigpio_interfaces/srv/hal_pigpio_set_input_mode.hpp"
 #include "hal_pigpio_interfaces/srv/hal_pigpio_set_output_mode.hpp"
@@ -40,7 +40,7 @@
 
 #define MOTOR_PWM_FREQUENCY 1000
 
-using HalMotorControlMsg_t = hal_motor_control_interfaces::msg::HalMotorControl;
+using HalMotorControlEncodersMsg_t = hal_motor_control_interfaces::msg::HalMotorControlEncoders;
 using HalPigpioEncoderCountMsg_t = hal_pigpio_interfaces::msg::HalPigpioEncoderCount;
 using HeaderMsg_t = std_msgs::msg::Header;
 
