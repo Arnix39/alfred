@@ -30,7 +30,7 @@ steps:
       --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DSYNTHETIC_BUILD:BOOL=ON
       --no-warn-unused-cli
 
-- name: Build logs upload
+- name: Upload build logs
   image: plugins/artifactory
   settings:
     url: http://192.168.1.252/artifactory
@@ -52,6 +52,19 @@ steps:
   image: ros:humble-ros-base-jammy
   commands:
     - cd workspace
+    - . /opt/ros/$ROS_DISTRO/setup.sh
+    - apt-get update 
+    - rosdep install -y
+      --from-paths src/
+      --ignore-src
+      --skip-keys "console_bridge
+        fastcdr
+        fastrtps
+        libopensplice67
+        libopensplice69
+        rti-connext-dds-5.3.1
+        urdfdom_headers" 
+    - rm -rf /var/lib/apt/lists/*
     - colcon test
     - colcon test-result
   when:
@@ -60,7 +73,7 @@ steps:
   depends_on:
     - Build
 
-- name: Test logs upload
+- name: Upload test logs
   image: plugins/artifactory
   settings:
     url: http://192.168.1.252/artifactory
@@ -94,6 +107,7 @@ steps:
     LANG: C.UTF-8
     LC_ALL: C.UTF-8
     ROS_DISTRO: humble
+  failure: ignore
 #   commands:
 #     - echo 'Etc/UTC' > /etc/timezone
 #     - ln -s /usr/share/zoneinfo/Etc/UTC /etc/localtime
@@ -133,7 +147,7 @@ steps:
 #       --cmake-args
 #       --no-warn-unused-cli
 
-- name: Logs upload
+- name: Upload build logs
   image: plugins/artifactory
   settings:
     url: http://192.168.1.252/artifactory
@@ -151,7 +165,7 @@ steps:
   depends_on:
     - build
 
-- name: Binaries upload
+- name: Upload binaries
   image: plugins/artifactory
   settings:
     url: http://192.168.1.252/artifactory
