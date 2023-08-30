@@ -7,7 +7,7 @@ platform:
   arch: amd64
 
 steps:
-- name: host
+- name: Host tests
   image: ros:humble-ros-base-jammy
   commands:
     - cd workspace
@@ -31,6 +31,23 @@ steps:
       --no-warn-unused-cli
     - colcon test
     - colcon test-result
+
+- name: Logs upload
+  image: plugins/artifactory
+  settings:
+    url: http://192.168.1.252/artifactory
+    username:
+      from_secret: ARTIFACTORY_USERNAME
+    password:
+      from_secret: ARTIFACTORY_PASSWORD
+    source: workspace/log/latest_test/(*)/(*)
+    target: Alfred/tests/"$(date +'%Y-%m-%d_%H-%M')"/{1}/{2}
+    flat: true
+    insecure: true
+  when:
+    status:
+    - failure
+    - success
 
 # ---
 # kind: pipeline
