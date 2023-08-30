@@ -1,13 +1,13 @@
 ---
 kind: pipeline
 type: docker
-name: host
+name: Alfred host build
 platform:
   os: linux
   arch: amd64
 
 steps:
-- name: Host tests
+- name: Build
   image: ros:humble-ros-base-jammy
   commands:
     - cd workspace
@@ -29,10 +29,38 @@ steps:
       --symlink-install
       --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DSYNTHETIC_BUILD:BOOL=ON
       --no-warn-unused-cli
+
+- name: Build logs upload
+  image: plugins/artifactory
+  settings:
+    url: http://192.168.1.252/artifactory
+    username:
+      from_secret: ARTIFACTORY_USERNAME
+    password:
+      from_secret: ARTIFACTORY_PASSWORD
+    source: workspace/log/latest_build/(*)/(*)
+    target: Alfred/logs/build/host/"$(date +'%Y-%m-%d_%H-%M')"/{1}/{2}
+    flat: true
+    insecure: true
+  when:
+    status:
+    - failure
+  depends_on:
+    - Build
+
+- name: Tests
+  image: ros:humble-ros-base-jammy
+  commands:
+    - cd workspace
     - colcon test
     - colcon test-result
+  when:
+    status:
+    - success
+  depends_on:
+    - Build
 
-- name: Logs upload
+- name: Test logs upload
   image: plugins/artifactory
   settings:
     url: http://192.168.1.252/artifactory
@@ -41,29 +69,31 @@ steps:
     password:
       from_secret: ARTIFACTORY_PASSWORD
     source: workspace/log/latest_test/(*)/(*)
-    target: Alfred/tests/"$(date +'%Y-%m-%d_%H-%M')"/{1}/{2}
+    target: Alfred/logs/tests/"$(date +'%Y-%m-%d_%H-%M')"/{1}/{2}
     flat: true
     insecure: true
   when:
     status:
     - failure
     - success
+  depends_on:
+    - Tests
 
-# ---
-# kind: pipeline
-# type: docker
-# name: target
-# platform:
-#   os: linux
-#   arch: amd64
+---
+kind: pipeline
+type: docker
+name: Alfred target build
+platform:
+  os: linux
+  arch: amd64
 
-# steps:
-# - name: build
-#   image: arm64v8/ubuntu:jammy
-#   environment:
-#     LANG: C.UTF-8
-#     LC_ALL: C.UTF-8
-#     ROS_DISTRO: humble
+steps:
+- name: build
+  image: arm64v8/ubuntu:jammy
+  environment:
+    LANG: C.UTF-8
+    LC_ALL: C.UTF-8
+    ROS_DISTRO: humble
 #   commands:
 #     - echo 'Etc/UTC' > /etc/timezone
 #     - ln -s /usr/share/zoneinfo/Etc/UTC /etc/localtime
@@ -102,3 +132,41 @@ steps:
 #       --symlink-install
 #       --cmake-args
 #       --no-warn-unused-cli
+
+- name: Logs upload
+  image: plugins/artifactory
+  settings:
+    url: http://192.168.1.252/artifactory
+    username:
+      from_secret: ARTIFACTORY_USERNAME
+    password:
+      from_secret: ARTIFACTORY_PASSWORD
+    source: workspace/log/latest_build/(*)/(*)
+    target: Alfred/logs/build/target/"$(date +'%Y-%m-%d_%H-%M')"/{1}/{2}
+    flat: true
+    insecure: true
+  when:
+    status:
+    - failure
+  depends_on:
+    - build
+
+- name: Binaries upload
+  image: plugins/artifactory
+  settings:
+    url: http://192.168.1.252/artifactory
+    username:
+      from_secret: ARTIFACTORY_USERNAME
+    password:
+      from_secret: ARTIFACTORY_PASSWORD
+    source: workspace/install/(*)
+    target: Alfred/binaries/"$(date +'%Y-%m-%d_%H-%M')"/{1}
+    flat: true
+    insecure: true
+  when:
+    status:
+    - success
+  depends_on:
+    - build
+
+
