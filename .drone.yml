@@ -15,15 +15,11 @@ steps:
     - . /opt/ros/$ROS_DISTRO/setup.sh
     - apt-get update 
     - rosdep install -y
-      --from-paths src/
+      --from-paths src
       --ignore-src
-      --skip-keys "console_bridge
-        fastcdr
-        fastrtps
-        libopensplice67
-        libopensplice69
-        rti-connext-dds-5.3.1
-        urdfdom_headers" 
+      --skip-keys "fastcdr \
+        rti-connext-dds-6.0.1 \
+        urdfdom_headers"
     - rm -rf /var/lib/apt/lists/*
     - colcon build
       --symlink-install
@@ -55,15 +51,11 @@ steps:
     - . /opt/ros/$ROS_DISTRO/setup.sh
     - apt-get update 
     - rosdep install -y
-      --from-paths src/
+      --from-paths src
       --ignore-src
-      --skip-keys "console_bridge
-        fastcdr
-        fastrtps
-        libopensplice67
-        libopensplice69
-        rti-connext-dds-5.3.1
-        urdfdom_headers" 
+      --skip-keys "fastcdr \
+        rti-connext-dds-6.0.1 \
+        urdfdom_headers"
     - rm -rf /var/lib/apt/lists/*
     - colcon test
     - colcon test-result
@@ -101,51 +93,24 @@ platform:
   arch: amd64
 
 steps:
-- name: build
-  image: arm64v8/ubuntu:jammy
-  environment:
-    LANG: C.UTF-8
-    LC_ALL: C.UTF-8
-    ROS_DISTRO: humble
-  failure: ignore
-#   commands:
-#     - echo 'Etc/UTC' > /etc/timezone
-#     - ln -s /usr/share/zoneinfo/Etc/UTC /etc/localtime
-#     - apt-get update
-#     - apt-get install -q -y --no-install-recommends tzdata dirmngr gnupg2
-#     - rm -rf /var/lib/apt/lists/*
-#     - echo "deb http://packages.ros.org/ros2/ubuntu jammy main" > /etc/apt/sources.list.d/ros2-latest.list
-#     - apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-#     - apt-get update && apt-get install --no-install-recommends -y
-#         build-essential
-#         python3-colcon-common-extensions
-#         python3-colcon-mixin
-#         python3-rosdep
-#         python3-vcstool
-#     - rm -rf /var/lib/apt/lists/*
-#     - rosdep init
-#     - rosdep update --rosdistro $ROS_DISTRO
-#     - apt-get update && apt-get install -y --no-install-recommends ros-humble-ros-base=0.10.0-1*
-#     - rm -rf /var/lib/apt/lists/*
-#     - cd workspace
-#     - rm -fR sim/
-#     - . /opt/ros/$ROS_DISTRO/setup.sh
-#     - apt-get update 
-#     - rosdep install -y
-#       --from-paths src/
-#       --ignore-src
-#       --skip-keys "console_bridge
-#         fastcdr
-#         fastrtps
-#         libopensplice67
-#         libopensplice69
-#         rti-connext-dds-5.3.1
-#         urdfdom_headers" 
-#     - rm -rf /var/lib/apt/lists/*
-#     - colcon build
-#       --symlink-install
-#       --cmake-args
-#       --no-warn-unused-cli
+- name: Build
+  image: docker:dind
+  volumes:
+  - name: dockersock
+    path: /var/run
+  commands:
+    - sleep 5 # give docker enough time to start
+    - cd workspace/cross_compile
+    - mkdir workspace
+    - cp -r ../src workspace
+    - rm -fR workspace/src/sim/
+    - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+    - docker build -t arm_ros2:humble -f ./Dockerfile/Dockerfile_ubuntu_arm_humble .
+    - docker run --name arm_cross arm_ros2:humble
+    - docker container export -o sysroot.tar arm_cross
+    - tar -C /ros2_ws/install -xf sysroot.tar ../install
+    - rm sysroot.tar
+    - rm -r workspace
 
 - name: Upload build logs
   image: plugins/artifactory
@@ -163,7 +128,7 @@ steps:
     status:
     - failure
   depends_on:
-    - build
+    - Build
 
 - name: Upload binaries
   image: plugins/artifactory
@@ -181,6 +146,16 @@ steps:
     status:
     - success
   depends_on:
-    - build
+    - Build
 
+services:
+- name: docker
+  image: docker:dind
+  privileged: true
+  volumes:
+  - name: dockersock
+    path: /var/run
 
+volumes:
+- name: dockersock
+  temp: {}
