@@ -105,11 +105,11 @@ steps:
     - cp -r ../src workspace
     - rm -fR workspace/src/sim/
     - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-    - docker build -t arm_ros2:humble -f ./Dockerfile/Dockerfile_ubuntu_arm_humble .
-    - docker run --name arm_cross arm_ros2:humble
-    - docker container export -o sysroot.tar arm_cross
-    - tar -C /ros2_ws/install -xf sysroot.tar ../install
-    - rm sysroot.tar
+    - docker build -t arm_ros2:humble -f ./Dockerfile/Dockerfile_arm64_humble .
+    - docker run --name alfred_cross arm_ros2:humble
+    - docker cp alfred_cross:/ros2_ws/build/. ../build
+    - docker cp alfred_cross:/ros2_ws/install/. ../install
+    - docker cp alfred_cross:/ros2_ws/log/. ../log
     - rm -r workspace
 
 - name: Upload build logs

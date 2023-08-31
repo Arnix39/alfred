@@ -141,51 +141,65 @@
                 "clean"
             ]
         },
-        {
-            "label": "Workspace: Generate sysroot for target",
-            "detail": "Generate sysroot for cross compilation for Raspberry Pi 3B+.",
-            "type": "shell",
-            "options": {
-                "cwd": "${workspaceFolder}/cross_compile"
-            },
-            "command": "${workspaceFolder}/cross_compile/generate_sysroot.sh"
-        },
+        // {
+        //     "label": "Workspace: Generate sysroot for target",
+        //     "detail": "Generate sysroot for cross compilation for Raspberry Pi 3B+.",
+        //     "type": "shell",
+        //     "options": {
+        //         "cwd": "${workspaceFolder}/cross_compile"
+        //     },
+        //     "command": "${workspaceFolder}/cross_compile/generate_sysroot.sh"
+        // },
+        // {
+        //     "label": "ROS2: Build workspace for target",
+        //     "detail": "Build workspace for Raspberry Pi 3B+.",
+        //     "type": "shell",
+        //     "options": {
+        //         "cwd": "${workspaceFolder}",
+        //         "env": {
+        //             "TARGET_ARCH": "aarch64",
+        //             "CROSS_COMPILE": "/usr/bin/aarch64-linux-gnu-",
+        //             "SYSROOT": "${workspaceFolder}/cross_compile/sysroot",
+        //             "ROS2_INSTALL_PATH": "${workspaceFolder}/install/target",
+        //             "PYTHON_SOABI": "cpython-310-aarch64-linux-gnu",
+        //             "CC": "/usr/bin/aarch64-linux-gnu-gcc",
+        //             "CXX": "/usr/bin/aarch64-linux-gnu-g++",
+        //             "CROSS_COMPILE_DIR": "${workspaceFolder}/cross_compile"
+        //         }
+        //     },
+        //     "command": "colcon",
+        //     "args": [
+        //         "build",
+        //         "--build-base",
+        //         "build/target",
+        //         "--install-base",
+        //         "install/target",
+        //         "--packages-skip-regex",
+        //         "ros_gz",
+        //         "--symlink-install",
+        //         "--cmake-args",
+        //         "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON",
+        //         "-DCMAKE_TOOLCHAIN_FILE=${CROSS_COMPILE_DIR}/cmake-toolchains/generic_linux.cmake",
+        //         "--no-warn-unused-cli"
+        //     ],
+        //     "group": {
+        //         "kind": "build"
+        //     },
+        //     "problemMatcher": "$gcc"
+        // },
         {
             "label": "ROS2: Build workspace for target",
             "detail": "Build workspace for Raspberry Pi 3B+.",
             "type": "shell",
             "options": {
-                "cwd": "${workspaceFolder}",
-                "env": {
-                    "TARGET_ARCH": "aarch64",
-                    "CROSS_COMPILE": "/usr/bin/aarch64-linux-gnu-",
-                    "SYSROOT": "${workspaceFolder}/cross_compile/sysroot",
-                    "ROS2_INSTALL_PATH": "${workspaceFolder}/install/target",
-                    "PYTHON_SOABI": "cpython-310-aarch64-linux-gnu",
-                    "CC": "/usr/bin/aarch64-linux-gnu-gcc",
-                    "CXX": "/usr/bin/aarch64-linux-gnu-g++",
-                    "CROSS_COMPILE_DIR": "${workspaceFolder}/cross_compile"
-                }
+                "cwd": "${workspaceFolder}/cross_compile",
             },
-            "command": "colcon",
-            "args": [
-                "build",
-                "--build-base",
-                "build/target",
-                "--install-base",
-                "install/target",
-                "--packages-skip-regex",
-                "ros_gz",
-                "--symlink-install",
-                "--cmake-args",
-                "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON",
-                "-DCMAKE_TOOLCHAIN_FILE=${CROSS_COMPILE_DIR}/cmake-toolchains/generic_linux.cmake",
-                "--no-warn-unused-cli"
-            ],
+            "command": "./cross_compile.sh",
+            "args": [],
             "group": {
                 "kind": "build"
             },
-            "problemMatcher": "$gcc"
+            "problemMatcher": []
         },
         {
             "label": "ROS2: Install on target",
@@ -232,37 +246,37 @@
             },
             "problemMatcher": "$gcc"
         },
-        {
-            "label": "Workspace: Clean target files",
-            "detail": "Clean workspace for target build files.",
-            "type": "shell",
-            "options": {
-                "cwd": "${workspaceFolder}",
-                "env": {
-                    "TARGET_ARCH": "aarch64",
-                    "CROSS_COMPILE": "/usr/bin/aarch64-linux-gnu-",
-                    "SYSROOT": "${workspaceFolder}/cross_compile/sysroot/",
-                    "ROS2_INSTALL_PATH": "${workspaceFolder}/install/target",
-                    "PYTHON_SOABI": "cpython-310-aarch64-linux-gnu",
-                    "CC": "/usr/bin/aarch64-linux-gnu-gcc",
-                    "CXX": "/usr/bin/aarch64-linux-gnu-g++",
-                    "CROSS_COMPILE_DIR": "${workspaceFolder}/cross_compile"
-                }
-            },
-            "command": "colcon",
-            "args": [
-                "build",
-                "--build-base",
-                "build/target",
-                "--install-base",
-                "install/target",
-                "--packages-skip-regex",
-                "ros_gz",
-                "--cmake-target",
-                "clean"
-            ],
-            "problemMatcher": []
-        },
+        // {
+        //     "label": "Workspace: Clean target files",
+        //     "detail": "Clean workspace for target build files.",
+        //     "type": "shell",
+        //     "options": {
+        //         "cwd": "${workspaceFolder}",
+        //         "env": {
+        //             "TARGET_ARCH": "aarch64",
+        //             "CROSS_COMPILE": "/usr/bin/aarch64-linux-gnu-",
+        //             "SYSROOT": "${workspaceFolder}/cross_compile/sysroot/",
+        //             "ROS2_INSTALL_PATH": "${workspaceFolder}/install/target",
+        //             "PYTHON_SOABI": "cpython-310-aarch64-linux-gnu",
+        //             "CC": "/usr/bin/aarch64-linux-gnu-gcc",
+        //             "CXX": "/usr/bin/aarch64-linux-gnu-g++",
+        //             "CROSS_COMPILE_DIR": "${workspaceFolder}/cross_compile"
+        //         }
+        //     },
+        //     "command": "colcon",
+        //     "args": [
+        //         "build",
+        //         "--build-base",
+        //         "build/target",
+        //         "--install-base",
+        //         "install/target",
+        //         "--packages-skip-regex",
+        //         "ros_gz",
+        //         "--cmake-target",
+        //         "clean"
+        //     ],
+        //     "problemMatcher": []
+        // },
         {
             "label": "ROS2: Gazebo bridge",
             "detail": "Build ros_gz package.",
