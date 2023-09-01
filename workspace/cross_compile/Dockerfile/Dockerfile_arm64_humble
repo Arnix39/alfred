@@ -12,9 +12,6 @@ RUN apt-get update && rosdep install -y \
         rti-connext-dds-6.0.1 \
         urdfdom_headers"
 
-RUN . /opt/ros/$ROS_DISTRO/setup.sh && \
-    colcon build \
-        --symlink-install \
-        --cmake-args --no-warn-unused-cli
-
-RUN tar -h -czvf install.tar.gz install
+WORKDIR /   
+RUN apt-get update && apt-get install -y symlinks
+RUN symlinks -rc .
