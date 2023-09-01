@@ -100,16 +100,19 @@ steps:
     path: /var/run
   commands:
     - sleep 5 # give docker enough time to start
-    - cd workspace/cross_compile
+    - cd workspace
+    - mkdir install
+    - cd cross_compile
     - mkdir workspace
     - cp -r ../src workspace
     - rm -fR workspace/src/sim/
     - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
     - docker build -t arm_ros2:humble -f ./Dockerfile/Dockerfile_arm64_humble .
     - docker run --name alfred_cross arm_ros2:humble
-    - docker cp alfred_cross:/ros2_ws/build/. ../build
-    - docker cp alfred_cross:/ros2_ws/install/. ../install
     - docker cp alfred_cross:/ros2_ws/log/. ../log
+    - docker cp alfred_cross:/ros2_ws/install.tar.gz .
+    - tar -C ../install --strip-components 1 -xf install.tar.gz
+    - rm install.tar.gz
     - rm -r workspace
 
 - name: Upload build logs

@@ -16,3 +16,5 @@ RUN . /opt/ros/$ROS_DISTRO/setup.sh && \
     colcon build \
         --symlink-install \
         --cmake-args --no-warn-unused-cli
+
+RUN tar -h -czvf install.tar.gz install
