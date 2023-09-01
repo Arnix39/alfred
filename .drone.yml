@@ -107,13 +107,19 @@ steps:
     - cp -r ../src workspace
     - rm -fR workspace/src/sim/
     - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-    - docker build -t arm_ros2:humble -f ./Dockerfile/Dockerfile_arm64_humble .
-    - docker run --name alfred_cross arm_ros2:humble
+    # - docker build -t arm_ros2:humble -f ./Dockerfile/Dockerfile_arm64_humble .
+    # - docker run --name alfred_cross arm_ros2:humble
+    - docker run -t -d --name alfred_cross arnixrobotix/alfred:cross_humble
+    - docker cp workspace/. alfred_cross:/ros2_ws
+    - docker exec alfred_cross tar -h -czf install.tar.gz install
     - docker cp alfred_cross:/ros2_ws/log/. ../log
     - docker cp alfred_cross:/ros2_ws/install.tar.gz .
     - tar -C ../install --strip-components 1 -xf install.tar.gz
     - rm install.tar.gz
     - rm -r workspace
+
+  image_pull_secrets:
+    - docker_config
 
 - name: Upload build logs
   image: plugins/artifactory
