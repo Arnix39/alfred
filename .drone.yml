@@ -59,9 +59,6 @@ steps:
     - rm -rf /var/lib/apt/lists/*
     - colcon test
     - colcon test-result
-  when:
-    status:
-    - success
   depends_on:
     - Build
 
@@ -150,9 +147,6 @@ steps:
       --symlink-install
       --cmake-args -DCMAKE_TOOLCHAIN_FILE=$CROSS_COMPILE_DIR/cmake-toolchains/generic_linux.cmake
       --no-warn-unused-cli
-  when:
-    status:
-    - success
   depends_on:
     - Prepare sysroot
 
@@ -187,9 +181,6 @@ steps:
     flat: true
     insecure: true
   failure: ignore
-  when:
-    status:
-    - success
   depends_on:
     - Build
 
@@ -290,9 +281,6 @@ steps:
     flat: true
     insecure: true
   failure: ignore
-  when:
-    status:
-    - success
   depends_on:
     - Build
 
@@ -308,9 +296,6 @@ steps:
     command_timeout: 2m
     script:
       - ls
-  when:
-    status:
-    - success
   depends_on:
     - Build
 
