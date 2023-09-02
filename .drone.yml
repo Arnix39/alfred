@@ -1,7 +1,7 @@
 ---
 kind: pipeline
 type: docker
-name: Alfred host build
+name: Host build
 platform:
   os: linux
   arch: amd64
@@ -84,10 +84,15 @@ steps:
   depends_on:
     - Tests
 
+trigger:
+  event:
+    exclude:
+    - promote
+
 ---
 kind: pipeline
 type: docker
-name: Alfred target build
+name: Target build
 platform:
   os: linux
   arch: amd64
@@ -169,21 +174,6 @@ steps:
   depends_on:
     - Build
 
-- name: Debug
-  image: plugins/artifactory
-  settings:
-    url: http://192.168.1.252/artifactory
-    username:
-      from_secret: ARTIFACTORY_USERNAME
-    password:
-      from_secret: ARTIFACTORY_PASSWORD
-    source: workspace/build/(*)
-    target: Alfred/build/target/"$(date +'%Y-%m-%d_%H-%M')"/{1}
-    flat: true
-    insecure: true
-  depends_on:
-    - Build
-
 - name: Upload binaries
   image: plugins/artifactory
   settings:
@@ -193,7 +183,7 @@ steps:
     password:
       from_secret: ARTIFACTORY_PASSWORD
     source: workspace/install/(*)
-    target: Alfred/binaries/"$(date +'%Y-%m-%d_%H-%M')"/{1}
+    target: Alfred/binaries/development/"$(date +'%Y-%m-%d_%H-%M')"/{1}
     flat: true
     insecure: true
   failure: ignore
@@ -214,3 +204,130 @@ services:
 volumes:
 - name: dockersock
   temp: {}
+
+trigger:
+  event:
+    exclude:
+    - promote
+
+---
+kind: pipeline
+type: docker
+name: Deploy
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: Prepare sysroot
+  image: docker:dind
+  volumes:
+  - name: dockersock
+    path: /var/run
+  commands:
+    - sleep 5 # give docker enough time to start
+    - cd workspace/cross_compile
+    - mkdir workspace
+    - cp -r ../src workspace
+    - rm -fR workspace/src/sim/
+    - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+    - docker build -t arm_ros2:humble -f ./Dockerfile/Dockerfile_arm64_humble .
+    - docker run --name alfred_cross arm_ros2:humble
+    - docker container export -o sysroot.tar alfred_cross
+    - mkdir sysroot
+    - tar -C sysroot -xf sysroot.tar lib usr opt etc
+    - rm sysroot.tar
+    - rm -r workspace
+
+- name: Build
+  image: ros:humble-ros-base-jammy
+  environment:
+    RMW_IMPLEMENTATION: rmw_fastrtps_cpp
+    TARGET_ARCH: aarch64
+    CROSS_COMPILE: /usr/bin/aarch64-linux-gnu-
+    PYTHON_SOABI: cpython-310-aarch64-linux-gnu
+    CC: /usr/bin/aarch64-linux-gnu-gcc
+    CXX: /usr/bin/aarch64-linux-gnu-g++
+
+  commands:
+    - export SYSROOT=$DRONE_WORKSPACE/workspace/cross_compile/sysroot
+    - export ROS2_INSTALL_PATH=$DRONE_WORKSPACE/workspace/install
+    - export CROSS_COMPILE_DIR=$DRONE_WORKSPACE/workspace/cross_compile
+    - cd workspace
+    - rm -fR sim/.
+    - . /opt/ros/$ROS_DISTRO/setup.sh
+    - apt-get update
+    - apt-get install -y g++-aarch64-linux-gnu g++-arm-linux-gnueabihf
+    - rosdep install -y
+      --from-paths src
+      --ignore-src
+      --skip-keys "fastcdr \
+        rti-connext-dds-6.0.1 \
+        urdfdom_headers"
+    - rm -rf /var/lib/apt/lists/*
+    # Quick and dirty fix => to be investigated further
+    - cp cross_compile/sysroot/usr/lib/aarch64-linux-gnu/libpython3.10.so /usr/lib/aarch64-linux-gnu/libpython3.10.so
+    - colcon build
+      --symlink-install
+      --cmake-args -DCMAKE_TOOLCHAIN_FILE=$CROSS_COMPILE_DIR/cmake-toolchains/generic_linux.cmake
+      --no-warn-unused-cli
+  when:
+    status:
+    - success
+  depends_on:
+    - Prepare sysroot
+
+- name: Upload binaries
+  image: plugins/artifactory
+  settings:
+    url: http://192.168.1.252/artifactory
+    username:
+      from_secret: ARTIFACTORY_USERNAME
+    password:
+      from_secret: ARTIFACTORY_PASSWORD
+    source: workspace/install/(*)
+    target: Alfred/binaries/deployment/build_$DRONE_BUILD_NUMBER/{1}
+    flat: true
+    insecure: true
+  failure: ignore
+  when:
+    status:
+    - success
+  depends_on:
+    - Build
+
+- name: Deploy on Alfred
+  image: plugins/ssh
+  settings:
+    host: 192.168.1.253
+    user:
+      from_secret: ALFRED_USERNAME
+    ssh_key:
+      from_secret: ALFRED_SSH_KEY
+    port: 22
+    command_timeout: 2m
+    script:
+      - ls
+  when:
+    status:
+    - success
+  depends_on:
+    - Build
+
+services:
+- name: docker
+  image: docker:dind
+  privileged: true
+  volumes:
+  - name: dockersock
+    path: /var/run
+
+volumes:
+- name: dockersock
+  temp: {}
+
+trigger:
+  event:
+  - promote
+  target:
+  - Alfred
