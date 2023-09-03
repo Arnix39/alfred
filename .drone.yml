@@ -36,7 +36,7 @@ steps:
     password:
       from_secret: ARTIFACTORY_PASSWORD
     source: workspace/build_logs.tar.gz
-    target: Alfred/logs/build/target/build_$${DRONE_BUILD_NUMBER}_logs.tar.gz
+    target: Alfred/logs/build/target/build_$${DRONE_BUILD_NUMBER}_build_logs.tar.gz
     flat: true
     insecure: true
   when:
@@ -73,7 +73,7 @@ steps:
     password:
       from_secret: ARTIFACTORY_PASSWORD
     source: workspace/tests_logs.tar.gz
-    target: Alfred/logs/tests/build_$${DRONE_BUILD_NUMBER}_logs.tar.gz
+    target: Alfred/logs/tests/build_$${DRONE_BUILD_NUMBER}_tests_logs.tar.gz
     flat: true
     insecure: true
   when:
@@ -163,7 +163,7 @@ steps:
     password:
       from_secret: ARTIFACTORY_PASSWORD
     source: workspace/build_logs.tar.gz
-    target: Alfred/logs/build/target/build_$${DRONE_BUILD_NUMBER}_logs.tar.gz
+    target: Alfred/logs/build/target/build_$${DRONE_BUILD_NUMBER}_build_logs.tar.gz
     flat: true
     insecure: true
   when:
@@ -272,6 +272,20 @@ steps:
   depends_on:
     - Prepare sysroot
 
+- name: Deploy
+  image: drillster/drone-rsync
+  settings:
+    hosts: [ "192.168.1.253" ]
+    user:
+      from_secret: ALFRED_USERNAME
+    key:
+      from_secret: ALFRED_SSH_KEY
+    source: workspace/install/
+    target: ~/Alfred/
+    args: --delete --copy-links -av
+    script:
+      - ros2 launch hal_lifecycle_manager hal_bringup_launch.py
+
 - name: Upload binaries
   image: plugins/artifactory
   settings:
@@ -281,7 +295,7 @@ steps:
     password:
       from_secret: ARTIFACTORY_PASSWORD
     source: workspace/install.tar.gz
-    target: Alfred/binaries/deployment/build_$${DRONE_BUILD_NUMBER}install.tar.gz
+    target: Alfred/binaries/deployment/build_$${DRONE_BUILD_NUMBER}_install.tar.gz
     flat: true
     insecure: true
   depends_on:
