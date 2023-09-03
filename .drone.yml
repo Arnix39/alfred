@@ -25,6 +25,7 @@ steps:
       --symlink-install
       --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DSYNTHETIC_BUILD:BOOL=ON
       --no-warn-unused-cli
+    - find log/latest_build/ -printf "%P\n" | tar -czf build_logs.tar.gz --no-recursion -C log/latest_build/ -T -
 
 - name: Upload build logs
   image: plugins/artifactory
@@ -34,8 +35,8 @@ steps:
       from_secret: ARTIFACTORY_USERNAME
     password:
       from_secret: ARTIFACTORY_PASSWORD
-    source: workspace/log/latest_build/(*)/(*)
-    target: Alfred/logs/build/host/"$(date +'%Y-%m-%d_%H-%M')"/{1}/{2}
+    source: workspace/build_logs.tar.gz
+    target: Alfred/logs/build/target/build_$${DRONE_BUILD_NUMBER}_logs.tar.gz
     flat: true
     insecure: true
   when:
@@ -59,6 +60,7 @@ steps:
     - rm -rf /var/lib/apt/lists/*
     - colcon test
     - colcon test-result
+    - find log/latest_test/ -printf "%P\n" | tar -czf tests_logs.tar.gz --no-recursion -C log/latest_test/ -T -
   depends_on:
     - Build
 
@@ -70,8 +72,8 @@ steps:
       from_secret: ARTIFACTORY_USERNAME
     password:
       from_secret: ARTIFACTORY_PASSWORD
-    source: workspace/log/latest_test/(*)/(*)
-    target: Alfred/logs/tests/"$(date +'%Y-%m-%d_%H-%M')"/{1}/{2}
+    source: workspace/tests_logs.tar.gz
+    target: Alfred/logs/tests/build_$${DRONE_BUILD_NUMBER}_logs.tar.gz
     flat: true
     insecure: true
   when:
@@ -147,6 +149,8 @@ steps:
       --symlink-install
       --cmake-args -DCMAKE_TOOLCHAIN_FILE=$CROSS_COMPILE_DIR/cmake-toolchains/generic_linux.cmake
       --no-warn-unused-cli
+    - find install/ -printf "%P\n" | tar -czf install.tar.gz --no-recursion -C install/ -T -
+    - find log/latest_build/ -printf "%P\n" | tar -czf build_logs.tar.gz --no-recursion -C log/latest_build/ -T -
   depends_on:
     - Prepare sysroot
 
@@ -158,8 +162,8 @@ steps:
       from_secret: ARTIFACTORY_USERNAME
     password:
       from_secret: ARTIFACTORY_PASSWORD
-    source: workspace/log/latest_build/(*)/(*)
-    target: Alfred/logs/build/target/"$(date +'%Y-%m-%d_%H-%M')"/{1}/{2}
+    source: workspace/build_logs.tar.gz
+    target: Alfred/logs/build/target/build_$${DRONE_BUILD_NUMBER}_logs.tar.gz
     flat: true
     insecure: true
   when:
@@ -176,11 +180,10 @@ steps:
       from_secret: ARTIFACTORY_USERNAME
     password:
       from_secret: ARTIFACTORY_PASSWORD
-    source: workspace/install/(*)
-    target: Alfred/binaries/development/"$(date +'%Y-%m-%d_%H-%M')"/{1}
+    source: workspace/install.tar.gz
+    target: Alfred/binaries/development/build_$${DRONE_BUILD_NUMBER}_install.tar.gz
     flat: true
     insecure: true
-  failure: ignore
   depends_on:
     - Build
 
@@ -262,6 +265,7 @@ steps:
       --symlink-install
       --cmake-args -DCMAKE_TOOLCHAIN_FILE=$CROSS_COMPILE_DIR/cmake-toolchains/generic_linux.cmake
       --no-warn-unused-cli
+    - find install/ -printf "%P\n" | tar -czf install.tar.gz --no-recursion -C install/ -T -
   when:
     status:
     - success
@@ -276,26 +280,10 @@ steps:
       from_secret: ARTIFACTORY_USERNAME
     password:
       from_secret: ARTIFACTORY_PASSWORD
-    source: workspace/install/(*)
-    target: Alfred/binaries/deployment/build_$DRONE_BUILD_NUMBER/{1}
+    source: workspace/install.tar.gz
+    target: Alfred/binaries/deployment/build_$${DRONE_BUILD_NUMBER}install.tar.gz
     flat: true
     insecure: true
-  failure: ignore
-  depends_on:
-    - Build
-
-- name: Deploy on Alfred
-  image: plugins/ssh
-  settings:
-    host: 192.168.1.253
-    user:
-      from_secret: ALFRED_USERNAME
-    ssh_key:
-      from_secret: ALFRED_SSH_KEY
-    port: 22
-    command_timeout: 2m
-    script:
-      - ls
   depends_on:
     - Build
 
