@@ -25,7 +25,17 @@ steps:
       --symlink-install
       --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DSYNTHETIC_BUILD:BOOL=ON
       --no-warn-unused-cli
+
+- name: Archive build logs
+  image: ros:humble-ros-base-jammy
+  commands:
+    - cd workspace
     - find log/latest_build/ -printf "%P\n" | tar -czf build_logs.tar.gz --no-recursion -C log/latest_build/ -T -
+  when:
+    status:
+    - failure
+  depends_on:
+    - Build
 
 - name: Upload build logs
   image: plugins/artifactory
@@ -43,7 +53,7 @@ steps:
     status:
     - failure
   depends_on:
-    - Build
+    - Archive build logs
 
 - name: Tests
   image: ros:humble-ros-base-jammy
@@ -60,9 +70,20 @@ steps:
     - rm -rf /var/lib/apt/lists/*
     - colcon test
     - colcon test-result
-    - find log/latest_test/ -printf "%P\n" | tar -czf tests_logs.tar.gz --no-recursion -C log/latest_test/ -T -
   depends_on:
     - Build
+
+- name: Archive tests logs
+  image: ros:humble-ros-base-jammy
+  commands:
+    - cd workspace
+    - find log/latest_test/ -printf "%P\n" | tar -czf tests_logs.tar.gz --no-recursion -C log/latest_test/ -T -
+  when:
+    status:
+    - failure
+    - success
+  depends_on:
+    - Tests
 
 - name: Upload test logs
   image: plugins/artifactory
@@ -81,7 +102,7 @@ steps:
     - failure
     - success
   depends_on:
-    - Tests
+    - Archive tests logs
 
 trigger:
   event:
@@ -148,8 +169,6 @@ steps:
     - colcon build
       --cmake-args -DCMAKE_TOOLCHAIN_FILE=$CROSS_COMPILE_DIR/cmake-toolchains/generic_linux.cmake
       --no-warn-unused-cli
-    - find install/ -printf "%P\n" | tar -czf install.tar.gz --no-recursion -C install/ -T -
-    - find log/latest_build/ -printf "%P\n" | tar -czf build_logs.tar.gz --no-recursion -C log/latest_build/ -T -
   depends_on:
     - Prepare sysroot
 
@@ -162,6 +181,17 @@ steps:
     - apt-get update
     - apt-get install -y rsync
     - rsync -a --delete $DRONE_WORKSPACE/workspace/cross_compile/sysroot/ /tmp/sysroot/
+  depends_on:
+    - Build
+
+- name: Archive build logs
+  image: ros:humble-ros-base-jammy
+  commands:
+    - cd workspace
+    - find log/latest_build/ -printf "%P\n" | tar -czf build_logs.tar.gz --no-recursion -C log/latest_build/ -T -
+  when:
+    status:
+    - failure
   depends_on:
     - Build
 
@@ -181,6 +211,14 @@ steps:
     status:
     - failure
   depends_on:
+    - Archive build logs
+
+- name: Archive binaries
+  image: ros:humble-ros-base-jammy
+  commands:
+    - cd workspace
+    - find install/ -printf "%P\n" | tar -czf install.tar.gz --no-recursion -C install/ -T -
+  depends_on:
     - Build
 
 - name: Upload binaries
@@ -196,7 +234,7 @@ steps:
     flat: true
     insecure: true
   depends_on:
-    - Build
+    - Archive binaries
 
 services:
 - name: docker
@@ -262,8 +300,6 @@ steps:
     - colcon build
       --cmake-args -DCMAKE_TOOLCHAIN_FILE=$CROSS_COMPILE_DIR/cmake-toolchains/generic_linux.cmake
       --no-warn-unused-cli
-    - find install/ -printf "%P\n" | tar -czf install.tar.gz --no-recursion -C install/ -T -
-    - find log/latest_build/ -printf "%P\n" | tar -czf build_logs.tar.gz --no-recursion -C log/latest_build/ -T -
 
 - name: Deploy
   image: drillster/drone-rsync
@@ -283,6 +319,17 @@ steps:
   depends_on:
     - Build
 
+- name: Archive build logs
+  image: ros:humble-ros-base-jammy
+  commands:
+    - cd workspace
+    - find log/latest_build/ -printf "%P\n" | tar -czf build_logs.tar.gz --no-recursion -C log/latest_build/ -T -
+  when:
+    status:
+    - failure
+  depends_on:
+    - Build
+
 - name: Upload build logs
   image: plugins/artifactory
   settings:
@@ -299,6 +346,14 @@ steps:
     status:
     - failure
   depends_on:
+    - Archive build logs
+
+- name: Archive binaries
+  image: ros:humble-ros-base-jammy
+  commands:
+    - cd workspace
+    - find install/ -printf "%P\n" | tar -czf install.tar.gz --no-recursion -C install/ -T -
+  depends_on:
     - Build
 
 - name: Upload binaries
@@ -314,7 +369,7 @@ steps:
     flat: true
     insecure: true
   depends_on:
-    - Build
+    - Archive binaries
 
 volumes:
 - name: sysroot
