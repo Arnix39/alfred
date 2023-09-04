@@ -199,9 +199,10 @@
             ],
             "command": "rsync",
             "args": [
+                "-a",
+                "--info=progress2",
                 "--delete",
                 "--copy-links",
-                "-av",
                 "${workspaceFolder}/install/target/",
                 "arnix@alfred:/home/arnix/Alfred/"
             ],

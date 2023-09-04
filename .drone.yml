@@ -146,7 +146,6 @@ steps:
     # Quick and dirty fix => to be investigated further
     - cp $SYSROOT/usr/lib/aarch64-linux-gnu/libpython3.10.so /usr/lib/aarch64-linux-gnu/libpython3.10.so
     - colcon build
-      --symlink-install
       --cmake-args -DCMAKE_TOOLCHAIN_FILE=$CROSS_COMPILE_DIR/cmake-toolchains/generic_linux.cmake
       --no-warn-unused-cli
     - find install/ -printf "%P\n" | tar -czf install.tar.gz --no-recursion -C install/ -T -
@@ -162,7 +161,7 @@ steps:
   commands:
     - apt-get update
     - apt-get install -y rsync
-    - rsync -a --delete --links $DRONE_WORKSPACE/workspace/cross_compile/sysroot/ /tmp/sysroot/
+    - rsync -a --delete $DRONE_WORKSPACE/workspace/cross_compile/sysroot/ /tmp/sysroot/
   depends_on:
     - Build
 
@@ -261,22 +260,44 @@ steps:
     # Quick and dirty fix => to be investigated further
     - cp $SYSROOT/usr/lib/aarch64-linux-gnu/libpython3.10.so /usr/lib/aarch64-linux-gnu/libpython3.10.so
     - colcon build
-      --symlink-install
       --cmake-args -DCMAKE_TOOLCHAIN_FILE=$CROSS_COMPILE_DIR/cmake-toolchains/generic_linux.cmake
       --no-warn-unused-cli
     - find install/ -printf "%P\n" | tar -czf install.tar.gz --no-recursion -C install/ -T -
+    - find log/latest_build/ -printf "%P\n" | tar -czf build_logs.tar.gz --no-recursion -C log/latest_build/ -T -
 
 - name: Deploy
-  image: ros:humble-ros-base-jammy
-  environment:
+  image: drillster/drone-rsync
+  settings:
+    hosts: [ "192.168.1.253" ]
+    port: 22
+    source: workspace/install/
+    target: ~/Alfred/
     user:
       from_secret: ALFRED_USERNAME
     key:
       from_secret: ALFRED_SSH_KEY
-  commands:
-    - apt-get update
-    - apt-get install -y rsync ssh
-    - rsync -a --delete --copy-links -e 'ssh -v -i $KEY' workspace/install/ $USER@192.168.1.253:~/Alfred/
+    args:
+      -v
+      --delete
+      --copy-links
+  depends_on:
+    - Build
+
+- name: Upload build logs
+  image: plugins/artifactory
+  settings:
+    url: http://192.168.1.252/artifactory
+    username:
+      from_secret: ARTIFACTORY_USERNAME
+    password:
+      from_secret: ARTIFACTORY_PASSWORD
+    source: workspace/build_logs.tar.gz
+    target: Alfred/logs/build/target/build_$${DRONE_BUILD_NUMBER}_build_logs.tar.gz
+    flat: true
+    insecure: true
+  when:
+    status:
+    - failure
   depends_on:
     - Build
 
