@@ -29,6 +29,8 @@ LifecycleCallbackReturn_t HalPoseManager::on_configure(
   const rclcpp_lifecycle::State & previous_state)
 {
   odometryPublisher = this->create_publisher<OdometryMsg_t>("odometry", 10);
+  wheelsVelocityCmdPublisher = this->create_publisher<HalMotorControlCommandMsg_t>(
+    "wheelsVelocityCmd", 10);
   twistSubscriber = this->create_subscription<TwistMsg_t>(
     "cmd_velocity", 10, std::bind(&HalPoseManager::wheelsVelocityCommand, this, _1));
   motorsECSubscriber = this->create_subscription<HalMotorControlEncodersMsg_t>(
@@ -44,6 +46,7 @@ LifecycleCallbackReturn_t HalPoseManager::on_activate(
   const rclcpp_lifecycle::State & previous_state)
 {
   odometryPublisher->on_activate();
+  wheelsVelocityCmdPublisher->on_activate();
 
   RCLCPP_INFO(get_logger(), "Node activated!");
 
@@ -54,6 +57,7 @@ LifecycleCallbackReturn_t HalPoseManager::on_deactivate(
   const rclcpp_lifecycle::State & previous_state)
 {
   odometryPublisher->on_deactivate();
+  wheelsVelocityCmdPublisher->on_deactivate();
 
   RCLCPP_INFO(get_logger(), "Node deactivated!");
 
@@ -63,6 +67,7 @@ LifecycleCallbackReturn_t HalPoseManager::on_deactivate(
 LifecycleCallbackReturn_t HalPoseManager::on_cleanup(const rclcpp_lifecycle::State & previous_state)
 {
   odometryPublisher.reset();
+  wheelsVelocityCmdPublisher.reset();
 
   RCLCPP_INFO(get_logger(), "Node unconfigured!");
 
@@ -73,6 +78,7 @@ LifecycleCallbackReturn_t HalPoseManager::on_shutdown(
   const rclcpp_lifecycle::State & previous_state)
 {
   odometryPublisher.reset();
+  wheelsVelocityCmdPublisher.reset();
 
   RCLCPP_INFO(get_logger(), "Node shutdown!");
 
@@ -84,10 +90,24 @@ LifecycleCallbackReturn_t HalPoseManager::on_error(const rclcpp_lifecycle::State
   return LifecycleCallbackReturn_t::FAILURE;
 }
 
-void HalPoseManager::wheelsVelocityCommand(const TwistMsg_t & msg) {}
+void HalPoseManager::wheelsVelocityCommand(const TwistMsg_t & msg)
+{
+  auto wheelsVelocityCommandMsg = HalMotorControlCommandMsg_t();
+  WheelsVelocity wheelsVelocityCommand;
+
+  wheelsVelocityCmdPublisher->publish(wheelsVelocityCommandMsg);
+}
 
 void HalPoseManager::wheelsVelocityComputation(const HalMotorControlEncodersMsg_t & msg)
 {
+  auto header = HeaderMsg_t();
+  auto odometry = OdometryMsg_t();
+  auto pose = PoseMsg_t();
+  auto twist = TwistMsg_t();
+
+  header.stamp = rclcpp::Clock().now();
+  header.frame_id = "Body";
+
   int32_t encoderCountDelta = 0;
   int32_t timeDelta = msg.header.stamp.nanosec - encodersCount.timestampNs;
 
@@ -107,4 +127,11 @@ void HalPoseManager::wheelsVelocityComputation(const HalMotorControlEncodersMsg_
 
   encoderCountDelta = encodersCount.rightCurrrent - encodersCount.rightPrevious;
   wheelsVelocity.right = computeVelocity(encoderCountDelta, timeDelta);
+
+  odometry.header = std::move(header);
+  odometry.child_frame_id = "Body";
+  odometry.pose = std::move(pose);
+  odometry.twist = std::move(twist);
+
+  odometryPublisher->publish(odometry);
 }

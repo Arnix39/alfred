@@ -12,10 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "gtest/gtest.h"
+#include "hal_pose_manager_tests.hpp"
 
-#include "rclcpp/rclcpp.hpp"
-#include "lifecycle_msgs/srv/change_state.hpp"
+PoseManagerCheckerNode::PoseManagerCheckerNode()
+: rclcpp::Node{"hal_pose_manager_checker_node"},
+  changeStateClient{this->create_client<lifecycle_msgs::srv::ChangeState>(
+      "hal_pose_manager_node/change_state")}
+{
+}
+
+TEST_F(PoseManagerTest, dummy)
+{
+  FAIL();
+}
 
 int main(int argc, char ** argv)
 {

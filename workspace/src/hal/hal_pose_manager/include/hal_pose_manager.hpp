@@ -22,6 +22,7 @@
 // Services and messages headers (generated)
 #include "nav_msgs/msg/odometry.hpp"
 #include "geometry_msgs/msg/twist_with_covariance.hpp"
+#include "geometry_msgs/msg/pose_with_covariance.hpp"
 #include "std_msgs/msg/header.hpp"
 #include "hal_motor_control_interfaces/msg/hal_motor_control_encoders.hpp"
 #include "hal_motor_control_interfaces/msg/hal_motor_control_command.hpp"
@@ -29,6 +30,7 @@
 #define MS_TO_NS 1000000
 
 using OdometryMsg_t = nav_msgs::msg::Odometry;
+using PoseMsg_t = geometry_msgs::msg::PoseWithCovariance;
 using TwistMsg_t = geometry_msgs::msg::TwistWithCovariance;
 using HeaderMsg_t = std_msgs::msg::Header;
 using HalMotorControlEncodersMsg_t = hal_motor_control_interfaces::msg::HalMotorControlEncoders;
@@ -53,6 +55,8 @@ class HalPoseManager : public rclcpp_lifecycle::LifecycleNode
 {
 private:
   rclcpp_lifecycle::LifecyclePublisher<OdometryMsg_t>::SharedPtr odometryPublisher;
+  rclcpp_lifecycle::LifecyclePublisher<HalMotorControlCommandMsg_t>::SharedPtr
+    wheelsVelocityCmdPublisher;
   rclcpp::Subscription<TwistMsg_t>::SharedPtr twistSubscriber;
   rclcpp::Subscription<HalMotorControlEncodersMsg_t>::SharedPtr motorsECSubscriber;
 
