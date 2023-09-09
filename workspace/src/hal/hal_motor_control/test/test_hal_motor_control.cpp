@@ -69,7 +69,7 @@ TEST_F(MotorControlTest, configureMotor)
     ASSERT_EQ(
       get_PWM_frequency(pigpioDummy->piHandle, MOTOR_RIGHT_PWM_B_GPIO), MOTOR_PWM_FREQUENCY);
   } else {
-    FAIL();
+    FAIL() << "Future didn't complete successfully";
   }
 }
 
@@ -85,7 +85,7 @@ TEST_F(MotorControlTest, setPwmLeftForward)
   auto status = executor.spin_until_future_complete(future);
 
   if (status != rclcpp::FutureReturnCode::SUCCESS) {
-    FAIL();
+    FAIL() << "Future didn't complete successfully";
   }
 
   motorControl->setPwmLeft(20, FORWARD);
@@ -108,7 +108,7 @@ TEST_F(MotorControlTest, setPwmLeftBackward)
   auto status = executor.spin_until_future_complete(future);
 
   if (status != rclcpp::FutureReturnCode::SUCCESS) {
-    FAIL();
+    FAIL() << "Future didn't complete successfully";
   }
 
   motorControl->setPwmLeft(20, BACKWARD);
@@ -131,7 +131,7 @@ TEST_F(MotorControlTest, setPwmRightForward)
   auto status = executor.spin_until_future_complete(future);
 
   if (status != rclcpp::FutureReturnCode::SUCCESS) {
-    FAIL();
+    FAIL() << "Future didn't complete successfully";
   }
 
   motorControl->setPwmRight(20, FORWARD);
@@ -154,7 +154,7 @@ TEST_F(MotorControlTest, setPwmRightBackward)
   auto status = executor.spin_until_future_complete(future);
 
   if (status != rclcpp::FutureReturnCode::SUCCESS) {
-    FAIL();
+    FAIL() << "Future didn't complete successfully";
   }
 
   motorControl->setPwmRight(20, BACKWARD);

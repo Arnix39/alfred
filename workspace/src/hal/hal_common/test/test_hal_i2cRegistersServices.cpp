@@ -135,7 +135,7 @@ TEST_F(I2cRegistersServicesTest, getI2cHandleSuccess)
   if (status == rclcpp::FutureReturnCode::SUCCESS) {
     ASSERT_EQ(future.get(), IMU_GOOD_HANDLE);
   } else {
-    FAIL();
+    FAIL() << "Future didn't complete successfully";
   }
 }
 
@@ -157,7 +157,7 @@ TEST_F(I2cRegistersServicesTest, readByteFromRegisterSuccess)
   if (status == rclcpp::FutureReturnCode::SUCCESS) {
     ASSERT_EQ(future.get(), valueToRead);
   } else {
-    FAIL();
+    FAIL() << "Future didn't complete successfully";
   }
 
   i2c_close(halDummyNode->piHandle, i2cHandle);
@@ -179,7 +179,7 @@ TEST_F(I2cRegistersServicesTest, readByteFromRegisterFailure)
   if (status == rclcpp::FutureReturnCode::SUCCESS) {
     ASSERT_EQ(future.get(), -1);
   } else {
-    FAIL();
+    FAIL() << "Future didn't complete successfully";
   }
 
   i2c_close(halDummyNode->piHandle, i2cHandle);
@@ -209,7 +209,7 @@ TEST_F(I2cRegistersServicesTest, readBlockFromRegisterSuccess)
       ASSERT_EQ(reading.at(index), valuesToRead[index]);
     }
   } else {
-    FAIL();
+    FAIL() << "Future didn't complete successfully";
   }
 
   i2c_close(halDummyNode->piHandle, i2cHandle);
@@ -233,7 +233,7 @@ TEST_F(I2cRegistersServicesTest, readBlockFromRegisterFailure)
     auto reading = future.get();
     ASSERT_EQ(reading.size(), 0);
   } else {
-    FAIL();
+    FAIL() << "Future didn't complete successfully";
   }
 
   i2c_close(halDummyNode->piHandle, i2cHandle);
@@ -256,7 +256,7 @@ TEST_F(I2cRegistersServicesTest, writeByteInRegisterSuccess)
   if (status == rclcpp::FutureReturnCode::SUCCESS) {
     ASSERT_EQ(future.get(), true);
   } else {
-    FAIL();
+    FAIL() << "Future didn't complete successfully";
   }
 
   i2c_close(halDummyNode->piHandle, i2cHandle);
@@ -279,7 +279,7 @@ TEST_F(I2cRegistersServicesTest, writeByteInRegisterFailure)
   if (status == rclcpp::FutureReturnCode::SUCCESS) {
     ASSERT_EQ(future.get(), false);
   } else {
-    FAIL();
+    FAIL() << "Future didn't complete successfully";
   }
 
   i2c_close(halDummyNode->piHandle, i2cHandle);
@@ -310,7 +310,7 @@ TEST_F(I2cRegistersServicesTest, writeBitInRegisterSuccess)
       i2c_read_byte_data(halDummyNode->piHandle, i2cHandle, I2C_GOOD_REGISTER),
       (bitValue << bitToWrite));
   } else {
-    FAIL();
+    FAIL() << "Future didn't complete successfully";
   }
 
   i2c_close(halDummyNode->piHandle, i2cHandle);
@@ -337,7 +337,7 @@ TEST_F(I2cRegistersServicesTest, writeBitInRegisterFailure)
   if (status == rclcpp::FutureReturnCode::SUCCESS) {
     ASSERT_EQ(future.get(), false);
   } else {
-    FAIL();
+    FAIL() << "Future didn't complete successfully";
   }
 
   i2c_close(halDummyNode->piHandle, i2cHandle);
@@ -363,7 +363,7 @@ TEST_F(I2cRegistersServicesTest, writeBlockInRegisterSuccess)
   if (status == rclcpp::FutureReturnCode::SUCCESS) {
     ASSERT_EQ(future.get(), true);
   } else {
-    FAIL();
+    FAIL() << "Future didn't complete successfully";
   }
 
   i2c_close(halDummyNode->piHandle, i2cHandle);
@@ -389,7 +389,7 @@ TEST_F(I2cRegistersServicesTest, writeBlockInRegisterFailure)
   if (status == rclcpp::FutureReturnCode::SUCCESS) {
     ASSERT_EQ(future.get(), false);
   } else {
-    FAIL();
+    FAIL() << "Future didn't complete successfully";
   }
 
   i2c_close(halDummyNode->piHandle, i2cHandle);

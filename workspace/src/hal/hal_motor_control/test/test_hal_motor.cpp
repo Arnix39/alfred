@@ -76,7 +76,7 @@ TEST_F(MotorTest, ConfigureGpios)
     ASSERT_EQ(get_PWM_frequency(pigpioDummy->piHandle, GPIO_PWM_CHANNEL_A_M1), MOTOR_PWM_FREQUENCY);
     ASSERT_EQ(get_PWM_frequency(pigpioDummy->piHandle, GPIO_PWM_CHANNEL_B_M1), MOTOR_PWM_FREQUENCY);
   } else {
-    FAIL();
+    FAIL() << "Future didn't complete successfully";
   }
 }
 
@@ -100,7 +100,7 @@ TEST_F(MotorTest, SetPwmDutyCycleAndDirectionForward)
   auto status = executor.spin_until_future_complete(future);
 
   if (status != rclcpp::FutureReturnCode::SUCCESS) {
-    FAIL();
+    FAIL() << "Future didn't complete successfully";
   }
 
   motor->motorOk.setPwmDutyCycleAndDirection(motorChecker->setPwmDutycycleClient, 20, FORWARD);
@@ -132,7 +132,7 @@ TEST_F(MotorTest, SetPwmDutyCycleAndDirectionBackward)
   auto status = executor.spin_until_future_complete(future);
 
   if (status != rclcpp::FutureReturnCode::SUCCESS) {
-    FAIL();
+    FAIL() << "Future didn't complete successfully";
   }
 
   motor->motorOk.setPwmDutyCycleAndDirection(motorChecker->setPwmDutycycleClient, 20, BACKWARD);
