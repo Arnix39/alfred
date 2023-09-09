@@ -93,7 +93,9 @@ LifecycleCallbackReturn_t HalPoseManager::on_error(const rclcpp_lifecycle::State
 void HalPoseManager::wheelsVelocityCommand(const TwistMsg_t & msg)
 {
   auto wheelsVelocityCommandMsg = HalMotorControlCommandMsg_t();
-  WheelsVelocity wheelsVelocityCommand;
+
+  wheelsVelocityCommandMsg.motor_left_velocity_command = msg.twist.linear.x;
+  wheelsVelocityCommandMsg.motor_right_velocity_command = msg.twist.linear.x;
 
   wheelsVelocityCmdPublisher->publish(wheelsVelocityCommandMsg);
 }
@@ -105,15 +107,11 @@ void HalPoseManager::wheelsVelocityComputation(const HalMotorControlEncodersMsg_
   auto pose = PoseMsg_t();
   auto twist = TwistMsg_t();
 
-  header.stamp = rclcpp::Clock().now();
-  header.frame_id = "Body";
-
   int32_t encoderCountDelta = 0;
   int32_t timeDelta = msg.header.stamp.nanosec - encodersCount.timestampNs;
 
   auto computeVelocity = [](int32_t encoderCountDelta, int32_t timeDelta) {
-      return static_cast<int32_t>(round(
-               static_cast<double>(encoderCountDelta) / timeDelta * MS_TO_NS));
+      return static_cast<double>(encoderCountDelta) / timeDelta * EC_PER_NS_TO_M_PER_S;
     };
 
   encodersCount.leftPrevious = encodersCount.leftCurrrent;
@@ -128,10 +126,15 @@ void HalPoseManager::wheelsVelocityComputation(const HalMotorControlEncodersMsg_
   encoderCountDelta = encodersCount.rightCurrrent - encodersCount.rightPrevious;
   wheelsVelocity.right = computeVelocity(encoderCountDelta, timeDelta);
 
-  odometry.header = std::move(header);
+  twist.twist.linear.x = wheelsVelocity.right;
+  odometry.twist = std::move(twist);
+
   odometry.child_frame_id = "Body";
   odometry.pose = std::move(pose);
-  odometry.twist = std::move(twist);
+
+  header.frame_id = "Body";
+  header.stamp = rclcpp::Clock().now();
+  odometry.header = std::move(header);
 
   odometryPublisher->publish(odometry);
 }

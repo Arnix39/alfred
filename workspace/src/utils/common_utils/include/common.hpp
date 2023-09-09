@@ -24,7 +24,7 @@
 
 #include "gpioDefinitions.hpp"
 
-struct Quaternions
+struct Quaternion
 {
   double w;
   double x;
@@ -37,6 +37,24 @@ struct Vector3
   double x;
   double y;
   double z;
+};
+
+struct Twist
+{
+  Vector3 linear;
+  Vector3 angular;
+};
+
+struct Pose
+{
+  Vector3 position;
+  Quaternion orientation;
+};
+
+struct Odometry
+{
+  Twist twist;
+  Pose pose;
 };
 
 enum class EdgeChangeConfiguration

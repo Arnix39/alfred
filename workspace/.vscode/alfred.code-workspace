@@ -104,7 +104,8 @@
 			"latch": "cpp",
 			"scoped_allocator": "cpp",
 			"span": "cpp",
-			"syncstream": "cpp"
+			"syncstream": "cpp",
+			"*.txx": "cpp"
 		}
 	}
 }

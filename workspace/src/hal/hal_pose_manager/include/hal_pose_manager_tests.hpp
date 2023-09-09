@@ -24,6 +24,9 @@
 
 #include "hal_pose_manager.hpp"
 
+#define TWIST_COMMAND_1_M_PER_S 1.0
+#define TWIST_COMMAND_2_M_PER_S 2.0
+
 class PoseManagerCheckerNode : public rclcpp::Node
 {
 public:
@@ -31,12 +34,20 @@ public:
   ~PoseManagerCheckerNode() = default;
 
   rclcpp::Client<lifecycle_msgs::srv::ChangeState>::SharedPtr changeStateClient;
+  rclcpp::Subscription<HalMotorControlCommandMsg_t>::SharedPtr wheelsVelocityCmdSubscriber;
+  rclcpp::Subscription<OdometryMsg_t>::SharedPtr odometrySubscriber;
 
   void changePoseManagerNodeToState(std::uint8_t transition);
+
+  void wheelsVelocityCmdReader(const HalMotorControlCommandMsg_t & msg);
+  void odometryReader(const OdometryMsg_t & msg);
+
+  WheelsVelocity wheelsVelocityCommand;
+  Odometry odometry;
 };
 
 /* Test fixture */
-class PoseManagerTest : public testing::Test
+class PoseManagerActivatedTest : public testing::Test
 {
 protected:
   std::shared_ptr<HalPoseManager> poseManager;
@@ -50,10 +61,20 @@ protected:
 
     executorPoseManager.add_node(poseManager->get_node_base_interface());
     executorPoseManager.add_node(poseManagerChecker);
+
+    poseManagerChecker->changePoseManagerNodeToState(
+      lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE);
+    executorPoseManager.spin_some();
+    poseManagerChecker->changePoseManagerNodeToState(
+      lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
+    executorPoseManager.spin_some();
   }
 
   void TearDown()
   {
+    poseManagerChecker->changePoseManagerNodeToState(
+      lifecycle_msgs::msg::Transition::TRANSITION_ACTIVE_SHUTDOWN);
+    executorPoseManager.spin_some();
     executorPoseManager.cancel();
     executorPoseManager.remove_node(poseManager->get_node_base_interface());
     executorPoseManager.remove_node(poseManagerChecker);

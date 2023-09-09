@@ -84,7 +84,7 @@ void Pigpio::readQuaternionData(void)
           pigpioHandle, i2cHandle, MPU6050_FIFO_REGISTER, fifoData,
           MPU6050_DMP_FIFO_QUAT_SIZE) == MPU6050_DMP_FIFO_QUAT_SIZE)
       {
-        computeQuaternions(fifoData);
+        computeQuaternion(fifoData);
       } else {
         RCLCPP_ERROR(get_logger(), "Failed to read FIFO!");
         resetFifo();
@@ -100,7 +100,7 @@ void Pigpio::readQuaternionData(void)
   }
 }
 
-void Pigpio::computeQuaternions(char (& data)[MPU6050_DMP_FIFO_QUAT_SIZE])
+void Pigpio::computeQuaternion(char (& data)[MPU6050_DMP_FIFO_QUAT_SIZE])
 {
   quaternions_.w =
     static_cast<double>((static_cast<int32_t>(data[0]) <<

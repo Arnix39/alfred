@@ -16,6 +16,7 @@
 #define HAL_POSE_MANAGER_HPP_
 
 #include <cmath>
+#include <array>
 
 #include "common.hpp"
 
@@ -27,7 +28,7 @@
 #include "hal_motor_control_interfaces/msg/hal_motor_control_encoders.hpp"
 #include "hal_motor_control_interfaces/msg/hal_motor_control_command.hpp"
 
-#define MS_TO_NS 1000000
+#define EC_PER_NS_TO_M_PER_S 19231  // 52EC = 1mm
 
 using OdometryMsg_t = nav_msgs::msg::Odometry;
 using PoseMsg_t = geometry_msgs::msg::PoseWithCovariance;
@@ -47,8 +48,8 @@ struct EncodersCount
 
 struct WheelsVelocity
 {
-  int32_t right;
-  int32_t left;
+  double right;
+  double left;
 };
 
 class HalPoseManager : public rclcpp_lifecycle::LifecycleNode
