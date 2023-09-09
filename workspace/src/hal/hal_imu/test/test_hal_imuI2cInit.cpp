@@ -16,6 +16,15 @@
 
 using namespace std::placeholders;
 
+namespace hal
+{
+namespace imu
+{
+namespace i2cInit
+{
+namespace test
+{
+
 PigpioDummyNode::PigpioDummyNode()
 : rclcpp::Node{"hal_pigpioDummy_node"},
   piHandle{pigpio_start(NULL, NULL)},
@@ -132,6 +141,11 @@ TEST_F(ImuI2cInitTest, initI2cCommunicationFailure)
 
   ASSERT_EQ(handle, MPU6050_I2C_NO_HANDLE);
 }
+
+}  // namespace test
+}  // namespace i2cInit
+}  // namespace imu
+}  // namespace hal
 
 int main(int argc, char ** argv)
 {

@@ -15,10 +15,6 @@
 #ifndef HAL_IMU_TESTS_HPP_
 #define HAL_IMU_TESTS_HPP_
 
-#define BIAS_VALUE 0x1516
-#define SENSOR_BIAS_MSB_REGISTER 0x11
-#define SENSOR_BIAS_LSB_REGISTER 0x12
-
 #include <memory>
 #include <vector>
 
@@ -29,6 +25,17 @@
 
 #include "hal_imu.hpp"
 #include "mock/hal_i2cRegistersServicesMock.hpp"
+
+namespace hal
+{
+namespace imu
+{
+namespace test
+{
+
+#define BIAS_VALUE 0x1516
+#define SENSOR_BIAS_MSB_REGISTER 0x11
+#define SENSOR_BIAS_LSB_REGISTER 0x12
 
 class ImuCheckerNode : public rclcpp::Node
 {
@@ -67,7 +74,7 @@ protected:
     executorImu.add_node(imu->get_node_base_interface());
     executorImu.add_node(imuChecker);
 
-    imuChecker->imuHandle = getI2cHandle(imuChecker->imuGetHandleDummy);
+    imuChecker->imuHandle = hal::common::getI2cHandle(imuChecker->imuGetHandleDummy);
   }
 
   void TearDown()
@@ -75,10 +82,14 @@ protected:
     executorImu.cancel();
     executorImu.remove_node(imu->get_node_base_interface());
     executorImu.remove_node(imuChecker);
-    closePigpio(imuChecker->imuHandle);
+    hal::common::closePigpio(imuChecker->imuHandle);
     imu.reset();
     imuChecker.reset();
   }
 };
+
+}  // namespace test
+}  // namespace imu
+}  // namespace hal
 
 #endif  // HAL_IMU_TESTS_HPP_

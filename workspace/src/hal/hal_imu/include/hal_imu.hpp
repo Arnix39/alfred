@@ -37,13 +37,18 @@
 #include "hal_imu_interfaces/srv/hal_imu_get_handle.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 
-#define IMU_GYROSCOPE_X_OFFSET 0
-#define IMU_GYROSCOPE_Y_OFFSET -34
-#define IMU_GYROSCOPE_Z_OFFSET -9
+namespace hal
+{
+namespace imu
+{
 
-#define IMU_ACCELEROMETER_X_OFFSET -556
-#define IMU_ACCELEROMETER_Y_OFFSET -1188
-#define IMU_ACCELEROMETER_Z_OFFSET 873
+#define GYROSCOPE_X_OFFSET  0
+#define GYROSCOPE_Y_OFFSET  -34
+#define GYROSCOPE_Z_OFFSET  -9
+
+#define ACCELEROMETER_X_OFFSET -556
+#define ACCELEROMETER_Y_OFFSET -1188
+#define ACCELEROMETER_Z_OFFSET 873
 
 struct SensorBias
 {
@@ -114,5 +119,8 @@ public:
 
   void imuForwarder(const ImuDataMsg_t & msg);
 };
+
+}  // namespace imu
+}  // namespace hal
 
 #endif  // HAL_IMU_HPP_

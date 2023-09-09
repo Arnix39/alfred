@@ -16,7 +16,14 @@
 
 using namespace std::placeholders;
 
-ImuDmpWritingServer::ImuDmpWritingServer()
+namespace hal
+{
+namespace imu
+{
+namespace dmp
+{
+
+DmpWritingServer::DmpWritingServer()
 : rclcpp_lifecycle::LifecycleNode{"hal_imuDmpWritingServer_node"},
   imuHandle{MPU6050_I2C_NO_HANDLE},
   imuGetHandleSyncClient{"getHandleSyncClientDmp_node"},
@@ -25,15 +32,15 @@ ImuDmpWritingServer::ImuDmpWritingServer()
 {
 }
 
-LifecycleCallbackReturn_t ImuDmpWritingServer::on_configure(
+LifecycleCallbackReturn_t DmpWritingServer::on_configure(
   const rclcpp_lifecycle::State & previous_state)
 {
   imuDmpWritingServer = rclcpp_action::create_server<HalImuWriteDmpAction>(
     this,
     "hal_imuWriteDmp",
-    std::bind(&ImuDmpWritingServer::handle_goal, this, _1, _2),
-    std::bind(&ImuDmpWritingServer::handle_cancel, this, _1),
-    std::bind(&ImuDmpWritingServer::handle_accepted, this, _1));
+    std::bind(&DmpWritingServer::handle_goal, this, _1, _2),
+    std::bind(&DmpWritingServer::handle_cancel, this, _1),
+    std::bind(&DmpWritingServer::handle_accepted, this, _1));
   imuGetHandleSyncClient.init("hal_imuGetHandle");
   i2cWriteByteDataSyncClient.init("hal_pigpioI2cWriteByteData");
   i2cWriteBlockDataSyncClient.init("hal_pigpioI2cWriteBlockData");
@@ -43,15 +50,15 @@ LifecycleCallbackReturn_t ImuDmpWritingServer::on_configure(
   return LifecycleCallbackReturn_t::SUCCESS;
 }
 
-LifecycleCallbackReturn_t ImuDmpWritingServer::on_activate(
+LifecycleCallbackReturn_t DmpWritingServer::on_activate(
   const rclcpp_lifecycle::State & previous_state)
 {
-  imuHandle = getI2cHandle(imuGetHandleSyncClient);
+  imuHandle = hal::common::getI2cHandle(imuGetHandleSyncClient);
 
   return LifecycleCallbackReturn_t::SUCCESS;
 }
 
-LifecycleCallbackReturn_t ImuDmpWritingServer::on_deactivate(
+LifecycleCallbackReturn_t DmpWritingServer::on_deactivate(
   const rclcpp_lifecycle::State & previous_state)
 {
   imuHandle = MPU6050_I2C_NO_HANDLE;
@@ -60,7 +67,7 @@ LifecycleCallbackReturn_t ImuDmpWritingServer::on_deactivate(
   return LifecycleCallbackReturn_t::SUCCESS;
 }
 
-LifecycleCallbackReturn_t ImuDmpWritingServer::on_cleanup(
+LifecycleCallbackReturn_t DmpWritingServer::on_cleanup(
   const rclcpp_lifecycle::State & previous_state)
 {
   RCLCPP_INFO(get_logger(), "Node unconfigured!");
@@ -68,7 +75,7 @@ LifecycleCallbackReturn_t ImuDmpWritingServer::on_cleanup(
   return LifecycleCallbackReturn_t::SUCCESS;
 }
 
-LifecycleCallbackReturn_t ImuDmpWritingServer::on_shutdown(
+LifecycleCallbackReturn_t DmpWritingServer::on_shutdown(
   const rclcpp_lifecycle::State & previous_state)
 {
   RCLCPP_INFO(get_logger(), "Node shutdown!");
@@ -76,13 +83,13 @@ LifecycleCallbackReturn_t ImuDmpWritingServer::on_shutdown(
   return LifecycleCallbackReturn_t::SUCCESS;
 }
 
-LifecycleCallbackReturn_t ImuDmpWritingServer::on_error(
+LifecycleCallbackReturn_t DmpWritingServer::on_error(
   const rclcpp_lifecycle::State & previous_state)
 {
   return LifecycleCallbackReturn_t::FAILURE;
 }
 
-rclcpp_action::GoalResponse ImuDmpWritingServer::handle_goal(
+rclcpp_action::GoalResponse DmpWritingServer::handle_goal(
   const rclcpp_action::GoalUUID & uuid,
   std::shared_ptr<const HalImuWriteDmpAction::Goal> goal)
 {
@@ -92,7 +99,7 @@ rclcpp_action::GoalResponse ImuDmpWritingServer::handle_goal(
   return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
 }
 
-rclcpp_action::CancelResponse ImuDmpWritingServer::handle_cancel(
+rclcpp_action::CancelResponse DmpWritingServer::handle_cancel(
   const std::shared_ptr<HalImuWriteDmpGoal> goal_handle)
 {
   (void)goal_handle;
@@ -100,12 +107,12 @@ rclcpp_action::CancelResponse ImuDmpWritingServer::handle_cancel(
   return rclcpp_action::CancelResponse::ACCEPT;
 }
 
-void ImuDmpWritingServer::handle_accepted(const std::shared_ptr<HalImuWriteDmpGoal> goal_handle)
+void DmpWritingServer::handle_accepted(const std::shared_ptr<HalImuWriteDmpGoal> goal_handle)
 {
-  std::thread{std::bind(&ImuDmpWritingServer::writeDmp, this, _1), goal_handle}.detach();
+  std::thread{std::bind(&DmpWritingServer::writeDmp, this, _1), goal_handle}.detach();
 }
 
-void ImuDmpWritingServer::writeDmp(const std::shared_ptr<HalImuWriteDmpGoal> goal_handle)
+void DmpWritingServer::writeDmp(const std::shared_ptr<HalImuWriteDmpGoal> goal_handle)
 {
   /* This address is the start address of DMP code */
   /* It is coming from InvenSense */
@@ -157,10 +164,10 @@ void ImuDmpWritingServer::writeDmp(const std::shared_ptr<HalImuWriteDmpGoal> goa
     }
   }
 
-  writeSuccess = writeByteInRegister(
+  writeSuccess = hal::common::writeByteInRegister(
     i2cWriteByteDataSyncClient, imuHandle,
     MPU6050_DMP_START_ADDRESS_H_REGISTER, startAddressMsb);
-  writeSuccess &= writeByteInRegister(
+  writeSuccess &= hal::common::writeByteInRegister(
     i2cWriteByteDataSyncClient, imuHandle,
     MPU6050_DMP_START_ADDRESS_L_REGISTER, startAddressLsb);
   if (!writeSuccess) {
@@ -173,11 +180,11 @@ void ImuDmpWritingServer::writeDmp(const std::shared_ptr<HalImuWriteDmpGoal> goa
   goal_handle->succeed(result);
 }
 
-bool ImuDmpWritingServer::writeData(uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data)
+bool DmpWritingServer::writeData(uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data)
 {
   if (addressInBank == 0) {
     /* A new bank is starting */
-    if (!writeByteInRegister(
+    if (!hal::common::writeByteInRegister(
         i2cWriteByteDataSyncClient, imuHandle, MPU6050_BANK_SELECTION_REGISTER,
         bank))
     {
@@ -185,16 +192,22 @@ bool ImuDmpWritingServer::writeData(uint8_t bank, uint8_t addressInBank, std::ve
     }
   }
 
-  if (!writeByteInRegister(
+  if (!hal::common::writeByteInRegister(
       i2cWriteByteDataSyncClient, imuHandle, MPU6050_ADDRESS_IN_BANK_REGISTER,
       addressInBank))
   {
     return false;
   }
 
-  if (!writeDataBlock(i2cWriteBlockDataSyncClient, imuHandle, MPU6050_READ_WRITE_REGISTER, data)) {
+  if (!hal::common::writeDataBlock(
+      i2cWriteBlockDataSyncClient, imuHandle, MPU6050_READ_WRITE_REGISTER, data))
+  {
     return false;
   }
 
   return true;
 }
+
+}  // namespace dmp
+}  // namespace imu
+}  // namespace hal

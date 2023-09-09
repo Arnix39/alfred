@@ -17,6 +17,13 @@
 using namespace std::placeholders;
 using namespace std::chrono_literals;
 
+namespace hal
+{
+namespace common
+{
+namespace test
+{
+
 I2cRegistersServicesCheckerNode::I2cRegistersServicesCheckerNode()
 : rclcpp::Node{"hal_i2cRegistersServices_checker_node"},
   imuGetHandleSyncClient{"getHandleSyncClientImu_node"},
@@ -394,6 +401,10 @@ TEST_F(I2cRegistersServicesTest, writeBlockInRegisterFailure)
 
   i2c_close(halDummyNode->piHandle, i2cHandle);
 }
+
+}  // namespace test
+}  // namespace common
+}  // namespace hal
 
 int main(int argc, char ** argv)
 {

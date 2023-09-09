@@ -14,6 +14,11 @@
 
 #include "hal_i2cRegistersServices.hpp"
 
+namespace hal
+{
+namespace common
+{
+
 int32_t getI2cHandle(imuGetHandleSyncClientNode_t imuGetHandleSyncClient)
 {
   auto imuGetHandleRequest = std::make_shared<HalImuGetHandle_t::Request>();
@@ -123,3 +128,6 @@ bool writeDataBlock(
 
   return i2cWriteBlockDataSyncClientNode.sendRequest(i2cWriteBlockDataRequest)->has_succeeded;
 }
+
+}  // namespace common
+}  // namespace hal

@@ -31,6 +31,13 @@
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_read_block_data.hpp"
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_write_byte_data.hpp"
 
+namespace hal
+{
+namespace common
+{
+namespace test
+{
+
 #define I2C_GOOD_ADDRESS MPU6050_I2C_ADDRESS
 #define I2C_GOOD_BUS_1 0
 #define I2C_GOOD_HANDLE 0
@@ -120,5 +127,9 @@ protected:
     i2cRegistersServicesChecker.reset();
   }
 };
+
+}  // namespace test
+}  // namespace common
+}  // namespace hal
 
 #endif  // HAL_I2CREGISTERSSERVICES_TESTS_HPP_

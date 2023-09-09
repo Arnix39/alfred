@@ -17,6 +17,13 @@
 using namespace std::placeholders;
 using namespace std::chrono_literals;
 
+namespace hal
+{
+namespace imu
+{
+namespace i2cInit
+{
+
 ImuI2cInit::ImuI2cInit()
 : rclcpp_lifecycle::LifecycleNode{"hal_imuI2cInit_node"},
   imuHandle{MPU6050_I2C_NO_HANDLE}
@@ -114,7 +121,7 @@ void ImuI2cInit::initI2cCommunication(void)
 {
   auto i2cOpenRequest = std::make_shared<HalPigpioI2cOpen_t::Request>();
 
-  i2cOpenRequest->bus = IMU_I2C_BUS;
+  i2cOpenRequest->bus = I2C_BUS;
   i2cOpenRequest->address = MPU6050_I2C_ADDRESS;
 
   auto i2cOpenCallback = [this](I2cOpenFuture_t future)
@@ -128,3 +135,7 @@ void ImuI2cInit::initI2cCommunication(void)
     };
   auto i2cOpenFuture = i2cOpenClient->async_send_request(i2cOpenRequest, i2cOpenCallback);
 }
+
+}  // namespace i2cInit
+}  // namespace imu
+}  // namespace hal

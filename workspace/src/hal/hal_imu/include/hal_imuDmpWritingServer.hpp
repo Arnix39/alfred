@@ -35,7 +35,14 @@
 using HalImuWriteDmpAction = hal_imu_interfaces::action::HalImuWriteDmp;
 using HalImuWriteDmpGoal = rclcpp_action::ServerGoalHandle<HalImuWriteDmpAction>;
 
-class ImuDmpWritingServer : public rclcpp_lifecycle::LifecycleNode
+namespace hal
+{
+namespace imu
+{
+namespace dmp
+{
+
+class DmpWritingServer : public rclcpp_lifecycle::LifecycleNode
 {
 private:
   int32_t imuHandle;
@@ -53,8 +60,8 @@ private:
   void handle_accepted(const std::shared_ptr<HalImuWriteDmpGoal> goal_handle);
 
 public:
-  ImuDmpWritingServer();
-  ~ImuDmpWritingServer() = default;
+  DmpWritingServer();
+  ~DmpWritingServer() = default;
 
   LifecycleCallbackReturn_t on_configure(const rclcpp_lifecycle::State & previous_state);
   LifecycleCallbackReturn_t on_activate(const rclcpp_lifecycle::State & previous_state);
@@ -66,5 +73,9 @@ public:
   void writeDmp(const std::shared_ptr<HalImuWriteDmpGoal> goal_handle);
   bool writeData(uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data);
 };
+
+}  // namespace dmp
+}  // namespace imu
+}  // namespace hal
 
 #endif  // HAL_IMUDMPWRITINGSERVER_HPP_

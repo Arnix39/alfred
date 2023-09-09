@@ -43,6 +43,11 @@ using i2cWriteBlockDataSyncClientNode_t = ServiceNodeSync<HalPigpioI2cWriteBlock
 
 using imuGetHandleSyncClientNode_t = ServiceNodeSync<HalImuGetHandle_t>;
 
+namespace hal
+{
+namespace common
+{
+
 int32_t getI2cHandle(imuGetHandleSyncClientNode_t imuGetHandleSyncClientNode);
 
 int16_t readByteFromRegister(
@@ -65,5 +70,8 @@ bool writeByteInRegister(
 bool writeDataBlock(
   i2cWriteBlockDataSyncClientNode_t i2cWriteBlockDataSyncClientNode, int32_t imuHandle,
   uint8_t registerToWrite, std::vector<uint8_t> data);
+
+}  // namespace common
+}  // namespace hal
 
 #endif  // HAL_I2CREGISTERSSERVICES_HPP_

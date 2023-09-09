@@ -15,6 +15,11 @@
 #include "hal_i2cRegistersServices.hpp"
 #include "mock/hal_i2cRegistersServicesMock.hpp"
 
+namespace hal
+{
+namespace common
+{
+
 static int piHandle = pigpio_start(NULL, NULL);
 
 void closePigpio(int32_t i2cHandle)
@@ -118,3 +123,6 @@ bool writeDataBlock(
     return false;
   }
 }
+
+}  // namespace common
+}  // namespace hal

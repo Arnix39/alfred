@@ -14,6 +14,13 @@
 
 #include "hal_imu_tests.hpp"
 
+namespace hal
+{
+namespace imu
+{
+namespace test
+{
+
 ImuCheckerNode::ImuCheckerNode()
 : rclcpp::Node{"hal_imu_checker_node"},
   changeStateClient{this->create_client<lifecycle_msgs::srv::ChangeState>(
@@ -35,17 +42,18 @@ void ImuCheckerNode::changeImuNodeToState(std::uint8_t transition)
 
 void ImuCheckerNode::writeByte(uint8_t imuRegister, uint8_t value)
 {
-  writeByteInRegister(i2cWriteByteDataDummy, imuHandle, imuRegister, value);
+  hal::common::writeByteInRegister(i2cWriteByteDataDummy, imuHandle, imuRegister, value);
 }
 
 int16_t ImuCheckerNode::readByte(uint8_t imuRegister)
 {
-  return readByteFromRegister(i2cReadByteDataDummy, imuHandle, imuRegister);
+  return hal::common::readByteFromRegister(i2cReadByteDataDummy, imuHandle, imuRegister);
 }
 
 std::vector<uint8_t> ImuCheckerNode::readBlock(uint8_t imuRegister, uint8_t bytesToRead)
 {
-  return readBlockFromRegister(i2cReadBlockDataDummy, imuHandle, imuRegister, bytesToRead);
+  return hal::common::readBlockFromRegister(
+    i2cReadBlockDataDummy, imuHandle, imuRegister, bytesToRead);
 }
 
 TEST_F(ImuTest, resetImu)
@@ -145,6 +153,10 @@ TEST_F(ImuTest, writeSensorBiases)
   ASSERT_EQ(imuChecker->readByte(SENSOR_BIAS_MSB_REGISTER), biasValueMsb);
   ASSERT_EQ(imuChecker->readByte(SENSOR_BIAS_LSB_REGISTER), biasValueLsb);
 }
+
+}  // namespace test
+}  // namespace imu
+}  // namespace hal
 
 int main(int argc, char ** argv)
 {

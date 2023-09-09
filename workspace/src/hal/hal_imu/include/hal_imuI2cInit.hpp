@@ -25,7 +25,14 @@
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_close.hpp"
 #include "hal_imu_interfaces/srv/hal_imu_get_handle.hpp"
 
-#define IMU_I2C_BUS 0x1
+namespace hal
+{
+namespace imu
+{
+namespace i2cInit
+{
+
+#define I2C_BUS 0x1
 
 using HalPigpioI2cOpen_t = hal_pigpio_interfaces::srv::HalPigpioI2cOpen;
 using HalPigpioI2cClose_t = hal_pigpio_interfaces::srv::HalPigpioI2cClose;
@@ -59,5 +66,9 @@ public:
     std::shared_ptr<HalImuGetHandle_t::Response> response);
   void initI2cCommunication(void);
 };
+
+}  // namespace i2cInit
+}  // namespace imu
+}  // namespace hal
 
 #endif  // HAL_IMUI2CINIT_HPP_

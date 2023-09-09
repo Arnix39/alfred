@@ -22,6 +22,11 @@
 #include "std_msgs/msg/header.hpp"
 #include "common.hpp"
 
+namespace hal
+{
+namespace camera
+{
+
 class Camera : public rclcpp_lifecycle::LifecycleNode
 {
 private:
@@ -43,5 +48,8 @@ public:
 
   void captureAndPublishFrame(void);
 };
+
+}  // namespace camera
+}  // namespace hal
 
 #endif  // HAL_CAMERA_HPP_"

@@ -17,9 +17,17 @@
 
 #include "pigpiod_if2.h" // NOLINT
 
+namespace hal
+{
+namespace common
+{
+
 #define IMU_I2C_BUS 0x1
 #define I2C_BUFFER_MAX_BYTES 32
 
 void closePigpio(int32_t i2cHandle);
+
+}  // namespace common
+}  // namespace hal
 
 #endif  // MOCK__HAL_I2CREGISTERSSERVICESMOCK_HPP_

@@ -17,6 +17,11 @@
 using namespace std::chrono_literals;
 using namespace std::placeholders;
 
+namespace hal
+{
+namespace imu
+{
+
 Imu::Imu()
 : rclcpp_lifecycle::LifecycleNode{"hal_imuI2cInit_node"},
   imuHandle{MPU6050_I2C_NO_HANDLE},
@@ -47,7 +52,7 @@ LifecycleCallbackReturn_t Imu::on_configure(const rclcpp_lifecycle::State & prev
 
 LifecycleCallbackReturn_t Imu::on_activate(const rclcpp_lifecycle::State & previous_state)
 {
-  imuHandle = getI2cHandle(imuGetHandleSyncClient);
+  imuHandle = hal::common::getI2cHandle(imuGetHandleSyncClient);
 
   resetImu(imuHandle);
   setClockSource(imuHandle);
@@ -132,7 +137,7 @@ void Imu::resetImu(int32_t imuHandle)
   RCLCPP_INFO(get_logger(), "IMU resetting...");
 
   /* Reset MPU6050 */
-  if (!writeByteInRegister(
+  if (!hal::common::writeByteInRegister(
       i2cWriteByteDataSyncClient, imuHandle, MPU6050_POWER_MANAGEMENT_1_REGISTER,
       MPU6050_RESET))
   {
@@ -143,7 +148,7 @@ void Imu::resetImu(int32_t imuHandle)
   rclcpp::sleep_for(100ms);
 
   /* Reset signal paths */
-  if (!writeByteInRegister(
+  if (!hal::common::writeByteInRegister(
       i2cWriteByteDataSyncClient, imuHandle, MPU6050_SIGNAL_PATH_RESET_REGISTER,
       MPU6050_SIGNAL_PATH_RESET))
   {
@@ -154,7 +159,7 @@ void Imu::resetImu(int32_t imuHandle)
   rclcpp::sleep_for(100ms);
 
   /* Disable sleep mode */
-  if (!writeByteInRegister(
+  if (!hal::common::writeByteInRegister(
       i2cWriteByteDataSyncClient, imuHandle, MPU6050_POWER_MANAGEMENT_1_REGISTER,
       0x00))
   {
@@ -167,7 +172,7 @@ void Imu::resetImu(int32_t imuHandle)
 
 void Imu::setClockSource(int32_t imuHandle)
 {
-  if (!writeByteInRegister(
+  if (!hal::common::writeByteInRegister(
       i2cWriteByteDataSyncClient, imuHandle, MPU6050_POWER_MANAGEMENT_1_REGISTER,
       MPU6050_CLOCK_SOURCE_PLL_X))
   {
@@ -189,7 +194,7 @@ void Imu::setMpuRate(int32_t imuHandle, uint16_t rate)
 
   div = MPU6050_MAX_SAMPLE_RATE / rate - 1;
 
-  if (!writeByteInRegister(
+  if (!hal::common::writeByteInRegister(
       i2cWriteByteDataSyncClient, imuHandle, MPU6050_SAMPLE_RATE_REGISTER, div))
   {
     RCLCPP_ERROR(get_logger(), "Failed to set MPU sample rate.");
@@ -200,7 +205,7 @@ void Imu::setMpuRate(int32_t imuHandle, uint16_t rate)
 
 void Imu::setConfiguration(int32_t imuHandle)
 {
-  if (!writeByteInRegister(
+  if (!hal::common::writeByteInRegister(
       i2cWriteByteDataSyncClient, imuHandle, MPU6050_CONFIGURATION_REGISTER,
       MPU6050_DLPF_BANDWITH_188))
   {
@@ -212,7 +217,7 @@ void Imu::setConfiguration(int32_t imuHandle)
 
 void Imu::setAccelerometerSensitivity(int32_t imuHandle)
 {
-  if (!writeByteInRegister(
+  if (!hal::common::writeByteInRegister(
       i2cWriteByteDataSyncClient, imuHandle,
       MPU6050_ACCELEROMETER_CONFIGURATION_REGISTER, MPU6050_ACCELEROMETER_FULL_SENSITIVITY))
   {
@@ -224,7 +229,7 @@ void Imu::setAccelerometerSensitivity(int32_t imuHandle)
 
 void Imu::setGyroscopeSensitivity(int32_t imuHandle)
 {
-  if (!writeByteInRegister(
+  if (!hal::common::writeByteInRegister(
       i2cWriteByteDataSyncClient, imuHandle,
       MPU6050_GYROSCOPE_CONFIGURATION_REGISTER, MPU6050_GYROSCOPE_FULL_SENSITIVITY))
   {
@@ -282,7 +287,7 @@ void Imu::setDmpRate(int32_t imuHandle, uint16_t rate)
 
 void Imu::resetFifo(int32_t imuHandle)
 {
-  if (!writeBitInRegister(
+  if (!hal::common::writeBitInRegister(
       i2cReadByteDataSyncClient, i2cWriteByteDataSyncClient, imuHandle,
       MPU6050_USER_CONTROL_REGISTER, MPU6050_FIFO_RESET_BIT, 1))
   {
@@ -294,11 +299,11 @@ void Imu::resetFifo(int32_t imuHandle)
 
 void Imu::setAccelerometerOffsets(int32_t imuHandle)
 {
-  SensorBias accelerometerXBias{'X', IMU_ACCELEROMETER_X_OFFSET,
+  SensorBias accelerometerXBias{'X', ACCELEROMETER_X_OFFSET,
     MPU6050_ACCELEROMETER_X_OFFSET_MSB_REGISTER, MPU6050_ACCELEROMETER_X_OFFSET_LSB_REGISTER};
-  SensorBias accelerometerYBias{'Y', IMU_ACCELEROMETER_Y_OFFSET,
+  SensorBias accelerometerYBias{'Y', ACCELEROMETER_Y_OFFSET,
     MPU6050_ACCELEROMETER_Y_OFFSET_MSB_REGISTER, MPU6050_ACCELEROMETER_Y_OFFSET_LSB_REGISTER};
-  SensorBias accelerometerZBias{'Z', IMU_ACCELEROMETER_Z_OFFSET,
+  SensorBias accelerometerZBias{'Z', ACCELEROMETER_Z_OFFSET,
     MPU6050_ACCELEROMETER_Z_OFFSET_MSB_REGISTER, MPU6050_ACCELEROMETER_Z_OFFSET_LSB_REGISTER};
 
   const std::vector<SensorBias> accelerometerBiases{accelerometerXBias, accelerometerYBias,
@@ -313,11 +318,11 @@ void Imu::setAccelerometerOffsets(int32_t imuHandle)
 
 void Imu::setGyroscopeOffsets(int32_t imuHandle)
 {
-  SensorBias gyroscopeXBias{'X', IMU_GYROSCOPE_X_OFFSET, MPU6050_GYROSCOPE_X_OFFSET_MSB_REGISTER,
+  SensorBias gyroscopeXBias{'X', GYROSCOPE_X_OFFSET, MPU6050_GYROSCOPE_X_OFFSET_MSB_REGISTER,
     MPU6050_GYROSCOPE_X_OFFSET_LSB_REGISTER};
-  SensorBias gyroscopeYBias{'Y', IMU_GYROSCOPE_Y_OFFSET, MPU6050_GYROSCOPE_Y_OFFSET_MSB_REGISTER,
+  SensorBias gyroscopeYBias{'Y', GYROSCOPE_Y_OFFSET, MPU6050_GYROSCOPE_Y_OFFSET_MSB_REGISTER,
     MPU6050_GYROSCOPE_Y_OFFSET_LSB_REGISTER};
-  SensorBias gyroscopeZBias{'Z', IMU_GYROSCOPE_Z_OFFSET, MPU6050_GYROSCOPE_Z_OFFSET_MSB_REGISTER,
+  SensorBias gyroscopeZBias{'Z', GYROSCOPE_Z_OFFSET, MPU6050_GYROSCOPE_Z_OFFSET_MSB_REGISTER,
     MPU6050_GYROSCOPE_Z_OFFSET_LSB_REGISTER};
 
   const std::vector<SensorBias> gyroscopeBiases{gyroscopeXBias, gyroscopeYBias, gyroscopeZBias};
@@ -335,7 +340,7 @@ bool Imu::writeSensorBiases(int32_t imuHandle, const std::vector<SensorBias> sen
     uint8_t sensorBiasMsb = static_cast<uint8_t>((sensorBias.bias >> 8) & 0xFF);
     uint8_t sensorBiasLsb = static_cast<uint8_t>(sensorBias.bias & 0xFF);
 
-    if (!writeByteInRegister(
+    if (!hal::common::writeByteInRegister(
         i2cWriteByteDataSyncClient, imuHandle, sensorBias.msbRegister,
         sensorBiasMsb))
     {
@@ -343,7 +348,7 @@ bool Imu::writeSensorBiases(int32_t imuHandle, const std::vector<SensorBias> sen
       return false;
     }
 
-    if (!writeByteInRegister(
+    if (!hal::common::writeByteInRegister(
         i2cWriteByteDataSyncClient, imuHandle, sensorBias.lsbRegister,
         sensorBiasLsb))
     {
@@ -435,7 +440,7 @@ void Imu::configureDmpFeatures(int32_t imuHandle)
 void Imu::enableDmpAndStartReading(int32_t imuHandle)
 {
   /* Enable DMP and FIFO */
-  if (!writeByteInRegister(
+  if (!hal::common::writeByteInRegister(
       i2cWriteByteDataSyncClient, imuHandle, MPU6050_USER_CONTROL_REGISTER,
       MPU6050_DMP_EMABLE | MPU6050_FIFO_ENABLE))
   {
@@ -453,7 +458,7 @@ void Imu::enableDmpAndStartReading(int32_t imuHandle)
 bool Imu::writeDataToDmp(
   int32_t imuHandle, uint8_t bank, uint8_t addressInBank, std::vector<uint8_t> data)
 {
-  if (!writeByteInRegister(
+  if (!hal::common::writeByteInRegister(
       i2cWriteByteDataSyncClient, imuHandle, MPU6050_BANK_SELECTION_REGISTER,
       bank))
   {
@@ -461,7 +466,7 @@ bool Imu::writeDataToDmp(
     return false;
   }
 
-  if (!writeByteInRegister(
+  if (!hal::common::writeByteInRegister(
       i2cWriteByteDataSyncClient, imuHandle, MPU6050_ADDRESS_IN_BANK_REGISTER,
       addressInBank))
   {
@@ -469,7 +474,9 @@ bool Imu::writeDataToDmp(
     return false;
   }
 
-  if (!writeDataBlock(i2cWriteBlockDataSyncClient, imuHandle, MPU6050_READ_WRITE_REGISTER, data)) {
+  if (!hal::common::writeDataBlock(
+      i2cWriteBlockDataSyncClient, imuHandle, MPU6050_READ_WRITE_REGISTER, data))
+  {
     RCLCPP_ERROR(get_logger(), "Failed to write data!");
     return false;
   }
@@ -522,3 +529,6 @@ void Imu::computeAngularVelAndLinearAcc()
   angles.psi = std::atan2(tanPsi, quadrantPsi) * 180 / M_PI;
 }
 */
+
+}  // namespace imu
+}  // namespace hal

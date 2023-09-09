@@ -16,6 +16,11 @@
 
 using namespace std::chrono_literals;
 
+namespace hal
+{
+namespace camera
+{
+
 Camera::Camera()
 : rclcpp_lifecycle::LifecycleNode{"hal_camera_node"}
 {
@@ -104,3 +109,6 @@ void Camera::captureAndPublishFrame(void)
     imagePublisher->publish(*imageMsg);
   }
 }
+
+}  // namespace camera
+}  // namespace hal

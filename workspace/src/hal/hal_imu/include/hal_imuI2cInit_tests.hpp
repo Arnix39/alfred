@@ -25,6 +25,15 @@
 #include "hal_imuI2cInit.hpp"
 #include "pigpiod_if2.h" // NOLINT
 
+namespace hal
+{
+namespace imu
+{
+namespace i2cInit
+{
+namespace test
+{
+
 class PigpioDummyNode : public rclcpp::Node
 {
 public:
@@ -96,5 +105,10 @@ protected:
     imuI2cInitChecker.reset();
   }
 };
+
+}  // namespace test
+}  // namespace i2cInit
+}  // namespace imu
+}  // namespace hal
 
 #endif  // HAL_IMUI2CINIT_TESTS_HPP_
