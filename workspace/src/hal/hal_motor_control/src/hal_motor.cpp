@@ -14,6 +14,11 @@
 
 #include "hal_motor.hpp"
 
+namespace hal
+{
+namespace motor
+{
+
 Motor::Motor(
   uint8_t gpioPwmChannelA, uint8_t gpioPwmChannelB,
   uint8_t gpioEncoderChannelA, uint8_t gpioEncoderChannelB,
@@ -152,3 +157,6 @@ uint8_t Motor::getId(void)
 {
   return id;
 }
+
+}  // namespace motor
+}  // namespace hal

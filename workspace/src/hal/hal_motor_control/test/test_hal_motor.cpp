@@ -16,6 +16,13 @@
 
 using namespace std::placeholders;
 
+namespace hal
+{
+namespace motor
+{
+namespace test
+{
+
 MotorNode::MotorNode()
 : rclcpp::Node{"hal_motor_node"},
   motorOk{
@@ -143,6 +150,10 @@ TEST_F(MotorTest, SetPwmDutyCycleAndDirectionBackward)
   ASSERT_EQ(get_PWM_dutycycle(pigpioDummy->piHandle, GPIO_PWM_CHANNEL_A_M1), 0);
   ASSERT_EQ(get_PWM_dutycycle(pigpioDummy->piHandle, GPIO_PWM_CHANNEL_B_M1), 20);
 }
+
+}  // namespace test
+}  // namespace motor
+}  // namespace hal
 
 int main(int argc, char ** argv)
 {

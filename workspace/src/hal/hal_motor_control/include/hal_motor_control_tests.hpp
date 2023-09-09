@@ -22,6 +22,15 @@
 #include "hal_motor_control_tests_helpers.hpp"
 #include "hal_motor_control.hpp"
 
+namespace hal
+{
+namespace motor
+{
+namespace control
+{
+namespace test
+{
+
 #define BAD_MOTOR_ID (MOTOR_RIGHT + 10)
 
 class MotorControlCheckerNode : public rclcpp::Node
@@ -44,14 +53,14 @@ class MotorControlTest : public testing::Test
 {
 protected:
   std::shared_ptr<MotorControl> motorControl;
-  std::shared_ptr<HalPigpioDummyNode> pigpioDummy;
+  std::shared_ptr<hal::motor::test::HalPigpioDummyNode> pigpioDummy;
   std::shared_ptr<MotorControlCheckerNode> motorControlChecker;
   rclcpp::executors::SingleThreadedExecutor executor;
 
   void SetUp()
   {
     motorControl = std::make_shared<MotorControl>();
-    pigpioDummy = std::make_shared<HalPigpioDummyNode>();
+    pigpioDummy = std::make_shared<hal::motor::test::HalPigpioDummyNode>();
     motorControlChecker = std::make_shared<MotorControlCheckerNode>();
 
     executor.add_node(motorControl->get_node_base_interface());
@@ -76,5 +85,10 @@ protected:
     motorControl.reset();
   }
 };
+
+}  // namespace test
+}  // namespace control
+}  // namespace motor
+}  // namespace hal
 
 #endif  // HAL_MOTOR_CONTROL_TESTS_HPP_

@@ -18,10 +18,19 @@
 #include "hal_motor_control_commonDefinitions.hpp"
 #include "hal_motor.hpp"
 
+namespace hal
+{
+namespace motor
+{
+
 using setInputModeSyncClientNode_t = ServiceNodeSync<HalPigpioSetInputMode_t>;
 using setOutputModeSyncClientNode_t = ServiceNodeSync<HalPigpioSetOutputMode_t>;
 using setEncoderCallbackSyncClientNode_t = ServiceNodeSync<HalPigpioSetEncoderCallback_t>;
 using setPwmFrequencySyncClientNode_t = ServiceNodeSync<HalPigpioSetPwmFrequency_t>;
+
+
+namespace control
+{
 
 class MotorControl : public rclcpp_lifecycle::LifecycleNode
 {
@@ -60,5 +69,9 @@ public:
   void setPwmLeft(uint16_t dutycycle, bool direction);
   void setPwmRight(uint16_t dutycycle, bool direction);
 };
+
+}  // namespace control
+}  // namespace motor
+}  // namespace hal
 
 #endif  // HAL_MOTOR_CONTROL_HPP_

@@ -17,7 +17,7 @@
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
-  auto node = std::make_shared<MotorControl>();
+  auto node = std::make_shared<hal::motor::control::MotorControl>();
 
   rclcpp::spin(node->get_node_base_interface());
 

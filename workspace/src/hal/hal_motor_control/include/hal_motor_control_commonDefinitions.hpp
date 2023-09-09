@@ -26,6 +26,11 @@
 #include "hal_pigpio_interfaces/srv/hal_pigpio_set_pwm_frequency.hpp"
 #include "hal_pigpio_interfaces/srv/hal_pigpio_set_pwm_dutycycle.hpp"
 
+namespace hal
+{
+namespace motor
+{
+
 #define MOTOR_LEFT 0
 #define MOTOR_LEFT_PWM_A_GPIO GPIO19
 #define MOTOR_LEFT_PWM_B_GPIO GPIO16
@@ -55,5 +60,8 @@ using SetOutputModeFuture_t = rclcpp::Client<HalPigpioSetOutputMode_t>::SharedFu
 using SetEncoderCallbackFuture_t = rclcpp::Client<HalPigpioSetEncoderCallback_t>::SharedFuture;
 using SetPwmFrequencyFuture_t = rclcpp::Client<HalPigpioSetPwmFrequency_t>::SharedFuture;
 using SetPwmDutycycleFuture_t = rclcpp::Client<HalPigpioSetPwmDutycycle_t>::SharedFuture;
+
+}  // namespace motor
+}  // namespace hal
 
 #endif  // HAL_MOTOR_CONTROL_COMMONDEFINITIONS_HPP_

@@ -16,6 +16,15 @@
 
 using namespace std::placeholders;
 
+namespace hal
+{
+namespace motor
+{
+namespace control
+{
+namespace test
+{
+
 MotorControlCheckerNode::MotorControlCheckerNode()
 : rclcpp::Node{"hal_motor_control_checker_node"},
   changeStateClient{this->create_client<lifecycle_msgs::srv::ChangeState>(
@@ -212,6 +221,10 @@ TEST_F(MotorControlTest, encoderCountCallbackAndPublishMessageFailure)
   ASSERT_EQ(motorControlChecker->encoderCounts.at(0), 10);
   ASSERT_EQ(motorControlChecker->encoderCounts.at(1), 0);
 }
+}  // namespace test
+}  // namespace control
+}  // namespace motor
+}  // namespace hal
 
 int main(int argc, char ** argv)
 {

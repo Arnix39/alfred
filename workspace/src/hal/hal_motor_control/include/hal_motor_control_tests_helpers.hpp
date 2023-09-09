@@ -26,6 +26,13 @@
 
 #include "pigpiod_if2.h" // NOLINT
 
+namespace hal
+{
+namespace motor
+{
+namespace test
+{
+
 #define INPUT 0
 #define OUTPUT 1
 #define FORWARD true
@@ -62,5 +69,9 @@ public:
     const std::shared_ptr<HalPigpioSetEncoderCallback_t::Request> request,
     std::shared_ptr<HalPigpioSetEncoderCallback_t::Response> response);
 };
+
+}  // namespace test
+}  // namespace motor
+}  // namespace hal
 
 #endif  // HAL_MOTOR_CONTROL_TESTS_HELPERS_HPP_

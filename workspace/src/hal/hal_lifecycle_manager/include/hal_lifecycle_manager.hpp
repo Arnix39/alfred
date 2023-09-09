@@ -32,6 +32,11 @@ using TransitionMessage = lifecycle_msgs::msg::TransitionEvent;
 using TransitionMessageSubscription = rclcpp::Subscription<TransitionMessage>::SharedPtr;
 using ChangeStateCallback_t = std::function<void (TransitionMessage::ConstSharedPtr)>;
 
+namespace hal
+{
+namespace lifecycle_manager
+{
+
 enum NodeState
 {
   Unconfigured,
@@ -98,5 +103,8 @@ private:
   std::map<std::string, NodeState> nodesState;
   std::map<std::string, NodeState> expectedNodesState;
 };
+
+}  // namespace lifecycle_manager
+}  // namespace hal
 
 #endif  // HAL_LIFECYCLE_MANAGER_HPP_

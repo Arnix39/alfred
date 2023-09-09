@@ -16,6 +16,11 @@
 
 using namespace std::chrono_literals;
 
+namespace hal
+{
+namespace lifecycle_manager
+{
+
 LifecycleManager::LifecycleManager()
 : rclcpp_lifecycle::LifecycleNode{"hal_lifecycle_manager"},
   changeStateClients{},
@@ -229,3 +234,6 @@ NodeState LifecycleManager::getEnumFromString(std::string state)
 {
   return nodeStatesEnum.find(state)->second;
 }
+
+}  // namespace lifecycle_manager
+}  // namespace hal

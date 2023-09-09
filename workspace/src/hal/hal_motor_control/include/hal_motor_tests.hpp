@@ -21,6 +21,13 @@
 #include "hal_motor_control_tests_helpers.hpp"
 #include "hal_motor.hpp"
 
+namespace hal
+{
+namespace motor
+{
+namespace test
+{
+
 #define MOTOR_ID_1 0
 #define GPIO_PWM_CHANNEL_A_M1 GPIO3
 #define GPIO_PWM_CHANNEL_B_M1 GPIO4
@@ -87,5 +94,9 @@ protected:
     motor.reset();
   }
 };
+
+}  // namespace test
+}  // namespace motor
+}  // namespace hal
 
 #endif  // HAL_MOTOR_TESTS_HPP_

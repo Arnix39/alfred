@@ -17,6 +17,13 @@
 using namespace std::placeholders;
 using namespace std::chrono_literals;
 
+namespace hal
+{
+namespace motor
+{
+namespace control
+{
+
 MotorControl::MotorControl()
 : rclcpp_lifecycle::LifecycleNode{"hal_motorControl_node"},
   motorLeft{MOTOR_LEFT_PWM_A_GPIO, MOTOR_LEFT_PWM_B_GPIO,
@@ -153,3 +160,7 @@ void MotorControl::setPwmRight(uint16_t dutycycle, bool direction)
 {
   motorRight.setPwmDutyCycleAndDirection(gpioSetPwmDutycycleClient, dutycycle, direction);
 }
+
+}  // namespace control
+}  // namespace motor
+}  // namespace hal

@@ -17,6 +17,11 @@
 
 #include "hal_motor_control_commonDefinitions.hpp"
 
+namespace hal
+{
+namespace motor
+{
+
 using setInputModeSyncClientNode_t = ServiceNodeSync<HalPigpioSetInputMode_t>;
 using setOutputModeSyncClientNode_t = ServiceNodeSync<HalPigpioSetOutputMode_t>;
 using setEncoderCallbackSyncClientNode_t = ServiceNodeSync<HalPigpioSetEncoderCallback_t>;
@@ -68,5 +73,8 @@ public:
     setPwmFrequencySyncClientNode_t gpioSetPwmFrequencyClient);
   uint8_t getId(void);
 };
+
+}  // namespace motor
+}  // namespace hal
 
 #endif  // HAL_MOTOR_HPP_

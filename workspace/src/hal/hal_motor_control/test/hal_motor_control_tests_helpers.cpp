@@ -16,6 +16,13 @@
 
 using namespace std::placeholders;
 
+namespace hal
+{
+namespace motor
+{
+namespace test
+{
+
 HalPigpioDummyNode::HalPigpioDummyNode()
 : rclcpp::Node{"hal_pigpio_dummy_node"},
   piHandle{pigpio_start(NULL, NULL)},
@@ -109,3 +116,7 @@ void HalPigpioDummyNode::setEncoderCallback(
     response->has_succeeded = false;
   }
 }
+
+}  // namespace test
+}  // namespace motor
+}  // namespace hal
