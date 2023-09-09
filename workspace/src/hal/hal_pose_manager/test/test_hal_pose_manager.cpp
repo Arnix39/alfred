@@ -24,7 +24,9 @@ PoseManagerCheckerNode::PoseManagerCheckerNode()
       "wheelsVelocityCmd", 10,
       std::bind(&PoseManagerCheckerNode::wheelsVelocityCmdReader, this, _1))},
   odometrySubscriber{this->create_subscription<OdometryMsg_t>(
-      "odometry", 10, std::bind(&PoseManagerCheckerNode::odometryReader, this, _1) )}
+      "odometry", 10, std::bind(&PoseManagerCheckerNode::odometryReader, this, _1) )},
+  wheelsVelocityCommand{0.0, 0.0},
+  odometry{{{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}}, {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0}}}
 {
 }
 
@@ -60,16 +62,78 @@ void PoseManagerCheckerNode::odometryReader(const OdometryMsg_t & msg)
   odometry.pose = extractPoseValues(msg.pose.pose);
 }
 
-TEST_F(PoseManagerActivatedTest, wheelsVelocityCmdPublished)
+TEST_F(PoseManagerActivatedTest, WheelsVelocityCmdPublished)
 {
   TwistMsg_t twistTestMessage;
   twistTestMessage.twist.linear.x = TWIST_COMMAND_1_M_PER_S;
   twistTestMessage.twist.angular.x = TWIST_COMMAND_2_M_PER_S;
-  poseManager->wheelsVelocityCommand(twistTestMessage);
+  poseManager->computeAndPublishwheelsVelocityCmd(twistTestMessage);
   executorPoseManager.spin_some();
 
-  ASSERT_FLOAT_EQ(poseManagerChecker->wheelsVelocityCommand.right, TWIST_COMMAND_1_M_PER_S);
-  ASSERT_FLOAT_EQ(poseManagerChecker->wheelsVelocityCommand.left, TWIST_COMMAND_1_M_PER_S);
+  ASSERT_DOUBLE_EQ(poseManagerChecker->wheelsVelocityCommand.right, TWIST_COMMAND_1_M_PER_S);
+  ASSERT_DOUBLE_EQ(poseManagerChecker->wheelsVelocityCommand.left, TWIST_COMMAND_1_M_PER_S);
+}
+
+TEST_F(PoseManagerActivatedTest, NullVelocityOdometryPublished)
+{
+  HalMotorControlEncodersMsg_t encoderCountFirstMessage;
+  encoderCountFirstMessage.header.stamp.nanosec = 0;
+  encoderCountFirstMessage.motor_left_encoder_count = 520;
+  encoderCountFirstMessage.motor_right_encoder_count = 520;
+
+  poseManager->computeAndPublishOdometry(encoderCountFirstMessage);
+  executorPoseManager.spin_some();
+
+  ASSERT_NEAR(poseManagerChecker->odometry.twist.linear.x, 0.0, 1e-3);
+}
+
+TEST_F(PoseManagerActivatedTest, PositiveVelocityOdometryPublished)
+{
+  HalMotorControlEncodersMsg_t encoderCountFirstMessage;
+  encoderCountFirstMessage.header.stamp.nanosec = 10 * MS_TO_NS;
+  encoderCountFirstMessage.motor_left_encoder_count = 520;
+  encoderCountFirstMessage.motor_right_encoder_count = 520;
+
+  poseManager->computeAndPublishOdometry(encoderCountFirstMessage);
+  executorPoseManager.spin_some();
+
+  ASSERT_NEAR(poseManagerChecker->odometry.twist.linear.x, 1.0, 1e-3);
+}
+
+TEST_F(PoseManagerActivatedTest, PositiveVelocityOdometryPublishedTwoMessages)
+{
+  HalMotorControlEncodersMsg_t encoderCountFirstMessage;
+  encoderCountFirstMessage.header.stamp.nanosec = 10 * MS_TO_NS;
+  encoderCountFirstMessage.motor_left_encoder_count = 520;
+  encoderCountFirstMessage.motor_right_encoder_count = 520;
+
+  HalMotorControlEncodersMsg_t encoderCountSecondMessage;
+  encoderCountSecondMessage.header.stamp.nanosec = 20 * MS_TO_NS;
+  encoderCountSecondMessage.motor_left_encoder_count = 1560;
+  encoderCountSecondMessage.motor_right_encoder_count = 1560;
+
+  poseManager->computeAndPublishOdometry(encoderCountFirstMessage);
+  executorPoseManager.spin_some();
+
+  EXPECT_NEAR(poseManagerChecker->odometry.twist.linear.x, 1.0, 1e-3);
+
+  poseManager->computeAndPublishOdometry(encoderCountSecondMessage);
+  executorPoseManager.spin_some();
+
+  ASSERT_NEAR(poseManagerChecker->odometry.twist.linear.x, 2.0, 1e-3);
+}
+
+TEST_F(PoseManagerActivatedTest, NegativeVelocityOdometryPublished)
+{
+  HalMotorControlEncodersMsg_t encoderCountFirstMessage;
+  encoderCountFirstMessage.header.stamp.nanosec = 10 * MS_TO_NS;
+  encoderCountFirstMessage.motor_left_encoder_count = -520;
+  encoderCountFirstMessage.motor_right_encoder_count = -520;
+
+  poseManager->computeAndPublishOdometry(encoderCountFirstMessage);
+  executorPoseManager.spin_some();
+
+  ASSERT_NEAR(poseManagerChecker->odometry.twist.linear.x, -1.0, 1e-3);
 }
 
 int main(int argc, char ** argv)

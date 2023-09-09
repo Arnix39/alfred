@@ -75,8 +75,8 @@ public:
   LifecycleCallbackReturn_t on_shutdown(const rclcpp_lifecycle::State & previous_state);
   LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
 
-  void wheelsVelocityCommand(const TwistMsg_t & msg);
-  void wheelsVelocityComputation(const HalMotorControlEncodersMsg_t & msg);
+  void computeAndPublishwheelsVelocityCmd(const TwistMsg_t & msg);
+  void computeAndPublishOdometry(const HalMotorControlEncodersMsg_t & msg);
 };
 
 #endif  // HAL_POSE_MANAGER_HPP_

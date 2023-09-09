@@ -21,7 +21,7 @@ HalPoseManager::HalPoseManager()
   encodersCount{.rightCurrrent = 0, .rightPrevious = 0,
     .leftCurrrent = 0, .leftPrevious = 0,
     .timestampNs = 0},
-  wheelsVelocity{.right = 0, .left = 0}
+  wheelsVelocity{.right = 0.0, .left = 0.0}
 {
 }
 
@@ -32,10 +32,10 @@ LifecycleCallbackReturn_t HalPoseManager::on_configure(
   wheelsVelocityCmdPublisher = this->create_publisher<HalMotorControlCommandMsg_t>(
     "wheelsVelocityCmd", 10);
   twistSubscriber = this->create_subscription<TwistMsg_t>(
-    "cmd_velocity", 10, std::bind(&HalPoseManager::wheelsVelocityCommand, this, _1));
+    "cmd_velocity", 10, std::bind(&HalPoseManager::computeAndPublishwheelsVelocityCmd, this, _1));
   motorsECSubscriber = this->create_subscription<HalMotorControlEncodersMsg_t>(
     "motorsEncoderCountValue", 10,
-    std::bind(&HalPoseManager::wheelsVelocityComputation, this, _1));
+    std::bind(&HalPoseManager::computeAndPublishOdometry, this, _1));
 
   RCLCPP_INFO(get_logger(), "Node configured!");
 
@@ -90,7 +90,7 @@ LifecycleCallbackReturn_t HalPoseManager::on_error(const rclcpp_lifecycle::State
   return LifecycleCallbackReturn_t::FAILURE;
 }
 
-void HalPoseManager::wheelsVelocityCommand(const TwistMsg_t & msg)
+void HalPoseManager::computeAndPublishwheelsVelocityCmd(const TwistMsg_t & msg)
 {
   auto wheelsVelocityCommandMsg = HalMotorControlCommandMsg_t();
 
@@ -100,7 +100,7 @@ void HalPoseManager::wheelsVelocityCommand(const TwistMsg_t & msg)
   wheelsVelocityCmdPublisher->publish(wheelsVelocityCommandMsg);
 }
 
-void HalPoseManager::wheelsVelocityComputation(const HalMotorControlEncodersMsg_t & msg)
+void HalPoseManager::computeAndPublishOdometry(const HalMotorControlEncodersMsg_t & msg)
 {
   auto header = HeaderMsg_t();
   auto odometry = OdometryMsg_t();
@@ -109,22 +109,25 @@ void HalPoseManager::wheelsVelocityComputation(const HalMotorControlEncodersMsg_
 
   int32_t encoderCountDelta = 0;
   int32_t timeDelta = msg.header.stamp.nanosec - encodersCount.timestampNs;
+  encodersCount.timestampNs = msg.header.stamp.nanosec;
 
   auto computeVelocity = [](int32_t encoderCountDelta, int32_t timeDelta) {
-      return static_cast<double>(encoderCountDelta) / timeDelta * EC_PER_NS_TO_M_PER_S;
+      return static_cast<double>(encoderCountDelta) * EC_PER_NS_TO_M_PER_S / timeDelta;
     };
 
   encodersCount.leftPrevious = encodersCount.leftCurrrent;
   encodersCount.leftCurrrent = msg.motor_left_encoder_count;
 
-  encoderCountDelta = encodersCount.leftCurrrent - encodersCount.leftPrevious;
-  wheelsVelocity.left = computeVelocity(encoderCountDelta, timeDelta);
-
   encodersCount.rightPrevious = encodersCount.rightCurrrent;
   encodersCount.rightCurrrent = msg.motor_right_encoder_count;
 
-  encoderCountDelta = encodersCount.rightCurrrent - encodersCount.rightPrevious;
-  wheelsVelocity.right = computeVelocity(encoderCountDelta, timeDelta);
+  if (timeDelta != 0) {
+    encoderCountDelta = encodersCount.leftCurrrent - encodersCount.leftPrevious;
+    wheelsVelocity.left = computeVelocity(encoderCountDelta, timeDelta);
+
+    encoderCountDelta = encodersCount.rightCurrrent - encodersCount.rightPrevious;
+    wheelsVelocity.right = computeVelocity(encoderCountDelta, timeDelta);
+  }
 
   twist.twist.linear.x = wheelsVelocity.right;
   odometry.twist = std::move(twist);

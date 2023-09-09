@@ -26,6 +26,7 @@
 
 #define TWIST_COMMAND_1_M_PER_S 1.0
 #define TWIST_COMMAND_2_M_PER_S 2.0
+#define MS_TO_NS 1000000
 
 class PoseManagerCheckerNode : public rclcpp::Node
 {
