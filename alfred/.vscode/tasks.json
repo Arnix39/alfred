@@ -92,7 +92,7 @@
                 "ROS2: Gazebo bridge"
             ],
             "group": {
-                "kind": "build",
+                "kind": "build"
             }
         },
         {
@@ -126,7 +126,7 @@
             "detail": "Clean workspace for host build files.",
             "type": "shell",
             "options": {
-                "cwd": "${workspaceFolder}",
+                "cwd": "${workspaceFolder}"
             },
             "command": "colcon",
             "args": [
@@ -148,7 +148,8 @@
             "options": {
                 "cwd": "${workspaceFolder}/cross_compile"
             },
-            "command": "${workspaceFolder}/cross_compile/generate_sysroot.sh"
+            "command": "${workspaceFolder}/cross_compile/generate_sysroot.sh",
+            "problemMatcher": []
         },
         {
             "label": "ROS2: Build workspace for target",
@@ -195,7 +196,7 @@
                 "cwd": "${workspaceFolder}"
             },
             "dependsOn": [
-                "ROS2: Build workspace for target",
+                "ROS2: Build workspace for target"
             ],
             "command": "rsync",
             "args": [
@@ -208,7 +209,7 @@
             ],
             "group": {
                 "kind": "build"
-            },
+            }
         },
         {
             "label": "ROS2: Copy src on target",
@@ -229,7 +230,7 @@
             ],
             "group": {
                 "kind": "build"
-            },
+            }
         },
         {
             "label": "Workspace: Clean target files",
@@ -259,7 +260,7 @@
                 "ros_gz",
                 "--cmake-target",
                 "clean"
-            ],
+            ]
         },
         {
             "label": "ROS2: Gazebo bridge",
