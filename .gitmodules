@@ -1,5 +1,5 @@
-[submodule "workspace/src/sim/ros_gz"]
-	path = workspace/src/sim/ros_gz
+[submodule "alfred/src/sim/ros_gz"]
+	path = alfred/src/sim/ros_gz
 	url = https://github.com/gazebosim/ros_gz.git
 	branch = ros2
 [submodule "remote/hubris"]

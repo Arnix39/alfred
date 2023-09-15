@@ -1,9 +1,12 @@
 {
 	"folders": [
-		{
-			"path": "workspace"
-		}
-	],
+    {
+      "path": "alfred"
+    },
+    {
+      "path": "remote"
+    }
+  ],
 	"settings": {
 		"python.autoComplete.extraPaths": [
 			"/opt/ros/humble/lib/python3/dist-packages"

@@ -10,7 +10,7 @@ steps:
 - name: Build
   image: ros:humble-ros-base-jammy
   commands:
-    - cd workspace
+    - cd alfred
     - rm -fR sim/
     - . /opt/ros/$ROS_DISTRO/setup.sh
     - apt-get update 
@@ -28,7 +28,7 @@ steps:
 - name: Archive build logs
   image: ros:humble-ros-base-jammy
   commands:
-    - cd workspace
+    - cd alfred
     - find log/latest_build/ -printf "%P\n" | tar -czf build_logs.tar.gz --no-recursion -C log/latest_build/ -T -
   when:
     status:
@@ -44,7 +44,7 @@ steps:
       from_secret: ARTIFACTORY_USERNAME
     password:
       from_secret: ARTIFACTORY_PASSWORD
-    source: workspace/build_logs.tar.gz
+    source: alfred/build_logs.tar.gz
     target: Alfred/logs/build/target/build_$${DRONE_BUILD_NUMBER}_build_logs.tar.gz
     flat: true
     insecure: true
@@ -57,7 +57,7 @@ steps:
 - name: Tests
   image: ros:humble-ros-base-jammy
   commands:
-    - cd workspace
+    - cd alfred
     - . /opt/ros/$ROS_DISTRO/setup.sh
     - apt-get update 
     - rosdep install -y
@@ -74,7 +74,7 @@ steps:
 - name: Archive tests logs
   image: ros:humble-ros-base-jammy
   commands:
-    - cd workspace
+    - cd alfred
     - find log/latest_test/ -printf "%P\n" | tar -czf tests_logs.tar.gz --no-recursion -C log/latest_test/ -T -
   when:
     status:
@@ -91,7 +91,7 @@ steps:
       from_secret: ARTIFACTORY_USERNAME
     password:
       from_secret: ARTIFACTORY_PASSWORD
-    source: workspace/tests_logs.tar.gz
+    source: alfred/tests_logs.tar.gz
     target: Alfred/logs/tests/build_$${DRONE_BUILD_NUMBER}_tests_logs.tar.gz
     flat: true
     insecure: true
@@ -123,7 +123,7 @@ steps:
     path: /var/run
   commands:
     - sleep 5 # give docker enough time to start
-    - cd workspace/cross_compile
+    - cd alfred/cross_compile
     - mkdir workspace
     - cp -r ../src workspace
     - rm -fR workspace/src/sim/
@@ -147,10 +147,10 @@ steps:
     CXX: /usr/bin/aarch64-linux-gnu-g++
 
   commands:
-    - export SYSROOT=$DRONE_WORKSPACE/workspace/cross_compile/sysroot
-    - export ROS2_INSTALL_PATH=$DRONE_WORKSPACE/workspace/install
-    - export CROSS_COMPILE_DIR=$DRONE_WORKSPACE/workspace/cross_compile
-    - cd workspace
+    - export SYSROOT=$DRONE_WORKSPACE/alfred/cross_compile/sysroot
+    - export ROS2_INSTALL_PATH=$DRONE_WORKSPACE/alfred/install
+    - export CROSS_COMPILE_DIR=$DRONE_WORKSPACE/alfred/cross_compile
+    - cd alfred
     - rm -fR sim/
     - . /opt/ros/$ROS_DISTRO/setup.sh
     - apt-get update
@@ -177,14 +177,14 @@ steps:
   commands:
     - apt-get update
     - apt-get install -y rsync
-    - rsync -a --delete $DRONE_WORKSPACE/workspace/cross_compile/sysroot/ /tmp/sysroot/
+    - rsync -a --delete $DRONE_WORKSPACE/alfred/cross_compile/sysroot/ /tmp/sysroot/
   depends_on:
     - Build
 
 - name: Archive build logs
   image: ros:humble-ros-base-jammy
   commands:
-    - cd workspace
+    - cd alfred
     - find log/latest_build/ -printf "%P\n" | tar -czf build_logs.tar.gz --no-recursion -C log/latest_build/ -T -
   when:
     status:
@@ -200,7 +200,7 @@ steps:
       from_secret: ARTIFACTORY_USERNAME
     password:
       from_secret: ARTIFACTORY_PASSWORD
-    source: workspace/build_logs.tar.gz
+    source: alfred/build_logs.tar.gz
     target: Alfred/logs/build/target/build_$${DRONE_BUILD_NUMBER}_build_logs.tar.gz
     flat: true
     insecure: true
@@ -213,7 +213,7 @@ steps:
 - name: Archive binaries
   image: ros:humble-ros-base-jammy
   commands:
-    - cd workspace
+    - cd alfred
     - find install/ -printf "%P\n" | tar -czf install.tar.gz --no-recursion -C install/ -T -
   depends_on:
     - Build
@@ -226,7 +226,7 @@ steps:
       from_secret: ARTIFACTORY_USERNAME
     password:
       from_secret: ARTIFACTORY_PASSWORD
-    source: workspace/install.tar.gz
+    source: alfred/install.tar.gz
     target: Alfred/binaries/development/build_$${DRONE_BUILD_NUMBER}_install.tar.gz
     flat: true
     insecure: true
@@ -278,9 +278,9 @@ steps:
     CXX: /usr/bin/aarch64-linux-gnu-g++
 
   commands:
-    - export ROS2_INSTALL_PATH=$DRONE_WORKSPACE/workspace/install
-    - export CROSS_COMPILE_DIR=$DRONE_WORKSPACE/workspace/cross_compile
-    - cd workspace
+    - export ROS2_INSTALL_PATH=$DRONE_WORKSPACE/alfred/install
+    - export CROSS_COMPILE_DIR=$DRONE_WORKSPACE/alfred/cross_compile
+    - cd alfred
     - rm -fR sim/
     - . /opt/ros/$ROS_DISTRO/setup.sh
     - apt-get update
@@ -302,7 +302,7 @@ steps:
   settings:
     hosts: [ "192.168.1.253" ]
     port: 22
-    source: workspace/install/
+    source: alfred/install/
     target: ~/Alfred/
     user:
       from_secret: ALFRED_USERNAME
@@ -318,7 +318,7 @@ steps:
 - name: Archive build logs
   image: ros:humble-ros-base-jammy
   commands:
-    - cd workspace
+    - cd alfred
     - find log/latest_build/ -printf "%P\n" | tar -czf build_logs.tar.gz --no-recursion -C log/latest_build/ -T -
   when:
     status:
@@ -334,7 +334,7 @@ steps:
       from_secret: ARTIFACTORY_USERNAME
     password:
       from_secret: ARTIFACTORY_PASSWORD
-    source: workspace/build_logs.tar.gz
+    source: alfred/build_logs.tar.gz
     target: Alfred/logs/build/target/build_$${DRONE_BUILD_NUMBER}_build_logs.tar.gz
     flat: true
     insecure: true
@@ -347,7 +347,7 @@ steps:
 - name: Archive binaries
   image: ros:humble-ros-base-jammy
   commands:
-    - cd workspace
+    - cd alfred
     - find install/ -printf "%P\n" | tar -czf install.tar.gz --no-recursion -C install/ -T -
   depends_on:
     - Build
@@ -360,7 +360,7 @@ steps:
       from_secret: ARTIFACTORY_USERNAME
     password:
       from_secret: ARTIFACTORY_PASSWORD
-    source: workspace/install.tar.gz
+    source: alfred/install.tar.gz
     target: Alfred/binaries/deployment/build_$${DRONE_BUILD_NUMBER}_install.tar.gz
     flat: true
     insecure: true
