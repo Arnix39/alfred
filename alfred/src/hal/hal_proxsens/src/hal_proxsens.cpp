@@ -17,7 +17,9 @@
 using namespace std::placeholders;
 using namespace std::chrono_literals;
 
-namespace hal_proxsens
+namespace hal
+{
+namespace proxsens
 {
 
 Proxsens::Proxsens()
@@ -256,4 +258,5 @@ void Proxsens::publishAndGetDistance(void)
   trigger();
 }
 
-}  // namespace hal_proxsens
+}  // namespace proxsens
+}  // namespace hal

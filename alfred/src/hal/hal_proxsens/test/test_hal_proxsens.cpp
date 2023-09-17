@@ -18,6 +18,13 @@
 
 #include "hal_proxsens.hpp"
 
+namespace hal
+{
+namespace proxsens
+{
+namespace test
+{
+
 #define PROX_SENS_DISTANCE_10CM 0.1
 #define PROX_SENS_DISTANCE_1M 1.0
 #define PROX_SENS_DISTANCE_DEFAULT_VALUE (UINT16_MAX / 100.0)
@@ -25,17 +32,17 @@
 using namespace std::placeholders;
 using namespace std::chrono_literals;
 
-const hal_proxsens::pigpio_msg::HalPigpioEdgeChange & edgeChangeMessage(
+const pigpio_msg::HalPigpioEdgeChange & edgeChangeMessage(
   uint8_t gpioId,
   EdgeChangeType edgeChangeType,
   uint32_t timeSinceBoot_us)
 {
-  auto message = hal_proxsens::pigpio_msg::HalPigpioEdgeChange();
+  auto message = pigpio_msg::HalPigpioEdgeChange();
 
   message.gpio_id = gpioId;
   message.edge_change_type = static_cast<uint8_t>(edgeChangeType);
   message.time_since_boot_us = timeSinceBoot_us;
-  const hal_proxsens::pigpio_msg::HalPigpioEdgeChange & messageToSend = message;
+  const pigpio_msg::HalPigpioEdgeChange & messageToSend = message;
 
   return messageToSend;
 }
@@ -46,7 +53,7 @@ public:
   ProxsensCheckerNode()
   : rclcpp::Node{"hal_proxsens_checker_node"},
     proxsensSub{this->create_subscription
-      <hal_proxsens::ProxsensMsg_t>(
+      <ProxsensMsg_t>(
         "proximitySensor",
         10,
         std::bind(&ProxsensCheckerNode::getProxsensDistance, this, _1))},
@@ -55,7 +62,7 @@ public:
   {
   }
   ~ProxsensCheckerNode() = default;
-  void getProxsensDistance(const hal_proxsens::ProxsensMsg_t & msg)
+  void getProxsensDistance(const ProxsensMsg_t & msg)
   {
     distance.set_value(msg.range);
   }
@@ -69,7 +76,7 @@ public:
   }
 
 private:
-  rclcpp::Subscription<hal_proxsens::ProxsensMsg_t>::SharedPtr proxsensSub;
+  rclcpp::Subscription<ProxsensMsg_t>::SharedPtr proxsensSub;
   rclcpp::Client<lifecycle_msgs::srv::ChangeState>::SharedPtr changeStateClient;
 };
 
@@ -77,14 +84,14 @@ private:
 class ProxsensTest : public testing::Test
 {
 protected:
-  std::shared_ptr<hal_proxsens::Proxsens> proxsens;
+  std::shared_ptr<Proxsens> proxsens;
   std::shared_ptr<ProxsensCheckerNode> proxsensChecker;
   rclcpp::executors::SingleThreadedExecutor executor;
 
   void SetUp()
   {
     proxsensChecker = std::make_shared<ProxsensCheckerNode>();
-    proxsens = std::make_shared<hal_proxsens::Proxsens>();
+    proxsens = std::make_shared<Proxsens>();
 
     executor.add_node(proxsens->get_node_base_interface());
     executor.add_node(proxsensChecker);
@@ -228,6 +235,10 @@ TEST_F(ProxsensTest, sensorDistanceTwoRisingEdges)
   ASSERT_EQ(executor.spin_until_future_complete(future, 1s), rclcpp::FutureReturnCode::SUCCESS);
   ASSERT_FLOAT_EQ(future.get(), PROX_SENS_DISTANCE_10CM);
 }
+
+}  // namespace test
+}  // namespace proxsens
+}  // namespace hal
 
 int main(int argc, char ** argv)
 {

@@ -16,7 +16,7 @@
 
 #include "mock/raspberrypi_mock.hpp"
 
-static RaspberryPi raspberryPi;
+static hw::raspberry_pi::RaspberryPi raspberryPi;
 
 /* I2C */
 int i2c_open(int pi, unsigned i2c_bus, unsigned i2c_addr, unsigned i2c_flags)
@@ -171,12 +171,14 @@ void pigpio_stop(int pi)
 
 int set_mode(int pi, unsigned gpio, unsigned mode)
 {
-  if (static_cast<gpioType>(mode) != gpioType::input &&
-    static_cast<gpioType>(mode) != gpioType::output)
+  if (static_cast<hw::raspberry_pi::gpioType>(mode) != hw::raspberry_pi::gpioType::input &&
+    static_cast<hw::raspberry_pi::gpioType>(mode) != hw::raspberry_pi::gpioType::output)
   {
     return PI_BAD_MODE;
   } else if (std::get<0>(raspberryPi.getGpioType(static_cast<gpioId>(gpio)))) {
-    return raspberryPi.setGpioType(static_cast<gpioId>(gpio), static_cast<gpioType>(mode));
+    return raspberryPi.setGpioType(
+      static_cast<gpioId>(gpio),
+      static_cast<hw::raspberry_pi::gpioType>(mode));
   } else {
     return PI_BAD_GPIO;
   }
@@ -193,13 +195,15 @@ int get_mode(int pi, unsigned gpio)
 
 int set_pull_up_down(int pi, unsigned gpio, unsigned pud)
 {
-  if (static_cast<gpioResistor>(pud) != gpioResistor::off &&
-    static_cast<gpioResistor>(pud) != gpioResistor::pullDown &&
-    static_cast<gpioResistor>(pud) != gpioResistor::pullUp)
+  if (static_cast<hw::raspberry_pi::gpioResistor>(pud) != hw::raspberry_pi::gpioResistor::off &&
+    static_cast<hw::raspberry_pi::gpioResistor>(pud) != hw::raspberry_pi::gpioResistor::pullDown &&
+    static_cast<hw::raspberry_pi::gpioResistor>(pud) != hw::raspberry_pi::gpioResistor::pullUp)
   {
     return PI_BAD_PUD;
   } else if (std::get<0>(raspberryPi.getGpioType(static_cast<gpioId>(gpio)))) {
-    return raspberryPi.setGpioResistor(static_cast<gpioId>(gpio), static_cast<gpioResistor>(pud));
+    return raspberryPi.setGpioResistor(
+      static_cast<gpioId>(gpio),
+      static_cast<hw::raspberry_pi::gpioResistor>(pud));
   } else {
     return PI_BAD_GPIO;
   }
@@ -218,10 +222,12 @@ int gpio_read(int pi, unsigned gpio)
 
 int callback(int pi, unsigned user_gpio, unsigned edge, CBFunc_t f)
 {
-  gpioCallback callback =
-  {false, static_cast<gpioId>(user_gpio), static_cast<gpioEdgeChangeType>(edge)};
+  hw::raspberry_pi::gpioCallback callback =
+  {false, static_cast<gpioId>(user_gpio), static_cast<hw::raspberry_pi::gpioEdgeChangeType>(edge)};
 
-  if (std::get<1>(raspberryPi.getGpioType(static_cast<gpioId>(user_gpio))) == gpioType::input) {
+  if (std::get<1>(raspberryPi.getGpioType(static_cast<gpioId>(user_gpio))) ==
+    hw::raspberry_pi::gpioType::input)
+  {
     return raspberryPi.setGpioCallback(static_cast<gpioId>(user_gpio), callback);
   }
   return pigif_bad_malloc;
@@ -229,10 +235,12 @@ int callback(int pi, unsigned user_gpio, unsigned edge, CBFunc_t f)
 
 int callback_ex(int pi, unsigned user_gpio, unsigned edge, CBFuncEx_t f, void * userdata)
 {
-  gpioCallback callback =
-  {false, static_cast<gpioId>(user_gpio), static_cast<gpioEdgeChangeType>(edge)};
+  hw::raspberry_pi::gpioCallback callback =
+  {false, static_cast<gpioId>(user_gpio), static_cast<hw::raspberry_pi::gpioEdgeChangeType>(edge)};
 
-  if (std::get<1>(raspberryPi.getGpioType(static_cast<gpioId>(user_gpio))) == gpioType::input) {
+  if (std::get<1>(raspberryPi.getGpioType(static_cast<gpioId>(user_gpio))) ==
+    hw::raspberry_pi::gpioType::input)
+  {
     return raspberryPi.setGpioCallback(static_cast<gpioId>(user_gpio), callback);
   }
   return pigif_bad_malloc;
@@ -241,7 +249,7 @@ int callback_ex(int pi, unsigned user_gpio, unsigned edge, CBFuncEx_t f, void * 
 /* Output */
 int set_PWM_dutycycle(int pi, unsigned user_gpio, unsigned dutycycle)
 {
-  gpioPwm pwm;
+  hw::raspberry_pi::gpioPwm pwm;
   if (std::get<0>(raspberryPi.getGpioPwm(static_cast<gpioId>(user_gpio)))) {
     if (std::get<1>(raspberryPi.getGpioPwm(static_cast<gpioId>(user_gpio))).isEnabled) {
       pwm = std::get<1>(raspberryPi.getGpioPwm(static_cast<gpioId>(user_gpio)));
@@ -271,7 +279,7 @@ int get_PWM_dutycycle(int pi, unsigned user_gpio)
 
 int set_PWM_frequency(int pi, unsigned user_gpio, unsigned frequency)
 {
-  gpioPwm pwm;
+  hw::raspberry_pi::gpioPwm pwm;
   if (std::get<0>(raspberryPi.getGpioPwm(static_cast<gpioId>(user_gpio)))) {
     if (std::get<1>(raspberryPi.getGpioPwm(static_cast<gpioId>(user_gpio))).isEnabled) {
       pwm = std::get<1>(raspberryPi.getGpioPwm(static_cast<gpioId>(user_gpio)));
@@ -301,7 +309,10 @@ int get_PWM_frequency(int pi, unsigned user_gpio)
 
 int gpio_write(int pi, unsigned gpio, unsigned level)
 {
-  auto result = raspberryPi.setGpioLevel(static_cast<gpioId>(gpio), static_cast<gpioLevel>(level));
+  auto result =
+    raspberryPi.setGpioLevel(
+    static_cast<gpioId>(gpio),
+    static_cast<hw::raspberry_pi::gpioLevel>(level));
   if (result == 0) {
     return 0;
   } else if (result == 1) {
@@ -314,7 +325,9 @@ int gpio_write(int pi, unsigned gpio, unsigned level)
 int gpio_trigger(int pi, unsigned user_gpio, unsigned pulseLen, unsigned level)
 {
   auto result =
-    raspberryPi.setGpioLevel(static_cast<gpioId>(user_gpio), static_cast<gpioLevel>(level));
+    raspberryPi.setGpioLevel(
+    static_cast<gpioId>(user_gpio),
+    static_cast<hw::raspberry_pi::gpioLevel>(level));
   if (result == 0) {
     return 0;
   } else if (result == 1) {

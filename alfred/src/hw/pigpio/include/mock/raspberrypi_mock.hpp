@@ -25,6 +25,11 @@
 
 #include "gpioDefinitions.hpp"
 
+namespace hw
+{
+namespace raspberry_pi
+{
+
 #define MPU6050_I2C_ADDRESS_LOW 0x67
 #define MPU6050_I2C_ADDRESS_HIGH 0x68
 #define MPU6050_USER_CONTROL_REGISTER 0x6A
@@ -162,5 +167,8 @@ public:
   std::tuple<bool, gpioPwm> getGpioPwm(gpioId gpioId);
   std::tuple<bool, gpioCallback> getGpioCallback(gpioId gpioId);
 };
+
+}  // namespace raspberry_pi
+}  // namespace hw
 
 #endif  // MOCK__RASPBERRYPI_MOCK_HPP_

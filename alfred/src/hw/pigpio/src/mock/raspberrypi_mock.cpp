@@ -14,6 +14,11 @@
 
 #include "mock/raspberrypi_mock.hpp"
 
+namespace hw
+{
+namespace raspberry_pi
+{
+
 RaspberryPi::RaspberryPi()
 : gpios{},
   i2cHandles{},
@@ -320,3 +325,6 @@ std::tuple<bool, gpioCallback> RaspberryPi::getGpioCallback(gpioId gpioId)
     return std::make_tuple(false, gpioCallback);
   }
 }
+
+}  // namespace raspberry_pi
+}  // namespace hw

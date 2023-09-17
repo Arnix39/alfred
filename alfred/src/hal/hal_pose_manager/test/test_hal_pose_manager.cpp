@@ -14,6 +14,13 @@
 
 #include "hal_pose_manager_tests.hpp"
 
+namespace hal
+{
+namespace pose_manager
+{
+namespace test
+{
+
 using namespace std::placeholders;
 
 PoseManagerCheckerNode::PoseManagerCheckerNode()
@@ -135,6 +142,10 @@ TEST_F(PoseManagerActivatedTest, NegativeVelocityOdometryPublished)
 
   ASSERT_NEAR(poseManagerChecker->odometry.twist.linear.x, -1.0, 1e-3);
 }
+
+}  // namespace test
+}  // namespace pose_manager
+}  // namespace hal
 
 int main(int argc, char ** argv)
 {

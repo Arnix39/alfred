@@ -28,6 +28,11 @@
 #include "hal_motor_control_interfaces/msg/hal_motor_control_encoders.hpp"
 #include "hal_motor_control_interfaces/msg/hal_motor_control_command.hpp"
 
+namespace hal
+{
+namespace pose_manager
+{
+
 #define EC_PER_NS_TO_M_PER_S 19231  // 52EC = 1mm
 
 using OdometryMsg_t = nav_msgs::msg::Odometry;
@@ -78,5 +83,8 @@ public:
   void computeAndPublishwheelsVelocityCmd(const TwistMsg_t & msg);
   void computeAndPublishOdometry(const HalMotorControlEncodersMsg_t & msg);
 };
+
+}  // namespace pose_manager
+}  // namespace hal
 
 #endif  // HAL_POSE_MANAGER_HPP_

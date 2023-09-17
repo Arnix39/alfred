@@ -14,6 +14,11 @@
 
 #include "hal_pose_manager.hpp"
 
+namespace hal
+{
+namespace pose_manager
+{
+
 using namespace std::placeholders;
 
 HalPoseManager::HalPoseManager()
@@ -141,3 +146,6 @@ void HalPoseManager::computeAndPublishOdometry(const HalMotorControlEncodersMsg_
 
   odometryPublisher->publish(odometry);
 }
+
+}  // namespace pose_manager
+}  // namespace hal

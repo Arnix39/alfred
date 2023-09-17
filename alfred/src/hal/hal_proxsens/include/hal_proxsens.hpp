@@ -35,7 +35,9 @@
 #define PROXSENS_MAX_RANGE 4.0
 #define PROXSENS_FOV 15
 
-namespace hal_proxsens
+namespace hal
+{
+namespace proxsens
 {
 
 namespace pigpio_srv = hal_pigpio_interfaces::srv;
@@ -89,7 +91,8 @@ public:
   void edgeChangeCallback(const pigpio_msg::HalPigpioEdgeChange & msg);
 };
 
-}  // namespace hal_proxsens
+}  // namespace proxsens
+}  // namespace hal
 
 
 #endif  // HAL_PROXSENS_HPP_

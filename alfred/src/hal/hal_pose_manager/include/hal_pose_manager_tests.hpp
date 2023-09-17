@@ -24,6 +24,13 @@
 
 #include "hal_pose_manager.hpp"
 
+namespace hal
+{
+namespace pose_manager
+{
+namespace test
+{
+
 #define TWIST_COMMAND_1_M_PER_S 1.0
 #define TWIST_COMMAND_2_M_PER_S 2.0
 #define MS_TO_NS 1000000
@@ -83,5 +90,9 @@ protected:
     poseManagerChecker.reset();
   }
 };
+
+}  // namespace test
+}  // namespace pose_manager
+}  // namespace hal
 
 #endif  // HAL_POSE_MANAGER_TESTS_HPP_
