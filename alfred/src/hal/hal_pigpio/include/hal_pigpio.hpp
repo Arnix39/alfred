@@ -29,6 +29,11 @@
 #include "hal_pigpioInput.hpp"
 #include "hal_pigpioOutput.hpp"
 
+namespace hal
+{
+namespace pigpio
+{
+
 using HalPigpioSetInputMode_t = hal_pigpio_interfaces::srv::HalPigpioSetInputMode;
 using HalPigpioSetOutputMode_t = hal_pigpio_interfaces::srv::HalPigpioSetOutputMode;
 using HalPigpioGetMode_t = hal_pigpio_interfaces::srv::HalPigpioGetMode;
@@ -211,5 +216,8 @@ public:
     const std::shared_ptr<HalPigpioSendTriggerPulse_t::Request> request,
     std::shared_ptr<HalPigpioSendTriggerPulse_t::Response> response);
 };
+
+}  // namespace pigpio
+}  // namespace hal
 
 #endif  // HAL_PIGPIO_HPP_

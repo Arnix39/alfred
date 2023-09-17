@@ -14,6 +14,13 @@
 
 #include "hal_pigpio_tests.hpp"
 
+namespace hal
+{
+namespace pigpio
+{
+namespace test
+{
+
 /* Test cases */
 TEST_F(PigpioTest, SetInputModeSuccess)
 {
@@ -74,6 +81,10 @@ TEST_F(PigpioTest, ClearResistorFailure)
 {
   ASSERT_EQ(hal_pigpioGpioSet(BAD_GPIO, pigpioChecker->clearResistorClient, &executor), false);
 }
+
+}  // namespace test
+}  // namespace pigpio
+}  // namespace hal
 
 int main(int argc, char ** argv)
 {

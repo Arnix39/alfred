@@ -14,6 +14,11 @@
 
 #include "hal_pigpio.hpp"
 
+namespace hal
+{
+namespace pigpio
+{
+
 void Pigpio::readGpio(
   const std::shared_ptr<HalPigpioReadGpio_t::Request> request,
   std::shared_ptr<HalPigpioReadGpio_t::Response> response)
@@ -197,3 +202,6 @@ void Pigpio::setEncoderCallback(
       request->gpio_id);
   }
 }
+
+}  // namespace pigpio
+}  // namespace hal

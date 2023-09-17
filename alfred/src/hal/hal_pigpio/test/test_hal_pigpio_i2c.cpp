@@ -14,6 +14,13 @@
 
 #include "hal_pigpio_tests.hpp"
 
+namespace hal
+{
+namespace pigpio
+{
+namespace test
+{
+
 /* Test cases */
 TEST_F(PigpioTest, I2cOpenSuccess)
 {
@@ -157,6 +164,10 @@ TEST_F(PigpioTest, I2cReadBlockFailure)
     pigpioChecker->i2cReadBlockData(handle, I2C_BAD_REGISTER, dataBlock.size(), &executor);
   ASSERT_EQ(dataBlockRead.size(), 0);
 }
+
+}  // namespace test
+}  // namespace pigpio
+}  // namespace hal
 
 int main(int argc, char ** argv)
 {

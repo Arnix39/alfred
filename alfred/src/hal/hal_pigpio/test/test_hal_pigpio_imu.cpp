@@ -14,6 +14,13 @@
 
 #include "hal_pigpio_tests.hpp"
 
+namespace hal
+{
+namespace pigpio
+{
+namespace test
+{
+
 using namespace std::chrono_literals;
 
 /* Test cases */
@@ -80,6 +87,10 @@ TEST_F(PigpioTest, ImuComputeAndPublishAnglesFIFOOverflowed)
     pigpioChecker->i2cReadByteData(handle, MPU6050_USER_CONTROL_REGISTER, &executor),
     MPU6050_FIFO_RESET);
 }
+
+}  // namespace test
+}  // namespace pigpio
+}  // namespace hal
 
 int main(int argc, char ** argv)
 {

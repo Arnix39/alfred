@@ -14,6 +14,13 @@
 
 #include "hal_pigpio_tests.hpp"
 
+namespace hal
+{
+namespace pigpio
+{
+namespace test
+{
+
 /* Test cases */
 TEST_F(PigpioTest, ReadGpioSuccess)
 {
@@ -321,6 +328,10 @@ TEST_F(PigpioTest, PublishEncoderCountMessageTwoMotors)
   ASSERT_EQ((motorIndex != pigpioChecker->motorsEC.end()), true);
   ASSERT_EQ(motorIndex->second, 1);
 }
+
+}  // namespace test
+}  // namespace pigpio
+}  // namespace hal
 
 int main(int argc, char ** argv)
 {

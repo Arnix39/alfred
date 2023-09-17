@@ -25,6 +25,13 @@
 
 #include "hal_pigpio.hpp"
 
+namespace hal
+{
+namespace pigpio
+{
+namespace test
+{
+
 #define GOOD_GPIO GPIO2
 #define CHANNEL_A_MOTOR_1 GPIO3
 #define CHANNEL_B_MOTOR_1 GPIO4
@@ -208,5 +215,9 @@ protected:
     pigpioChecker.reset();
   }
 };
+
+}  // namespace test
+}  // namespace pigpio
+}  // namespace hal
 
 #endif  // HAL_PIGPIO_TESTS_HPP_

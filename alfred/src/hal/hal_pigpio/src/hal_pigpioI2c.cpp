@@ -14,6 +14,11 @@
 
 #include "hal_pigpio.hpp"
 
+namespace hal
+{
+namespace pigpio
+{
+
 void Pigpio::i2cOpen(
   const std::shared_ptr<HalPigpioI2cOpen_t::Request> request,
   std::shared_ptr<HalPigpioI2cOpen_t::Response> response)
@@ -157,3 +162,6 @@ void Pigpio::i2cWriteBlockData(
       request->device_register, request->handle);
   }
 }
+
+}  // namespace pigpio
+}  // namespace hal

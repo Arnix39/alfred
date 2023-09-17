@@ -14,6 +14,11 @@
 
 #include "hal_pigpio.hpp"
 
+namespace hal
+{
+namespace pigpio
+{
+
 using namespace std::placeholders;
 
 void Pigpio::setPwmDutycycle(
@@ -77,3 +82,6 @@ void Pigpio::sendTriggerPulse(
     RCLCPP_ERROR(get_logger(), "Failed to send trigger pulse for GPIO %u!", request->gpio_id);
   }
 }
+
+}  // namespace pigpio
+}  // namespace hal

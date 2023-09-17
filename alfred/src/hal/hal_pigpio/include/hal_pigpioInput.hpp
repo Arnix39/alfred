@@ -26,6 +26,11 @@
 #include "hal_pigpio_interfaces/msg/hal_pigpio_edge_change.hpp"
 #include "hal_pigpio_interfaces/msg/hal_pigpio_encoder_count.hpp"
 
+namespace hal
+{
+namespace pigpio
+{
+
 struct Motor
 {
   uint8_t id;
@@ -34,5 +39,8 @@ struct Motor
   EdgeChangeType previousEdgeChangeType;
   int32_t encoderCount;
 };
+
+}  // namespace pigpio
+}  // namespace hal
 
 #endif  // HAL_PIGPIOINPUT_HPP_

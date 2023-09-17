@@ -14,6 +14,13 @@
 
 #include "hal_pigpio_tests.hpp"
 
+namespace hal
+{
+namespace pigpio
+{
+namespace test
+{
+
 using namespace std::placeholders;
 
 PigioCheckerNode::PigioCheckerNode()
@@ -375,3 +382,7 @@ void PigioCheckerNode::i2cStopImuReading(
 
   executor->spin_until_future_complete(future);
 }
+
+}  // namespace test
+}  // namespace pigpio
+}  // namespace hal

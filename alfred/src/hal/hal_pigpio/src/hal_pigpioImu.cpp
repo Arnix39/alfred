@@ -14,6 +14,11 @@
 
 #include "hal_pigpio.hpp"
 
+namespace hal
+{
+namespace pigpio
+{
+
 void Pigpio::resetFifo()
 {
   int16_t valueRead;
@@ -229,3 +234,6 @@ void Pigpio::i2cImuReading(
     resetFifo();
   }
 }
+
+}  // namespace pigpio
+}  // namespace hal

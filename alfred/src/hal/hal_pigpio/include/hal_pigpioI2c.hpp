@@ -25,6 +25,14 @@
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_write_word_data.hpp"
 #include "hal_pigpio_interfaces/srv/hal_pigpio_i2c_write_block_data.hpp"
 
+namespace hal
+{
+namespace pigpio
+{
+
 #define I2C_BUFFER_MAX_BYTES 32
+
+}  // namespace pigpio
+}  // namespace hal
 
 #endif  // HAL_PIGPIOI2C_HPP_

@@ -14,6 +14,11 @@
 
 #include "hal_pigpio.hpp"
 
+namespace hal
+{
+namespace pigpio
+{
+
 void Pigpio::getMode(
   const std::shared_ptr<HalPigpioGetMode_t::Request> request,
   std::shared_ptr<HalPigpioGetMode_t::Response> response)
@@ -91,3 +96,6 @@ void Pigpio::clearResistor(
     RCLCPP_INFO(get_logger(), "Failed to clear resistor for GPIO %u!", request->gpio_id);
   }
 }
+
+}  // namespace pigpio
+}  // namespace hal

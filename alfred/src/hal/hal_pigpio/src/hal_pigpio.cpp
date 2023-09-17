@@ -14,6 +14,11 @@
 
 #include "hal_pigpio.hpp"
 
+namespace hal
+{
+namespace pigpio
+{
+
 using namespace std::chrono_literals;
 using namespace std::placeholders;
 
@@ -199,3 +204,6 @@ LifecycleCallbackReturn_t Pigpio::on_error(const rclcpp_lifecycle::State & previ
 {
   return LifecycleCallbackReturn_t::FAILURE;
 }
+
+}  // namespace pigpio
+}  // namespace hal
