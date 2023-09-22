@@ -17,10 +17,10 @@ overflow-checks = true
 # cargo build/run --release
 [profile.release]
 codegen-units = 1
-debug = 2
+debug = true # symbols are nice and they don't increase the size on Flash
 debug-assertions = false
 incremental = false
-lto = 'fat'
+lto = true # better optimizations
 opt-level = 3
 overflow-checks = false
 

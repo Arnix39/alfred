@@ -1,5 +1,7 @@
 {
     "rust-analyzer.linkedProjects": [
-        "./remote/basic/Cargo.toml"
+        // order is important (rust-analyzer/rust-analyzer#7764)
+        "Cargo.toml",
+        "remote/Cargo.toml"
     ]
 }
