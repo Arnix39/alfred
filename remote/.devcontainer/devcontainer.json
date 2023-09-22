@@ -26,11 +26,6 @@
             "type": "bind"
         },
         {
-            "source": "${localWorkspaceFolder}/../.git/modules/remote/hubris/",
-            "target": "/home/workspace/hubris/.git",
-            "type": "bind"
-        },
-        {
             "source": "devcontainer-cargo-cache-${devcontainerId}",
             "target": "/usr/local/cargo",
             "type": "volume"
