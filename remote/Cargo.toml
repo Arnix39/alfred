@@ -1,0 +1,6 @@
+[workspace]
+members = [
+  "host_tests"
+]
+
+resolver = "2"

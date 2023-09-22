@@ -1,116 +1,63 @@
 {
-  "version": "2.0.0",
-  "tasks": [
-      {
-        "label": "Humility: Installation",
-        "detail": "Install Humility (Hubris' debugger).",
-        "type": "shell",
-        "options": {
-          "cwd": "${workspaceFolder}"
+    // See https://go.microsoft.com/fwlink/?LinkId=733558 
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            /*
+             * This is the default cargo build task,
+             * but we need to provide a label for it,
+             * so we can invoke it from the debug launcher.
+             */
+            "label": "Cargo Build (debug)",
+            "type": "process",
+            "command": "cargo",
+            "args": ["build"],
+            "problemMatcher": [
+                "$rustc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         },
-        "command": "cargo",
-        "args": [
-          "install",
-          "--git",
-          "https://github.com/oxidecomputer/humility.git",
-          "--locked",
-          "humility"
-        ],
-        "group": {
-          "kind": "build",
+        {
+            "label": "Cargo Build (release)",
+            "type": "process",
+            "command": "cargo",
+            "args": ["build", "--release"],
+            "problemMatcher": [
+                "$rustc"
+            ],
+            "group": "build"
         },
-      },
-      {
-        "label": "Hubris: Prepare workspace",
-        "detail": "Copy files to Hubris directory.",
-        "type": "shell",
-        "options": {
-          "cwd": "${workspaceFolder}"
+        {
+            "label": "Cargo Build Examples (debug)",
+            "type": "process",
+            "command": "cargo",
+            "args": ["build","--examples"],
+            "problemMatcher": [
+                "$rustc"
+            ],
+            "group": "build"
         },
-        "command": "cp",
-        "args": [
-          "-R",
-          "app/",
-          "chips/",
-          "drv/",
-          "task/",
-          "hubris/"
-        ],
-        "group": {
-          "kind": "build",
+        {
+            "label": "Cargo Build Examples (release)",
+            "type": "process",
+            "command": "cargo",
+            "args": ["build","--examples", "--release"],
+            "problemMatcher": [
+                "$rustc"
+            ],
+            "group": "build"
         },
-      },
-      {
-        "label": "Hubris: Build application",
-        "detail": "Build complete application.",
-        "type": "shell",
-        "options": {
-          "cwd": "${workspaceFolder}/hubris"
+        {
+            "label": "Cargo Clean",
+            "type": "process",
+            "command": "cargo",
+            "args": ["clean"],
+            "problemMatcher": [],
+            "group": "build"
         },
-        "command": "cargo",
-        "args": [
-          "xtask",
-          "dist",
-          "app/remote/app.toml",
-        ],
-        "group": {
-          "kind": "build",
-        },
-      },
-      {
-        "label": "Hubris: Flash application",
-        "detail": "Flash application onto target.",
-        "type": "shell",
-        "options": {
-          "cwd": "${workspaceFolder}/hubris"
-        },
-        "command": "cargo",
-        "args": [
-          "xtask",
-          "flash",
-          "app/remote/app.toml",
-        ],
-        "group": {
-          "kind": "build",
-        },
-      },
-      {
-        "label": "Humility: Tasks statistics",
-        "detail": "Run Humility on target.",
-        "type": "shell",
-        "options": {
-          "cwd": "${workspaceFolder}/hubris"
-        },
-        "command": "cargo",
-        "args": [
-          "xtask",
-          "humility",
-          "app/remote/app.toml",
-          "--",
-          "tasks",
-        ],
-        "group": {
-          "kind": "build",
-        },
-      },
-      {
-        "label": "Humility: Debug application",
-        "detail": "Debug application on target.",
-        "type": "shell",
-        "options": {
-          "cwd": "${workspaceFolder}/hubris"
-        },
-        "command": "cargo",
-        "args": [
-          "xtask",
-          "gdb",
-          "app/remote/app.toml",
-          "--",
-          "--run-openocd",
-        ],
-        "group": {
-          "kind": "build",
-        },
-      },
     ]
 }

@@ -13,8 +13,8 @@
     "customizations": {
         "vscode": {
             "extensions": [
-                "twxs.cmake",
-                "donjayamanne.python-extension-pack",
+                "rust-lang.rust-analyzer",
+                "marus25.cortex-debug",
                 "vscode-icons-team.vscode-icons"
             ]
         }
@@ -31,6 +31,5 @@
             "type": "volume"
         }
     ],
-    "postCreateCommand": "bash /home/workspace/.devcontainer/postCreate.bash",
     "postStartCommand": "bash /home/workspace/.devcontainer/postStart.bash"
 }
