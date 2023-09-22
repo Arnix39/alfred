@@ -26,5 +26,7 @@ ENV SHELL /bin/bash
 USER $USERNAME
 
 RUN rustup target add thumbv7em-none-eabihf
+RUN rustup component add llvm-tools-preview
+RUN cargo install cargo-binutils
 
 CMD ["/bin/bash"]

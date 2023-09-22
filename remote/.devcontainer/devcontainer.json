@@ -13,10 +13,11 @@
     "customizations": {
         "vscode": {
             "extensions": [
-                "rust-lang.rust-analyzer",
-                "marus25.cortex-debug",
-                "vscode-icons-team.vscode-icons"
-            ]
+				"rust-lang.rust-analyzer",
+				"marus25.cortex-debug",
+				"vscode-icons-team.vscode-icons",
+				"tamasfe.even-better-toml"
+			]
         }
     },
     "mounts": [
