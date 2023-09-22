@@ -2,7 +2,10 @@
 	path = alfred/src/sim/ros_gz
 	url = https://github.com/gazebosim/ros_gz.git
 	branch = ros2
+	update = merge
 [submodule "remote/hubris"]
 	path = remote/hubris
 	url = https://github.com/oxidecomputer/hubris.git
 	ignore = all
+	branch = master
+	update = merge
