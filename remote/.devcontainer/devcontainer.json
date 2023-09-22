@@ -1,0 +1,41 @@
+{
+    "name": "Rust Development Container",
+    "privileged": true,
+    "remoteUser": "arnix",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "args": {
+            "USERNAME": "arnix"
+        }
+    },
+    "workspaceFolder": "/home/workspace",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/workspace,type=bind",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "twxs.cmake",
+                "donjayamanne.python-extension-pack",
+                "vscode-icons-team.vscode-icons"
+            ]
+        }
+    },
+    "mounts": [
+        {
+            "source": "/dev/bus/usb",
+            "target": "/dev/bus/usb",
+            "type": "bind"
+        },
+        {
+            "source": "${localWorkspaceFolder}/../.git/modules/remote/hubris/",
+            "target": "/home/workspace/hubris/.git",
+            "type": "bind"
+        },
+        {
+            "source": "devcontainer-cargo-cache-${devcontainerId}",
+            "target": "/usr/local/cargo",
+            "type": "volume"
+        }
+    ],
+    "postCreateCommand": "bash /home/workspace/.devcontainer/postCreate.bash",
+    "postStartCommand": "bash /home/workspace/.devcontainer/postStart.bash"
+}
