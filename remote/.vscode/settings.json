@@ -3,5 +3,6 @@
         // order is important (rust-analyzer/rust-analyzer#7764)
         "Cargo.toml",
         "remote/Cargo.toml"
-    ]
+    ],
+    "cortex-debug.gdbPath": "gdb-multiarch"
 }
