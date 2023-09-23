@@ -7,7 +7,7 @@ platform:
   arch: amd64
 
 steps:
-- name: Build
+- name: Build Alfred
   image: ros:humble-ros-base-jammy
   commands:
     - cd alfred
@@ -25,7 +25,7 @@ steps:
       --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DSYNTHETIC_BUILD:BOOL=ON
       --no-warn-unused-cli
 
-- name: Archive build logs
+- name: Archive Alfred's build logs
   image: ros:humble-ros-base-jammy
   commands:
     - cd alfred
@@ -34,9 +34,9 @@ steps:
     status:
     - failure
   depends_on:
-    - Build
+    - Build Alfred
 
-- name: Upload build logs
+- name: Upload Alfred's build logs
   image: plugins/artifactory
   settings:
     url: http://192.168.1.252/artifactory
@@ -52,9 +52,9 @@ steps:
     status:
     - failure
   depends_on:
-    - Archive build logs
+    - Archive Alfred's build logs
 
-- name: Tests
+- name: Test Alfred
   image: ros:humble-ros-base-jammy
   commands:
     - cd alfred
@@ -69,9 +69,9 @@ steps:
     - colcon test
     - colcon test-result
   depends_on:
-    - Build
+    - Build Alfred
 
-- name: Archive tests logs
+- name: Archive Alfred's tests logs
   image: ros:humble-ros-base-jammy
   commands:
     - cd alfred
@@ -81,9 +81,9 @@ steps:
     - failure
     - success
   depends_on:
-    - Tests
+    - Test Alfred
 
-- name: Upload test logs
+- name: Upload Alfred's tests logs
   image: plugins/artifactory
   settings:
     url: http://192.168.1.252/artifactory
@@ -100,7 +100,14 @@ steps:
     - failure
     - success
   depends_on:
-    - Archive tests logs
+    - Archive Alfred's tests logs
+
+- name: Test remote
+  image: rust:latest
+  commands:
+    - cd remote
+    - rustup target add thumbv7em-none-eabihf
+    - cargo test
 
 trigger:
   event:
@@ -136,7 +143,7 @@ steps:
     - rm sysroot.tar
     - rm -r workspace
 
-- name: Build
+- name: Build Alfred
   image: ros:humble-ros-base-jammy
   environment:
     RMW_IMPLEMENTATION: rmw_fastrtps_cpp
@@ -179,9 +186,9 @@ steps:
     - apt-get install -y rsync
     - rsync -a --delete $DRONE_WORKSPACE/alfred/cross_compile/sysroot/ /tmp/sysroot/
   depends_on:
-    - Build
+    - Build Alfred
 
-- name: Archive build logs
+- name: Archive Alfred's build logs
   image: ros:humble-ros-base-jammy
   commands:
     - cd alfred
@@ -190,9 +197,9 @@ steps:
     status:
     - failure
   depends_on:
-    - Build
+    - Build Alfred
 
-- name: Upload build logs
+- name: Upload Alfred's build logs
   image: plugins/artifactory
   settings:
     url: http://192.168.1.252/artifactory
@@ -208,17 +215,17 @@ steps:
     status:
     - failure
   depends_on:
-    - Archive build logs
+    - Archive Alfred's build logs
 
-- name: Archive binaries
+- name: Archive Alfred's binaries
   image: ros:humble-ros-base-jammy
   commands:
     - cd alfred
     - find install/ -printf "%P\n" | tar -czf install.tar.gz --no-recursion -C install/ -T -
   depends_on:
-    - Build
+    - Build Alfred
 
-- name: Upload binaries
+- name: Upload Alfred's binaries
   image: plugins/artifactory
   settings:
     url: http://192.168.1.252/artifactory
@@ -231,7 +238,29 @@ steps:
     flat: true
     insecure: true
   depends_on:
-    - Archive binaries
+    - Archive Alfred's binaries
+
+- name: Build remote
+  image: rust:latest
+  commands:
+    - cd remote/remote
+    - rustup target add thumbv7em-none-eabihf
+    - cargo build
+
+- name: Upload remote's binaries
+  image: plugins/artifactory
+  settings:
+    url: http://192.168.1.252/artifactory
+    username:
+      from_secret: ARTIFACTORY_USERNAME
+    password:
+      from_secret: ARTIFACTORY_PASSWORD
+    source: remote/remote/target/thumbv7em-none-eabihf/debug/basic
+    target: Alfred/binaries/development/build_$${DRONE_BUILD_NUMBER}_remote
+    flat: true
+    insecure: true
+  depends_on:
+    - Build remote
 
 services:
 - name: docker
@@ -263,7 +292,7 @@ platform:
   arch: amd64
 
 steps:
-- name: Build
+- name: Build Alfred
   image: ros:humble-ros-base-jammy
   volumes:
     - name: sysroot
@@ -297,7 +326,7 @@ steps:
       --cmake-args -DCMAKE_TOOLCHAIN_FILE=$CROSS_COMPILE_DIR/cmake-toolchains/generic_linux.cmake
       --no-warn-unused-cli
 
-- name: Deploy
+- name: Deploy Alfred
   image: drillster/drone-rsync
   settings:
     hosts: [ "192.168.1.253" ]
@@ -313,9 +342,9 @@ steps:
       --delete
       --copy-links
   depends_on:
-    - Build
+    - Build Alfred
 
-- name: Archive build logs
+- name: Archive Alfred's build logs
   image: ros:humble-ros-base-jammy
   commands:
     - cd alfred
@@ -324,9 +353,9 @@ steps:
     status:
     - failure
   depends_on:
-    - Build
+    - Build Alfred
 
-- name: Upload build logs
+- name: Upload Alfred's build logs
   image: plugins/artifactory
   settings:
     url: http://192.168.1.252/artifactory
@@ -342,17 +371,17 @@ steps:
     status:
     - failure
   depends_on:
-    - Archive build logs
+    - Archive Alfred's build logs
 
-- name: Archive binaries
+- name: Archive Alfred's binaries
   image: ros:humble-ros-base-jammy
   commands:
     - cd alfred
     - find install/ -printf "%P\n" | tar -czf install.tar.gz --no-recursion -C install/ -T -
   depends_on:
-    - Build
+    - Build Alfred
 
-- name: Upload binaries
+- name: Upload Alfred's binaries
   image: plugins/artifactory
   settings:
     url: http://192.168.1.252/artifactory
@@ -365,7 +394,29 @@ steps:
     flat: true
     insecure: true
   depends_on:
-    - Archive binaries
+    - Archive Alfred's binaries
+
+- name: Build remote
+  image: rust:latest
+  commands:
+    - cd remote/remote
+    - rustup target add thumbv7em-none-eabihf
+    - cargo build --release
+
+- name: Upload remote's binaries
+  image: plugins/artifactory
+  settings:
+    url: http://192.168.1.252/artifactory
+    username:
+      from_secret: ARTIFACTORY_USERNAME
+    password:
+      from_secret: ARTIFACTORY_PASSWORD
+    source: remote/remote/target/thumbv7em-none-eabihf/release/basic
+    target: Alfred/binaries/deployment/build_$${DRONE_BUILD_NUMBER}_remote
+    flat: true
+    insecure: true
+  depends_on:
+    - Build remote
 
 volumes:
 - name: sysroot
