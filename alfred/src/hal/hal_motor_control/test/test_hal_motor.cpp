@@ -110,7 +110,7 @@ TEST_F(MotorTest, SetPwmDutyCycleAndDirectionForward)
     FAIL() << "Future didn't complete successfully";
   }
 
-  motor->motorOk.setPwmDutyCycleAndDirection(motorChecker->setPwmDutycycleClient, 20, FORWARD);
+  motor->motorOk.setPwmDutyCycleAndDirection(motorChecker->setPwmDutycycleClient, 20, forward);
 
   executor.spin_some();
   executor.spin_some();
@@ -142,7 +142,7 @@ TEST_F(MotorTest, SetPwmDutyCycleAndDirectionBackward)
     FAIL() << "Future didn't complete successfully";
   }
 
-  motor->motorOk.setPwmDutyCycleAndDirection(motorChecker->setPwmDutycycleClient, 20, BACKWARD);
+  motor->motorOk.setPwmDutyCycleAndDirection(motorChecker->setPwmDutycycleClient, 20, backward);
 
   executor.spin_some();
   executor.spin_some();

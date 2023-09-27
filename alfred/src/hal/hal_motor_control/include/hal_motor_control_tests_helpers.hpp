@@ -35,8 +35,6 @@ namespace test
 
 #define INPUT 0
 #define OUTPUT 1
-#define FORWARD true
-#define BACKWARD false
 
 class HalPigpioDummyNode : public rclcpp::Node
 {

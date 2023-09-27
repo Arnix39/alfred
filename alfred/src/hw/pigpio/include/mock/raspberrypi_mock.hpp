@@ -92,7 +92,7 @@ enum gpioLevel
 struct gpioPwm
 {
   bool isEnabled;
-  uint16_t dutycycle;
+  uint8_t dutycycle;
   uint16_t frequency;
 };
 

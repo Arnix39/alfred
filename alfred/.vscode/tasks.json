@@ -139,7 +139,8 @@
                 "ros_gz",
                 "--cmake-target",
                 "clean"
-            ]
+            ],
+            "problemMatcher": "$gcc"
         },
         {
             "label": "Workspace: Generate sysroot for target",
@@ -260,7 +261,8 @@
                 "ros_gz",
                 "--cmake-target",
                 "clean"
-            ]
+            ],
+            "problemMatcher": "$gcc"
         },
         {
             "label": "ROS2: Gazebo bridge",
@@ -302,7 +304,8 @@
                 "build",
                 "install",
                 "log"
-            ]
+            ],
+            "problemMatcher": []
         }
     ]
 }

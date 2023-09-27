@@ -28,7 +28,6 @@ using setOutputModeSyncClientNode_t = ServiceNodeSync<HalPigpioSetOutputMode_t>;
 using setEncoderCallbackSyncClientNode_t = ServiceNodeSync<HalPigpioSetEncoderCallback_t>;
 using setPwmFrequencySyncClientNode_t = ServiceNodeSync<HalPigpioSetPwmFrequency_t>;
 
-
 namespace control
 {
 
@@ -48,6 +47,7 @@ private:
   rclcpp_lifecycle::LifecyclePublisher<HalMotorControlEncodersMsg_t>::SharedPtr motorControlPub;
 
   rclcpp::Subscription<HalPigpioEncoderCountMsg_t>::SharedPtr motorControlECSub;
+  rclcpp::Subscription<HalMotorControlCommandMsg_t>::SharedPtr motorControlCmdSub;
 
   rclcpp::TimerBase::SharedPtr encoderCountsTimer;
 
@@ -66,8 +66,9 @@ public:
   void configureMotor(void);
   void publishMessage(void);
   void pigpioEncoderCountCallback(const HalPigpioEncoderCountMsg_t & msg);
-  void setPwmLeft(uint16_t dutycycle, bool direction);
-  void setPwmRight(uint16_t dutycycle, bool direction);
+  void wheelsVelocityCmdCallback(const HalMotorControlCommandMsg_t & msg);
+  void setPwmLeft(uint8_t dutycycle, Direction direction);
+  void setPwmRight(uint8_t dutycycle, Direction direction);
 };
 
 }  // namespace control

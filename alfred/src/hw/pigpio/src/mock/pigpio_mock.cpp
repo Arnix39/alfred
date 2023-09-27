@@ -256,7 +256,7 @@ int set_PWM_dutycycle(int pi, unsigned user_gpio, unsigned dutycycle)
       pwm.dutycycle = dutycycle;
       return raspberryPi.setGpioPwm(static_cast<gpioId>(user_gpio), pwm);
     } else {
-      pwm = {true, static_cast<uint16_t>(dutycycle), 0};
+      pwm = {true, static_cast<uint8_t>(dutycycle), 0};
       return raspberryPi.setGpioPwm(static_cast<gpioId>(user_gpio), pwm);
     }
   } else {

@@ -54,6 +54,8 @@ LifecycleCallbackReturn_t MotorControl::on_configure(const rclcpp_lifecycle::Sta
 
   motorControlECSub = this->create_subscription<HalPigpioEncoderCountMsg_t>(
     "hal_pigpioEncoderCount", 10, std::bind(&MotorControl::pigpioEncoderCountCallback, this, _1));
+  motorControlCmdSub = this->create_subscription<HalMotorControlCommandMsg_t>(
+    "wheelsVelocityCmd", 10, std::bind(&MotorControl::wheelsVelocityCmdCallback, this, _1));
 
   encoderCountsTimer = create_wall_timer(10ms, std::bind(&MotorControl::publishMessage, this));
 
@@ -136,6 +138,28 @@ void MotorControl::pigpioEncoderCountCallback(
   }
 }
 
+void MotorControl::wheelsVelocityCmdCallback(const HalMotorControlCommandMsg_t & msg)
+{
+  uint8_t leftPwmDutycycle =
+    static_cast<uint8_t>(std::abs(msg.motor_left_velocity_command) * M_PER_S_TO_DUTYCYCLE);
+  uint8_t rightPwmDutycycle =
+    static_cast<uint8_t>(std::abs(msg.motor_right_velocity_command) * M_PER_S_TO_DUTYCYCLE);
+
+  auto leftDirection = forward;
+  auto rightDirection = forward;
+
+  if (msg.motor_left_velocity_command < 0.0) {
+    leftDirection = backward;
+  }
+
+  if (msg.motor_right_velocity_command < 0.0) {
+    rightDirection = backward;
+  }
+
+  setPwmLeft(leftPwmDutycycle, leftDirection);
+  setPwmRight(rightPwmDutycycle, rightDirection);
+}
+
 void MotorControl::publishMessage(void)
 {
   auto encoderCounts = HalMotorControlEncodersMsg_t();
@@ -151,12 +175,12 @@ void MotorControl::publishMessage(void)
   motorControlPub->publish(encoderCounts);
 }
 
-void MotorControl::setPwmLeft(uint16_t dutycycle, bool direction)
+void MotorControl::setPwmLeft(uint8_t dutycycle, Direction direction)
 {
   motorLeft.setPwmDutyCycleAndDirection(gpioSetPwmDutycycleClient, dutycycle, direction);
 }
 
-void MotorControl::setPwmRight(uint16_t dutycycle, bool direction)
+void MotorControl::setPwmRight(uint8_t dutycycle, Direction direction)
 {
   motorRight.setPwmDutyCycleAndDirection(gpioSetPwmDutycycleClient, dutycycle, direction);
 }

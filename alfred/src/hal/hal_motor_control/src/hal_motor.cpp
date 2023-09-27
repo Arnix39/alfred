@@ -114,7 +114,7 @@ void Motor::setEncoderCount(int32_t count)
 
 void Motor::setPwmDutyCycleAndDirection(
   rclcpp::Client<HalPigpioSetPwmDutycycle_t>::SharedPtr gpioSetPwmDutycycleClient,
-  uint16_t dutycycle,
+  uint8_t dutycycle,
   bool isDirectionForward)
 {
   auto setPwmDutycyclePwmChARequest = std::make_shared<HalPigpioSetPwmDutycycle_t::Request>();

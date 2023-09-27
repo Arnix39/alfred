@@ -1,6 +1,7 @@
 #!/bin/bash
 
 sudo rosdep update
+sudo apt update
 sudo rosdep install --from-paths src --ignore-src -r -i -y --rosdistro humble
 sudo chown -R arnix /home/workspace/
 

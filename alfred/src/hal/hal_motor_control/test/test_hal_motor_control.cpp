@@ -97,7 +97,8 @@ TEST_F(MotorControlTest, setPwmLeftForward)
     FAIL() << "Future didn't complete successfully";
   }
 
-  motorControl->setPwmLeft(20, FORWARD);
+  motorControl->setPwmLeft(20, forward);
+  // There are 2 calls to services
   executor.spin_some();
   executor.spin_some();
 
@@ -120,7 +121,8 @@ TEST_F(MotorControlTest, setPwmLeftBackward)
     FAIL() << "Future didn't complete successfully";
   }
 
-  motorControl->setPwmLeft(20, BACKWARD);
+  motorControl->setPwmLeft(20, backward);
+  // There are 2 calls to services
   executor.spin_some();
   executor.spin_some();
 
@@ -143,7 +145,8 @@ TEST_F(MotorControlTest, setPwmRightForward)
     FAIL() << "Future didn't complete successfully";
   }
 
-  motorControl->setPwmRight(20, FORWARD);
+  motorControl->setPwmRight(20, forward);
+  // There are 2 calls to services
   executor.spin_some();
   executor.spin_some();
 
@@ -166,12 +169,48 @@ TEST_F(MotorControlTest, setPwmRightBackward)
     FAIL() << "Future didn't complete successfully";
   }
 
-  motorControl->setPwmRight(20, BACKWARD);
+  motorControl->setPwmRight(20, backward);
+  // There are 2 calls to services
   executor.spin_some();
   executor.spin_some();
 
   ASSERT_EQ(get_PWM_dutycycle(pigpioDummy->piHandle, MOTOR_RIGHT_PWM_A_GPIO), 0);
   ASSERT_EQ(get_PWM_dutycycle(pigpioDummy->piHandle, MOTOR_RIGHT_PWM_B_GPIO), 20);
+}
+
+TEST_F(MotorControlTest, wheelsVelocityCmdCallback)
+{
+  std::function<void()> configureMotor = std::bind(
+    &MotorControl::configureMotor, motorControl);
+
+  auto future = std::async(
+    std::launch::async,
+    configureMotor);
+
+  auto status = executor.spin_until_future_complete(future);
+
+  if (status != rclcpp::FutureReturnCode::SUCCESS) {
+    FAIL() << "Future didn't complete successfully";
+  }
+
+  auto message = HalMotorControlCommandMsg_t();
+  message.motor_left_velocity_command = 0.6;
+  message.motor_right_velocity_command = -0.6;
+
+  const HalMotorControlCommandMsg_t & messageReceived = message;
+
+  motorControl->wheelsVelocityCmdCallback(message);
+  // There are 4 calls to services
+  executor.spin_some();
+  executor.spin_some();
+  executor.spin_some();
+  executor.spin_some();
+
+  ASSERT_EQ(get_PWM_dutycycle(pigpioDummy->piHandle, MOTOR_LEFT_PWM_A_GPIO), 153);
+  ASSERT_EQ(get_PWM_dutycycle(pigpioDummy->piHandle, MOTOR_LEFT_PWM_B_GPIO), 153);
+
+  ASSERT_EQ(get_PWM_dutycycle(pigpioDummy->piHandle, MOTOR_RIGHT_PWM_A_GPIO), 0);
+  ASSERT_EQ(get_PWM_dutycycle(pigpioDummy->piHandle, MOTOR_RIGHT_PWM_B_GPIO), 153);
 }
 
 TEST_F(MotorControlTest, encoderCountCallbackAndPublishMessageSuccess)
@@ -221,6 +260,7 @@ TEST_F(MotorControlTest, encoderCountCallbackAndPublishMessageFailure)
   ASSERT_EQ(motorControlChecker->encoderCounts.at(0), 10);
   ASSERT_EQ(motorControlChecker->encoderCounts.at(1), 0);
 }
+
 }  // namespace test
 }  // namespace control
 }  // namespace motor

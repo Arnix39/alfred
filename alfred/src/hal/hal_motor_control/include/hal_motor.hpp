@@ -42,7 +42,7 @@ struct Encoder_t
 struct Pwm
 {
   uint8_t gpio;
-  uint16_t dutycycle;
+  uint8_t dutycycle;
 };
 
 class Motor
@@ -64,7 +64,7 @@ public:
   void setEncoderCount(int32_t count);
   void setPwmDutyCycleAndDirection(
     rclcpp::Client<HalPigpioSetPwmDutycycle_t>::SharedPtr gpioSetPwmDutycycleClient,
-    uint16_t dutycycle,
+    uint8_t dutycycle,
     bool isDirectionForward);
   void configureGpios(
     setOutputModeSyncClientNode_t gpioSetOutputModeClient,
