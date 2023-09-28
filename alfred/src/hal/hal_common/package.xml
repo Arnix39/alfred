@@ -12,12 +12,13 @@
   <!-- Dependencies -->
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <depend>common_utils</depend>
   <depend>hal_pigpio_interfaces</depend>
   <depend>hal_imu_interfaces</depend>
+
   <depend>rclcpp</depend>
   <depend>rclcpp_lifecycle</depend>
-  <depend>common_utils</depend>
-
+  
   <test_depend>pigpio</test_depend>
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
