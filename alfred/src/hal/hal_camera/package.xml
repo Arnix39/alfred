@@ -12,7 +12,6 @@
   <!-- Dependencies -->
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>hal_camera_interfaces</depend>
   <depend>common_utils</depend>
   <depend>cv_bridge</depend>
   <depend>sensor_msgs</depend>

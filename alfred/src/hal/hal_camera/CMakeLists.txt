@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.8)
 project(hal_camera)
 
 find_package(ament_cmake REQUIRED)
-find_package(hal_camera_interfaces REQUIRED)
-find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(common_utils REQUIRED)
 find_package(OpenCV REQUIRED COMPONENTS core imgproc videoio)
@@ -19,9 +17,7 @@ include_directories(
 )
 
 set(dependencies
-  rclcpp
   rclcpp_lifecycle
-  hal_camera_interfaces
   common_utils
   OpenCV
   cv_bridge

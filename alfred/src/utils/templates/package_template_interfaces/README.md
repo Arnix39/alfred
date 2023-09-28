@@ -1,3 +1,13 @@
-# Description
+# package_template interfaces
 
-This directory contains the interfaces (messages, services and actions) for a package template.
+## Messages
+
+List of messages
+
+## Services
+
+List of services
+
+## Actions
+
+List of actions

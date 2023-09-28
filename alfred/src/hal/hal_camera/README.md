@@ -1,3 +1,26 @@
-# Description
+# hal_camera package
 
-This directory contains the `hal` components related to the camera (`Raspberry Pi Camera V2`)
+## Overview
+
+This package contains the node (`hal_camera_node`) that is capturing and publishing images using the camera (`Raspberry Pi Camera V2`) at a 5Hz rate. 
+
+## Interfaces
+
+### Topics
+
+The images are published as [image messages](https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg) on `cameraImage`.
+
+## Dependencies
+
+### Internal
+
+- [`common_utils`](../../utils/common_utils/README.md)
+
+### External
+
+- `ament_cmake`
+- `rclcpp_lifecycle`
+- `cv_bridge`
+- `libopencv-dev`
+- `sensor_msgs`
+- `std_msgs`

@@ -1,3 +1,21 @@
-# Description
+# package_template node
 
-This directory contains a package template
+## Overview
+
+Description of the package 
+
+## Interfaces
+
+### Topics
+
+Description of the published data on related topics
+
+## Dependencies
+
+### Internal
+
+List of internal dependencies
+
+### External
+
+List of external dependencies
