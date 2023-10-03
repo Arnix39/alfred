@@ -13,7 +13,7 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get install -y libusb-1.0-0-dev libftdi1-dev libudev-dev libssl-dev udev openocd gdb-multiarch qemu-system-arm
+RUN apt-get install -y libusb-1.0-0-dev libftdi1-dev libudev-dev libssl-dev udev openocd gdb-multiarch qemu-system-arm minicom
 RUN mkdir -p /etc/udev/rules.d
 RUN echo "SUBSYSTEM==\"usb\", ATTRS{idVendor}==\"0483\", ATTRS{idProduct}==\"374b\", MODE=\"0666\"" | tee -a /etc/udev/rules.d/99-stm32f3disc.rules > /dev/null
 ENV SHELL /bin/bash

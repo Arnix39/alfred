@@ -9,7 +9,7 @@
             "cwd": "${workspaceRoot}/remote",
             "preLaunchTask": "Target: Build (debug)",
             "runToEntryPoint": "main",
-            "executable": "target/thumbv7em-none-eabihf/debug/basic",
+            "executable": "target/thumbv7em-none-eabihf/debug/bluetooth",
             "device": "STM32F303VCT6",
             "configFiles": [
                 "interface/stlink.cfg",
