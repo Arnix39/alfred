@@ -255,7 +255,7 @@ steps:
       from_secret: ARTIFACTORY_USERNAME
     password:
       from_secret: ARTIFACTORY_PASSWORD
-    source: remote/remote/target/thumbv7em-none-eabihf/debug/basic
+    source: remote/remote/target/thumbv7em-none-eabihf/debug/bluetooth
     target: Alfred/binaries/development/build_$${DRONE_BUILD_NUMBER}_remote
     flat: true
     insecure: true
@@ -411,7 +411,7 @@ steps:
       from_secret: ARTIFACTORY_USERNAME
     password:
       from_secret: ARTIFACTORY_PASSWORD
-    source: remote/remote/target/thumbv7em-none-eabihf/release/basic
+    source: remote/remote/target/thumbv7em-none-eabihf/release/bluetooth
     target: Alfred/binaries/deployment/build_$${DRONE_BUILD_NUMBER}_remote
     flat: true
     insecure: true
