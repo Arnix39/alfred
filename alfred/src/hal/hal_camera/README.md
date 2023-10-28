@@ -19,6 +19,9 @@ The images are published as [image messages](https://github.com/ros2/common_inte
 ### External
 
 - `ament_cmake`
+- `ament_lint_auto`
+- `ament_lint_common`
+- `ament_cmake_gtest`
 - `rclcpp_lifecycle`
 - `cv_bridge`
 - `libopencv-dev`
