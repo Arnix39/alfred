@@ -31,5 +31,4 @@ N/A
 - `ament_lint_auto`
 - `ament_lint_common`
 - `ament_cmake_gtest`
-- `rclcpp`
 - `rclcpp_lifecycle`

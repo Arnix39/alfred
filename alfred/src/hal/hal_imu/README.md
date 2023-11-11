@@ -7,7 +7,7 @@ This package contains 3 nodes related to the IMU (**I**nertial **M**easurement *
 - `hal_imuDmpWritingServer_node`: This node is providing the implementation of an action server (`HalImuWriteDmp`) to program the DMP (**D**igital **M**otion **P**rocessor) present on the IMU (using the functions defined in `hal_common` package).
 - `hal_imu_node`: This node is configuring the IMU (including the DMP) and then publishing the IMU data at a 100Hz rate. 
 
-NB: The readings from the IMU are actually performed and published by [`hal_pigpio_node`](../hal_pigpio/README.md) and `hal_imu_node` is only forwarding these messages (the latency introduced by multiple layers of ROS services is too high).
+NB: The readings from the IMU are actually performed and published by [`hal_pigpio_node`](../hal_pigpio/README.md) and `hal_imu_node` is only forwarding these messages (the latency introduced by multiple layers of ROS services calls is too high, this is anyway a design improvement point).
 
 ## Interfaces
 
@@ -31,6 +31,5 @@ The IMU readings are published as [IMU messages](https://github.com/ros2/common_
 - `ament_lint_auto`
 - `ament_lint_common`
 - `ament_cmake_gtest`
-- `rclcpp`
 - `rclcpp_lifecycle`
 - `rclcpp_action`
