@@ -177,13 +177,12 @@ steps:
     - Prepare sysroot
 
 - name: Copy sysroot to host
-  image: ros:humble-ros-base-jammy
+  image: alpine:latest
   volumes:
     - name: sysroot
       path: /tmp/sysroot
   commands:
-    - apt-get update
-    - apt-get install -y rsync
+    - apk update && apk add rsync
     - rsync -a --delete $DRONE_WORKSPACE/alfred/cross_compile/sysroot/ /tmp/sysroot/
   depends_on:
     - Build Alfred
