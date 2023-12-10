@@ -7,7 +7,7 @@
 
   <!-- Maintainer and license information -->
   <maintainer email="arnaud.hote@gmail.com">Arnix</maintainer>
-  <license>BSD</license>
+  <license>Apache2</license>
 
   <!-- Dependencies -->
   <buildtool_depend>ament_cmake</buildtool_depend>

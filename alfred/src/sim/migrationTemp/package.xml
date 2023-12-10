@@ -7,7 +7,7 @@
   <!-- Maintainer, author and license information -->
   <maintainer email="arnaud.hote@gmail.com">Arnix</maintainer>
   <author email="arnaud.hote@gmail.com">Arnix</author>
-  <license>BSD</license>
+  <license>Apache2.0</license>
 
   <!-- Dependencies -->
   <buildtool_depend>catkin</buildtool_depend>

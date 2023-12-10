@@ -23,7 +23,7 @@ namespace imu
 {
 
 Imu::Imu()
-: rclcpp_lifecycle::LifecycleNode{"hal_imu_node"},
+: rclcpp_lifecycle::LifecycleNode{"hal_imu"},
   imuHandle{MPU6050_I2C_NO_HANDLE},
   imuGetHandleSyncClient{"getHandleSyncClientImu_node"},
   i2cReadByteDataSyncClient{"readByteDataSyncClientImu_node"},
