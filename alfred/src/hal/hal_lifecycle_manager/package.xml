@@ -13,6 +13,12 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>common_utils</depend>
+  <depend>hal_camera</depend>
+  <depend>hal_motor_control</depend>
+  <depend>hal_imu</depend>
+  <depend>hal_pigpio</depend>
+  <depend>hal_pose_manager</depend>
+  <depend>hal_proxsens</depend>
 
   <build_depend>rclcpp_lifecycle</build_depend>
   <exec_depend>rclcpp_lifecycle</exec_depend>

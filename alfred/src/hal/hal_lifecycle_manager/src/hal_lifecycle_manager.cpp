@@ -14,8 +14,6 @@
 
 #include "hal_lifecycle_manager.hpp"
 
-using namespace std::chrono_literals;
-
 namespace hal
 {
 namespace lifecycle_manager
@@ -45,6 +43,18 @@ LifecycleCallbackReturn_t LifecycleManager::on_configure(
 LifecycleCallbackReturn_t LifecycleManager::on_activate(
   const rclcpp_lifecycle::State & previous_state)
 {
+  for (auto node : nodesList) {
+    std::thread thread([this, node]() {changeNodeToState(node.name, NodeState::Active);});
+    thread.detach();
+    if (node.waitRequiredAtStartup) {
+      std::unique_lock<std::mutex> lock(nodesStateMutex);
+      goalStateCondition.wait(
+        lock, [this, node]() {
+          return nodesState.find(node.name)->second == NodeState::Active;
+        });
+      lock.unlock();
+    }
+  }
   RCLCPP_INFO(get_logger(), "Node activated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
@@ -53,9 +63,17 @@ LifecycleCallbackReturn_t LifecycleManager::on_activate(
 LifecycleCallbackReturn_t LifecycleManager::on_deactivate(
   const rclcpp_lifecycle::State & previous_state)
 {
-  for (auto node : nodesList) {
-    std::thread thread([this, node]() {changeNodeToState(node, NodeState::Unconfigured);});
+  for (auto node = nodesList.rbegin(); node <= nodesList.rend(); ++node) {
+    std::thread thread([this, node]() {changeNodeToState(node->name, NodeState::Unconfigured);});
     thread.detach();
+    if (node->waitRequiredAtShutdown) {
+      std::unique_lock<std::mutex> lock(nodesStateMutex);
+      goalStateCondition.wait(
+        lock, [this, node]() {
+          return nodesState.find(node->name)->second == NodeState::Unconfigured;
+        });
+      lock.unlock();
+    }
   }
   RCLCPP_INFO(get_logger(), "Node deactivated!");
 
@@ -76,9 +94,19 @@ LifecycleCallbackReturn_t LifecycleManager::on_cleanup(
 LifecycleCallbackReturn_t LifecycleManager::on_shutdown(
   const rclcpp_lifecycle::State & previous_state)
 {
-  for (auto node : nodesList) {
-    std::thread thread([this, node]() {changeNodeToState(node, NodeState::Finalized);});
+  for (auto node = nodesList.rbegin(); node <= nodesList.rend(); ++node) {
+    std::thread thread([this, node]() {changeNodeToState(node->name, NodeState::Finalized);});
     thread.detach();
+    if (node->waitRequiredAtShutdown) {
+      std::unique_lock<std::mutex> lock(nodesStateMutex);
+      goalStateCondition.wait(
+        lock, [this, node]() {
+          return nodesState.find(node->name)->second == NodeState::Finalized;
+        });
+      lock.unlock();
+    }
+
+    changeStateSubscriptions[node->name].reset();
   }
 
   changeStateClients.clear();
@@ -94,58 +122,80 @@ LifecycleCallbackReturn_t LifecycleManager::on_error(const rclcpp_lifecycle::Sta
   return LifecycleCallbackReturn_t::FAILURE;
 }
 
-void LifecycleManager::createChangeStateClients(std::vector<std::string> nodesList)
+void LifecycleManager::createChangeStateClients(std::vector<hal::lifecycle_manager::node> nodesList)
 {
   for (auto node : nodesList) {
     changeStateClients.emplace(
       std::make_pair(
-        node, this->create_client<lifecycle_msgs::srv::ChangeState>(node + "/change_state")));
+        node.name,
+        this->create_client<lifecycle_msgs::srv::ChangeState>(node.name + "/change_state")));
   }
 }
 
-void LifecycleManager::createChangeStateCallbacks(std::vector<std::string> nodesList)
+void LifecycleManager::createChangeStateCallbacks(
+  std::vector<hal::lifecycle_manager::node> nodesList)
 {
   for (auto node : nodesList) {
     ChangeStateCallback_t callback =
       [this, node](lifecycle_msgs::msg::TransitionEvent::ConstSharedPtr message) {
-        std::lock_guard<std::mutex> guard(nodesStateMutex);
         auto state = message->goal_state.label;
         if (state == "unconfigured" || state == "inactive" ||
           state == "active" || state == "finalized")
         {
-          nodesState[node] = getEnumFromString(state);
+          {
+            std::lock_guard<std::mutex> guard(nodesStateMutex);
+            nodesState[node.name] = getEnumFromString(state);
+          }
+          changeStateCondition.notify_all();
         }
       };
 
-    transitionCallbacks.emplace(std::make_pair(node, callback));
+    transitionCallbacks.emplace(std::make_pair(node.name, callback));
   }
 }
 
-void LifecycleManager::createChangeStateSubscriptions(std::vector<std::string> nodesList)
+void LifecycleManager::createChangeStateSubscriptions(
+  std::vector<hal::lifecycle_manager::node> nodesList)
 {
+  auto callback_group = create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+
+  rclcpp::SubscriptionOptions options;
+  options.callback_group = callback_group;
+
   for (auto node : nodesList) {
     changeStateSubscriptions.emplace(
       std::make_pair(
-        node,
+        node.name,
         this->create_subscription<lifecycle_msgs::msg::TransitionEvent>(
-          node + "/transition_event",
+          node.name + "/transition_event",
           10,
-          transitionCallbacks.find(node)->second)));
+          transitionCallbacks.find(node.name)->second,
+          options)));
   }
 }
 
-void LifecycleManager::initializeNodesState(std::vector<std::string> nodesList)
+void LifecycleManager::initializeNodesState(std::vector<hal::lifecycle_manager::node> nodesList)
 {
   for (auto node : nodesList) {
-    nodesState.emplace(std::make_pair(node, NodeState::Unconfigured));
-    expectedNodesState.emplace(std::make_pair(node, NodeState::Unconfigured));
+    nodesState.emplace(std::make_pair(node.name, NodeState::Unconfigured));
+    expectedNodesState.emplace(std::make_pair(node.name, NodeState::Unconfigured));
   }
 }
 
 void LifecycleManager::changeNodeToState(std::string node, NodeState goalState)
 {
-  auto currentState = nodesState.find(node)->second;
-  auto expectedState = expectedNodesState.find(node)->second;
+  NodeState currentState = NodeState::Unknown;
+  NodeState expectedState = NodeState::Unknown;
+  ChangeStatePtr clientPtr = nullptr;
+
+  {
+    std::lock_guard<std::mutex> guard(nodesStateMutex);
+    currentState = nodesState.find(node)->second;
+  }
+  {
+    std::lock_guard<std::mutex> guard(expectedNodesStateMutex);
+    expectedState = expectedNodesState.find(node)->second;
+  }
 
   if (goalState != currentState && currentState != NodeState::Finalized) {
     auto request = std::make_shared<lifecycle_msgs::srv::ChangeState::Request>();
@@ -167,7 +217,7 @@ void LifecycleManager::changeNodeToState(std::string node, NodeState goalState)
               break;
             default:
               RCLCPP_ERROR(get_logger(), "Node %s cannot reach requested state!", node.c_str());
-              break;
+              return;
           }
           break;
         case NodeState::Inactive:
@@ -186,7 +236,7 @@ void LifecycleManager::changeNodeToState(std::string node, NodeState goalState)
               break;
             default:
               RCLCPP_ERROR(get_logger(), "Node %s cannot reach requested state!", node.c_str());
-              break;
+              return;
           }
           break;
         case NodeState::Active:
@@ -202,36 +252,42 @@ void LifecycleManager::changeNodeToState(std::string node, NodeState goalState)
               break;
             default:
               RCLCPP_ERROR(get_logger(), "Node %s cannot reach requested state!", node.c_str());
-              break;
-          }
-          break;
-        case NodeState::Finalized:
-          switch (goalState) {
-            default:
-              RCLCPP_ERROR(get_logger(), "Node %s cannot reach requested state!", node.c_str());
-              break;
+              return;
           }
           break;
         default:
           RCLCPP_ERROR(get_logger(), "Node %s is in an unknown state!", node.c_str());
-          break;
+          return;
       }
+
+      expectedState = expectedNodesState.find(node)->second;
     }
 
     request->transition.id = transition;
-    auto result = changeStateClients.find(node)->second->async_send_request(request).future.share();
-    result.wait_for(5s);
+    {
+      std::lock_guard<std::mutex> guard(changeStateClientsMutex);
+      clientPtr = changeStateClients.find(node)->second;
+    }
+    auto resultFuture = clientPtr->async_send_request(request);
 
-    if (nodesState.find(node)->second != expectedNodesState.find(node)->second) {
-      RCLCPP_ERROR(get_logger(), "Node %s couldn't reach expected state!", node.c_str());
-    } else {
+    std::unique_lock<std::mutex> lock(changeStateClientsMutex);
+    changeStateCondition.wait(
+      lock, [this, node, expectedState]() {
+        return nodesState.find(node)->second == expectedState;
+      });
+    lock.unlock();
+
+    if (expectedState != goalState) {
       changeNodeToState(node, goalState);
+    } else {
+      goalStateCondition.notify_all();
     }
   }
 }
 
 NodeState LifecycleManager::getEnumFromString(std::string state)
 {
+  std::lock_guard<std::mutex> guard(nodeStatesEnumMutex);
   return nodeStatesEnum.find(state)->second;
 }
 

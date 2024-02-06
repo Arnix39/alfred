@@ -19,8 +19,8 @@
 #include <string>
 #include <vector>
 #include <mutex>
-#include <chrono>
 #include <thread>
+#include <condition_variable>
 
 #include "lifecycle_msgs/srv/change_state.hpp"
 #include "lifecycle_msgs/msg/transition_event.hpp"
@@ -48,7 +48,15 @@ enum NodeState
   Active,
   ShuttingDown,
   Finalized,
-  ErrorProcessing
+  ErrorProcessing,
+  Unknown
+};
+
+struct node
+{
+  std::string name;
+  bool waitRequiredAtStartup;
+  bool waitRequiredAtShutdown;
 };
 
 class LifecycleManager : public rclcpp_lifecycle::LifecycleNode
@@ -64,25 +72,29 @@ public:
   LifecycleCallbackReturn_t on_shutdown(const rclcpp_lifecycle::State & previous_state);
   LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
 
-  void createChangeStateClients(std::vector<std::string> nodeList);
-  void createChangeStateCallbacks(std::vector<std::string> nodeList);
-  void createChangeStateSubscriptions(std::vector<std::string> nodeList);
-  void initializeNodesState(std::vector<std::string> nodeList);
+  void createChangeStateClients(std::vector<hal::lifecycle_manager::node> nodeList);
+  void createChangeStateCallbacks(std::vector<hal::lifecycle_manager::node> nodeList);
+  void createChangeStateSubscriptions(std::vector<hal::lifecycle_manager::node> nodeList);
+  void initializeNodesState(std::vector<hal::lifecycle_manager::node> nodeList);
   void changeNodeToState(std::string node, NodeState goalState);
   NodeState getEnumFromString(std::string state);
 
 private:
   std::mutex nodesStateMutex;
   std::mutex expectedNodesStateMutex;
-  const std::vector<std::string> nodesList{
-    "hal_pigpio",
-    "hal_proxsens",
-    "hal_imuI2cInit",
-    "hal_imuDmpWritingServer",
-    "hal_imu",
-    "hal_motor_control",
-    "hal_pose_manager",
-    "hal_camera"
+  std::mutex changeStateClientsMutex;
+  std::mutex nodeStatesEnumMutex;
+  std::condition_variable changeStateCondition;
+  std::condition_variable goalStateCondition;
+  const std::vector<hal::lifecycle_manager::node> nodesList{
+    {"hal_pigpio", true, true},
+    {"hal_proxsens", false, true},
+    {"hal_motor_control", false, true},
+    {"hal_imuI2cInit", true, false},
+    {"hal_imuDmpWritingServer", true, false},
+    {"hal_imu", true, true},
+    {"hal_pose_manager", false, true},
+    {"hal_camera", false, false}
   };
   const std::map<std::string, NodeState> nodeStatesEnum{
     {"unconfigured", NodeState::Unconfigured},

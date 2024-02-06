@@ -39,7 +39,8 @@ steps:
 - name: Upload Alfred's build logs
   image: plugins/artifactory
   settings:
-    url: http://192.168.1.252/artifactory
+    url:
+      from_secret: ARTIFACTORY_PATH
     username:
       from_secret: ARTIFACTORY_USERNAME
     password:
@@ -86,7 +87,8 @@ steps:
 - name: Upload Alfred's tests logs
   image: plugins/artifactory
   settings:
-    url: http://192.168.1.252/artifactory
+    url:
+      from_secret: ARTIFACTORY_PATH
     username:
       from_secret: ARTIFACTORY_USERNAME
     password:
@@ -201,7 +203,8 @@ steps:
 - name: Upload Alfred's build logs
   image: plugins/artifactory
   settings:
-    url: http://192.168.1.252/artifactory
+    url:
+      from_secret: ARTIFACTORY_PATH
     username:
       from_secret: ARTIFACTORY_USERNAME
     password:
@@ -227,7 +230,8 @@ steps:
 - name: Upload Alfred's binaries
   image: plugins/artifactory
   settings:
-    url: http://192.168.1.252/artifactory
+    url:
+      from_secret: ARTIFACTORY_PATH
     username:
       from_secret: ARTIFACTORY_USERNAME
     password:
@@ -249,7 +253,8 @@ steps:
 - name: Upload remote's binaries
   image: plugins/artifactory
   settings:
-    url: http://192.168.1.252/artifactory
+    url:
+      from_secret: ARTIFACTORY_PATH
     username:
       from_secret: ARTIFACTORY_USERNAME
     password:
@@ -357,7 +362,8 @@ steps:
 - name: Upload Alfred's build logs
   image: plugins/artifactory
   settings:
-    url: http://192.168.1.252/artifactory
+    url:
+      from_secret: ARTIFACTORY_PATH
     username:
       from_secret: ARTIFACTORY_USERNAME
     password:
@@ -383,7 +389,8 @@ steps:
 - name: Upload Alfred's binaries
   image: plugins/artifactory
   settings:
-    url: http://192.168.1.252/artifactory
+    url:
+      from_secret: ARTIFACTORY_PATH
     username:
       from_secret: ARTIFACTORY_USERNAME
     password:
@@ -405,7 +412,8 @@ steps:
 - name: Upload remote's binaries
   image: plugins/artifactory
   settings:
-    url: http://192.168.1.252/artifactory
+    url:
+      from_secret: ARTIFACTORY_PATH
     username:
       from_secret: ARTIFACTORY_USERNAME
     password:

@@ -4,7 +4,14 @@ project(hal_lifecycle_manager)
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
+find_package(rclcpp_components REQUIRED)
 find_package(common_utils REQUIRED)
+find_package(hal_camera REQUIRED)
+find_package(hal_imu REQUIRED)
+find_package(hal_motor_control REQUIRED)
+find_package(hal_pigpio REQUIRED)
+find_package(hal_pose_manager REQUIRED)
+find_package(hal_proxsens REQUIRED)
 
 ###########
 ## Build ##
@@ -15,7 +22,13 @@ include_directories(
 set(dependencies
   rclcpp
   rclcpp_lifecycle
-  common_utils)
+  common_utils
+  hal_pigpio
+  hal_camera
+  hal_imu
+  hal_motor_control
+  hal_pose_manager
+  hal_proxsens)
 
 add_library(${PROJECT_NAME} OBJECT
   src/hal_lifecycle_manager.cpp)
