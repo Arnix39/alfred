@@ -23,7 +23,7 @@ set(dependencies
   std_msgs
   common_utils)
 
-add_library(${PROJECT_NAME} OBJECT src/hal_proxsens.cpp)
+add_library(${PROJECT_NAME} SHARED src/hal_proxsens.cpp)
 ament_target_dependencies(${PROJECT_NAME} ${dependencies})
 
 add_executable(${PROJECT_NAME}_node
@@ -51,5 +51,21 @@ install(
   TARGETS ${PROJECT_NAME}_node
   DESTINATION lib/${PROJECT_NAME}
 )
+
+install(
+  DIRECTORY include/
+  DESTINATION include)
+
+install(TARGETS
+  ${PROJECT_NAME}
+  EXPORT ${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include)
+
+ament_export_dependencies(${dependencies})
+
+ament_export_targets(${PROJECT_NAME} HAS_LIBRARY_TARGET)
 
 ament_package()

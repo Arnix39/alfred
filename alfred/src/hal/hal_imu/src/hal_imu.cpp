@@ -83,6 +83,7 @@ LifecycleCallbackReturn_t Imu::on_deactivate(const rclcpp_lifecycle::State & pre
 LifecycleCallbackReturn_t Imu::on_cleanup(const rclcpp_lifecycle::State & previous_state)
 {
   imuDataPublisher.reset();
+  imuSubscriber.reset();
 
   RCLCPP_INFO(get_logger(), "Node unconfigured!");
 
@@ -92,6 +93,7 @@ LifecycleCallbackReturn_t Imu::on_cleanup(const rclcpp_lifecycle::State & previo
 LifecycleCallbackReturn_t Imu::on_shutdown(const rclcpp_lifecycle::State & previous_state)
 {
   imuDataPublisher.reset();
+  imuSubscriber.reset();
   stopImuReading();
 
   RCLCPP_INFO(get_logger(), "Node shutdown!");

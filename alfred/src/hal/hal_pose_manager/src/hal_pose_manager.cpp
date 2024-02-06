@@ -73,6 +73,8 @@ LifecycleCallbackReturn_t HalPoseManager::on_cleanup(const rclcpp_lifecycle::Sta
 {
   odometryPublisher.reset();
   wheelsVelocityCmdPublisher.reset();
+  twistSubscriber.reset();
+  motorsECSubscriber.reset();
 
   RCLCPP_INFO(get_logger(), "Node unconfigured!");
 
@@ -84,6 +86,8 @@ LifecycleCallbackReturn_t HalPoseManager::on_shutdown(
 {
   odometryPublisher.reset();
   wheelsVelocityCmdPublisher.reset();
+  twistSubscriber.reset();
+  motorsECSubscriber.reset();
 
   RCLCPP_INFO(get_logger(), "Node shutdown!");
 

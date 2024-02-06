@@ -26,7 +26,7 @@ set(dependencies
   common_utils
   pigpio)
 
-add_library(${PROJECT_NAME} OBJECT
+add_library(${PROJECT_NAME} SHARED
   src/hal_pigpio.cpp
   src/hal_pigpioI2c.cpp
   src/hal_pigpioInit.cpp
@@ -90,5 +90,21 @@ install(
   TARGETS ${PROJECT_NAME}_node
   DESTINATION lib/${PROJECT_NAME}
 )
+
+install(
+  DIRECTORY include/
+  DESTINATION include)
+
+install(TARGETS
+  ${PROJECT_NAME}
+  EXPORT ${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include)
+
+ament_export_dependencies(${dependencies})
+
+ament_export_targets(${PROJECT_NAME} HAS_LIBRARY_TARGET)
 
 ament_package()

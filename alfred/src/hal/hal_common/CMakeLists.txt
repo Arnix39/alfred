@@ -56,7 +56,7 @@ install(
 if(BUILD_TESTING)
   install(
     TARGETS ${PROJECT_NAME}_mock
-    EXPORT ${PROJECT_NAME}_lib
+    EXPORT ${PROJECT_NAME}
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     RUNTIME DESTINATION bin
@@ -64,13 +64,13 @@ if(BUILD_TESTING)
 else()
   install(
     TARGETS ${PROJECT_NAME}
-    EXPORT ${PROJECT_NAME}_lib
+    EXPORT ${PROJECT_NAME}
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     RUNTIME DESTINATION bin
     INCLUDES DESTINATION include)
 endif()
 
-ament_export_targets(${PROJECT_NAME}_lib HAS_LIBRARY_TARGET)
+ament_export_targets(${PROJECT_NAME} HAS_LIBRARY_TARGET)
 
 ament_package()

@@ -17,6 +17,7 @@
   <depend>sensor_msgs</depend>
   <depend>std_msgs</depend>
   <depend>libopencv-dev</depend>
+  <depend>rclcpp_components</depend>
 
   <build_depend>rclcpp_lifecycle</build_depend>
   <exec_depend>rclcpp_lifecycle</exec_depend>

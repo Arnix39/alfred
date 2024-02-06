@@ -25,13 +25,17 @@ set(dependencies
   hal_common
   common_utils)
 
-add_library(${PROJECT_NAME} OBJECT src/hal_imu.cpp)
+set(test_dependencies
+  pigpio
+)
+
+add_library(${PROJECT_NAME} SHARED src/hal_imu.cpp)
 ament_target_dependencies(${PROJECT_NAME} ${dependencies})
 
-add_library(${PROJECT_NAME}I2cInit OBJECT src/hal_imuI2cInit.cpp)
+add_library(${PROJECT_NAME}I2cInit SHARED src/hal_imuI2cInit.cpp)
 ament_target_dependencies(${PROJECT_NAME}I2cInit ${dependencies})
 
-add_library(${PROJECT_NAME}DmpWritingServer OBJECT src/hal_imuDmpWritingServer.cpp)
+add_library(${PROJECT_NAME}DmpWritingServer SHARED src/hal_imuDmpWritingServer.cpp)
 ament_target_dependencies(${PROJECT_NAME}DmpWritingServer ${dependencies})
 
 add_executable(${PROJECT_NAME}_node
@@ -63,7 +67,7 @@ if(BUILD_TESTING)
   target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})
 
   ament_add_gtest(${PROJECT_NAME}I2cInit_test test/test_hal_imuI2cInit.cpp)
-  ament_target_dependencies(${PROJECT_NAME}I2cInit_test ${dependencies} pigpio)
+  ament_target_dependencies(${PROJECT_NAME}I2cInit_test ${dependencies} ${test_dependencies})
   target_link_libraries(${PROJECT_NAME}I2cInit_test ${PROJECT_NAME}I2cInit)
 
   ament_add_gtest(${PROJECT_NAME}DmpWritingServer_test test/test_hal_imuDmpWritingServer.cpp)
@@ -80,5 +84,26 @@ install(TARGETS
   ${PROJECT_NAME}I2cInit_node
   DESTINATION lib/${PROJECT_NAME}
 )
+
+install(
+  DIRECTORY include/
+  DESTINATION include)
+
+install(TARGETS
+  ${PROJECT_NAME}
+  ${PROJECT_NAME}DmpWritingServer
+  ${PROJECT_NAME}I2cInit
+  EXPORT ${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include)
+
+ament_export_dependencies(${dependencies})
+if(BUILD_TESTING)
+  ament_export_dependencies(${test_dependencies})
+endif()
+
+ament_export_targets(${PROJECT_NAME} HAS_LIBRARY_TARGET)
 
 ament_package()
