@@ -49,14 +49,14 @@ void MotorControlCheckerNode::encoderCountCallback(const HalMotorControlEncoders
   encoderCounts.at(1) = msg.motor_right_encoder_count;
 }
 
-TEST_F(MotorControlTest, configureMotor)
+TEST_F(MotorControlTest, configureMotors)
 {
-  std::function<void()> configureMotor = std::bind(
-    &MotorControl::configureMotor, motorControl);
+  std::function<void()> configureMotors = std::bind(
+    &MotorControl::configureMotors, motorControl);
 
   auto future = std::async(
     std::launch::async,
-    configureMotor);
+    configureMotors);
 
   auto status = executor.spin_until_future_complete(future);
 
@@ -84,12 +84,12 @@ TEST_F(MotorControlTest, configureMotor)
 
 TEST_F(MotorControlTest, setPwmLeftForward)
 {
-  std::function<void()> configureMotor = std::bind(
-    &MotorControl::configureMotor, motorControl);
+  std::function<void()> configureMotors = std::bind(
+    &MotorControl::configureMotors, motorControl);
 
   auto future = std::async(
     std::launch::async,
-    configureMotor);
+    configureMotors);
 
   auto status = executor.spin_until_future_complete(future);
 
@@ -108,12 +108,12 @@ TEST_F(MotorControlTest, setPwmLeftForward)
 
 TEST_F(MotorControlTest, setPwmLeftBackward)
 {
-  std::function<void()> configureMotor = std::bind(
-    &MotorControl::configureMotor, motorControl);
+  std::function<void()> configureMotors = std::bind(
+    &MotorControl::configureMotors, motorControl);
 
   auto future = std::async(
     std::launch::async,
-    configureMotor);
+    configureMotors);
 
   auto status = executor.spin_until_future_complete(future);
 
@@ -132,12 +132,12 @@ TEST_F(MotorControlTest, setPwmLeftBackward)
 
 TEST_F(MotorControlTest, setPwmRightForward)
 {
-  std::function<void()> configureMotor = std::bind(
-    &MotorControl::configureMotor, motorControl);
+  std::function<void()> configureMotors = std::bind(
+    &MotorControl::configureMotors, motorControl);
 
   auto future = std::async(
     std::launch::async,
-    configureMotor);
+    configureMotors);
 
   auto status = executor.spin_until_future_complete(future);
 
@@ -156,12 +156,12 @@ TEST_F(MotorControlTest, setPwmRightForward)
 
 TEST_F(MotorControlTest, setPwmRightBackward)
 {
-  std::function<void()> configureMotor = std::bind(
-    &MotorControl::configureMotor, motorControl);
+  std::function<void()> configureMotors = std::bind(
+    &MotorControl::configureMotors, motorControl);
 
   auto future = std::async(
     std::launch::async,
-    configureMotor);
+    configureMotors);
 
   auto status = executor.spin_until_future_complete(future);
 
@@ -180,12 +180,12 @@ TEST_F(MotorControlTest, setPwmRightBackward)
 
 TEST_F(MotorControlTest, wheelsVelocityCmdCallback)
 {
-  std::function<void()> configureMotor = std::bind(
-    &MotorControl::configureMotor, motorControl);
+  std::function<void()> configureMotors = std::bind(
+    &MotorControl::configureMotors, motorControl);
 
   auto future = std::async(
     std::launch::async,
-    configureMotor);
+    configureMotors);
 
   auto status = executor.spin_until_future_complete(future);
 

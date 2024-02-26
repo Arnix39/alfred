@@ -67,7 +67,7 @@ LifecycleCallbackReturn_t MotorControl::on_configure(const rclcpp_lifecycle::Sta
 LifecycleCallbackReturn_t MotorControl::on_activate(const rclcpp_lifecycle::State & previous_state)
 {
   activatePublisher();
-  configureMotor();
+  configureMotors();
 
   RCLCPP_INFO(get_logger(), "Node activated!");
 
@@ -114,7 +114,7 @@ void MotorControl::activatePublisher(void)
   motorControlPub->on_activate();
 }
 
-void MotorControl::configureMotor(void)
+void MotorControl::configureMotors(void)
 {
   motorLeft.configureGpios(
     setOutputModeSyncClient, setInputModeSyncClient, setEncoderCallbackSyncClient,

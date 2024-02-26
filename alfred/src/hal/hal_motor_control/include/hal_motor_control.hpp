@@ -63,7 +63,7 @@ public:
   LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
 
   void activatePublisher(void);
-  void configureMotor(void);
+  void configureMotors(void);
   void publishMessage(void);
   void pigpioEncoderCountCallback(const HalPigpioEncoderCountMsg_t & msg);
   void wheelsVelocityCmdCallback(const HalMotorControlCommandMsg_t & msg);
