@@ -2,7 +2,7 @@
 
 ## Overview
 
-This interface package is defining an action server (`HalImuWriteDmp`) to program the DMP (**D**igital **M**otion **P**rocessor) present on the IMU and a service (`HalImuGetHandle`) that responds with the IMU's I2C handle.
+This interface package defines an action server (`HalImuWriteDmp`) to program the DMP (**D**igital **M**otion **P**rocessor) present on the IMU and a service (`HalImuGetHandle`) that responds with the IMU's I2C handle.
 
 ## Interfaces
 

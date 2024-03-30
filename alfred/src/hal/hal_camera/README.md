@@ -2,7 +2,7 @@
 
 ## Overview
 
-This package contains the node (`hal_camera_node`) that is capturing and publishing images using the camera (`Raspberry Pi Camera V2`) at a 5Hz rate. 
+This package contains the node (`hal_camera_node`) that captures and publishes images using the camera (`Raspberry Pi Camera V2`) at a 5Hz rate. 
 
 ## Interfaces
 

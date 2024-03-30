@@ -2,11 +2,11 @@
 
 ## Overview
 
-This package is consisting of a node (`hal_pigpio_node`) that is abstracting the accesses to the GPIOS (including I2C and PWM) through the [Pigpio library](../../hw/pigpio/README.md) using services (the complete list of services is available [here](../hal_pigpio_interfaces/README.md)).
+This package consists of a node (`hal_pigpio_node`) that abstracts the accesses to the GPIOS (including I2C and PWM) through the [Pigpio library](../../hw/pigpio/README.md) using services (the complete list of services is available [here](../hal_pigpio_interfaces/README.md)).
 
-The node is publishing the level changes of digital inputs as configured by the calls to the `setCallback` service and the raw value of encoder counts for the motors at a 100Hz rate (this decision was made because of the amount of `HalPigpioEdgeChange` messages that would need to be transmitted otherwise).
+The node publishes the level changes of digital inputs as configured by the calls to the `setCallback` service and the raw value of encoder counts for the motors at a 100Hz rate (this decision was made because of the amount of `HalPigpioEdgeChange` messages that would need to be transmitted otherwise).
 
-`hal_pigpio_node` is also publishing the readings from the IMU (see [`here`](../hal_pigpio_interfaces/README.md) for more info.)
+`hal_pigpio_node` also publishes the readings from the IMU (see [`here`](../hal_pigpio_interfaces/README.md) for more info.)
 
 ## Interfaces
 

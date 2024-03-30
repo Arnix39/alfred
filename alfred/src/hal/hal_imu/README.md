@@ -3,9 +3,9 @@
 ## Overview
 
 This package contains 3 nodes related to the IMU (**I**nertial **M**easurement **U**nit), a MPU6050 from TDK InvenSense:
-- `hal_imuI2cInit_node`: This node is handling the opening and closing of the I2C communication with the IMU (using `HalPigpiogI2cOpen` and `HalPigpiogI2cClose` services). It also provides the I2C handle of the IMU through the `HalImuGetHandle` service.
-- `hal_imuDmpWritingServer_node`: This node is providing the implementation of an action server (`HalImuWriteDmp`) to program the DMP (**D**igital **M**otion **P**rocessor) present on the IMU (using the functions defined in `hal_common` package).
-- `hal_imu_node`: This node is configuring the IMU (including the DMP) and then publishing the IMU data at a 100Hz rate. 
+- `hal_imuI2cInit_node`: This node handles the opening and closing of the I2C communication with the IMU (using `HalPigpiogI2cOpen` and `HalPigpiogI2cClose` services). It also provides the I2C handle of the IMU through the `HalImuGetHandle` service.
+- `hal_imuDmpWritingServer_node`: This node provides the implementation of an action server (`HalImuWriteDmp`) to program the DMP (**D**igital **M**otion **P**rocessor) present on the IMU (using the functions defined in `hal_common` package).
+- `hal_imu_node`: This node configures the IMU (including the DMP) and then publishes the IMU data at a 100Hz rate. 
 
 NB: The readings from the IMU are actually performed and published by [`hal_pigpio_node`](../hal_pigpio/README.md) and `hal_imu_node` is only forwarding these messages (the latency introduced by multiple layers of ROS services calls is too high, this is anyway a design improvement point).
 
