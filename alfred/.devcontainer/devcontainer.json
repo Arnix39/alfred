@@ -13,12 +13,13 @@
   "customizations": {
       "vscode": {
           "extensions":[
-			"ms-vscode.cpptools",
-			"ms-vscode.cpptools-themes",
-			"twxs.cmake",
-			"donjayamanne.python-extension-pack",
-			"ms-iot.vscode-ros",
-			"vscode-icons-team.vscode-icons"
+            "ms-vscode.cpptools",
+            "ms-vscode.cpptools-themes",
+            "twxs.cmake",
+            "donjayamanne.python-extension-pack",
+            "ms-iot.vscode-ros",
+            "vscode-icons-team.vscode-icons",
+            "jebbs.plantuml"
 		]
       }
   },

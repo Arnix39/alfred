@@ -12,7 +12,7 @@ The motors' encoders values are published in a [`HalMotorControlEncoders`](../ha
 
 Velocity commands are received in a [`HalMotorControlCommand`](../hal_motor_control_interfaces/msg/HalMotorControlCommand.msg) message on `wheelsVelocityCmd`.
 
-Raw encoder count values are received [`HalPigpioEncoderCount`](../hal_pigpio_interfaces/msg/HalPigpioEncoderCount.msg) message on `hal_pigpioEncoderCount`.
+Raw encoder count values are received in a [`HalPigpioEncoderCount`](../hal_pigpio_interfaces/msg/HalPigpioEncoderCount.msg) message on `hal_pigpioEncoderCount`.
 
 ## Dependencies
 
