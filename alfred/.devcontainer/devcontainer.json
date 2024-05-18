@@ -1,15 +1,12 @@
 {
-  "name": "ROS 2 Development Container",
+  "name": "Alfred",
   "privileged": true,
   "remoteUser": "arnix",
   "build": {
-      "dockerfile": "Dockerfile",
-      "args": {
-          "USERNAME": "arnix"
-      }
+      "dockerfile": "Dockerfile"
   },
-  "workspaceFolder": "/home/workspace",
-  "workspaceMount": "source=${localWorkspaceFolder},target=/home/workspace,type=bind",
+  "workspaceFolder": "/home/arnix/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/home/arnix/workspace,type=bind",
   "customizations": {
       "vscode": {
           "extensions":[
@@ -36,5 +33,5 @@
       "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached",
       "source=/dev/dri,target=/dev/dri,type=bind,consistency=cached"
   ],
-  "postCreateCommand": "bash /home/workspace/.devcontainer/postCreate.bash"
+  "postCreateCommand": "bash /home/arnix/workspace/.devcontainer/postCreate.bash"
 }
