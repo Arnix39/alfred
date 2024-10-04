@@ -8,28 +8,25 @@ platform:
 
 steps:
 - name: Build Alfred
-  image: ros:humble-ros-base-jammy
+  image: ros:humble-ros-base-jammy@sha256:e2bf5d73089ecafac2f14de05e7cbc1b20ab7568185e2011cec508286dcc6b09
   commands:
     - cd alfred
-    - rm -fR sim/
+    - rm -fR src/sim/
     - . /opt/ros/$ROS_DISTRO/setup.sh
     - apt-get update 
     - rosdep install -y
       --from-paths src
       --ignore-src
-      --skip-keys "fastcdr \
-        rti-connext-dds-6.0.1 \
-        urdfdom_headers"
     - colcon build
       --symlink-install
       --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DSYNTHETIC_BUILD:BOOL=ON
       --no-warn-unused-cli
 
 - name: Archive Alfred's build logs
-  image: ros:humble-ros-base-jammy
+  image: alpine:latest
   commands:
-    - cd alfred
-    - find log/latest_build/ -printf "%P\n" | tar -czf build_logs.tar.gz --no-recursion -C log/latest_build/ -T -
+    - cd alfred/log/latest_build/
+    - find -type f -print | tar -czf build_logs.tar.gz --no-recursion -T -
   when:
     status:
     - failure
@@ -45,8 +42,8 @@ steps:
       from_secret: ARTIFACTORY_USERNAME
     password:
       from_secret: ARTIFACTORY_PASSWORD
-    source: alfred/build_logs.tar.gz
-    target: Alfred/logs/build/target/build_$${DRONE_BUILD_NUMBER}/logs.tar.gz
+    source: alfred/log/latest_build/build_logs.tar.gz
+    target: Alfred/logs/build/host/build_$${DRONE_BUILD_NUMBER}/logs.tar.gz
     flat: true
     insecure: true
   when:
@@ -56,27 +53,25 @@ steps:
     - Archive Alfred's build logs
 
 - name: Test Alfred
-  image: ros:humble-ros-base-jammy
+  image: ros:humble-ros-base-jammy@sha256:e2bf5d73089ecafac2f14de05e7cbc1b20ab7568185e2011cec508286dcc6b09
   commands:
     - cd alfred
+    - rm -fR src/sim/
     - . /opt/ros/$ROS_DISTRO/setup.sh
     - apt-get update 
     - rosdep install -y
       --from-paths src
       --ignore-src
-      --skip-keys "fastcdr \
-        rti-connext-dds-6.0.1 \
-        urdfdom_headers"
     - colcon test
     - colcon test-result
   depends_on:
     - Build Alfred
 
 - name: Archive Alfred's tests logs
-  image: ros:humble-ros-base-jammy
+  image: alpine:latest
   commands:
-    - cd alfred
-    - find log/latest_test/ -printf "%P\n" | tar -czf tests_logs.tar.gz --no-recursion -C log/latest_test/ -T -
+    - cd alfred/log/latest_test/
+    - find -type f -print | tar -czf tests_logs.tar.gz --no-recursion -T -
   when:
     status:
     - failure
@@ -93,7 +88,7 @@ steps:
       from_secret: ARTIFACTORY_USERNAME
     password:
       from_secret: ARTIFACTORY_PASSWORD
-    source: alfred/tests_logs.tar.gz
+    source: alfred/log/latest_test/tests_logs.tar.gz
     target: Alfred/logs/tests/build_$${DRONE_BUILD_NUMBER}/logs.tar.gz
     flat: true
     insecure: true
@@ -122,18 +117,119 @@ type: docker
 name: Target build
 platform:
   os: linux
-  arch: amd64
+  arch: arm64
 
 steps:
-- name: Build Alfred
-  image: docker:dind
-  volumes:
-  - name: dockersock
-    path: /var/run
+- name: Prepare sysroot
+  image: ros:humble-ros-base-jammy@sha256:b0b9bb05b0dceb08acc0e640c5b1c8a205da350369881d61b4ef42715ee42a63
   commands:
-    - sleep 5 # give docker enough time to start
-    - docker run --privileged --rm tonistiigi/binfmt --install arm64
-    - docker run --rm --platform linux/arm64 -v $pwd/..:/ros2_ws/src --name alfred_cross ros:humble-ros-base-jammy ./cross_compile.sh
+    - cd alfred
+    - rm -fR src/sim/
+    - . /opt/ros/$ROS_DISTRO/setup.sh
+    - apt-get update
+    - apt-get install -y symlinks
+    - rosdep install -y
+      --from-paths src
+      --ignore-src
+    - cd /
+    - symlinks -rc .
+    - mkdir -p $DRONE_WORKSPACE/alfred/cross_compile/sysroot
+    - cp -a lib usr opt etc $DRONE_WORKSPACE/alfred/cross_compile/sysroot
+
+- name: Build Alfred
+  image: ros:humble-ros-base-jammy@sha256:e2bf5d73089ecafac2f14de05e7cbc1b20ab7568185e2011cec508286dcc6b09
+  environment:
+    RMW_IMPLEMENTATION: rmw_fastrtps_cpp
+    TARGET_ARCH: aarch64
+    CROSS_COMPILE: /usr/bin/aarch64-linux-gnu-
+    PYTHON_SOABI: cpython-310-aarch64-linux-gnu
+    CC: /usr/bin/aarch64-linux-gnu-gcc
+    CXX: /usr/bin/aarch64-linux-gnu-g++
+
+  commands:
+    - export SYSROOT=$DRONE_WORKSPACE/alfred/cross_compile/sysroot
+    - export ROS2_INSTALL_PATH=$DRONE_WORKSPACE/alfred/install
+    - export CROSS_COMPILE_DIR=$DRONE_WORKSPACE/alfred/cross_compile
+    - cd alfred
+    - rm -fR sim/
+    - . /opt/ros/$ROS_DISTRO/setup.sh
+    - apt-get update
+    - apt-get install -y g++-aarch64-linux-gnu g++-arm-linux-gnueabihf
+    - rosdep install -y
+      --from-paths src
+      --ignore-src
+    # Quick and dirty fix => to be investigated further
+    - cp $SYSROOT/usr/lib/aarch64-linux-gnu/libpython3.10.so /usr/lib/aarch64-linux-gnu/libpython3.10.so
+    - colcon build
+      --cmake-args -DCMAKE_TOOLCHAIN_FILE=$CROSS_COMPILE_DIR/cmake-toolchains/generic_linux.cmake
+      --no-warn-unused-cli
+  depends_on:
+    - Prepare sysroot
+
+- name: Copy install files to host
+  image: alpine:latest
+  volumes:
+    - name: target_files
+      path: /tmp/target_files
+  commands:
+    - apk update && apk add rsync
+    - rsync -a --delete $DRONE_WORKSPACE/alfred/install/ /tmp/target_files/
+  depends_on:
+    - Build Alfred
+
+- name: Archive Alfred's build logs
+  image: alpine:latest
+  commands:
+    - cd alfred/log/latest_build/
+    - find -type f -print | tar -czf build_logs.tar.gz --no-recursion -T -
+  when:
+    status:
+    - failure
+  depends_on:
+    - Build Alfred
+
+- name: Upload Alfred's build logs
+  image: plugins/artifactory
+  settings:
+    url:
+      from_secret: ARTIFACTORY_PATH
+    username:
+      from_secret: ARTIFACTORY_USERNAME
+    password:
+      from_secret: ARTIFACTORY_PASSWORD
+    source: alfred/log/latest_build/build_logs.tar.gz
+    target: Alfred/logs/build/target/build_$${DRONE_BUILD_NUMBER}/logs.tar.gz
+    flat: true
+    insecure: true
+  when:
+    status:
+    - failure
+  depends_on:
+    - Archive Alfred's build logs
+
+- name: Archive Alfred's binaries
+  image: alpine:latest
+  commands:
+    - cd alfred/install/
+    - find -print | tar -czf install.tar.gz --no-recursion -T -
+  depends_on:
+    - Copy install files to host
+
+- name: Upload Alfred's binaries
+  image: plugins/artifactory
+  settings:
+    url:
+      from_secret: ARTIFACTORY_PATH
+    username:
+      from_secret: ARTIFACTORY_USERNAME
+    password:
+      from_secret: ARTIFACTORY_PASSWORD
+    source: alfred/install/install.tar.gz
+    target: Alfred/binaries/development/build_$${DRONE_BUILD_NUMBER}/install.tar.gz
+    flat: true
+    insecure: true
+  depends_on:
+    - Archive Alfred's binaries
 
 - name: Build remote
   image: rust:latest
@@ -155,24 +251,17 @@ steps:
     target: Alfred/binaries/development/build_$${DRONE_BUILD_NUMBER}/remote
     flat: true
     insecure: true
+  when:
+    status:
+    - failure
+    - success
   depends_on:
     - Build remote
 
-services:
-- name: docker
-  image: docker:dind
-  privileged: true
-  volumes:
-  - name: dockersock
-    path: /var/run
-
 volumes:
-- name: dockersock
-  temp: {}
-
-- name: sysroot
+- name: target_files
   host:
-    path: /usr/tmp/sysroot
+    path: /usr/tmp/install
 
 trigger:
   event:
@@ -188,46 +277,15 @@ platform:
   arch: amd64
 
 steps:
-- name: Build Alfred
-  image: ros:humble-ros-base-jammy
-  volumes:
-    - name: sysroot
-      path: /tmp/sysroot
-  environment:
-    RMW_IMPLEMENTATION: rmw_fastrtps_cpp
-    TARGET_ARCH: aarch64
-    SYSROOT: /tmp/sysroot
-    CROSS_COMPILE: /usr/bin/aarch64-linux-gnu-
-    PYTHON_SOABI: cpython-310-aarch64-linux-gnu
-    CC: /usr/bin/aarch64-linux-gnu-gcc
-    CXX: /usr/bin/aarch64-linux-gnu-g++
-
-  commands:
-    - export ROS2_INSTALL_PATH=$DRONE_WORKSPACE/alfred/install
-    - export CROSS_COMPILE_DIR=$DRONE_WORKSPACE/alfred/cross_compile
-    - cd alfred
-    - rm -fR sim/
-    - . /opt/ros/$ROS_DISTRO/setup.sh
-    - apt-get update
-    - apt-get install -y g++-aarch64-linux-gnu g++-arm-linux-gnueabihf
-    - rosdep install -y
-      --from-paths src
-      --ignore-src
-      --skip-keys "fastcdr \
-        rti-connext-dds-6.0.1 \
-        urdfdom_headers"
-    # Quick and dirty fix => to be investigated further
-    - cp $SYSROOT/usr/lib/aarch64-linux-gnu/libpython3.10.so /usr/lib/aarch64-linux-gnu/libpython3.10.so
-    - colcon build
-      --cmake-args -DCMAKE_TOOLCHAIN_FILE=$CROSS_COMPILE_DIR/cmake-toolchains/generic_linux.cmake
-      --no-warn-unused-cli
-
 - name: Deploy Alfred
   image: drillster/drone-rsync
+  volumes:
+    - name: target_files
+      path: /tmp/target_files
   settings:
-    hosts: [ "192.168.1.253" ]
+    hosts: [ "192.168.5.253" ]
     port: 22
-    source: alfred/install/
+    source: /tmp/target_files/
     target: ~/Alfred/
     user:
       from_secret: ALFRED_USERNAME
@@ -237,49 +295,23 @@ steps:
       -v
       --delete
       --copy-links
-  depends_on:
-    - Build Alfred
-
-- name: Archive Alfred's build logs
-  image: ros:humble-ros-base-jammy
-  commands:
-    - cd alfred
-    - find log/latest_build/ -printf "%P\n" | tar -czf build_logs.tar.gz --no-recursion -C log/latest_build/ -T -
-  when:
-    status:
-    - failure
-  depends_on:
-    - Build Alfred
-
-- name: Upload Alfred's build logs
-  image: plugins/artifactory
-  settings:
-    url:
-      from_secret: ARTIFACTORY_PATH
-    username:
-      from_secret: ARTIFACTORY_USERNAME
-    password:
-      from_secret: ARTIFACTORY_PASSWORD
-    source: alfred/build_logs.tar.gz
-    target: Alfred/logs/build/target/build_$${DRONE_BUILD_NUMBER}/build_logs.tar.gz
-    flat: true
-    insecure: true
-  when:
-    status:
-    - failure
-  depends_on:
-    - Archive Alfred's build logs
 
 - name: Archive Alfred's binaries
-  image: ros:humble-ros-base-jammy
+  image: alpine:latest
+  volumes:
+    - name: target_files
+      path: /tmp/target_files
   commands:
-    - cd alfred
-    - find install/ -printf "%P\n" | tar -czf install.tar.gz --no-recursion -C install/ -T -
+    - cd /tmp/target_files
+    - find -print | tar -czf install.tar.gz --no-recursion -T -
   depends_on:
-    - Build Alfred
+    - Deploy Alfred
 
 - name: Upload Alfred's binaries
   image: plugins/artifactory
+  volumes:
+    - name: target_files
+      path: /tmp/target_files
   settings:
     url:
       from_secret: ARTIFACTORY_PATH
@@ -287,7 +319,7 @@ steps:
       from_secret: ARTIFACTORY_USERNAME
     password:
       from_secret: ARTIFACTORY_PASSWORD
-    source: alfred/install.tar.gz
+    source: /tmp/target_files/install.tar.gz
     target: Alfred/binaries/deployment/build_$${DRONE_BUILD_NUMBER}/install.tar.gz
     flat: true
     insecure: true
@@ -314,13 +346,17 @@ steps:
     target: Alfred/binaries/deployment/build_$${DRONE_BUILD_NUMBER}/remote
     flat: true
     insecure: true
+  when:
+    status:
+    - failure
+    - success
   depends_on:
     - Build remote
 
 volumes:
-- name: sysroot
+- name: target_files
   host:
-    path: /usr/tmp/sysroot
+    path: /usr/tmp/install
 
 trigger:
   event:

@@ -1,15 +1,17 @@
-#!/bin/sh
+#!/bin/bash
+
+. /opt/ros/humble/setup.bash
 
 sudo apt-get update
 
-rosdep update
+cd /ros2_ws
 
-rosdep install -y \
+rosdep install -ry \
     --rosdistro humble \
     --from-paths src \
     --ignore-src
-       
-. /opt/ros/humble/setup.bash
-colcon build --symlink-install \
+
+colcon build --packages-skip-regex ros_gz \
+             --symlink-install \
              --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
              --no-warn-unused-cli
