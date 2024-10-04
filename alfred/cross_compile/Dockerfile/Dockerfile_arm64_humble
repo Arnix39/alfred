@@ -1,4 +1,4 @@
-FROM --platform=arm64 ros:humble-ros-base-jammy
+FROM ros:humble-ros-base-jammy
 
 COPY ./workspace/src /ros2_ws/src
 
