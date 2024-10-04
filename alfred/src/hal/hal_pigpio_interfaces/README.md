@@ -8,7 +8,7 @@ This interface package defines:
     - `HalPigpioEncoderCount` that contains all the motors' raw encoder count values.
 
 - The following services:
-    - **Initilisation**
+    - **Initialization**
     - `HalPigpioGetMode` that gets the mode of the given GPIO by calling [`get_mode`](https://abyz.me.uk/rpi/pigpio/pdif2.html#get_mode). Returns `true` and the mode if it succeeded, `false` and `PI_BAD_GPIO` otherwise.
     - `HalPigpioSetInputMode` that sets the mode of the given GPIO to input by calling [`set_mode`](https://abyz.me.uk/rpi/pigpio/pdif2.html#set_mode) with `PI_INPUT`. Returns `true` if it succeeded, `false` otherwise.
     - `HalPigpioSetOutputMode` that sets the mode of the given GPIO to output by calling [`set_mode`](https://abyz.me.uk/rpi/pigpio/pdif2.html#set_mode) with `PI_OUTPUT`. Returns `true` if it succeeded, `false` otherwise.
