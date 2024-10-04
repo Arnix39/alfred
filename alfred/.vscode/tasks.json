@@ -3,7 +3,7 @@
     "tasks": [
         {
             "label": "ROS2: Build workspace",
-            "detail": "Build workspace for host machine.",
+            "detail": "Build workspace.",
             "type": "shell",
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -11,10 +11,6 @@
             "command": "colcon",
             "args": [
                 "build",
-                "--build-base",
-                "build/host",
-                "--install-base",
-                "install/host",
                 "--packages-skip-regex",
                 "ros_gz",
                 "--symlink-install",
@@ -39,10 +35,6 @@
             "command": "colcon",
             "args": [
                 "test",
-                "--build-base",
-                "build/host",
-                "--install-base",
-                "install/host",
                 "--packages-skip-regex",
                 "ros_gz"
             ],
@@ -59,9 +51,7 @@
             },
             "command": "colcon",
             "args": [
-                "test-result",
-                "--test-result-base",
-                "build/host"
+                "test-result"
             ],
             "group": {
                 "kind": "test"
@@ -122,8 +112,8 @@
             ]
         },
         {
-            "label": "Workspace: Clean host files",
-            "detail": "Clean workspace for host build files.",
+            "label": "Workspace: Clean build files",
+            "detail": "Clean workspace's build files.",
             "type": "shell",
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -131,86 +121,12 @@
             "command": "colcon",
             "args": [
                 "build",
-                "--build-base",
-                "build/host",
-                "--install-base",
-                "install/host",
                 "--packages-skip-regex",
                 "ros_gz",
                 "--cmake-target",
                 "clean"
             ],
             "problemMatcher": "$gcc"
-        },
-        {
-            "label": "Workspace: Generate sysroot for target",
-            "detail": "Generate sysroot for cross compilation for Raspberry Pi 3B+.",
-            "type": "shell",
-            "options": {
-                "cwd": "${workspaceFolder}/cross_compile"
-            },
-            "command": "${workspaceFolder}/cross_compile/generate_sysroot.sh",
-            "problemMatcher": []
-        },
-        {
-            "label": "ROS2: Build workspace for target",
-            "detail": "Build workspace for Raspberry Pi 3B+.",
-            "type": "shell",
-            "options": {
-                "cwd": "${workspaceFolder}",
-                "env": {
-                    "RMW_IMPLEMENTATION": "rmw_fastrtps_cpp",
-                    "TARGET_ARCH": "aarch64",
-                    "CROSS_COMPILE": "/usr/bin/aarch64-linux-gnu-",
-                    "SYSROOT": "${workspaceFolder}/cross_compile/sysroot",
-                    "ROS2_INSTALL_PATH": "${workspaceFolder}/install/target",
-                    "PYTHON_SOABI": "cpython-310-aarch64-linux-gnu",
-                    "CC": "/usr/bin/aarch64-linux-gnu-gcc",
-                    "CXX": "/usr/bin/aarch64-linux-gnu-g++",
-                    "CROSS_COMPILE_DIR": "${workspaceFolder}/cross_compile"
-                }
-            },
-            "command": "colcon",
-            "args": [
-                "build",
-                "--build-base",
-                "build/target",
-                "--install-base",
-                "install/target",
-                "--packages-skip-regex",
-                "ros_gz",
-                "--symlink-install",
-                "--cmake-args",
-                "-DCMAKE_TOOLCHAIN_FILE=${CROSS_COMPILE_DIR}/cmake-toolchains/generic_linux.cmake",
-                "--no-warn-unused-cli"
-            ],
-            "group": {
-                "kind": "build"
-            },
-            "problemMatcher": "$gcc"
-        },
-        {
-            "label": "ROS2: Install on target",
-            "detail": "Install application on Raspberry Pi 3B+.",
-            "type": "shell",
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "dependsOn": [
-                "ROS2: Build workspace for target"
-            ],
-            "command": "rsync",
-            "args": [
-                "-a",
-                "--info=progress2",
-                "--delete",
-                "--copy-links",
-                "${workspaceFolder}/install/target/",
-                "arnix@alfred:/home/arnix/Alfred/"
-            ],
-            "group": {
-                "kind": "build"
-            }
         },
         {
             "label": "ROS2: Copy src on target",
@@ -234,37 +150,6 @@
             }
         },
         {
-            "label": "Workspace: Clean target files",
-            "detail": "Clean workspace for target build files.",
-            "type": "shell",
-            "options": {
-                "cwd": "${workspaceFolder}",
-                "env": {
-                    "TARGET_ARCH": "aarch64",
-                    "CROSS_COMPILE": "/usr/bin/aarch64-linux-gnu-",
-                    "SYSROOT": "${workspaceFolder}/cross_compile/sysroot/",
-                    "ROS2_INSTALL_PATH": "${workspaceFolder}/install/target",
-                    "PYTHON_SOABI": "cpython-310-aarch64-linux-gnu",
-                    "CC": "/usr/bin/aarch64-linux-gnu-gcc",
-                    "CXX": "/usr/bin/aarch64-linux-gnu-g++",
-                    "CROSS_COMPILE_DIR": "${workspaceFolder}/cross_compile"
-                }
-            },
-            "command": "colcon",
-            "args": [
-                "build",
-                "--build-base",
-                "build/target",
-                "--install-base",
-                "install/target",
-                "--packages-skip-regex",
-                "ros_gz",
-                "--cmake-target",
-                "clean"
-            ],
-            "problemMatcher": "$gcc"
-        },
-        {
             "label": "ROS2: Gazebo bridge",
             "detail": "Build ros_gz package.",
             "type": "shell",
@@ -277,10 +162,6 @@
             "command": "colcon",
             "args": [
                 "build",
-                "--build-base",
-                "build/host",
-                "--install-base",
-                "install/host",
                 "--packages-up-to",
                 "ros_gz",
                 "--symlink-install"
@@ -295,10 +176,10 @@
             "label": "Workspace: Purge",
             "detail": "Purge workspace by deleting all generated files.",
             "type": "shell",
-            "command": "rm",
             "options": {
                 "cwd": "${workspaceFolder}"
             },
+            "command": "rm",
             "args": [
                 "-fr",
                 "build",
