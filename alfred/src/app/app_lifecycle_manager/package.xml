@@ -7,10 +7,12 @@
 
   <!-- Maintainer and license information -->
   <maintainer email="arnaud.hote@gmail.com">Arnix</maintainer>
-  <license>Apache2.0</license>
+  <license>Apache2</license>
 
   <!-- Dependencies -->
   <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>ros2launch</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
