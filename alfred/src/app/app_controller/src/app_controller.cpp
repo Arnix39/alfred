@@ -31,6 +31,10 @@ LifecycleCallbackReturn_t Controller::on_configure(
 {
   imuSubscriber = this->create_subscription<ImuDataMsg_t>(
     "imuData", 10, std::bind(&Controller::imuDataReader, this, _1));
+  odometrySubscriber = this->create_subscription<OdometryMsg_t>(
+    "cmd_velocity", 10, std::bind(&Controller::odometryReader, this, _1));
+
+  twistPublisher = this->create_publisher<TwistMsg_t>("cmd_velocity", 10);
 
   RCLCPP_INFO(get_logger(), "Node configured!");
 
@@ -40,6 +44,8 @@ LifecycleCallbackReturn_t Controller::on_configure(
 LifecycleCallbackReturn_t Controller::on_activate(
   const rclcpp_lifecycle::State & previous_state)
 {
+  twistPublisher->on_activate();
+
   RCLCPP_INFO(get_logger(), "Node activated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
@@ -48,6 +54,8 @@ LifecycleCallbackReturn_t Controller::on_activate(
 LifecycleCallbackReturn_t Controller::on_deactivate(
   const rclcpp_lifecycle::State & previous_state)
 {
+  twistPublisher->on_deactivate();
+
   RCLCPP_INFO(get_logger(), "Node deactivated!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
@@ -56,6 +64,10 @@ LifecycleCallbackReturn_t Controller::on_deactivate(
 LifecycleCallbackReturn_t Controller::on_cleanup(
   const rclcpp_lifecycle::State & previous_state)
 {
+  imuSubscriber.reset();
+  odometrySubscriber.reset();
+  twistPublisher.reset();
+
   RCLCPP_INFO(get_logger(), "Node unconfigured!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
@@ -64,6 +76,10 @@ LifecycleCallbackReturn_t Controller::on_cleanup(
 LifecycleCallbackReturn_t Controller::on_shutdown(
   const rclcpp_lifecycle::State & previous_state)
 {
+  imuSubscriber.reset();
+  odometrySubscriber.reset();
+  twistPublisher.reset();
+
   RCLCPP_INFO(get_logger(), "Node shutdown!");
 
   return LifecycleCallbackReturn_t::SUCCESS;
@@ -76,6 +92,10 @@ LifecycleCallbackReturn_t Controller::on_error(
 }
 
 void Controller::imuDataReader(const ImuDataMsg_t & msg)
+{
+}
+
+void Controller::odometryReader(const OdometryMsg_t & msg)
 {
 }
 
