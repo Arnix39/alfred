@@ -26,9 +26,7 @@ Pigpio::Pigpio()
 : rclcpp_lifecycle::LifecycleNode{"hal_pigpio_node"},
   pigpioHandle{PI_NO_HANDLE},
   i2cHandle{PI_NO_HANDLE},
-  quaternions_{0.0, 0.0, 0.0, 0.0},
-  angularVelocity_{0.0, 0.0, 0.0},
-  linearAcceleration_{0.0, 0.0, 0.0},
+  quaternion_{0.0, 0.0, 0.0, 0.0},
   isImuReady{false},
   callbackList{},
   motors{}
@@ -135,9 +133,7 @@ LifecycleCallbackReturn_t Pigpio::on_deactivate(const rclcpp_lifecycle::State & 
   imuPublisher->on_deactivate();
 
   isImuReady = false;
-  quaternions_ = {0.0, 0.0, 0.0, 0.0};
-  angularVelocity_ = {0.0, 0.0, 0.0};
-  linearAcceleration_ = {0.0, 0.0, 0.0};
+  quaternion_ = {0.0, 0.0, 0.0, 0.0};
 
   i2cHandle = PI_NO_HANDLE;
 

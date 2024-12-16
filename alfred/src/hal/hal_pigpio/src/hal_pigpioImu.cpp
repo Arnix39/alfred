@@ -107,75 +107,32 @@ void Pigpio::readQuaternionData(void)
 
 void Pigpio::computeQuaternion(char (& data)[MPU6050_DMP_FIFO_QUAT_SIZE])
 {
-  quaternions_.w =
+  quaternion_.w =
     static_cast<double>((static_cast<int32_t>(data[0]) <<
     24) |
     (static_cast<int32_t>(data[1]) <<
     16) | (static_cast<int32_t>(data[2]) << 8) | data[3]) / MPU6050_QUATERNION_SCALE;
-  quaternions_.x =
+  quaternion_.x =
     static_cast<double>((static_cast<int32_t>(data[4]) <<
     24) |
     (static_cast<int32_t>(data[5]) <<
     16) | (static_cast<int32_t>(data[6]) << 8) | data[7]) / MPU6050_QUATERNION_SCALE;
-  quaternions_.y =
+  quaternion_.y =
     static_cast<double>((static_cast<int32_t>(data[8]) <<
     24) |
     (static_cast<int32_t>(data[9]) <<
     16) | (static_cast<int32_t>(data[10]) << 8) | data[11]) / MPU6050_QUATERNION_SCALE;
-  quaternions_.z =
+  quaternion_.z =
     static_cast<double>((static_cast<int32_t>(data[12]) <<
     24) |
     (static_cast<int32_t>(data[13]) <<
     16) | (static_cast<int32_t>(data[14]) << 8) | data[15]) / MPU6050_QUATERNION_SCALE;
 }
 
-void Pigpio::readAccelerometerData()
-{
-  char accelerometerData[MPU6050_DATA_SIZE];
-
-  if (i2c_read_i2c_block_data(
-      pigpioHandle, i2cHandle, MPU6050_ACCELEROMETER_X_OUT_MSB_REGISTER, accelerometerData,
-      MPU6050_DATA_SIZE) == MPU6050_DATA_SIZE)
-  {
-    linearAcceleration_ = computeImuData(accelerometerData);
-  } else {
-    RCLCPP_ERROR(get_logger(), "Failed to read accelerometer data!");
-    return;
-  }
-}
-
-void Pigpio::readGyroscopeData()
-{
-  char gyroscopeData[MPU6050_DATA_SIZE];
-
-  if (i2c_read_i2c_block_data(
-      pigpioHandle, i2cHandle, MPU6050_GYROSCOPE_X_OUT_MSB_REGISTER, gyroscopeData,
-      MPU6050_DATA_SIZE) == MPU6050_DATA_SIZE)
-  {
-    angularVelocity_ = computeImuData(gyroscopeData);
-  } else {
-    RCLCPP_ERROR(get_logger(), "Failed to read gyroscope data!");
-    return;
-  }
-}
-
-Vector3 Pigpio::computeImuData(char (& data)[MPU6050_DATA_SIZE])
-{
-  Vector3 values;
-
-  /* TODO(Arnix) review computation of raw data */
-
-  values.x = static_cast<uint16_t>((data[0] << 8) | data[1]);
-  values.y = static_cast<uint16_t>((data[2] << 8) | data[3]);
-  values.z = static_cast<uint16_t>((data[4] << 8) | data[5]);
-
-  return values;
-}
-
 void Pigpio::publishImuMessage()
 {
   auto message = HalPigpioImuMsg_t();
-  auto quaternions = QuaternionMsg_t();
+  auto quaternion = QuaternionMsg_t();
   auto angularVelocity = Vector3Msg_t();
   auto linearAcceleration = Vector3Msg_t();
   auto header = HeaderMsg_t();
@@ -186,24 +143,24 @@ void Pigpio::publishImuMessage()
 
   std::array<double, 9> covariance_zero = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
-  quaternions.x = quaternions_.x;
-  quaternions.y = quaternions_.y;
-  quaternions.z = quaternions_.z;
-  quaternions.z = quaternions_.z;
+  quaternion.x = quaternion_.x;
+  quaternion.y = quaternion_.y;
+  quaternion.z = quaternion_.z;
+  quaternion.w = quaternion_.w;
 
-  message.orientation = quaternions;
+  message.orientation = quaternion;
   message.orientation_covariance = covariance_zero;
 
-  angularVelocity.x = angularVelocity_.x;
-  angularVelocity.y = angularVelocity_.y;
-  angularVelocity.z = angularVelocity_.z;
+  angularVelocity.x = 0.0;  // No roll
+  angularVelocity.y = 0.0;  // TODO(arnix): Compute this value from the quaternion
+  angularVelocity.z = 0.0;  // No yaw in body referential
 
   message.angular_velocity = angularVelocity;
   message.angular_velocity_covariance = covariance_zero;
 
-  linearAcceleration.x = linearAcceleration_.x;
-  linearAcceleration.y = linearAcceleration_.y;
-  linearAcceleration.z = linearAcceleration_.z;
+  linearAcceleration.x = 0.0;  // TODO(arnix): Compute this value from the quaternion
+  linearAcceleration.y = 0.0;  // No lateral acceleration in body referential
+  linearAcceleration.z = 0.0;  // Vertical acceleration can be disregarded
 
   message.linear_acceleration = linearAcceleration;
   message.linear_acceleration_covariance = covariance_zero;
@@ -215,8 +172,6 @@ void Pigpio::readImuDataAndPublishMessage()
 {
   if (isImuReady) {
     readQuaternionData();
-    readAccelerometerData();
-    readGyroscopeData();
     publishImuMessage();
   }
 }

@@ -69,9 +69,7 @@ class Pigpio : public rclcpp_lifecycle::LifecycleNode
 private:
   int pigpioHandle;
   int32_t i2cHandle;
-  Quaternion quaternions_;
-  Vector3 angularVelocity_;
-  Vector3 linearAcceleration_;
+  Quaternion quaternion_;
   bool isImuReady;
   std::vector<uint> callbackList;
   std::vector<Motor> motors;
@@ -126,10 +124,7 @@ public:
   LifecycleCallbackReturn_t on_error(const rclcpp_lifecycle::State & previous_state);
 
   void readQuaternionData(void);
-  void readAccelerometerData(void);
-  void readGyroscopeData(void);
   void computeQuaternion(char (& data)[MPU6050_DMP_FIFO_QUAT_SIZE]);
-  Vector3 computeImuData(char (& data)[MPU6050_DATA_SIZE]);
   void publishImuMessage(void);
   void readImuDataAndPublishMessage(void);
   void resetFifo(void);
