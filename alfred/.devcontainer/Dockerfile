@@ -3,6 +3,8 @@ ARG USERNAME=arnix
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
+RUN chmod 1777 /tmp
+
 # Create the user and add it to sudoers
 RUN groupadd --gid $USER_GID $USERNAME \
     && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
@@ -14,6 +16,9 @@ RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y python3-pip
 RUN apt-get install -y g++-aarch64-linux-gnu g++-arm-linux-gnueabihf lcov
 ENV SHELL /bin/bash
+
+RUN chown root:root /usr/bin
+RUN chmod u+s /usr/bin/sudo
 
 # Set default user
 USER $USERNAME

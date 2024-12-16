@@ -3,7 +3,10 @@
   "privileged": true,
   "remoteUser": "arnix",
   "build": {
-      "dockerfile": "Dockerfile"
+      "dockerfile": "Dockerfile",
+      "args": {
+            "USERNAME": "arnix"
+      }
   },
   "workspaceFolder": "/home/arnix/workspace",
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/arnix/workspace,type=bind",
@@ -27,6 +30,8 @@
   },
   "runArgs": [
       "--net=host",
+      "--pid=host",
+      "--ipc=host",
       "-e", "DISPLAY=${env:DISPLAY}"
   ],
   "mounts": [
